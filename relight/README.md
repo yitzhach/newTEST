@@ -4,9 +4,13 @@ An isolated WebGL2 bench for the relighting engine described in `RELIGHT-BRIEF.m
 No build step: serve this directory and open `index.html`.
 
 ```
-python3 -m http.server 8080     # then open http://localhost:8080/relight/
-node relight/tools/validate.mjs # ground-truth check on the surface maths
+python3 -m http.server 8080      # then open http://localhost:8080/relight/
+node relight/tools/validate.mjs  # ground-truth check on the surface maths
+node relight/tools/smoke.mjs     # end-to-end browser check (needs playwright)
 ```
+
+Deploying it anywhere — Cloudflare Pages included — is covered in `DEPLOY.md`.
+There is no build step; it needs a static host and nothing else.
 
 Built per §8 #1 (standalone bench before touching shipping code) so that surface
 response can be judged before anything is wired into a host app.

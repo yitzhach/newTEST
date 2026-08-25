@@ -1,0 +1,10 @@
+# Cloudflare Pages headers.
+# The bench is iterated on often, so the entry point must never be served stale;
+# the modules are small enough that revalidating them costs nothing noticeable.
+/*
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+
+/src/*
+  Cache-Control: no-cache

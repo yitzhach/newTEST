@@ -129,16 +129,27 @@ async function setSource(src) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-  // Fit the canvas to the viewport without letting the backing store balloon.
-  const budget = Math.min(window.innerWidth * (window.innerWidth > 860 ? 0.62 : 0.96),
-                          window.innerHeight * 0.92);
-  const disp = Math.min(1, budget / Math.max(imgW, imgH));
   canvas.width = imgW; canvas.height = imgH;
-  canvas.style.width = `${Math.round(imgW * disp)}px`;
-  canvas.style.height = `${Math.round(imgH * disp)}px`;
+  fitCanvas();
 
   dirtySurface = true;
   render();
+}
+
+/**
+ * Size the canvas to the stage's real box rather than to the window. Guessing
+ * from viewport fractions is what let the canvas slide underneath the control
+ * panel on a phone, where the panel's height is not a fixed fraction.
+ */
+function fitCanvas() {
+  if (!imgW || !imgH) return;
+  const stage = $('stage');
+  const r = stage.getBoundingClientRect();
+  const availW = Math.max(80, r.width - 32);
+  const availH = Math.max(80, r.height - 32);
+  const disp = Math.min(availW / imgW, availH / imgH);
+  canvas.style.width = `${Math.round(imgW * disp)}px`;
+  canvas.style.height = `${Math.round(imgH * disp)}px`;
 }
 
 // ---------------------------------------------------------------- lights UI
@@ -402,17 +413,34 @@ function bind(id, key, surface) {
   });
 }
 
+/**
+ * Refuse to run rather than render quietly-wrong output. The height field is
+ * signed, so without float render targets it clamps to [0,1] and the relief goes
+ * wrong in a way that still looks like relief — the failure mode this whole tool
+ * is built to avoid.
+ */
+function checkCapabilities(caps) {
+  if (!caps.colorBufferFloat) {
+    throw new Error(
+      'This browser has WebGL2 but not EXT_color_buffer_float, which the surface '
+      + 'passes need for a signed height field. Without it the output would be '
+      + 'wrong in ways that still look plausible, so it is refused rather than '
+      + 'shown.\n\nTry a current Chrome, Edge, Firefox, or Safari 15+.',
+    );
+  }
+}
+
 async function boot() {
   try {
     glctx = createGL(canvas);
+    checkCapabilities(glctx.caps);
     gbuf = new GBuffer(glctx);
     shader = new Shader(glctx);
     photo = new Photometric(glctx);
   } catch (e) { return fail(e); }
 
   $('hint').textContent =
-    'Drag a light dot. Acceptance test: set Cone toward spot, drag one light across the '
-    + 'surface — brushstroke shadows must flip side as it crosses. Try View > Normals.';
+    'Drag the dot to move the light. Distance sets its height. Tap to dismiss.';
 
   ['reliefScale:reliefScale', 'azimuth:azimuthDeg', 'taps:integrateTaps',
    'reliefStrength:reliefStrength', 'chromaReject:chromaReject',
@@ -485,7 +513,13 @@ async function boot() {
     getFullSource: () => fullSource,
     caps: () => glctx.caps,
   };
-  window.addEventListener('resize', () => { if (srcTex) render(); });
+  const relayout = () => { fitCanvas(); if (srcTex) render(); };
+  window.addEventListener('resize', relayout);
+  window.addEventListener('orientationchange', () => setTimeout(relayout, 120));
+  // The panel can change height as sections show and hide, which changes the
+  // stage box; observing it is more reliable than guessing when that happens.
+  if (window.ResizeObserver) new ResizeObserver(() => fitCanvas()).observe($('stage'));
+  $('hint').addEventListener('click', () => $('hint').classList.add('gone'));
 }
 
 // ---------------------------------------------------------------- export
