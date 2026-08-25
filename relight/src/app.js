@@ -8,6 +8,7 @@ import { GBuffer } from './gbuffer.js';
 import { Shader, MAX_LIGHTS } from './shade.js';
 import { kelvinToLinearRGB, hexToLinearRGB, linearRGBToHex } from './kelvin.js';
 import { synthesizePainting } from './synth.js';
+import { exportFullRes, downloadCanvas, requiredMargin } from './export.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('gl');
@@ -15,13 +16,17 @@ const wrap = $('wrap');
 
 let glctx, gbuf, shader, srcTex = null, targets = null;
 let imgW = 0, imgH = 0;
+// The untouched source is kept so export can go back to native resolution;
+// the preview only ever sees a downscaled copy.
+let fullSource = null, fullW = 0, fullH = 0, previewScale = 1;
 let dirtySurface = true;
 
 const state = {
   reliefScale: 3, azimuthDeg: 141, integrateTaps: 8, reliefStrength: 12,
   chromaReject: 0.6, albedoSuppress: 0.7,
   reliefAmount: 1, heightScale: 0.006, roughness: 0.55, specular: 1,
-  shadow: 0.7, ao: 0.4, ambient: 0.12, exposure: 0,
+  shadow: 0.7, shadowSpread: 4, ao: 0.4, ambient: 0.12, exposure: 0,
+  shadowDist: 0.02, shadowDistPx: 12, exporting: false,
   ambientColor: [1, 1, 1],
   viewMode: 0,
   selected: 0,
@@ -87,12 +92,14 @@ async function setSource(src) {
   const { gl } = glctx;
   const w = src.width || src.naturalWidth;
   const h = src.height || src.naturalHeight;
+  fullSource = src; fullW = w; fullH = h;
 
   // Cap the working resolution. Relief lives at a few pixels, so there is no
   // point carrying a 100MP scan through an interactive loop — the export path is
   // where full resolution belongs.
   const MAX = 1400;
   const scale = Math.min(1, MAX / Math.max(w, h));
+  previewScale = scale;
   imgW = Math.round(w * scale);
   imgH = Math.round(h * scale);
 
@@ -276,9 +283,18 @@ function rebuildViews() {
 
 // ---------------------------------------------------------------- render
 
+function updateDerived(workingW) {
+  // Shadow reach is expressed in multiples of the relief scale rather than as a
+  // fraction of image width, so a brushstroke casts the same shadow whether the
+  // working image is 1400px or 14000px.
+  state.shadowDistPx = state.reliefScale * state.shadowSpread;
+  state.shadowDist = state.shadowDistPx / Math.max(1, workingW);
+}
+
 function render() {
   if (!srcTex) return;
   try {
+    updateDerived(imgW);
     if (dirtySurface) {
       targets = gbuf.build(srcTex, imgW, imgH, state);
       dirtySurface = false;
@@ -322,7 +338,7 @@ async function boot() {
    'albedoSuppress:albedoSuppress'].forEach((s) => {
     const [id, key] = s.split(':'); bind(id, key, true);
   });
-  ['reliefAmount', 'heightScale', 'roughness', 'specular', 'shadow', 'ao', 'ambient', 'exposure']
+  ['reliefAmount', 'heightScale', 'roughness', 'specular', 'shadow', 'shadowSpread', 'ao', 'ambient', 'exposure']
     .forEach((id) => bind(id, id, false));
 
   $('src').addEventListener('change', async () => {
@@ -342,11 +358,86 @@ async function boot() {
   rebuildTabs(); rebuildLightPanel(); rebuildViews(); rebuildHandles(); syncOutputs();
   await setSource(await loadSynthetic());
 
+  wireExport();
+
   // Test hook. The §8 #7 acceptance criterion — brushstroke shadows must invert
   // when the light crosses to the other side — is a claim about pixels, so it
   // should be checked against pixels rather than by eye.
-  window.__bench = { state, render, setSource, loadSynthetic, canvas, applyColor };
+  window.__bench = {
+    state, render, setSource, loadSynthetic, canvas, applyColor,
+    exportFullRes: (src, onP) => exportFullRes(glctx, gbuf, shader, src || fullSource, state, onP),
+    getFullSource: () => fullSource,
+    caps: () => glctx.caps,
+  };
   window.addEventListener('resize', () => { if (srcTex) render(); });
+}
+
+// ---------------------------------------------------------------- export
+
+function wireExport() {
+  const btn = $('exportBtn');
+  const status = $('exportStatus');
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+    if (!fullSource) return;
+    btn.disabled = true;
+    const fmt = $('exportFmt').value;
+    const scalePct = parseFloat($('exportScale').value) / 100;
+    const outW = Math.max(1, Math.round(fullW * scalePct));
+    const ratio = outW / imgW;
+
+    // Surface parameters are measured in pixels of the working image, so they
+    // have to be rescaled or the export shows different relief from the preview.
+    const saved = {
+      reliefScale: state.reliefScale,
+      integrateTaps: state.integrateTaps,
+      reliefStrength: state.reliefStrength,
+    };
+    state.reliefScale = saved.reliefScale * ratio;
+    state.integrateTaps = saved.integrateTaps * ratio;
+    // Gradients are taken per texel, so the slope-to-normal gain has to come
+    // down as texels get smaller, or the export reads far harsher than preview.
+    state.reliefStrength = saved.reliefStrength / ratio;
+
+    const clamped = [];
+    if (state.reliefScale > 16) { clamped.push(`blur ${state.reliefScale.toFixed(0)}px > 16px shader cap`); }
+    if (state.integrateTaps > 32) { clamped.push(`integration ${state.integrateTaps.toFixed(0)} > 32 tap cap`); }
+
+    let src = fullSource;
+    if (scalePct < 1) {
+      const c = document.createElement('canvas');
+      c.width = outW; c.height = Math.round(fullH * scalePct);
+      c.getContext('2d').drawImage(fullSource, 0, 0, c.width, c.height);
+      src = c;
+    }
+
+    try {
+      status.textContent = `margin ${requiredMargin(state)}px — starting…`;
+      const t0 = performance.now();
+      const canvas = await exportFullRes(glctx, gbuf, shader, src, state, (frac, i, n) => {
+        status.textContent = `tile ${i}/${n} — ${Math.round(frac * 100)}%`;
+      });
+      status.textContent = 'encoding…';
+      const bytes = await downloadCanvas(
+        canvas,
+        `relit-${canvas.width}x${canvas.height}.${fmt === 'image/png' ? 'png' : 'jpg'}`,
+        fmt,
+        fmt === 'image/jpeg' ? 0.95 : undefined,
+      );
+      const secs = ((performance.now() - t0) / 1000).toFixed(1);
+      status.textContent = `${canvas.width}x${canvas.height}, ${(bytes / 1e6).toFixed(1)}MB, ${secs}s`
+        + (clamped.length ? ` — clamped: ${clamped.join('; ')}` : '');
+    } catch (e) {
+      status.textContent = 'failed — see console';
+      fail(e);
+    } finally {
+      Object.assign(state, saved);
+      dirtySurface = true;
+      render();
+      btn.disabled = false;
+    }
+  });
 }
 
 boot();

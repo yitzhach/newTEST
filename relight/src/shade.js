@@ -27,6 +27,9 @@ uniform float uLightCone[${MAX_LIGHTS}];     // 0 = flood, 1 = tight spot
 uniform float uLightEnabled[${MAX_LIGHTS}];
 
 uniform float uAspect;
+uniform vec2  uUVOffset;   // where this tile sits in the full image
+uniform vec2  uUVScale;    // how much of the full image this tile covers
+uniform float uShadowDist; // march length, in whole-image UV units
 uniform float uAmbient;
 uniform vec3  uAmbientColor;
 uniform float uRoughness;
@@ -77,11 +80,11 @@ float shadowMarch(vec2 uv, vec3 L) {
   vec2 dir = dxy / lxy;
   float slope = L.z / lxy;                 // world height gained per unit travelled
   float h0 = sampleHeight(uv);
-  float maxDist = 0.04;                    // relief is shallow; a long march is wasted
+  float maxDist = uShadowDist;
   float occ = 0.0;
   for (int i = 1; i <= SHADOW_STEPS; i++) {
     float t = (float(i) / float(SHADOW_STEPS)) * maxDist;
-    vec2 suv = uv + dir * t / vec2(1.0, uAspect);
+    vec2 suv = uv + (dir * t / vec2(1.0, uAspect)) / uUVScale;
     if (suv.x < 0.0 || suv.x > 1.0 || suv.y < 0.0 || suv.y > 1.0) break;
     float rise = sampleHeight(suv) - h0;
     occ = max(occ, rise / t - slope);
@@ -114,7 +117,9 @@ void main() {
   // between "flat print" and "heavy impasto".
   vec3 N = normalize(mix(vec3(0.0, 0.0, 1.0), reliefN, uReliefAmount));
 
-  vec3 P = vec3(vUV.x, vUV.y * uAspect, 0.0);
+  // Position in whole-image space, so a light stays put as tiles change.
+  vec2 gUV = uUVOffset + vUV * uUVScale;
+  vec3 P = vec3(gUV.x, gUV.y * uAspect, 0.0);
   vec3 V = normalize(vec3(0.5, 0.5 * uAspect, 1.6) - P);
   float NoV = max(dot(N, V), 1e-4);
 
@@ -179,10 +184,14 @@ export class Shader {
     this.prog = program(glctx.gl, SHADE_FS, 'shade');
   }
 
-  draw(targets, state, aspect, viewW, viewH) {
+  /**
+   * @param tile  {ox,oy,sx,sy} placing this draw within the full image in UV
+   *              terms. Defaults to the whole image.
+   */
+  draw(targets, state, aspect, viewW, viewH, tile) {
     const { gl } = this.glctx;
     const p = this.prog;
-    bindTarget(gl, null);
+    if (!state.exporting) bindTarget(gl, null);
     gl.viewport(0, 0, viewW, viewH);
     gl.useProgram(p.program);
     bindTextures(gl, p, [
@@ -213,6 +222,13 @@ export class Shader {
     gl.uniform1fv(u.uLightCone, cone);
     gl.uniform1fv(u.uLightEnabled, on);
     gl.uniform1f(u.uAspect, aspect);
+    const t = tile || { ox: 0, oy: 0, sx: 1, sy: 1 };
+    gl.uniform2f(u.uUVOffset, t.ox, t.oy);
+    gl.uniform2f(u.uUVScale, t.sx, t.sy);
+    // Shadow length follows the relief scale, not the image size. A fixed
+    // fraction of image width would make shadows grow with resolution, so the
+    // preview and the full-res export would not match.
+    gl.uniform1f(u.uShadowDist, state.shadowDist);
     gl.uniform1f(u.uAmbient, state.ambient);
     gl.uniform3fv(u.uAmbientColor, new Float32Array(state.ambientColor));
     gl.uniform1f(u.uRoughness, state.roughness);

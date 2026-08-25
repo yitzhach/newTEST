@@ -110,6 +110,7 @@ the along-azimuth component.
 | Material | relief amount, depth, roughness, specular, cast shadow, occlusion, ambient, exposure |
 | Lights | N lights, drag on canvas for X/Y, Distance for Z, Kelvin or custom colour, Power, Cone |
 | View | relit / normals / height / albedo / original |
+| Export | format, scale, tiled full-resolution render with progress |
 
 Shading is Cook-Torrance GGX in linear light with height-correlated Smith
 visibility, inverse-square falloff, real spot cones, a horizon-march cast shadow
@@ -139,8 +140,14 @@ Because the height field is known, recovery can be scored rather than admired.
   along the wrong axis) rather than producing garbage.
 - Chroma reject helps only where pigment changes shift hue. Achromatic paint
   texture is indistinguishable from relief in a single image, by construction.
-- Working resolution is capped at 1400px. Tiled full-resolution export is not
-  built yet.
+- The preview works at up to 1400px. Export goes back to the native source and
+  renders in tiles, rescaling the pixel-domain surface settings so the export
+  matches what the preview showed. Very large ratios between preview and export
+  can push the blur past its 16px shader cap or the integration past 32 taps;
+  when that happens the status line says so rather than silently differing.
+- The synthetic source's canvas weave is coarse relative to the image, so it
+  reads more strongly than a real linen would. Defaults are tuned around it and
+  will want revisiting against real photographs.
 
 ## Status against the brief's phase skeleton
 
@@ -153,5 +160,15 @@ Because the height field is known, recovery can be scored rather than admired.
   occlusion).
 - **Phase 4 — Albedo recovery.** Partial: ratio-based base/detail split. Retinex
   not attempted.
-- **Phases 5–8.** Not started. Phase 5 in particular needs the host-app findings
-  recorded in the session notes before it can be planned honestly.
+- **Phase 5 — Host integration.** **Dropped.** The engine is a standalone tool,
+  not a feature inside the wall-preview app, so there is nothing to integrate
+  into. (For the record, had it gone ahead: the live stage there composites
+  through a ≤1100px JPEG data URL under a CSS `matrix3d` transform, which would
+  have destroyed exactly the fine detail this engine produces.)
+- **Phase 6 — Export.** Done. Tiled full-resolution render with an overlap
+  margin; a 56-tile render matches a single-tile render to 3.4e-6 on the channel
+  sum. PNG or JPEG, with a scale control.
+- **Phase 7 — Photometric stereo.** Not started, and promoted. Finding 2 makes
+  this the difference between half a surface and a whole one.
+- **Phase 8 — Tier 3 depth model.** Not started, and unnecessary for the stated
+  use case.
