@@ -34,6 +34,10 @@ export const MAX_SHOTS = 8;
 /**
  * Build the per-pixel solve as a precomputed matrix.
  *
+ * Note on shot count: three shots solve for a normal, four solve for a normal
+ * plus ambient — but neither leaves anything over to check the answer with. Add
+ * one more than the minimum and the residual becomes meaningful.
+ *
  * The normal equations depend only on the light directions, never on pixel
  * values, so the pseudo-inverse is computed once on the CPU and the shader is
  * left with a matrix-vector product: g = P·I, where column k of P scales the
@@ -80,7 +84,13 @@ export function buildSolver(lightDirs, { fitAmbient = false } = {}) {
 
   // Condition number of A, as a usable warning about a poorly spread rig.
   const cond = conditionEstimate(A, inv, cols);
-  return { ok: true, P, count: n, fitAmbient, cond };
+  // Degrees of freedom left over after the fit. This decides whether the capture
+  // can be checked at all: with dof = 0 the system is exactly determined, the
+  // model reproduces the data perfectly by construction, and the residual is
+  // identically zero however wrong the capture is. Four shots with the ambient
+  // term fitted is exactly that case — a solve with no way to validate itself.
+  const dof = n - cols;
+  return { ok: true, P, count: n, fitAmbient, cond, dof, unknowns: cols };
 }
 
 function invertSmall(A, n) {
@@ -190,6 +200,68 @@ void main() {
     gR += p.xyz * c.r; gG += p.xyz * c.g; gB += p.xyz * c.b;
   }
   outColor = vec4(vec3(length(gR), length(gG), length(gB)) * uAlbedoGain, 1.0);
+}`;
+
+// Residual: how well the Lambertian model actually fits the captured data.
+//
+// This is the diagnostic the synthetic tests get for free and a real capture
+// never does. With N shots and 3 unknowns the system is over-determined, so
+// re-projecting the solved g through each light direction and comparing against
+// what was photographed costs nothing and says plainly whether the capture can be
+// trusted. High residual means one of: frames not aligned, light directions
+// wrong, specular glints, or cast shadows breaking the Lambertian assumption.
+//
+// Everything else in this tool produces something plausible-looking whether or
+// not it is right. This is the one output that says which.
+const RESIDUAL_FS = `${HEAD}
+uniform highp sampler2DArray uShots;
+uniform vec4  uP[${MAX_SHOTS}];
+uniform vec3  uL[${MAX_SHOTS}];
+uniform int   uCount;
+uniform float uClamp;
+uniform int   uFitAmbient;
+
+void main() {
+  vec3 g = vec3(0.0);
+  float amb = 0.0;
+  float mean = 0.0;
+  for (int k = 0; k < ${MAX_SHOTS}; k++) {
+    if (k >= uCount) break;
+    vec3 c = min(srgbToLinear(texture(uShots, vec3(vUV, float(k))).rgb), vec3(uClamp));
+    float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
+    g += uP[k].xyz * lum;
+    amb += uP[k].w * lum;
+    mean += lum;
+  }
+  mean /= float(uCount);
+
+  float sse = 0.0;
+  for (int k = 0; k < ${MAX_SHOTS}; k++) {
+    if (k >= uCount) break;
+    vec3 c = min(srgbToLinear(texture(uShots, vec3(vUV, float(k))).rgb), vec3(uClamp));
+    float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
+    float pred = dot(g, uL[k]) + (uFitAmbient == 1 ? amb : 0.0);
+    float e = lum - pred;
+    sse += e * e;
+  }
+  float rms = sqrt(sse / float(uCount));
+  // Relative to local brightness: an absolute error means little on a dark
+  // passage and a lot on a bright one.
+  outColor = vec4(rms, rms / max(mean, 1e-3), mean, 1.0);
+}`;
+
+// False-colour the residual so a bad capture is obvious at a glance rather than
+// being a number the user has to interpret.
+const RESIDUAL_VIEW_FS = `${HEAD}
+uniform sampler2D uResidual;
+uniform float uScale;
+void main() {
+  float r = clamp(texture(uResidual, vUV).g * uScale, 0.0, 1.0);
+  // dark blue (good) -> green -> yellow -> red (bad)
+  vec3 c = r < 0.5
+    ? mix(vec3(0.05, 0.10, 0.28), vec3(0.15, 0.75, 0.35), r * 2.0)
+    : mix(vec3(0.15, 0.75, 0.35), vec3(0.95, 0.16, 0.12), (r - 0.5) * 2.0);
+  outColor = vec4(c, 1.0);
 }`;
 
 // Height from measured normals is a Poisson problem: find h whose gradient
@@ -302,6 +374,8 @@ export class Photometric {
       div: program(gl, DIVERGENCE_FS, 'ps-div'),
       jacobi: program(gl, JACOBI_FS, 'ps-jacobi'),
       pack: program(gl, PACK_FS, 'ps-pack'),
+      residual: program(gl, RESIDUAL_FS, 'ps-residual'),
+      residualView: program(gl, RESIDUAL_VIEW_FS, 'ps-residual-view'),
       blur: program(gl, BLUR_FS, 'ps-blur'),
     };
     this.targets = null;
@@ -316,7 +390,7 @@ export class Photometric {
     }
     const mk = () => makeTarget(gl, w, h, { float: true, caps });
     this.targets = {
-      normal: mk(), albedo: mk(), div: mk(),
+      normal: mk(), albedo: mk(), div: mk(), residual: mk(),
       hA: mk(), hB: mk(), tmp: mk(), mean: mk(), lin: mk(),
     };
     this.size = { w, h };
@@ -370,6 +444,25 @@ export class Photometric {
     gl.uniform1f(this.progs.albedo.uniforms.uAlbedoGain, albedoGain);
     drawFullscreen(gl);
 
+    // --- residual: fit quality, computed alongside rather than on demand so the
+    //     number is always current with the surface being shown
+    if (opts.lightDirs) {
+      const L = new Float32Array(MAX_SHOTS * 3);
+      opts.lightDirs.slice(0, MAX_SHOTS).forEach((d, k) => {
+        const m = Math.hypot(d[0], d[1], d[2]) || 1;
+        L[k * 3] = d[0] / m; L[k * 3 + 1] = d[1] / m; L[k * 3 + 2] = d[2] / m;
+      });
+      bindTarget(gl, T.residual);
+      gl.useProgram(this.progs.residual.program);
+      bindShots(this.progs.residual);
+      gl.uniform4fv(this.progs.residual.uniforms.uP, solver.P);
+      gl.uniform3fv(this.progs.residual.uniforms.uL, L);
+      gl.uniform1i(this.progs.residual.uniforms.uCount, solver.count);
+      gl.uniform1f(this.progs.residual.uniforms.uClamp, highlightClamp);
+      gl.uniform1i(this.progs.residual.uniforms.uFitAmbient, solver.fitAmbient ? 1 : 0);
+      drawFullscreen(gl);
+    }
+
     // --- height by Poisson relaxation
     const run = (prog, target, textures, setU) => {
       bindTarget(gl, target);
@@ -411,6 +504,45 @@ export class Photometric {
     bindTarget(gl, null);
     // `lin` stands in for the original-image view; the first exposure is the
     // closest thing a capture set has to "the untouched photograph".
-    return { albedo: T.albedo, normal: dst, lin: T.albedo };
+    return { albedo: T.albedo, normal: dst, lin: T.albedo, residual: T.residual };
+  }
+
+  /** Paint the false-coloured residual straight to the screen. */
+  drawResidual(viewW, viewH, scale = 6) {
+    const { gl } = this.glctx;
+    const p = this.progs.residualView;
+    bindTarget(gl, null);
+    gl.viewport(0, 0, viewW, viewH);
+    gl.useProgram(p.program);
+    bindTextures(gl, p, [['uResidual', this.targets.residual.tex]]);
+    gl.uniform1f(p.uniforms.uScale, scale);
+    drawFullscreen(gl);
+  }
+
+  /**
+   * Whole-image fit quality, as a percentage of local brightness. Reads back a
+   * coarse sample rather than the full buffer — this is a headline number, not a
+   * measurement that needs every pixel.
+   */
+  measureResidual(w, h) {
+    const { gl } = this.glctx;
+    const step = Math.max(1, Math.floor(Math.min(w, h) / 256));
+    const sw = Math.floor(w / step), sh = Math.floor(h / step);
+    bindTarget(gl, this.targets.residual);
+    const buf = new Float32Array(w * 4);
+    let sum = 0, sumsq = 0, n = 0, worst = 0;
+    for (let y = 0; y < sh; y++) {
+      gl.readPixels(0, y * step, w, 1, gl.RGBA, gl.FLOAT, buf);
+      for (let x = 0; x < sw; x++) {
+        const v = buf[x * step * 4 + 1];
+        if (!Number.isFinite(v)) continue;
+        sum += v; sumsq += v * v; n++;
+        if (v > worst) worst = v;
+      }
+    }
+    bindTarget(gl, null);
+    if (!n) return null;
+    const mean = sum / n;
+    return { mean, rms: Math.sqrt(sumsq / n), worst, samples: n };
   }
 }

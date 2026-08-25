@@ -102,7 +102,7 @@
       <input type="file" id="file" accept="image/*" class="full" style="display:none;margin-top:8px">
 
       <div id="psOpts" style="display:none">
-        <div class="row"><label>Shots</label><input type="range" id="psShots" min="3" max="8" step="1" value="4"><output></output></div>
+        <div class="row"><label>Shots</label><input type="range" id="psShots" min="3" max="8" step="1" value="6"><output></output></div>
         <div class="row"><label>Elevation</label><input type="range" id="psElev" min="15" max="75" step="1" value="45"><output></output></div>
         <div class="row"><label>Elev. spread</label><input type="range" id="psSpread" min="0" max="25" step="1" value="15"><output></output></div>
         <div style="display:flex;gap:6px;margin:8px 0">
@@ -115,7 +115,10 @@
         <p class="note" id="psStatus"></p>
         <p class="note">Measured normals and true albedo from N exposures with the light
           moved. Fitting ambient needs the lights to differ in <i>elevation</i> — at one
-          elevation the system is singular and the solve is refused.</p>
+          elevation the system is singular and the solve is refused. Shoot at least one
+          more exposure than there are unknowns (3 without the ambient term, 4 with it):
+          with nothing spare the model fits perfectly by construction and the
+          <b>Fit</b> view cannot tell you anything.</p>
       </div>
     </div>
 

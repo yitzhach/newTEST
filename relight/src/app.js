@@ -41,6 +41,7 @@ const state = {
   psShowTruth: false,
   psHeightGain: 1.0,
   psJacobi: 48,
+  residualScale: 6,
   psMeanSigma: 16,   // 3*sigma == psJacobi: keep only the converged band
   lights: [],
 };
@@ -274,6 +275,10 @@ function rebuildHandles() {
 
 const VIEWS = [
   ['Relit', 0, 'The shaded result. This is the deliverable.'],
+  ['Fit', 5, 'Photometric only. How well the Lambertian model matches what was '
+    + 'photographed. Blue is a good fit; red means misaligned frames, wrong light '
+    + 'angles, specular glints or cast shadows. This is the one view that tells you '
+    + 'whether to trust the rest.'],
   ['Normals', 1, 'Recovered surface orientation. Should trace individual brushstrokes, not the composition.'],
   ['Height', 2, 'Reconstructed relief after integration along the azimuth.'],
   ['Albedo', 3, 'Base colour with the baked fine-scale shading divided out.'],
@@ -331,14 +336,34 @@ function render() {
           return;
         }
         if (status) {
-          status.textContent = `${solver.count} shots, ${solver.fitAmbient ? 'ambient fitted' : 'no ambient term'}`
-            + `, condition ${solver.cond.toFixed(0)}`
-            + (solver.cond > 800 ? ' — poorly spread rig, widen the azimuths' : '');
+          status.textContent = `${solver.count} shots, ${solver.unknowns} unknowns, `
+            + `${solver.dof} spare`
+            + (solver.cond > 800 ? ` · condition ${solver.cond.toFixed(0)}, poorly spread rig` : '');
         }
         targets = photo.build(shotArrayTex, solver, imgW, imgH, {
           highlightClamp: state.psClamp,
-          heightGain: 1.0,
+          heightGain: state.psHeightGain,
+          jacobiIterations: state.psJacobi,
+          meanSigma: state.psMeanSigma,
+          lightDirs: shots.map(shotDir),
         });
+        // Fit quality, reported every rebuild. On a real capture this is the only
+        // signal that the surface can be trusted.
+        if (solver.dof <= 0) {
+          // Say so rather than printing a reassuring 0%: with nothing spare the
+          // residual is zero by construction and means nothing.
+          if (status) {
+            status.innerHTML += ` · <b>fit unmeasurable</b> — add a shot to check it`;
+          }
+        } else {
+          const fit = photo.measureResidual(imgW, imgH);
+          if (fit && status) {
+            const pct = (fit.mean * 100).toFixed(1);
+            const verdict = fit.mean < 1.5 ? 'good'
+              : fit.mean < 5 ? 'usable' : 'poor — check alignment and light angles';
+            status.textContent += ` · fit ${pct}% (${verdict})`;
+          }
+        }
       } else {
         targets = gbuf.build(srcTex, imgW, imgH, state);
       }
@@ -349,7 +374,12 @@ function render() {
       // in the same view without re-rendering anything else.
       targets = Object.assign({}, targets, { normal: { tex: truthTex } });
     }
-    shader.draw(targets, state, imgH / imgW, imgW, imgH);
+    if (state.viewMode === 5) {
+      if (state.mode === 'photometric') photo.drawResidual(imgW, imgH, state.residualScale);
+      else shader.draw(targets, state, imgH / imgW, imgW, imgH);
+    } else {
+      shader.draw(targets, state, imgH / imgW, imgW, imgH);
+    }
   } catch (e) { fail(e); }
 }
 
@@ -429,6 +459,24 @@ async function boot() {
     state, render, setSource, loadSynthetic, canvas, applyColor,
     exportFullRes: (job, onP) => exportFullRes(glctx, { gbuf, photo, shader },
       job || { mode: 'single', source: fullSource }, state, onP),
+    // --- diagnostics used by the test harness
+    shots: () => shots,
+    dirty: () => { dirtySurface = true; },
+    measureFit: () => photo.measureResidual(imgW, imgH),
+    residualTarget: () => photo.targets && photo.targets.residual,
+    /** Displace one exposure, to model a tripod that moved between shots. */
+    shiftShot: async (i, dx, dy) => {
+      const src = shots[i].source;
+      const c = document.createElement('canvas');
+      c.width = src.width || src.naturalWidth;
+      c.height = src.height || src.naturalHeight;
+      const cx = c.getContext('2d');
+      cx.drawImage(src, dx, dy);
+      shots[i].source = c;
+      packShots(c.width, c.height);
+      dirtySurface = true;
+      render();
+    },
     photometricJob: () => ({
       mode: 'photometric',
       sources: shots.map((s2) => s2.source),

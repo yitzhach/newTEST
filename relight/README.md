@@ -116,7 +116,32 @@ features up to roughly the sweep count have converged, so the mean-removal blur
 that follows is cut at that same reach and the unconverged remainder is
 discarded rather than carried into the shading.
 
-### 5. The proposed v1 acceptance test passes when the geometry is wrong
+### 5. A capture with no spare shots cannot be checked, and reports a perfect fit
+
+Photometric stereo is normally over-determined, so re-projecting the solved `g`
+through each light direction and comparing against what was photographed gives a
+per-pixel fit residual — the one diagnostic a real capture can have, since it
+comes with no ground truth. It works:
+
+| capture | mean residual | worst |
+|---|---|---|
+| clean, 6 shots | 0.16% | 4.1% |
+| one frame displaced 3px | **3.39%** | 49.9% |
+| one light angle wrong by 40° | **1.70%** | 46.3% |
+
+But the residual only carries information when there are degrees of freedom left
+over. Three shots solve for a normal; four solve for a normal plus ambient.
+Either way **the system is then exactly determined, the model reproduces the data
+perfectly by construction, and the residual is identically zero however wrong the
+capture is.** The same 3px misalignment that reads 3.39% on six shots reads
+exactly 0.00% on four.
+
+That makes the museum four-shot convention a solve with no way to validate
+itself. The bench now defaults to six exposures, reports `shots / unknowns /
+spare` on every rebuild, and says **"fit unmeasurable"** rather than printing a
+reassuring zero when nothing is spare.
+
+### 6. The proposed v1 acceptance test passes when the geometry is wrong
 
 §8 #7 proposes: a raking light must produce brushstroke shadowing that inverts when
 the light crosses to the other side. Run against the bench:
@@ -145,8 +170,9 @@ the along-azimuth component.
 | Surface recovery | relief scale, source azimuth, integration length, strength, chroma reject, albedo de-lighting |
 | Material | relief amount, depth, roughness, specular, cast shadow, occlusion, ambient, exposure |
 | Lights | N lights, drag on canvas for X/Y, Distance for Z, Kelvin or custom colour, Power, Cone |
-| View | relit / normals / height / albedo / original |
+| View | relit / fit / normals / height / albedo / original |
 | Photometric | N exposures, per-shot azimuth/elevation, ambient fit, highlight clamp, truth compare |
+| Fit view | per-pixel residual between the model and the photographs, false-coloured, with a headline percentage |
 | Export | format, scale, tiled full-resolution render with progress; honours whichever surface path is active |
 
 Shading is Cook-Torrance GGX in linear light with height-correlated Smith
@@ -175,8 +201,10 @@ For the photometric path, shooting for the solver rather than for the eye:
 
 1. Fixed camera. A tripod, no reframing, no zoom change between exposures. The
    solve is per pixel and assumes every exposure sees the same pixel.
-2. One light, moved. Four exposures at roughly 90° azimuth spacing is the museum
-   convention and is plenty.
+2. One light, moved. **Six exposures**, not four. Four is the museum convention
+   and solves fine, but leaves nothing spare to check the answer with — see
+   finding 5. The extra two exposures cost a minute and are what make the Fit
+   view mean anything.
 3. **Vary the light height** between exposures by ~15°. Constant elevation makes
    the ambient term unrecoverable.
 4. Fixed exposure, white balance, and focus. Shoot raw or at least uncompressed;
