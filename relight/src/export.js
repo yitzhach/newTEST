@@ -10,17 +10,37 @@
 // exactly where the relief is strongest.
 
 import { makeTarget, bindTarget } from './gl.js';
+import { uploadShotArray } from './photometric.js';
 
-/** How far outside a tile the surface passes reach, in pixels. */
+/**
+ * How far outside a tile the surface passes reach, in pixels. Getting this wrong
+ * does not fail loudly — it seams, exactly where the relief is strongest.
+ */
 export function requiredMargin(state) {
+  const shadow = Math.ceil(state.shadowDistPx || 0);
+  if (state.mode === 'photometric') {
+    // Height comes from Jacobi relaxation, which moves information one texel per
+    // sweep, so a pixel depends on everything within `iterations` texels. The
+    // mean-removal blur that follows reaches 3 sigma further.
+    const jacobi = Math.ceil(state.psJacobi || 48);
+    const mean = Math.ceil(3 * (state.psMeanSigma || 16));
+    return jacobi + mean + shadow + 4;
+  }
   const blur = Math.ceil(3 * state.reliefScale);
   const integrate = Math.ceil(state.integrateTaps);
-  const shadow = Math.ceil(state.shadowDistPx || 0);
   return blur + integrate + shadow + 4;
 }
 
-export async function exportFullRes(glctx, gbuf, shader, source, state, onProgress) {
+/**
+ * @param builders {gbuf, photo, shader}
+ * @param job      {mode:'single', source} | {mode:'photometric', sources:[], solver}
+ */
+export async function exportFullRes(glctx, builders, job, state, onProgress) {
   const { gl, caps } = glctx;
+  const { gbuf, photo, shader } = builders;
+  const photometric = job.mode === 'photometric';
+  const sources = photometric ? job.sources : [job.source];
+  const source = sources[0];
   const W = source.width || source.naturalWidth;
   const H = source.height || source.naturalHeight;
   const aspect = H / W;
@@ -47,7 +67,8 @@ export async function exportFullRes(glctx, gbuf, shader, source, state, onProgre
   const cut = document.createElement('canvas');
   const cutx = cut.getContext('2d', { willReadFrequently: false });
 
-  const tex = gl.createTexture();
+  const tex = photometric ? null : gl.createTexture();
+  let shotArray = null;
   let target = null;
   let done = 0;
 
@@ -71,17 +92,36 @@ export async function exportFullRes(glctx, gbuf, shader, source, state, onProgre
         const pw = px1 - px0, ph = py1 - py0;
 
         cut.width = pw; cut.height = ph;
-        cutx.clearRect(0, 0, pw, ph);
-        cutx.drawImage(source, px0, py0, pw, ph, 0, 0, pw, ph);
 
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, cut);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-        const targets = gbuf.build(tex, pw, ph, state);
+        let targets;
+        if (photometric) {
+          // Cut the same region out of every exposure. The solve is per pixel and
+          // assumes all exposures see the same pixel, so they must be cut alike.
+          const pieces = sources.map((src) => {
+            const c = document.createElement('canvas');
+            c.width = pw; c.height = ph;
+            c.getContext('2d').drawImage(src, px0, py0, pw, ph, 0, 0, pw, ph);
+            return c;
+          });
+          if (shotArray) gl.deleteTexture(shotArray);
+          shotArray = uploadShotArray(gl, pieces, pw, ph);
+          targets = photo.build(shotArray, job.solver, pw, ph, {
+            highlightClamp: state.psClamp,
+            heightGain: state.psHeightGain,
+            jacobiIterations: state.psJacobi || 48,
+            meanSigma: state.psMeanSigma || 16,
+          });
+        } else {
+          cutx.clearRect(0, 0, pw, ph);
+          cutx.drawImage(source, px0, py0, pw, ph, 0, 0, pw, ph);
+          gl.bindTexture(gl.TEXTURE_2D, tex);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, cut);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+          targets = gbuf.build(tex, pw, ph, state);
+        }
 
         if (!target || target.w !== pw || target.h !== ph) {
           if (target) { gl.deleteTexture(target.tex); gl.deleteFramebuffer(target.fbo); }
@@ -126,7 +166,8 @@ export async function exportFullRes(glctx, gbuf, shader, source, state, onProgre
   } finally {
     state.exporting = prevExporting;
     bindTarget(gl, null);
-    gl.deleteTexture(tex);
+    if (tex) gl.deleteTexture(tex);
+    if (shotArray) gl.deleteTexture(shotArray);
     if (target) { gl.deleteTexture(target.tex); gl.deleteFramebuffer(target.fbo); }
   }
 

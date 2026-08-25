@@ -39,6 +39,9 @@ const state = {
   psFitAmbient: true,
   psClamp: 1.0,
   psShowTruth: false,
+  psHeightGain: 1.0,
+  psJacobi: 48,
+  psMeanSigma: 16,   // 3*sigma == psJacobi: keep only the converged band
   lights: [],
 };
 
@@ -292,12 +295,26 @@ function rebuildViews() {
 
 // ---------------------------------------------------------------- render
 
+// Height from the Poisson solve is measured in texels, so it grows with
+// resolution; normalising against a reference width keeps a capture looking the
+// same in the preview and in a full-resolution export.
+const PS_REFERENCE_W = 700;
+
 function updateDerived(workingW) {
-  // Shadow reach is expressed in multiples of the relief scale rather than as a
-  // fraction of image width, so a brushstroke casts the same shadow whether the
-  // working image is 1400px or 14000px.
-  state.shadowDistPx = state.reliefScale * state.shadowSpread;
-  state.shadowDist = state.shadowDistPx / Math.max(1, workingW);
+  const W = Math.max(1, workingW);
+  if (state.mode === 'photometric') {
+    // Measured relief sits at its true physical scale whatever the resolution,
+    // so shadow reach is a fraction of image width and stays put.
+    state.shadowDist = state.shadowSpread * 0.005;
+    state.shadowDistPx = state.shadowDist * W;
+    state.psHeightGain = PS_REFERENCE_W / W;
+  } else {
+    // Single-image relief is parameterised in PIXELS, so its features shrink as
+    // resolution rises; tying shadow reach to the relief scale keeps the two in
+    // step. A fixed fraction of image width would leave shadows too long.
+    state.shadowDistPx = state.reliefScale * state.shadowSpread;
+    state.shadowDist = state.shadowDistPx / W;
+  }
 }
 
 function render() {
@@ -410,7 +427,13 @@ async function boot() {
   // should be checked against pixels rather than by eye.
   window.__bench = {
     state, render, setSource, loadSynthetic, canvas, applyColor,
-    exportFullRes: (src, onP) => exportFullRes(glctx, gbuf, shader, src || fullSource, state, onP),
+    exportFullRes: (job, onP) => exportFullRes(glctx, { gbuf, photo, shader },
+      job || { mode: 'single', source: fullSource }, state, onP),
+    photometricJob: () => ({
+      mode: 'photometric',
+      sources: shots.map((s2) => s2.source),
+      solver: buildSolver(shots.map(shotDir), { fitAmbient: state.psFitAmbient }),
+    }),
     getFullSource: () => fullSource,
     caps: () => glctx.caps,
   };
@@ -432,35 +455,54 @@ function wireExport() {
     const outW = Math.max(1, Math.round(fullW * scalePct));
     const ratio = outW / imgW;
 
-    // Surface parameters are measured in pixels of the working image, so they
-    // have to be rescaled or the export shows different relief from the preview.
+    const photometric = state.mode === 'photometric';
     const saved = {
       reliefScale: state.reliefScale,
       integrateTaps: state.integrateTaps,
       reliefStrength: state.reliefStrength,
     };
-    state.reliefScale = saved.reliefScale * ratio;
-    state.integrateTaps = saved.integrateTaps * ratio;
-    // Gradients are taken per texel, so the slope-to-normal gain has to come
-    // down as texels get smaller, or the export reads far harsher than preview.
-    state.reliefStrength = saved.reliefStrength / ratio;
-
     const clamped = [];
-    if (state.reliefScale > 16) { clamped.push(`blur ${state.reliefScale.toFixed(0)}px > 16px shader cap`); }
-    if (state.integrateTaps > 32) { clamped.push(`integration ${state.integrateTaps.toFixed(0)} > 32 tap cap`); }
 
-    let src = fullSource;
-    if (scalePct < 1) {
+    if (!photometric) {
+      // Single-image surface parameters are measured in pixels of the working
+      // image, so they have to be rescaled or the export shows different relief
+      // from the preview.
+      state.reliefScale = saved.reliefScale * ratio;
+      state.integrateTaps = saved.integrateTaps * ratio;
+      // Gradients are taken per texel, so the slope-to-normal gain comes down as
+      // texels get smaller, or the export reads far harsher than the preview.
+      state.reliefStrength = saved.reliefStrength / ratio;
+      if (state.reliefScale > 16) clamped.push(`blur ${state.reliefScale.toFixed(0)}px > 16px shader cap`);
+      if (state.integrateTaps > 32) clamped.push(`integration ${state.integrateTaps.toFixed(0)} > 32 tap cap`);
+    }
+    // The photometric path measures geometry directly, so nothing about the
+    // surface needs rescaling; updateDerived() handles the two terms that do.
+
+    let solver = null;
+    if (photometric) {
+      solver = buildSolver(shots.map(shotDir), { fitAmbient: state.psFitAmbient });
+      if (!solver.ok) {
+        status.innerHTML = `<b>Cannot export.</b> ${solver.reason}`;
+        btn.disabled = false;
+        return;
+      }
+    }
+
+    const rescale = (img) => {
+      if (scalePct >= 1) return img;
       const c = document.createElement('canvas');
       c.width = outW; c.height = Math.round(fullH * scalePct);
-      c.getContext('2d').drawImage(fullSource, 0, 0, c.width, c.height);
-      src = c;
-    }
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      return c;
+    };
+    const job = photometric
+      ? { mode: 'photometric', sources: shots.map((s2) => rescale(s2.source)), solver }
+      : { mode: 'single', source: rescale(fullSource) };
 
     try {
       status.textContent = `margin ${requiredMargin(state)}px — starting…`;
       const t0 = performance.now();
-      const canvas = await exportFullRes(glctx, gbuf, shader, src, state, (frac, i, n) => {
+      const canvas = await exportFullRes(glctx, { gbuf, photo, shader }, job, state, (frac, i, n) => {
         status.textContent = `tile ${i}/${n} — ${Math.round(frac * 100)}%`;
       });
       status.textContent = 'encoding…';

@@ -111,7 +111,10 @@ than left to be discovered:
   the design matrix — and the precomputed inverse — intact.
 
 Height for the shadow march and occlusion comes from a Poisson solve over the
-measured gradients (Jacobi relaxation, ~48 sweeps, built once per capture).
+measured gradients (Jacobi relaxation, ~48 sweeps, built once per capture). Only
+features up to roughly the sweep count have converged, so the mean-removal blur
+that follows is cut at that same reach and the unconverged remainder is
+discarded rather than carried into the shading.
 
 ### 5. The proposed v1 acceptance test passes when the geometry is wrong
 
@@ -144,7 +147,7 @@ the along-azimuth component.
 | Lights | N lights, drag on canvas for X/Y, Distance for Z, Kelvin or custom colour, Power, Cone |
 | View | relit / normals / height / albedo / original |
 | Photometric | N exposures, per-shot azimuth/elevation, ambient fit, highlight clamp, truth compare |
-| Export | format, scale, tiled full-resolution render with progress |
+| Export | format, scale, tiled full-resolution render with progress; honours whichever surface path is active |
 
 Shading is Cook-Torrance GGX in linear light with height-correlated Smith
 visibility, inverse-square falloff, real spot cones, a horizon-march cast shadow
@@ -180,6 +183,22 @@ For the photometric path, shooting for the solver rather than for the eye:
    the solve is linear and JPEG at fine detail is not.
 5. Kill the room light if you can. What you cannot kill, fit — see rule 3.
 
+## Why the two paths rescale differently on export
+
+Single-image recovery is parameterised in **pixels** of the working image, so its
+features shrink as resolution rises. On export the blur, integration length and
+slope gain are all rescaled by the resolution ratio, and shadow reach is tied to
+the relief scale so the two stay in step.
+
+The photometric path measures geometry directly, at its true physical scale
+whatever the resolution, so none of that applies. There, shadow reach is a plain
+fraction of image width, and only the Poisson height needs normalising — it is
+integrated in texels, so it grows with resolution and is divided back down
+against a reference width.
+
+Getting this backwards is what makes a preview stop matching its export, so both
+are computed in one place (`updateDerived`) rather than at each call site.
+
 ## Known limits
 
 - Auto-estimating the source azimuth is unreliable when a regular canvas weave is
@@ -200,8 +219,13 @@ For the photometric path, shooting for the solver rather than for the eye:
   match but does not register the frames. A tripod is doing that work.
 - Light directions for uploaded shots are entered by hand. Estimating them from a
   chrome sphere in frame is the standard trick and is not implemented.
-- The photometric path is preview-resolution only so far; export still runs the
-  single-image pipeline.
+- Tiled photometric export is not bit-exact against an untiled render (mean
+  0.026/765, max 21, no coherent seam). Jacobi propagates one texel per sweep, so
+  only features up to ~N texels have converged after N sweeps and anything larger
+  stays domain-dependent. The mean-removal blur is cut at exactly that reach
+  (3·sigma = iterations) to discard the unconverged band, which brought the worst
+  interior difference from 79 to 21. Driving it to zero needs a multigrid solve
+  rather than more Jacobi sweeps.
 
 ## Status against the brief's phase skeleton
 
@@ -219,9 +243,12 @@ For the photometric path, shooting for the solver rather than for the eye:
   into. (For the record, had it gone ahead: the live stage there composites
   through a ≤1100px JPEG data URL under a CSS `matrix3d` transform, which would
   have destroyed exactly the fine detail this engine produces.)
-- **Phase 6 — Export.** Done. Tiled full-resolution render with an overlap
-  margin; a 56-tile render matches a single-tile render to 3.4e-6 on the channel
-  sum. PNG or JPEG, with a scale control.
+- **Phase 6 — Export.** Done, for both surface paths. Tiled full-resolution
+  render with an overlap margin; the single-image path matches a one-tile render
+  to 3.4e-6 on the channel sum, and the photometric path reproduces its own
+  preview **bit-identically** (mean |d| 0.000, max 0). A rig that cannot be
+  solved blocks export with the reason rather than writing a wrong file. PNG or
+  JPEG, with a scale control.
 - **Phase 7 — Photometric stereo.** Done, and it is the strongest part of the
   tool: 0.9995 / 0.9994 against ground truth, versus 0.74 / −0.13 from one
   photograph. Supersedes Phase 4, since true albedo comes out of the same solve.

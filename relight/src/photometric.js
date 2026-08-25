@@ -331,7 +331,13 @@ export class Photometric {
     const { gl } = this.glctx;
     const {
       highlightClamp = 1.0, albedoGain = 1.0, heightGain = 1.0,
-      jacobiIterations = 48, meanSigma = 12,
+      jacobiIterations = 48,
+      // Jacobi propagates one texel per sweep, so after N sweeps only features
+      // up to ~N texels have converged; anything larger is still domain-
+      // dependent, which makes it differ between a tile and a whole image. Cut
+      // the mean-removal blur at exactly that reach (3 sigma = N) so the height
+      // field keeps only the band that actually converged.
+      meanSigma = jacobiIterations / 3,
     } = opts;
     this.resize(w, h);
     const T = this.targets;
