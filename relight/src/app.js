@@ -1,0 +1,352 @@
+// app.js — the bench. Loads a source image, builds the G-buffer once, then
+// re-shades on every interaction. The split matters: surface recovery is the
+// expensive half and it only reruns when a surface control moves, which is what
+// keeps light dragging at frame rate.
+
+import { createGL } from './gl.js';
+import { GBuffer } from './gbuffer.js';
+import { Shader, MAX_LIGHTS } from './shade.js';
+import { kelvinToLinearRGB, hexToLinearRGB, linearRGBToHex } from './kelvin.js';
+import { synthesizePainting } from './synth.js';
+
+const $ = (id) => document.getElementById(id);
+const canvas = $('gl');
+const wrap = $('wrap');
+
+let glctx, gbuf, shader, srcTex = null, targets = null;
+let imgW = 0, imgH = 0;
+let dirtySurface = true;
+
+const state = {
+  reliefScale: 3, azimuthDeg: 141, integrateTaps: 8, reliefStrength: 12,
+  chromaReject: 0.6, albedoSuppress: 0.7,
+  reliefAmount: 1, heightScale: 0.006, roughness: 0.55, specular: 1,
+  shadow: 0.7, ao: 0.4, ambient: 0.12, exposure: 0,
+  ambientColor: [1, 1, 1],
+  viewMode: 0,
+  selected: 0,
+  lights: [],
+};
+
+function newLight(i) {
+  const spots = [[0.28, 0.78], [0.74, 0.66], [0.5, 0.22]];
+  const p = spots[i % spots.length];
+  return {
+    x: p[0], y: p[1], z: 0.55,
+    kelvin: 4300, useKelvin: true, hex: '#ffffff',
+    rgb: kelvinToLinearRGB(4300),
+    power: 2.2, cone: 0.35, enabled: true,
+  };
+}
+state.lights.push(newLight(0));
+
+function fail(e) {
+  const box = $('err');
+  box.style.display = 'block';
+  box.textContent = String(e && e.stack ? e.stack : e);
+  console.error(e);
+}
+
+// ---------------------------------------------------------------- source
+
+async function loadSynthetic() {
+  const lighting = $('synthLight').value;
+  const pigmentDetail = parseFloat($('pigment').value);
+  const s = synthesizePainting({ width: 820, height: 980, seed: 7, lighting, pigmentDetail });
+  const c = document.createElement('canvas');
+  c.width = s.width; c.height = s.rows;
+  c.getContext('2d').putImageData(s.image, 0, 0);
+
+  // The synthetic rig knows how it lit the scene, so seed the azimuth dial with
+  // the truth. On a real photograph this is the one number the user has to supply.
+  const AZ = { symmetric: [-0.55, 0.45], single: [-0.55, 0.45], raking: [-0.90, 0.20] }[lighting];
+  const deg = (Math.atan2(AZ[1], AZ[0]) * 180 / Math.PI + 360) % 360;
+  $('azimuth').value = Math.round(deg);
+  state.azimuthDeg = Math.round(deg);
+  syncOutputs();
+
+  $('synthNote').innerHTML = lighting === 'symmetric'
+    ? '<b>Worst case by design.</b> Two matched opposing lights cancel first-order relief shading — that is what the geometry is for. Expect the recovery to find almost nothing here; that is the correct result, not a bug.'
+    : lighting === 'raking'
+      ? 'Easy case. Strong directional signal along the azimuth; almost none perpendicular to it.'
+      : 'Typical one-light repro shot. Partial recovery along the azimuth.';
+
+  return c;
+}
+
+function loadFile(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('Could not decode that image.'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+async function setSource(src) {
+  const { gl } = glctx;
+  const w = src.width || src.naturalWidth;
+  const h = src.height || src.naturalHeight;
+
+  // Cap the working resolution. Relief lives at a few pixels, so there is no
+  // point carrying a 100MP scan through an interactive loop — the export path is
+  // where full resolution belongs.
+  const MAX = 1400;
+  const scale = Math.min(1, MAX / Math.max(w, h));
+  imgW = Math.round(w * scale);
+  imgH = Math.round(h * scale);
+
+  const c = document.createElement('canvas');
+  c.width = imgW; c.height = imgH;
+  c.getContext('2d').drawImage(src, 0, 0, imgW, imgH);
+
+  if (srcTex) gl.deleteTexture(srcTex);
+  srcTex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, srcTex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, c);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+  // Fit the canvas to the viewport without letting the backing store balloon.
+  const budget = Math.min(window.innerWidth * (window.innerWidth > 860 ? 0.62 : 0.96),
+                          window.innerHeight * 0.92);
+  const disp = Math.min(1, budget / Math.max(imgW, imgH));
+  canvas.width = imgW; canvas.height = imgH;
+  canvas.style.width = `${Math.round(imgW * disp)}px`;
+  canvas.style.height = `${Math.round(imgH * disp)}px`;
+
+  dirtySurface = true;
+  render();
+}
+
+// ---------------------------------------------------------------- lights UI
+
+function rebuildTabs() {
+  const tabs = $('tabs');
+  tabs.innerHTML = '';
+  state.lights.forEach((l, i) => {
+    const b = document.createElement('button');
+    b.textContent = `Light ${i + 1}`;
+    if (i === state.selected) b.className = 'on';
+    b.onclick = () => { state.selected = i; rebuildTabs(); rebuildLightPanel(); };
+    tabs.appendChild(b);
+  });
+  if (state.lights.length < MAX_LIGHTS) {
+    const add = document.createElement('button');
+    add.textContent = '+ Light';
+    add.onclick = () => {
+      state.lights.push(newLight(state.lights.length));
+      state.selected = state.lights.length - 1;
+      rebuildTabs(); rebuildLightPanel(); rebuildHandles(); render();
+    };
+    tabs.appendChild(add);
+  }
+}
+
+function slider(label, min, max, step, value, oninput, fmt) {
+  const row = document.createElement('div');
+  row.className = 'row';
+  const lab = document.createElement('label'); lab.textContent = label;
+  const inp = document.createElement('input');
+  inp.type = 'range'; inp.min = min; inp.max = max; inp.step = step; inp.value = value;
+  const out = document.createElement('output');
+  const show = () => { out.textContent = fmt ? fmt(parseFloat(inp.value)) : parseFloat(inp.value).toFixed(2); };
+  inp.oninput = () => { oninput(parseFloat(inp.value)); show(); render(); };
+  show();
+  row.append(lab, inp, out);
+  return row;
+}
+
+function rebuildLightPanel() {
+  const p = $('lightPanel');
+  p.innerHTML = '';
+  const l = state.lights[state.selected];
+  if (!l) return;
+
+  const head = document.createElement('div');
+  head.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:8px';
+
+  const mode = document.createElement('button');
+  mode.textContent = l.useKelvin ? 'Kelvin' : 'Custom';
+  mode.onclick = () => { l.useKelvin = !l.useKelvin; applyColor(l); rebuildLightPanel(); rebuildHandles(); render(); };
+
+  const eye = document.createElement('button');
+  eye.textContent = l.enabled ? 'Visible' : 'Hidden';
+  if (l.enabled) eye.className = 'on';
+  eye.onclick = () => { l.enabled = !l.enabled; rebuildLightPanel(); rebuildHandles(); render(); };
+
+  const del = document.createElement('button');
+  del.textContent = 'Delete';
+  del.disabled = state.lights.length <= 1;
+  del.onclick = () => {
+    state.lights.splice(state.selected, 1);
+    state.selected = Math.max(0, state.selected - 1);
+    rebuildTabs(); rebuildLightPanel(); rebuildHandles(); render();
+  };
+
+  head.append(mode, eye, del);
+  p.appendChild(head);
+
+  if (l.useKelvin) {
+    p.appendChild(slider('Temperature', 1800, 10000, 50, l.kelvin,
+      (v) => { l.kelvin = v; applyColor(l); rebuildHandles(); }, (v) => `${v | 0}K`));
+  } else {
+    const row = document.createElement('div');
+    row.className = 'row';
+    const lab = document.createElement('label'); lab.textContent = 'Colour';
+    const inp = document.createElement('input');
+    inp.type = 'color'; inp.value = l.hex;
+    inp.oninput = () => { l.hex = inp.value; applyColor(l); rebuildHandles(); render(); };
+    row.append(lab, inp, document.createElement('output'));
+    p.appendChild(row);
+  }
+
+  p.appendChild(slider('Power', 0, 8, 0.05, l.power, (v) => { l.power = v; }));
+  p.appendChild(slider('Distance', 0.08, 2.5, 0.01, l.z, (v) => { l.z = v; rebuildHandles(); }));
+  p.appendChild(slider('Cone', 0, 1, 0.01, l.cone, (v) => { l.cone = v; },
+    (v) => (v < 0.02 ? 'flood' : v > 0.97 ? 'spot' : v.toFixed(2))));
+
+  const note = document.createElement('p');
+  note.className = 'note';
+  note.textContent = 'Drag the dot on the canvas for X/Y; Distance is Z.';
+  p.appendChild(note);
+}
+
+function applyColor(l) {
+  l.rgb = l.useKelvin ? kelvinToLinearRGB(l.kelvin) : hexToLinearRGB(l.hex);
+}
+
+function rebuildHandles() {
+  wrap.querySelectorAll('.handle').forEach((h) => h.remove());
+  state.lights.forEach((l, i) => {
+    const d = document.createElement('div');
+    d.className = 'handle' + (i === state.selected ? ' sel' : '') + (l.enabled ? '' : ' off');
+    d.style.background = l.useKelvin ? linearRGBToHex(l.rgb) : l.hex;
+    // Handle size previews the light's reach, so the canvas shows Z as well as X/Y.
+    const px = 18 + l.z * 26;
+    d.style.width = d.style.height = `${px}px`;
+    d.style.margin = `${-px / 2}px 0 0 ${-px / 2}px`;
+    d.style.left = `${l.x * 100}%`;
+    d.style.top = `${(1 - l.y) * 100}%`;
+    d.onpointerdown = (e) => {
+      e.preventDefault();
+      state.selected = i; rebuildTabs(); rebuildLightPanel(); rebuildHandles();
+      const el = wrap.querySelectorAll('.handle')[i];
+      el.setPointerCapture(e.pointerId);
+      const move = (ev) => {
+        const r = canvas.getBoundingClientRect();
+        l.x = Math.min(1.4, Math.max(-0.4, (ev.clientX - r.left) / r.width));
+        l.y = Math.min(1.4, Math.max(-0.4, 1 - (ev.clientY - r.top) / r.height));
+        el.style.left = `${l.x * 100}%`;
+        el.style.top = `${(1 - l.y) * 100}%`;
+        render();
+      };
+      const up = () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerup', up); };
+      el.addEventListener('pointermove', move);
+      el.addEventListener('pointerup', up);
+    };
+    wrap.appendChild(d);
+  });
+}
+
+// ---------------------------------------------------------------- views
+
+const VIEWS = [
+  ['Relit', 0, 'The shaded result. This is the deliverable.'],
+  ['Normals', 1, 'Recovered surface orientation. Should trace individual brushstrokes, not the composition.'],
+  ['Height', 2, 'Reconstructed relief after integration along the azimuth.'],
+  ['Albedo', 3, 'Base colour with the baked fine-scale shading divided out.'],
+  ['Original', 4, 'The untouched source, for before/after.'],
+];
+
+function rebuildViews() {
+  const v = $('views');
+  v.innerHTML = '';
+  VIEWS.forEach(([name, mode, note]) => {
+    const b = document.createElement('button');
+    b.textContent = name;
+    if (state.viewMode === mode) b.className = 'on';
+    b.onclick = () => { state.viewMode = mode; rebuildViews(); render(); };
+    v.appendChild(b);
+  });
+  $('viewNote').textContent = (VIEWS.find((x) => x[1] === state.viewMode) || [])[2] || '';
+}
+
+// ---------------------------------------------------------------- render
+
+function render() {
+  if (!srcTex) return;
+  try {
+    if (dirtySurface) {
+      targets = gbuf.build(srcTex, imgW, imgH, state);
+      dirtySurface = false;
+    }
+    shader.draw(targets, state, imgH / imgW, imgW, imgH);
+  } catch (e) { fail(e); }
+}
+
+function syncOutputs() {
+  document.querySelectorAll('#panel .grp .row').forEach((row) => {
+    const inp = row.querySelector('input[type=range]');
+    const out = row.querySelector('output');
+    if (inp && out && inp.id) out.textContent = parseFloat(inp.value).toFixed(inp.step < 1 ? 3 : 0);
+  });
+}
+
+function bind(id, key, surface) {
+  const el = $(id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    state[key] = parseFloat(el.value);
+    if (surface) dirtySurface = true;
+    syncOutputs();
+    render();
+  });
+}
+
+async function boot() {
+  try {
+    glctx = createGL(canvas);
+    gbuf = new GBuffer(glctx);
+    shader = new Shader(glctx);
+  } catch (e) { return fail(e); }
+
+  $('hint').textContent =
+    'Drag a light dot. Acceptance test: set Cone toward spot, drag one light across the '
+    + 'surface — brushstroke shadows must flip side as it crosses. Try View > Normals.';
+
+  ['reliefScale:reliefScale', 'azimuth:azimuthDeg', 'taps:integrateTaps',
+   'reliefStrength:reliefStrength', 'chromaReject:chromaReject',
+   'albedoSuppress:albedoSuppress'].forEach((s) => {
+    const [id, key] = s.split(':'); bind(id, key, true);
+  });
+  ['reliefAmount', 'heightScale', 'roughness', 'specular', 'shadow', 'ao', 'ambient', 'exposure']
+    .forEach((id) => bind(id, id, false));
+
+  $('src').addEventListener('change', async () => {
+    const isSynth = $('src').value === 'synth';
+    $('synthOpts').style.display = isSynth ? '' : 'none';
+    $('file').style.display = isSynth ? 'none' : '';
+    if (isSynth) await setSource(await loadSynthetic());
+  });
+  $('synthLight').addEventListener('change', async () => setSource(await loadSynthetic()));
+  $('pigment').addEventListener('input', async () => setSource(await loadSynthetic()));
+  $('file').addEventListener('change', async (e) => {
+    if (e.target.files[0]) {
+      try { await setSource(await loadFile(e.target.files[0])); } catch (err) { fail(err); }
+    }
+  });
+
+  rebuildTabs(); rebuildLightPanel(); rebuildViews(); rebuildHandles(); syncOutputs();
+  await setSource(await loadSynthetic());
+
+  // Test hook. The §8 #7 acceptance criterion — brushstroke shadows must invert
+  // when the light crosses to the other side — is a claim about pixels, so it
+  // should be checked against pixels rather than by eye.
+  window.__bench = { state, render, setSource, loadSynthetic, canvas, applyColor };
+  window.addEventListener('resize', () => { if (srcTex) render(); });
+}
+
+boot();

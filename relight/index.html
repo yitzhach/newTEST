@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Relight Bench</title>
+<style>
+  :root {
+    --bg: #14161a; --panel: #1c1f25; --panel2: #23272f; --line: #2f343d;
+    --ink: #e8eaee; --dim: #9aa2b1; --accent: #4f8cff; --warn: #ffb020;
+    --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 13px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    display: grid; grid-template-columns: minmax(0,1fr) 320px; overflow: hidden;
+  }
+  @media (max-width: 860px) { body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; } }
+
+  /* ---- stage ---- */
+  #stage { position: relative; display: grid; place-items: center; padding: 20px; min-width: 0; min-height: 0; }
+  #wrap { position: relative; line-height: 0; box-shadow: 0 18px 60px rgba(0,0,0,.6); }
+  canvas { display: block; max-width: 100%; max-height: calc(100vh - 40px); touch-action: none; }
+  .handle {
+    position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+    border-radius: 50%; border: 2px solid rgba(255,255,255,.9);
+    cursor: grab; touch-action: none; transition: box-shadow .12s;
+  }
+  .handle.sel { box-shadow: 0 0 0 9px rgba(255,255,255,.18); }
+  .handle.off { opacity: .3; }
+  #hint {
+    position: absolute; left: 20px; bottom: 12px; color: var(--dim);
+    font: 11px/1.4 var(--mono); background: rgba(0,0,0,.55);
+    padding: 6px 9px; border-radius: 6px; pointer-events: none; max-width: 60ch;
+  }
+
+  /* ---- panel ---- */
+  #panel { background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding-bottom: 40px; }
+  @media (max-width: 860px) { #panel { border-left: 0; border-top: 1px solid var(--line); max-height: 46vh; } }
+  h2 {
+    font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim);
+    margin: 0; padding: 14px 14px 8px; border-bottom: 1px solid var(--line);
+  }
+  .grp { padding: 10px 14px 14px; border-bottom: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 92px 1fr 46px; gap: 8px; align-items: center; margin: 7px 0; }
+  .row label { color: var(--dim); font-size: 11.5px; }
+  .row output { font: 11px var(--mono); color: var(--ink); text-align: right; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  select, button, input[type=color] {
+    background: var(--panel2); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 6px; padding: 5px 8px; font: inherit; font-size: 12px;
+  }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 5px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+  .tabs button { flex: 0 0 auto; }
+  .views { display: flex; flex-wrap: wrap; gap: 5px; }
+  .note { color: var(--dim); font-size: 11px; margin: 8px 0 0; }
+  .note b { color: var(--warn); font-weight: 600; }
+  .full { width: 100%; }
+  #err {
+    display: none; position: absolute; inset: 20px; background: #2a1416; border: 1px solid #6b2b2b;
+    color: #ffd7d7; padding: 14px; border-radius: 8px; font: 11px/1.5 var(--mono);
+    white-space: pre-wrap; overflow: auto; z-index: 50;
+  }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <div id="wrap"><canvas id="gl"></canvas></div>
+    <div id="hint"></div>
+    <div id="err"></div>
+  </div>
+
+  <div id="panel">
+    <h2>Source</h2>
+    <div class="grp">
+      <div class="row" style="grid-template-columns:92px 1fr">
+        <label>Image</label>
+        <select id="src">
+          <option value="synth">Synthetic painting (known relief)</option>
+          <option value="upload">Upload a photograph…</option>
+        </select>
+      </div>
+      <div id="synthOpts">
+        <div class="row" style="grid-template-columns:92px 1fr">
+          <label>Shot with</label>
+          <select id="synthLight">
+            <option value="single">Single soft light</option>
+            <option value="raking">Raking light</option>
+            <option value="symmetric">Archival copy-stand (2 matched)</option>
+          </select>
+        </div>
+        <div class="row"><label>Paint detail</label><input type="range" id="pigment" min="0" max="1" step="0.05" value="0.35"><output></output></div>
+        <p class="note" id="synthNote"></p>
+      </div>
+      <input type="file" id="file" accept="image/*" class="full" style="display:none;margin-top:8px">
+    </div>
+
+    <h2>Surface recovery</h2>
+    <div class="grp">
+      <div class="row"><label>Relief scale</label><input type="range" id="reliefScale" min="1" max="16" step="0.5" value="3"><output></output></div>
+      <div class="row"><label>Source azimuth</label><input type="range" id="azimuth" min="0" max="359" step="1" value="141"><output></output></div>
+      <div class="row"><label>Integration</label><input type="range" id="taps" min="2" max="32" step="1" value="8"><output></output></div>
+      <div class="row"><label>Strength</label><input type="range" id="reliefStrength" min="0" max="40" step="0.5" value="12"><output></output></div>
+      <div class="row"><label>Chroma reject</label><input type="range" id="chromaReject" min="0" max="1" step="0.05" value="0.6"><output></output></div>
+      <div class="row"><label>De-light albedo</label><input type="range" id="albedoSuppress" min="0" max="1" step="0.05" value="0.7"><output></output></div>
+      <p class="note">Azimuth is the direction the original photograph was lit from. Only the
+        slope <i>along</i> it is recoverable from one image; perpendicular is unconstrained.</p>
+    </div>
+
+    <h2>Material &amp; frame</h2>
+    <div class="grp">
+      <div class="row"><label>Relief amount</label><input type="range" id="reliefAmount" min="0" max="1" step="0.02" value="1"><output></output></div>
+      <div class="row"><label>Depth</label><input type="range" id="heightScale" min="0" max="0.02" step="0.0005" value="0.006"><output></output></div>
+      <div class="row"><label>Roughness</label><input type="range" id="roughness" min="0.05" max="1" step="0.01" value="0.55"><output></output></div>
+      <div class="row"><label>Specular</label><input type="range" id="specular" min="0" max="4" step="0.05" value="1"><output></output></div>
+      <div class="row"><label>Cast shadow</label><input type="range" id="shadow" min="0" max="1" step="0.05" value="0.7"><output></output></div>
+      <div class="row"><label>Occlusion</label><input type="range" id="ao" min="0" max="1" step="0.05" value="0.4"><output></output></div>
+      <div class="row"><label>Ambient</label><input type="range" id="ambient" min="0" max="1" step="0.02" value="0.12"><output></output></div>
+      <div class="row"><label>Exposure</label><input type="range" id="exposure" min="-3" max="3" step="0.05" value="0"><output></output></div>
+    </div>
+
+    <h2>Lights</h2>
+    <div class="tabs" id="tabs"></div>
+    <div class="grp" id="lightPanel"></div>
+
+    <h2>View</h2>
+    <div class="grp">
+      <div class="views" id="views"></div>
+      <p class="note" id="viewNote"></p>
+    </div>
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
