@@ -231,7 +231,103 @@ improve, the frames are put back and it says so: registration only corrects
 translation, and a rotated frame or a wrong light angle will not be fixed by
 shifting it.
 
-### 7. The proposed v1 acceptance test passes when the geometry is wrong
+### 7. A rig turned as a whole fits perfectly and returns the wrong surface
+
+The solve takes light directions as **given**. On the synthetic path they are known;
+on an uploaded capture they were typed in from memory of where the lamp was
+standing. That was the last guessed input in the tool, and it turns out to hide the
+worst-behaved error in it.
+
+Rotate every light by the same angle — mistake which wall you called zero, or type
+a nominal rig ("four at 90 degrees, 45 up") in at the wrong reference azimuth — and:
+
+| rig error | each light off its own way | | whole rig turned together | |
+|---|---|---|---|---|
+| | normals nx / ny | fit | normals nx / ny | fit |
+| 0° | 0.9997 / 0.9997 | 0.17% | 0.9997 / 0.9997 | 0.17% |
+| 2° | 0.9994 / 0.9996 | 1.21% | 0.9992 / 0.9991 | **0.17%** |
+| 10° | 0.9860 / 0.9903 | 6.29% | 0.9856 / 0.9834 | **0.17%** |
+| 20° | 0.4673 / 0.7812 | 9.57% | 0.9437 / 0.9349 | **0.17%** |
+| 40° | −0.3890 / 0.0833 | 10.43% | 0.7810 / 0.7498 | **0.17%** |
+
+The right-hand fit column never moves. That is not a threshold to tune — it is
+exact. Rotate every `L_k` by `R` and `g' = Rg` gives `g'·(R L_k) = g·L_k = I_k`, so
+the model reproduces every photograph perfectly and hands back a surface rotated off
+the painting. The relit result looks completely convincing, with its impasto
+shadows falling at the wrong angle to the brushwork.
+
+This is the third time this shape of thing has turned up here — a diagnostic reading
+perfect precisely where it has nothing to say — after the exactly-determined fit
+residual (finding 5) and the inversion test that passed hardest on the capture that
+recovered nothing (finding 8). Nothing already in the tool can see it, because every
+diagnostic here compares the lights against **each other**.
+
+**A chrome sphere in frame breaks the symmetry**, by measuring each direction
+against the room instead. It is exact geometry rather than a fit: a mirror reflects
+the lamp into the eye only where the surface normal bisects them, so the highlight
+sits at `N = normalise(L + V)`, and with `V = (0,0,1)` under orthographic projection
+that inverts in one square root:
+
+```
+N = ((hx-cx)/r, (hy-cy)/r, sqrt(1 - nx² - ny²))
+L = 2(N·V)N - V = (2·nz·nx, 2·nz·ny, 2·nz² - 1)
+```
+
+Measured against a rig whose angles are known, on a 200px-radius sphere: **worst
+0.33°** across six exposures, azimuth exact, the residual being the centroid of an
+asymmetric blob — a source of constant angular size maps to an image-space spot
+that is wider on the side toward the middle of the sphere.
+
+#### The circle is placed by hand, and that is not free
+
+| sphere radius | centre 3px out | centre 8px out | radius 5% out |
+|---|---|---|---|
+| 40px | 9.63° | 25.00° | 2.90° |
+| 80px | 5.07° | 12.79° | 2.99° |
+| 160px | 2.71° | 6.63° | 2.98° |
+| 300px | **1.60°** | 3.70° | 2.98° |
+
+Three pixels of centre error on a small sphere costs as much as simply recalling
+the angle. What rescues it is the scaling: the error depends on circle error
+**relative to the radius**, so the requirement is a *big sphere* — one line in the
+capture protocol — rather than a steady hand, which is not enforceable. Radius error
+is scale-free, as it should be. The reading reports its own `sensitivity` in degrees
+per pixel, so what a given placement is worth is on screen rather than assumed.
+
+The obvious repair — snap the circle to the sphere's silhouette automatically — was
+built and then removed. The bench cannot judge it: a silhouette detector tested
+against a synthetic sphere is being tested against `synth.js`'s own model of what a
+sphere looks like at its edge. And that model is not even favourable, since a mirror
+near its silhouette reflects the room at grazing angles: on the bench's render the
+luminance just inside the rim (~0.26) is indistinguishable from the painting just
+outside it (0.23–0.40). There is no step there to find, and a fitter tuned until it
+worked on that would be tuned to a fiction. The validatable route — optimising the
+circle against the fit residual, the same objective that made registration checkable
+— is in the queue instead.
+
+#### Two things that must be caught rather than obeyed
+
+A circle sitting on paint rather than on a sphere still finds a brightest spot and
+still returns six confident directions. Two checks catch it, and both fire on the
+bench:
+
+- **The lamp moved between exposures, so readings that all agree are not readings
+  of a mirror.** A circle placed on the painting returns six directions within 4.2°
+  of each other — physically impossible for a six-azimuth rig.
+- **The fit residual before against after.** The same objective the alignment uses:
+  0.16% → 6.35% says plainly that those directions describe the photographs worse
+  than the ones they replaced.
+
+#### A sphere in frame also has to be kept out of the fit
+
+A mirror is not Lambertian and never will be, so its pixels paint the loudest red in
+the Fit view and drag the headline number with them: a clean capture reads **1.49%**
+with the sphere left in and **0.16%** with its disc excluded. Left alone that is
+enough to hide a real fault behind the diagnostic meant to reveal it. The disc is
+excluded from the measurement and drawn flat grey in the view — visibly excluded,
+rather than quietly dropped.
+
+### 8. The proposed v1 acceptance test passes when the geometry is wrong
 
 §8 #7 proposes: a raking light must produce brushstroke shadowing that inverts when
 the light crosses to the other side. Run against the bench:
@@ -263,6 +359,7 @@ the along-azimuth component.
 | View | relit / fit / normals / height / albedo / original |
 | Photometric | N exposures, per-shot azimuth/elevation, ambient fit, highlight clamp, truth compare |
 | Alignment | measure and correct inter-frame drift, per-frame shift readout, revert to as-shot |
+| Chrome sphere | place a circle, read every exposure's light direction off it, per-shot sensitivity readout |
 | Fit view | per-pixel residual between the model and the photographs, false-coloured, with a headline percentage |
 | Export | format, scale, tiled full-resolution render with progress; honours whichever surface path is active |
 
@@ -300,9 +397,9 @@ For the photometric path, shooting for the solver rather than for the eye:
    view mean anything.
 3. **Vary the light height** between exposures by ~15°. Constant elevation makes
    the ambient term unrecoverable.
-4. Fixed exposure, white balance, and focus. Shoot raw or at least uncompressed;
+5. Fixed exposure, white balance, and focus. Shoot raw or at least uncompressed;
    the solve is linear and JPEG at fine detail is not.
-5. Kill the room light if you can. What you cannot kill, fit — see rule 3.
+6. Kill the room light if you can. What you cannot kill, fit — see rule 3.
 
 ## Why the two paths rescale differently on export
 
@@ -350,8 +447,11 @@ are computed in one place (`updateDerived`) rather than at each call site.
 - Registering an achromatic subject falls back to luminance alone, where 2 of 15
   frame pairs go wrong. The fit still lands because the other 13 outvote them, and
   the discounted count is reported — but that is the weak case.
-- Light directions for uploaded shots are entered by hand. Estimating them from a
-  chrome sphere in frame is the standard trick and is not implemented.
+- Light directions come from a chrome sphere if one was shot, and by hand otherwise.
+  The sphere's circle is placed by hand and there is no automatic silhouette fit —
+  see finding 7 for why one was removed rather than shipped.
+- A sphere reading assumes a neutral light and orthographic projection. A strongly
+  coloured lamp or a very short lens will bias it; neither is measured here.
 - Tiled photometric export is not bit-exact against an untiled render (mean
   0.026/765, max 21, no coherent seam). Jacobi propagates one texel per sweep, so
   only features up to ~N texels have converged after N sweeps and anything larger

@@ -119,6 +119,47 @@ await p.waitForTimeout(600);
 await p.selectOption('#src','psynth');
 await p.waitForTimeout(3000);
 
+// --- chrome sphere: light directions read rather than typed -----------------
+// A circle over paint rather than over a sphere must be caught, not obeyed. The
+// tell is physical: the lamp moved between exposures, so readings that all agree
+// cannot be readings of a mirror.
+await p.evaluate(()=>window.__bench.setSphere({cx:0.16,cy:0.86,r:0.11}));
+await p.click('#sphRead');
+await p.waitForFunction(()=>!document.getElementById('sphRead').disabled,null,{timeout:120000});
+await p.waitForTimeout(600);
+const noSph = await p.textContent('#sphStatus');
+check('a circle that is not on a sphere is caught',
+  /cannot be right/.test(noSph) && /worse/.test(noSph), noSph.trim().slice(0,90));
+
+// With a real sphere in frame, scrambled angles must be recovered.
+await p.click('#psSphere');
+await p.waitForTimeout(4000);
+const rigTruth = await p.evaluate(()=>window.__bench.shots().map(s=>({az:s.az,elev:s.elev})));
+await p.evaluate(()=>{window.__bench.shots().forEach(s=>{s.az=(s.az+25)%360;s.elev=Math.max(5,s.elev-12);});
+  window.__bench.dirty(); window.__bench.render();});
+await p.waitForTimeout(900);
+const fitScrambled = await p.evaluate(()=>window.__bench.measureFit());
+await p.click('#sphRead');
+await p.waitForFunction(()=>!document.getElementById('sphRead').disabled,null,{timeout:120000});
+await p.waitForTimeout(900);
+const rigRead = await p.evaluate(()=>window.__bench.shots().map(s=>({az:s.az,elev:s.elev})));
+const angErr = rigTruth.map((t,i)=>{
+  const d=(a,b)=>{const ta=a.az*Math.PI/180,te=a.elev*Math.PI/180,tb=b.az*Math.PI/180,tf=b.elev*Math.PI/180;
+    const v1=[Math.cos(ta)*Math.cos(te),Math.sin(ta)*Math.cos(te),Math.sin(te)];
+    const v2=[Math.cos(tb)*Math.cos(tf),Math.sin(tb)*Math.cos(tf),Math.sin(tf)];
+    return Math.acos(Math.max(-1,Math.min(1,v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])))*180/Math.PI;};
+  return d(t,rigRead[i]);
+});
+const worstAng = Math.max(...angErr);
+check('sphere recovers the rig it was shot under', worstAng < 1.0,
+  `worst ${worstAng.toFixed(2)} deg across ${rigTruth.length} exposures`);
+const fitRead = await p.evaluate(()=>window.__bench.measureFit());
+check('reading the sphere restores the fit', fitRead.mean < fitScrambled.mean*0.5,
+  `${(fitScrambled.mean*100).toFixed(2)}% -> ${(fitRead.mean*100).toFixed(2)}%`);
+
+await p.click('#psSphere');
+await p.waitForTimeout(3500);
+
 // photometric export
 dl = p.waitForEvent('download',{timeout:180000});
 await p.click('#exportBtn'); d = await dl;

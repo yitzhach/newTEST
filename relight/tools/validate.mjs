@@ -377,6 +377,175 @@ for (const [name, drifts, note, capOpts] of CASES) {
   regSummary.push({ name, sBefore, sAfter, before: before.residual, after: after.residual, errWorst, consistency: reg.consistency });
 }
 
+// ===========================================================================
+// Light directions from a chrome sphere
+// ===========================================================================
+//
+// The solve takes light directions as GIVEN, and on an uploaded capture they were
+// typed in from memory of where the lamp was standing. That is the last guessed
+// input in the tool, and the Fit view does not reliably catch it: a 40-degree error
+// reads 1.70%, well inside the range a merely-imperfect capture produces.
+//
+// A mirror sphere in frame makes it exact instead of remembered. Three things have
+// to be true for that to be an improvement, and only the first is obvious:
+//   1. the reading is accurate;
+//   2. placing the circle by hand does not just move the guesswork somewhere else;
+//   3. the accuracy gained is worth having — i.e. the surface actually cares.
+
+const SPH = await import(new URL('../src/sphere.js', import.meta.url));
+
+const angBetween = (a, b) => {
+  const m = (v) => Math.hypot(v[0], v[1], v[2]) || 1;
+  const d = (a[0] * b[0] + a[1] * b[1] + a[2] * b[2]) / (m(a) * m(b));
+  return Math.acos(Math.max(-1, Math.min(1, d))) * 180 / Math.PI;
+};
+
+// A sphere worth reading: see the size table below for why 80px is not one.
+const SPHERE = { cx: 250, cy: 640, r: 200 };
+
+function sphereCapture(opts = {}) {
+  const dirs = rig(6);
+  return {
+    dirs,
+    cap: synthesizeCaptureSet({
+      width: 900, height: 900, seed: 7, pigmentDetail: 0.35,
+      lightDirs: dirs, sphere: SPHERE, ...opts,
+    }),
+  };
+}
+
+console.log('\n\nLight direction read off a chrome sphere (900x900, sphere r=200px)\n');
+console.log('  shot   true az / elev    read az / elev    error    rim    deg per px');
+console.log('  ' + '-'.repeat(70));
+{
+  const { dirs, cap } = sphereCapture();
+  let worst = 0;
+  for (let k = 0; k < dirs.length; k++) {
+    const t = dirs[k];
+    const taz = (Math.atan2(t[1], t[0]) * 180 / Math.PI + 360) % 360;
+    const tel = Math.asin(t[2]) * 180 / Math.PI;
+    const e = SPH.estimateLight(cap.images[k].data, cap.width, cap.rows, SPHERE);
+    if (!e.ok) { console.log(`  ${k}      REFUSED — ${e.reason}`); continue; }
+    const err = angBetween(t, e.dir);
+    worst = Math.max(worst, err);
+    console.log(`   ${k}     ${taz.toFixed(1).padStart(5)} / ${tel.toFixed(1).padStart(4)}`
+      + `     ${e.az.toFixed(1).padStart(5)} / ${e.elev.toFixed(1).padStart(4)}`
+      + `     ${err.toFixed(2)}    ${e.rim.toFixed(2)}     ${e.sensitivity.toFixed(2)}`
+      + (e.reliable ? '' : '   [flagged]'));
+  }
+  console.log(`\n  worst ${worst.toFixed(2)} degrees.`);
+}
+
+// --- 2. does hand-placing the circle just move the guesswork? ---------------
+//
+// It does, in pixels — and does not, in the units that matter. The error scales
+// with circle error RELATIVE TO RADIUS, so the fix is a big sphere rather than a
+// steady hand.
+console.log('\nWhat a misplaced circle costs, against sphere size');
+console.log('(the circle is drawn by hand, so this is where the guesswork goes)\n');
+console.log('  sphere r    centre 3px out   centre 8px out   r 5% out    3px as a fraction of r');
+console.log('  ' + '-'.repeat(86));
+{
+  for (const r of [40, 80, 160, 300]) {
+    const sph = { cx: 340, cy: 340, r };
+    const dirs = rig(6);
+    const cap = synthesizeCaptureSet({
+      width: 700, height: 700, seed: 7, pigmentDetail: 0.35, lightDirs: dirs, sphere: sph,
+    });
+    const worstFor = (o) => {
+      let worst = 0;
+      for (let k = 0; k < dirs.length; k++) {
+        const e = SPH.estimateLight(cap.images[k].data, cap.width, cap.rows,
+          { cx: sph.cx + (o.cx || 0), cy: sph.cy + (o.cy || 0), r: sph.r * (1 + (o.r || 0)) });
+        if (!e.ok) return Infinity;
+        worst = Math.max(worst, angBetween(dirs[k], e.dir));
+      }
+      return worst;
+    };
+    console.log(`  ${String(r + 'px').padEnd(11)} ${worstFor({ cx: 3 }).toFixed(2).padStart(8)} deg`
+      + `    ${worstFor({ cx: 8 }).toFixed(2).padStart(8)} deg`
+      + `   ${worstFor({ r: 0.05 }).toFixed(2).padStart(6)} deg`
+      + `      ${(3 / r * 100).toFixed(1)}%`);
+  }
+}
+
+// --- 3. how much does the surface actually care? ---------------------------
+//
+// Perturb only the directions handed to the solver; the photographs still carry
+// the true ones. That is exactly the failure being modelled — angles recalled
+// wrongly for a capture that was itself fine.
+console.log('\nWhat a wrong light direction costs the surface');
+console.log('(images rendered with the true rig, solved with a rotated one)\n');
+console.log('                  -- each light off its own way --   -- whole rig turned together --');
+console.log('  direction error   normals nx / ny     fit         normals nx / ny      fit');
+console.log('  ' + '-'.repeat(88));
+{
+  const cap = driftedCapture([[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]], { size: 260 });
+  // Deterministic per-shot rotation axis, so every row perturbs the same way.
+  const rotate = (d, deg, k) => {
+    const t = (deg * Math.PI) / 180;
+    const phi = (k * 2.39996);                       // golden-angle spread
+    const ax = [Math.cos(phi), Math.sin(phi), 0];
+    // Rodrigues about an axis made perpendicular to d.
+    const dot = ax[0] * d[0] + ax[1] * d[1] + ax[2] * d[2];
+    let p = [ax[0] - dot * d[0], ax[1] - dot * d[1], ax[2] - dot * d[2]];
+    const pm = Math.hypot(p[0], p[1], p[2]) || 1;
+    p = [p[0] / pm, p[1] / pm, p[2] / pm];
+    const c = Math.cos(t), sn = Math.sin(t);
+    const cr = [p[1] * d[2] - p[2] * d[1], p[2] * d[0] - p[0] * d[2], p[0] * d[1] - p[1] * d[0]];
+    return [d[0] * c + cr[0] * sn, d[1] * c + cr[1] * sn, d[2] * c + cr[2] * sn];
+  };
+  // Rotate the WHOLE rig about the vertical axis by the same angle — what you get
+  // by mistaking which wall you called zero, or by typing a nominal rig in at the
+  // wrong reference azimuth.
+  const spin = (d, deg) => {
+    const t = (deg * Math.PI) / 180, c = Math.cos(t), sn = Math.sin(t);
+    return [d[0] * c - d[1] * sn, d[0] * sn + d[1] * c, d[2]];
+  };
+  const run = (mk) => {
+    const r = cpuSolve(cap.frames, cap.dirs.map(mk), cap.w, cap.h);
+    return { sc: scoreNormals(r.N, cap.truth, cap.w, cap.h), fit: r.residual };
+  };
+  for (const deg of [0, 0.33, 1, 2, 5, 10, 20, 40]) {
+    const scattered = run((d, k) => (deg ? rotate(d, deg, k) : d));
+    const rigid = run((d) => (deg ? spin(d, deg) : d));
+    const tag = deg === 0.33 ? '  <- what the sphere reads to'
+      : deg === 10 ? '  <- a plausible recollection' : '';
+    console.log(`  ${(deg + ' deg').padEnd(13)} ${scattered.sc.x.toFixed(4)} / ${scattered.sc.y.toFixed(4)}`
+      + `  ${(scattered.fit * 100).toFixed(2).padStart(5)}%   `
+      + `  ${rigid.sc.x.toFixed(4)} / ${rigid.sc.y.toFixed(4)}  ${(rigid.fit * 100).toFixed(2).padStart(5)}%${tag}`);
+  }
+}
+
+console.log('\nReading:');
+console.log('  * The reading is exact geometry, not a fit: the highlight sits where the');
+console.log('    normal bisects the lamp and the viewer, and that relation inverts in one');
+console.log('    square root. The residual error is the centroid of an asymmetric blob,');
+console.log('    since a source of constant angular size maps to an image-space spot that');
+console.log('    is wider on the side toward the middle of the sphere.');
+console.log('  * Hand-placing the circle DOES reintroduce guesswork, in pixels: 3px of');
+console.log('    centre error on an 80px sphere costs 5 degrees, which is the same order as');
+console.log('    recalling the angle. What rescues it is that the error scales with circle');
+console.log('    error RELATIVE TO RADIUS — the same 3px costs 1.60 degrees at r=300. So the');
+console.log('    requirement is a big sphere, which is a line in the capture protocol, not a');
+console.log('    steady hand, which is not enforceable. src/sphere.js records why the');
+console.log('    obvious repair — snapping the circle to the silhouette automatically — was');
+console.log('    built and then removed rather than shipped.');
+console.log('  * Look at the right-hand fit column. A rig turned as a whole reads 0.17% at');
+console.log('    EVERY angle — the same as a flawless capture — while the surface it returns');
+console.log('    rots away to 0.78. That is not a coincidence to be tuned out, it is exact:');
+console.log('    rotate every L_k by R and g\' = Rg reproduces the photographs perfectly,');
+console.log('    because both sides of I = g·L turn together. The model fits, and hands back');
+console.log('    a surface rotated off the painting.');
+console.log('  * So this is the third time the same shape of thing has come up here — a');
+console.log('    diagnostic reading perfect exactly where it has nothing to say, after the');
+console.log('    exactly-determined fit residual and the inversion test that passed hardest');
+console.log('    on the capture that recovered nothing. Nothing in this tool can see it,');
+console.log('    which is the argument for the sphere: it measures each direction against');
+console.log('    the room rather than against the other lights.');
+console.log('  * It is also the argument for NOT chasing the last 0.3 degrees: the curve is');
+console.log('    flat there and steep where recollection actually lands.\n');
+
 // --- what the working-resolution cap costs ---------------------------------
 //
 // registerFrames measures the drift at a capped resolution because the feature

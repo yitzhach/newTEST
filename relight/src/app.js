@@ -11,6 +11,7 @@ import { synthesizePainting, synthesizeCaptureSet, normalsToImageData } from './
 import { Photometric, buildSolver, uploadShotArray, MAX_SHOTS } from './photometric.js';
 import { exportFullRes, downloadCanvas, requiredMargin } from './export.js';
 import { registerFrames, resample } from './register.js';
+import { estimateLight, spherePointFromLight } from './sphere.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('gl');
@@ -47,6 +48,11 @@ const state = {
   psJacobi: 48,
   residualScale: 6,
   psMeanSigma: 16,   // 3*sigma == psJacobi: keep only the converged band
+  // Chrome sphere, as fractions of image width/height so it survives a rescale.
+  // Null until placed; placing it is a deliberate act, since a circle in the wrong
+  // spot produces confident wrong light directions.
+  sphere: null,
+  placingSphere: false,
   lights: [],
 };
 
@@ -371,7 +377,7 @@ function render() {
             status.innerHTML += ` · <b>fit unmeasurable</b> — add a shot to check it`;
           }
         } else {
-          const fit = photo.measureResidual(imgW, imgH);
+          const fit = photo.measureResidual(imgW, imgH, residualExclusion());
           if (fit && status) {
             const pct = (fit.mean * 100).toFixed(1);
             const verdict = fit.mean < 1.5 ? 'good'
@@ -390,7 +396,7 @@ function render() {
       targets = Object.assign({}, targets, { normal: { tex: truthTex } });
     }
     if (state.viewMode === 5) {
-      if (state.mode === 'photometric') photo.drawResidual(imgW, imgH, state.residualScale);
+      if (state.mode === 'photometric') photo.drawResidual(imgW, imgH, state.residualScale, residualExclusion());
       else shader.draw(targets, state, imgH / imgW, imgW, imgH);
     } else {
       shader.draw(targets, state, imgH / imgW, imgW, imgH);
@@ -483,6 +489,7 @@ async function boot() {
 
   wireExport();
   wirePhotometric();
+  wireSpherePlacement();
 
   // Test hook. The §8 #7 acceptance criterion — brushstroke shadows must invert
   // when the light crosses to the other side — is a claim about pixels, so it
@@ -494,7 +501,7 @@ async function boot() {
     // --- diagnostics used by the test harness
     shots: () => shots,
     dirty: () => { dirtySurface = true; },
-    measureFit: () => photo.measureResidual(imgW, imgH),
+    measureFit: () => photo.measureResidual(imgW, imgH, residualExclusion()),
     residualTarget: () => photo.targets && photo.targets.residual,
     /**
      * Displace one exposure, to model a tripod that moved between shots.
@@ -520,6 +527,9 @@ async function boot() {
       render();
     },
     alignShots,
+    readLightsFromSphere,
+    setSphere: (c) => { state.sphere = c; drawSphereOverlay(); },
+    shotReads: () => shots.map((s2) => s2.read || null),
     shotShifts: () => shots.map((s2) => s2.shift),
     photometricJob: () => ({
       mode: 'photometric',
@@ -625,6 +635,198 @@ function wireExport() {
   });
 }
 
+// ------------------------------------------------------------- chrome sphere
+
+/** Sphere in image pixels of the FULL-resolution frame the reading is taken from. */
+function spherePx(w, h) {
+  if (!state.sphere) return null;
+  return {
+    cx: state.sphere.cx * w,
+    cy: state.sphere.cy * h,
+    r: state.sphere.r * w,
+  };
+}
+
+/**
+ * Drag a circle over the chrome sphere.
+ *
+ * Placed by hand, and that is not free — a circle 3px off centre on an 80px sphere
+ * costs 5 degrees of light direction. What makes it workable is that the error
+ * scales with circle error relative to RADIUS, so a big sphere is forgiving where a
+ * small one is not. The readout reports degrees-per-pixel for the reading actually
+ * taken rather than leaving that to be assumed.
+ */
+function wireSpherePlacement() {
+  const btn = $('sphPlace');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    state.placingSphere = !state.placingSphere;
+    btn.className = state.placingSphere ? 'on' : '';
+    wrap.style.cursor = state.placingSphere ? 'crosshair' : '';
+    $('sphStatus').textContent = state.placingSphere
+      ? 'Drag from the centre of the sphere out to its edge.'
+      : '';
+  });
+
+  wrap.addEventListener('pointerdown', (e) => {
+    if (!state.placingSphere) return;
+    e.preventDefault(); e.stopPropagation();
+    const r = canvas.getBoundingClientRect();
+    const cx = (e.clientX - r.left) / r.width;
+    const cy = (e.clientY - r.top) / r.height;
+    wrap.setPointerCapture(e.pointerId);
+    const move = (ev) => {
+      const dx = ((ev.clientX - r.left) / r.width) - cx;
+      // Radius is carried as a fraction of WIDTH, so the circle stays round
+      // whatever the aspect ratio.
+      const dy = (((ev.clientY - r.top) / r.height) - cy) * (imgH / imgW);
+      state.sphere = { cx, cy, r: Math.max(0.005, Math.hypot(dx, dy)) };
+      drawSphereOverlay();
+    };
+    const up = () => {
+      wrap.removeEventListener('pointermove', move);
+      wrap.removeEventListener('pointerup', up);
+      state.placingSphere = false;
+      $('sphPlace').className = '';
+      wrap.style.cursor = '';
+      reportSphere();
+    };
+    wrap.addEventListener('pointermove', move);
+    wrap.addEventListener('pointerup', up);
+  }, true);
+}
+
+function drawSphereOverlay() {
+  let el = wrap.querySelector('.sphere-ring');
+  if (!state.sphere) { if (el) el.remove(); return; }
+  if (!el) {
+    el = document.createElement('div');
+    el.className = 'sphere-ring';
+    wrap.appendChild(el);
+  }
+  const s = state.sphere;
+  el.style.left = `${s.cx * 100}%`;
+  el.style.top = `${s.cy * 100}%`;
+  const wpc = s.r * 2 * 100;
+  el.style.width = `${wpc}%`;
+  el.style.height = `${(s.r * 2 * imgW / imgH) * 100}%`;
+}
+
+function reportSphere() {
+  const st = $('sphStatus');
+  if (!st) return;
+  if (!state.sphere) { st.textContent = ''; return; }
+  drawSphereOverlay();
+  const px = spherePx(imgW, imgH);
+  st.innerHTML = `Circle: centre ${(state.sphere.cx * 100).toFixed(1)}%, `
+    + `${(state.sphere.cy * 100).toFixed(1)}%, radius ${px.r.toFixed(0)}px in the preview.`
+    + ' Then <b>Read light directions</b>.';
+}
+
+/**
+ * Read every exposure's light direction off the sphere and write them into the rig.
+ *
+ * Read from `original` at full resolution: the reading's accuracy scales with the
+ * sphere's radius in pixels, so taking it from the downscaled preview would throw
+ * away most of the precision the sphere exists to provide.
+ */
+async function readLightsFromSphere() {
+  const st = $('sphStatus');
+  const btn = $('sphRead');
+  if (!state.sphere || !shots.length) {
+    if (st) st.innerHTML = '<b>Place the circle on the sphere first.</b>';
+    return;
+  }
+  if (btn) btn.disabled = true;
+  try {
+    const src = shots[0].original;
+    const w = src.width || src.naturalWidth, h = src.height || src.naturalHeight;
+    const sph = spherePx(w, h);
+    const before = solvableNow() ? photo.measureResidual(imgW, imgH, residualExclusion()) : null;
+    const rows = [];
+    let worstSens = 0, flagged = 0, failed = 0;
+
+    for (let i = 0; i < shots.length; i++) {
+      if (st) st.textContent = `Reading exposure ${i + 1} of ${shots.length}…`;
+      await yieldToUI();
+      const e = estimateLight(readShot(shots[i].original), w, h, sph);
+      if (!e.ok) { rows.push(`${shots[i].name}: ${e.reason}`); failed++; continue; }
+      shots[i].az = e.az;
+      shots[i].elev = e.elev;
+      shots[i].read = e;
+      worstSens = Math.max(worstSens, e.sensitivity);
+      if (!e.reliable) flagged++;
+    }
+    renderShotList();
+    dirtySurface = true;
+    render();
+
+    if (failed === shots.length) {
+      st.innerHTML = `<b>Could not read any exposure.</b> ${rows[0] || ''}`;
+      return;
+    }
+    const after = solvableNow() ? photo.measureResidual(imgW, imgH, residualExclusion()) : null;
+    let msg = `Read ${shots.length - failed} of ${shots.length} exposures.`
+      + ` Worst sensitivity ${worstSens.toFixed(2)}&deg;/px`
+      + ` — a circle 3px out costs about ${(worstSens * 3).toFixed(1)}&deg;.`;
+
+    // A capture moves the lamp between exposures — that is what makes it a capture.
+    // So if every reading comes back pointing the same way, the circle is not on a
+    // mirror: it is sitting on paint, and the "highlight" it found is just the
+    // brightest brushstroke in that patch, which does not move. Caught here because
+    // it is decisive and needs no reference; the fit check below catches the rest.
+    const read = shots.filter((s2) => s2.read);
+    if (read.length >= 3) {
+      let spread = 0;
+      for (let i = 0; i < read.length; i++) {
+        for (let j = i + 1; j < read.length; j++) {
+          const a = read[i].read.dir, b = read[j].read.dir;
+          const d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+          spread = Math.max(spread, Math.acos(Math.max(-1, Math.min(1, d))) * 180 / Math.PI);
+        }
+      }
+      if (spread < 12) {
+        msg += ` <b>These readings cannot be right:</b> every exposure came back within`
+          + ` ${spread.toFixed(1)}&deg; of the others, but the lamp moved between them.`
+          + ' The circle is almost certainly not on the sphere.';
+      }
+    }
+
+    if (before && after) {
+      msg += ` Fit ${(before.mean * 100).toFixed(2)}% &rarr; <b>${(after.mean * 100).toFixed(2)}%</b>`;
+      // The same objective test the alignment uses. Directions that make the model
+      // fit the photographs worse are worse directions, whatever the sphere looked
+      // like — and unlike alignment there is nothing to put back, since the angles
+      // being replaced were themselves guesses.
+      if (after.mean > before.mean * 1.25) {
+        msg += ' — <b>worse.</b> Either the circle is off the sphere, or it was'
+          + ' reading something else bright on it. The previous angles are not restored;'
+          + ' set them by hand or place the circle again.';
+      } else if (after.mean < before.mean * 0.9) {
+        msg += ' — better, so the sphere is telling you something the typed angles were not.';
+      } else {
+        msg += '.';
+      }
+    }
+    if (flagged) {
+      msg += ` <b>${flagged} reading${flagged === 1 ? '' : 's'} flagged</b> — the highlight`
+        + ' landed near the rim, the sphere is small in frame, or something else on it is'
+        + ' nearly as bright as the lamp. Check those angles before trusting the surface.';
+    }
+    if (failed) msg += ` ${failed} failed: ${rows[0]}`;
+    if (worstSens > 1.5) {
+      msg += ' <b>The sphere is small for this.</b> Accuracy scales with its radius in'
+        + ' pixels — re-shoot with it larger in frame, or nearer the camera.';
+    }
+    st.innerHTML = msg;
+  } catch (e) {
+    if (st) st.innerHTML = '<b>Read failed.</b> See console.';
+    fail(e);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
 // --------------------------------------------------------- frame registration
 
 /** A shot's pixels, read on demand so a full-resolution set is never all in RAM. */
@@ -666,7 +868,7 @@ async function alignShots() {
   const say = (html) => { if (status) status.innerHTML = html; };
 
   if (btn) btn.disabled = true;
-  const beforeFit = solvableNow() ? photo.measureResidual(imgW, imgH) : null;
+  const beforeFit = solvableNow() ? photo.measureResidual(imgW, imgH, residualExclusion()) : null;
 
   try {
     const reg = await registerFrames(
@@ -694,7 +896,7 @@ async function alignShots() {
     dirtySurface = true;
     render();
 
-    const afterFit = solvableNow() ? photo.measureResidual(imgW, imgH) : null;
+    const afterFit = solvableNow() ? photo.measureResidual(imgW, imgH, residualExclusion()) : null;
     const px = (v) => `${v.toFixed(2)}px`;
     let msg = `Aligned: drift up to ${px(reg.worst)}`
       + (reg.reduce > 1 ? ` (measured at 1/${reg.reduce} scale)` : '')
@@ -734,6 +936,11 @@ function revertShots(w, h) {
   renderShotList();
   dirtySurface = true;
   render();
+}
+
+/** The sphere's disc in preview pixels, for excluding it from the fit. */
+function residualExclusion() {
+  return state.sphere ? spherePx(imgW, imgH) : null;
 }
 
 /** Whether a residual is meaningful right now: it needs spare degrees of freedom. */
@@ -800,11 +1007,21 @@ async function loadSyntheticCapture() {
     meta.push({ az, elev: e, name: `shot ${i + 1}` });
   }
 
+  // The synthetic sphere is opt-in: it occupies part of the frame and the solve
+  // makes nonsense of those pixels, exactly as it would on a real capture, so it
+  // should not appear in the default bench image.
+  const withSphere = $('psSphere') && $('psSphere').className === 'on';
+  const sphere = withSphere ? { cx: 180, cy: 620, r: 150 } : null;
   const S = synthesizeCaptureSet({
     width: 700, height: 800, seed: 7,
     pigmentDetail: parseFloat($('pigment').value),
-    lightDirs: dirs,
+    lightDirs: dirs, sphere,
   });
+  if (sphere) {
+    // Pre-filled because on the synthetic path its position is known. On a real
+    // capture this is the one thing the user has to supply.
+    state.sphere = { cx: sphere.cx / S.width, cy: sphere.cy / S.rows, r: sphere.r / S.width };
+  }
 
   disposeShots();
   shots = S.images.map((im, i) => {
@@ -864,6 +1081,15 @@ function renderShotList() {
     row.append(lab,
       mk(s2.az, -360, 360, (v) => { s2.az = v; }, 'azimuth, degrees'),
       mk(s2.elev, 1, 89, (v) => { s2.elev = v; }, 'elevation, degrees'));
+    if (s2.read) {
+      const d = document.createElement('span');
+      d.className = 'note';
+      d.style.cssText = 'grid-column:1/-1;margin:0 0 4px;font:10px var(--mono);opacity:.75';
+      d.textContent = `sphere: ${s2.read.sensitivity.toFixed(2)}\u00b0/px, rim ${s2.read.rim.toFixed(2)}`
+        + (s2.read.reliable ? '' : ' — flagged');
+      if (!s2.read.reliable) d.style.color = 'var(--warn, #e0a030)';
+      row.appendChild(d);
+    }
     if (s2.shift) {
       // The measured drift, per frame. Worth showing rather than folding into one
       // headline: it says WHICH exposure moved, which is the thing a re-shoot
@@ -894,12 +1120,35 @@ function wirePhotometric() {
     $('psAmbient').className = state.psFitAmbient ? 'on' : '';
     dirtySurface = true; render();
   });
+  const sphToggle = $('psSphere');
+  if (sphToggle) {
+    sphToggle.addEventListener('click', async () => {
+      sphToggle.className = sphToggle.className === 'on' ? '' : 'on';
+      if (sphToggle.className !== 'on') { state.sphere = null; drawSphereOverlay(); }
+      shots.forEach((s2) => { s2.read = null; });
+      if (state.mode === 'photometric' && $('src').value === 'psynth') {
+        await setSource(await loadSyntheticCapture());
+        reportSphere();
+      }
+    });
+  }
   $('psTruth').addEventListener('click', () => {
     state.psShowTruth = !state.psShowTruth;
     $('psTruth').className = state.psShowTruth ? 'on' : '';
     if (state.psShowTruth && state.viewMode === 0) { state.viewMode = 1; rebuildViews(); }
     render();
   });
+  const sphRead = $('sphRead');
+  if (sphRead) sphRead.addEventListener('click', () => { readLightsFromSphere(); });
+  const sphClear = $('sphClear');
+  if (sphClear) {
+    sphClear.addEventListener('click', () => {
+      state.sphere = null;
+      shots.forEach((s2) => { s2.read = null; });
+      drawSphereOverlay(); renderShotList();
+      $('sphStatus').textContent = 'Circle cleared. Angles keep whatever they were last set to.';
+    });
+  }
   const alignBtn = $('psAlign');
   if (alignBtn) alignBtn.addEventListener('click', () => { alignShots(); });
   const resetBtn = $('psAlignReset');

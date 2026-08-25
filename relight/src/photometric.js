@@ -255,12 +255,22 @@ void main() {
 const RESIDUAL_VIEW_FS = `${HEAD}
 uniform sampler2D uResidual;
 uniform float uScale;
+uniform vec3  uExclude;   // xy centre, z radius, in UV; radius 0 disables
+uniform float uAspect;
 void main() {
   float r = clamp(texture(uResidual, vUV).g * uScale, 0.0, 1.0);
   // dark blue (good) -> green -> yellow -> red (bad)
   vec3 c = r < 0.5
     ? mix(vec3(0.05, 0.10, 0.28), vec3(0.15, 0.75, 0.35), r * 2.0)
     : mix(vec3(0.15, 0.75, 0.35), vec3(0.95, 0.16, 0.12), (r - 0.5) * 2.0);
+  // A chrome sphere is a mirror, so the Lambertian model does not describe it and
+  // never will. Left in, it paints the loudest red in the frame and buries whatever
+  // the rest of the capture is trying to say. Drawn flat grey instead: excluded,
+  // and visibly so, rather than quietly dropped.
+  if (uExclude.z > 0.0) {
+    vec2 d = vec2((vUV.x - uExclude.x), (vUV.y - uExclude.y) / uAspect);
+    if (dot(d, d) < uExclude.z * uExclude.z) c = vec3(0.16, 0.16, 0.18);
+  }
   outColor = vec4(c, 1.0);
 }`;
 
@@ -507,8 +517,12 @@ export class Photometric {
     return { albedo: T.albedo, normal: dst, lin: T.albedo, residual: T.residual };
   }
 
-  /** Paint the false-coloured residual straight to the screen. */
-  drawResidual(viewW, viewH, scale = 6) {
+  /**
+   * Paint the false-coloured residual straight to the screen.
+   * @param exclude optional {cx, cy, r} in pixels, image coordinates — a region the
+   *   Lambertian model is not expected to describe, such as a chrome sphere.
+   */
+  drawResidual(viewW, viewH, scale = 6, exclude = null) {
     const { gl } = this.glctx;
     const p = this.progs.residualView;
     bindTarget(gl, null);
@@ -516,6 +530,12 @@ export class Photometric {
     gl.useProgram(p.program);
     bindTextures(gl, p, [['uResidual', this.targets.residual.tex]]);
     gl.uniform1f(p.uniforms.uScale, scale);
+    // UV runs bottom-up against the image's top-down rows.
+    gl.uniform3f(p.uniforms.uExclude,
+      exclude ? exclude.cx / viewW : 0,
+      exclude ? 1 - exclude.cy / viewH : 0,
+      exclude ? exclude.r / viewW : 0);
+    gl.uniform1f(p.uniforms.uAspect, viewW / Math.max(1, viewH));
     drawFullscreen(gl);
   }
 
@@ -524,17 +544,30 @@ export class Photometric {
    * coarse sample rather than the full buffer — this is a headline number, not a
    * measurement that needs every pixel.
    */
-  measureResidual(w, h) {
+  measureResidual(w, h, exclude = null) {
     const { gl } = this.glctx;
     const step = Math.max(1, Math.floor(Math.min(w, h) / 256));
     const sw = Math.floor(w / step), sh = Math.floor(h / step);
     bindTarget(gl, this.targets.residual);
     const buf = new Float32Array(w * 4);
     let sum = 0, sumsq = 0, n = 0, worst = 0;
+    // Pixels the model is not expected to fit — a chrome sphere is a mirror, and
+    // scoring the Lambertian solve on a mirror measures nothing except that a
+    // mirror is not Lambertian. Measured on the bench: a sphere left in raises a
+    // clean capture's headline fit from 0.16% to 1.49%, which is enough to hide a
+    // real fault behind the diagnostic meant to reveal it.
+    const exR2 = exclude ? exclude.r * exclude.r : 0;
     for (let y = 0; y < sh; y++) {
-      gl.readPixels(0, y * step, w, 1, gl.RGBA, gl.FLOAT, buf);
+      const glY = y * step;
+      gl.readPixels(0, glY, w, 1, gl.RGBA, gl.FLOAT, buf);
+      const imgY = h - 1 - glY;
       for (let x = 0; x < sw; x++) {
-        const v = buf[x * step * 4 + 1];
+        const px = x * step;
+        if (exR2) {
+          const dx = px - exclude.cx, dy = imgY - exclude.cy;
+          if (dx * dx + dy * dy < exR2) continue;
+        }
+        const v = buf[px * 4 + 1];
         if (!Number.isFinite(v)) continue;
         sum += v; sumsq += v * v; n++;
         if (v > worst) worst = v;

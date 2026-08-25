@@ -182,6 +182,50 @@ function buildSurface(w, h, seed, pigmentDetail) {
   return { H, normals, albedo };
 }
 
+/**
+ * Paint a mirror sphere into a rendered exposure.
+ *
+ * A chrome sphere in the corner of the frame is how a real capture measures its
+ * light directions instead of recalling them. Modelled the way the reading works:
+ * the sphere reflects a small bright source, so the highlight lands at the point
+ * whose normal bisects L and the viewer, and its angular size is what gives the
+ * blob a few pixels to find a centroid in.
+ *
+ * `sigmaDeg` is the source's angular radius as the sphere sees it — 5 degrees is
+ * about a 30cm softbox at two metres, which is a realistic copy-stand rig.
+ *
+ * @param sphere {cx, cy, r} in pixels, cy DOWN the image, matching the pixel grid
+ */
+function drawSphere(px, w, h, sphere, dirs, weights, { sigmaDeg = 5, body = 0.05, rim = 0.35 } = {}) {
+  const { cx, cy, r } = sphere;
+  const sig = (sigmaDeg * Math.PI) / 180;
+  const x0 = Math.max(0, Math.floor(cx - r)), x1 = Math.min(w, Math.ceil(cx + r));
+  const y0 = Math.max(0, Math.floor(cy - r)), y1 = Math.min(h, Math.ceil(cy + r));
+  for (let y = y0; y < y1; y++) {
+    for (let x = x0; x < x1; x++) {
+      const dx = (x - cx) / r;
+      // Image rows run down, the light frame's y runs up.
+      const dy = -(y - cy) / r;
+      const rr = dx * dx + dy * dy;
+      if (rr > 1) continue;
+      const nz = Math.sqrt(1 - rr);
+      // Mirror: reflect the viewer direction (0,0,1) about the normal.
+      const d = 2 * nz;
+      const rx = d * dx, ry = d * dy, rz = d * nz - 1;
+      let v = body + rim * Math.pow(1 - nz, 3);   // dark body, brighter at the edge
+      for (let k = 0; k < dirs.length; k++) {
+        const L = dirs[k];
+        const dot = Math.max(-1, Math.min(1, rx * L[0] + ry * L[1] + rz * L[2]));
+        const ang = Math.acos(dot);
+        v += weights[k] * 12 * Math.exp(-(ang * ang) / (2 * sig * sig));
+      }
+      const o = (y * w + x) * 4;
+      px[o] = encodeSrgb(v); px[o + 1] = encodeSrgb(v); px[o + 2] = encodeSrgb(v);
+      px[o + 3] = 255;
+    }
+  }
+}
+
 /** Render one exposure of a prepared surface under the given light directions. */
 function renderUnder(surface, w, h, dirs, weights, ambient = AMBIENT) {
   const { normals, albedo } = surface;
@@ -235,15 +279,24 @@ export function synthesizePainting({ width = 900, height = 1100, seed = 7,
  */
 export function synthesizeCaptureSet({ width = 700, height = 800, seed = 7,
                                        pigmentDetail = 0.35, lightDirs = null,
-                                       ambient = AMBIENT } = {}) {
+                                       ambient = AMBIENT, sphere = null,
+                                       sphereOpts = {} } = {}) {
   const w = width, h = height;
   const surface = buildSurface(w, h, seed, pigmentDetail);
   const dirs = (lightDirs || [
     [ 1, 0, 1], [0,  1, 1], [-1, 0, 1], [0, -1, 1],
   ]).map(normalize3);
-  const images = dirs.map((d) => renderUnder(surface, w, h, [d], [1.0], ambient));
+  const images = dirs.map((d) => {
+    const img = renderUnder(surface, w, h, [d], [1.0], ambient);
+    // Painted over the painting, as it would be in the frame — the sphere sits in
+    // the shot, so its pixels are not paint and the solve will make nonsense of
+    // them. That is true of a real capture too, and is why the reading is taken
+    // before the crop.
+    if (sphere) drawSphere(img.data, w, h, sphere, [d], [1.0], sphereOpts);
+    return img;
+  });
   return {
-    images, lightDirs: dirs, ambient,
+    images, lightDirs: dirs, ambient, sphere,
     normals: surface.normals, albedo: surface.albedo, height: surface.H,
     width: w, rows: h,
   };

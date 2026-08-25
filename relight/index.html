@@ -34,6 +34,14 @@
   }
   .handle.sel { box-shadow: 0 0 0 9px rgba(255,255,255,.18); }
   .handle.off { opacity: .3; }
+  /* The chrome-sphere circle. Translucent so the highlight stays visible through
+     it — the point of the overlay is to check it sits on the sphere's outline. */
+  .sphere-ring {
+    position: absolute; transform: translate(-50%, -50%);
+    border-radius: 50%; border: 2px dashed rgba(120, 220, 255, .95);
+    box-shadow: 0 0 0 1px rgba(0,0,0,.5), inset 0 0 0 1px rgba(0,0,0,.5);
+    pointer-events: none;
+  }
   #hint {
     position: absolute; left: 16px; right: 16px; bottom: 10px; color: var(--dim);
     font: 11px/1.4 var(--mono); background: rgba(0,0,0,.72);
@@ -115,6 +123,7 @@
         <div style="display:flex;gap:6px;margin:8px 0">
           <button id="psAmbient" class="on">Fit ambient</button>
           <button id="psTruth">Show truth</button>
+          <button id="psSphere" title="Put a chrome sphere in the synthetic frame, so the light-direction reading can be checked against a rig whose angles are known.">Sphere in frame</button>
         </div>
         <div class="row"><label>Highlight clamp</label><input type="range" id="psClamp" min="0.1" max="1" step="0.02" value="1"><output></output></div>
         <input type="file" id="psFiles" accept="image/*" multiple class="full" style="display:none;margin-bottom:8px">
@@ -122,6 +131,12 @@
           <button id="psAlign" title="Measure the drift between exposures and correct it. The solve is per pixel, so a tripod that shifted between shots corrupts it silently.">Align frames</button>
           <button id="psAlignReset" title="Put the frames back exactly as they were loaded.">As shot</button>
         </div>
+        <div style="display:flex;gap:6px;margin:8px 0">
+          <button id="sphPlace" title="Drag a circle over the chrome sphere in the frame.">Place sphere</button>
+          <button id="sphRead" title="Read every exposure's light direction off the sphere.">Read light directions</button>
+          <button id="sphClear" title="Forget the circle.">Clear</button>
+        </div>
+        <p class="note" id="sphStatus"></p>
         <div id="psShotList"></div>
         <p class="note" id="psStatus"></p>
         <p class="note">Measured normals and true albedo from N exposures with the light
@@ -130,6 +145,12 @@
           more exposure than there are unknowns (3 without the ambient term, 4 with it):
           with nothing spare the model fits perfectly by construction and the
           <b>Fit</b> view cannot tell you anything.</p>
+        <p class="note">A <b>chrome sphere</b> in the corner of the frame turns the light
+          angles from recollection into measurement — the highlight sits where the surface
+          normal bisects the lamp and the eye, and that relation inverts exactly. Drag the
+          circle over it, then read. Accuracy scales with the sphere's <i>radius in pixels</i>:
+          a circle 3px off centre costs about 5&deg; on an 80px sphere and 1.6&deg; on a 300px
+          one, so shoot it large. Take the reading before cropping the sphere out.</p>
         <p class="note"><b>Align frames</b> measures how far each exposure drifted and
           shifts it back. The solve is per pixel and assumes every exposure sees the same
           pixel, so half a pixel of tripod movement corrupts it while still returning a

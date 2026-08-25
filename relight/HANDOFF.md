@@ -129,7 +129,7 @@ Only relevant if Phase 5 is ever revived, which it should not be:
 
 ## 4. What exists
 
-~4,000 lines, plain ES modules, **no build step**, no dependencies.
+~4,800 lines, plain ES modules, **no build step**, no dependencies.
 
 | file | role |
 |---|---|
@@ -137,6 +137,7 @@ Only relevant if Phase 5 is ever revived, which it should not be:
 | `src/gbuffer.js` | Single-image surface recovery — the corrected integrate-then-differentiate pipeline, chroma reject, ratio-based albedo de-lighting |
 | `src/photometric.js` | Multi-shot measured surface — least-squares solve, ambient fit, Poisson height, fit residual |
 | `src/register.js` | Capture-frame alignment — chromaticity matching, all-pairs robust fit, Lanczos-3 correction. DOM-free, so the harness scores it without a browser |
+| `src/sphere.js` | Light directions read off a chrome sphere in frame — exact reflection geometry, no fit. Also DOM-free |
 | `src/shade.js` | Cook-Torrance GGX, spot cones, inverse-square falloff, horizon-march cast shadows, occlusion, ACES |
 | `src/kelvin.js` | Colour temperature via the Planckian locus (Kim et al.) → CIE xy → XYZ → linear sRGB |
 | `src/export.js` | Tiled full-resolution render with overlap margin, for both surface paths |
@@ -219,6 +220,62 @@ off alone, and the leftover disagreement is a confidence number needing no groun
 truth. The verdict shown to the user is the **fit residual before against after**;
 if it does not improve, the frames are put back and it says so.
 
+### 4.2 The error nothing else in this tool can see
+
+**Read this before touching the photometric path.** It is the sharpest result of
+the project so far and it is not intuitive.
+
+The solve takes light directions as *given*. Turn the whole rig by one angle — the
+wrong reference azimuth, a nominal template typed in — and the Fit view reads
+**0.17% at every angle, identical to a flawless capture**, while the surface rotates
+off the painting:
+
+| rig turned by | 0° | 2° | 10° | 20° | 40° |
+|---|---|---|---|---|---|
+| normals nx / ny | .9997/.9997 | .9992/.9991 | .9856/.9834 | .9437/.9349 | **.7810/.7498** |
+| fit residual | 0.17% | 0.17% | 0.17% | 0.17% | **0.17%** |
+
+Exact, not a tuning artefact: rotate every `L_k` by `R` and `g' = Rg` satisfies
+`g'·(R L_k) = g·L_k = I_k`. The model reproduces every photograph perfectly and
+returns a rotated surface. The relit output is entirely convincing with its impasto
+shadows falling at the wrong angle to the brushwork.
+
+Errors that are *not* uniform do show (each light off its own way by 10° reads
+6.29%) — but the uniform case is what a remembered rig actually produces, and every
+diagnostic in this tool compares the lights against **each other**, so none of them
+can break the symmetry.
+
+**A chrome sphere can**, by measuring each direction against the room. `src/sphere.js`.
+It is exact geometry — a mirror reflects the lamp into the eye only where the normal
+bisects them, so `N = normalise(L + V)` and with `V = (0,0,1)` that inverts as
+`L = 2 nz (nx, ny, nz) - V`. Measured against a known rig on a 200px-radius sphere:
+**worst 0.33°**, azimuth exact.
+
+Three things worth not re-deriving:
+
+- **The circle is placed by hand and the error scales with circle-error / radius,
+  not with pixels.** 3px of centre error costs 9.63° at r=40 and 1.60° at r=300. So
+  the requirement is a *big sphere* — a line in the capture protocol — rather than a
+  steady hand, which is unenforceable. The reading reports `sensitivity` in degrees
+  per pixel so a given placement's worth is on screen.
+- **The obvious repair was built and removed.** Snapping the circle to the sphere's
+  silhouette cannot be judged by this bench: it would be tested against `synth.js`'s
+  own model of a sphere's edge. And on that render there is no edge to find — the
+  luminance just inside the rim (~0.26) is indistinguishable from the painting just
+  outside (0.23–0.40), because a mirror near its silhouette reflects the room at
+  grazing angles. The validatable route is optimising the circle against the fit
+  residual; it is in §8.
+- **A sphere in frame must be excluded from the fit.** A mirror is not Lambertian, so
+  its pixels dominate the residual: a clean capture reads 1.49% with the sphere left
+  in and 0.16% with its disc excluded — enough to hide a real fault behind the
+  diagnostic meant to reveal it. Excluded from the measurement, and drawn flat grey
+  in the Fit view rather than silently dropped.
+
+A circle that is not on a sphere still returns six confident directions, so two
+checks catch that: readings that all agree cannot be readings of a mirror (the lamp
+moved between exposures — a circle on paint returns six directions within 4.2° of
+each other), and the fit residual before against after (0.16% → 6.35%).
+
 ### Two capture rules enforced in code, not just documented
 
 1. **Ambient light must be fitted, and that needs varied light elevation.**
@@ -249,8 +306,8 @@ was photographed. Blue = the model matches. Clean capture 0.16%; one frame off b
 
 ```bash
 python3 -m http.server 8080          # then http://localhost:8080/relight/
-node relight/tools/validate.mjs      # ground-truth maths + registration check, no browser
-node relight/tools/smoke.mjs         # end-to-end browser suite, 15 checks (needs playwright)
+node relight/tools/validate.mjs      # ground-truth maths, registration and sphere, no browser
+node relight/tools/smoke.mjs         # end-to-end browser suite, 18 checks (needs playwright)
 ```
 
 Must be served over http(s) — ES modules will not load from `file://`.
@@ -275,7 +332,7 @@ bench refuses to start and says why.
 | 4 — Albedo recovery | partial single-image; **superseded** on the photometric path |
 | 5 — Host integration | **dropped** — standalone product |
 | 6 — Export | done, both paths |
-| 7 — Photometric stereo | done, and the strongest part of the tool; capture frames are now registered rather than trusted |
+| 7 — Photometric stereo | done, and the strongest part of the tool; frames are now registered rather than trusted, and light directions measured rather than recalled |
 | 8 — Tier 3 depth model | not started, and unnecessary for the stated use case |
 
 ---
@@ -294,8 +351,11 @@ bench refuses to start and says why.
   falls back on luminance alone and 2 of 15 frame pairs go wrong. The other 13
   outvote them and the answer still lands, but the discounted count is reported
   for a reason.
-- **Light directions for uploaded shots are typed in by hand.** Estimating them
-  from a chrome sphere in frame is the standard trick and is not implemented.
+- **The sphere's circle is placed by hand**, and there is no automatic silhouette
+  fit — §4.2 records why one was removed rather than shipped. Without a sphere in
+  the capture, light directions are still typed in, and §4.2 is what that costs.
+- **A sphere reading assumes a neutral lamp and orthographic projection.** A
+  strongly coloured light or a very short lens biases it; neither is measured.
 - **Defaults are tuned to the synthetic canvas**, whose weave is coarser than real
   linen. The prominent dotted texture in every screenshot so far is that synthetic
   weave, not a real painting.
@@ -314,25 +374,27 @@ bench refuses to start and says why.
 
 Ranked, with reasons rather than a bare list:
 
-1. **Estimate light directions from a chrome sphere** placed in frame. Now the
-   most error-prone manual step left, and the one remaining input that is typed in
-   rather than measured — a light angle 40° out reads only 1.70% on the Fit view,
-   which is well inside the range a merely-imperfect capture produces, so a wrong
-   angle is not reliably visible. The sphere makes it measurable.
-2. **Retune defaults against a real photograph.** Blocked on the owner supplying a
+1. **Retune defaults against a real photograph.** Blocked on the owner supplying a
    single-source raking-light shot of a painting with real impasto. Everything
-   downstream is calibrated against the synthetic weave until then. This is the
-   only item blocked on something other than time, and it gates the honesty of
-   every default in the tool.
-3. **A resample-free correction path.** §4.1 established that registration's
-   estimate is essentially exact and the whole remaining loss is interpolation
-   (fit 0.78% against a 0.17% floor on the sub-pixel case). Rather than a better
-   kernel, the real fix is not to resample at all: fold each frame's sub-pixel
-   offset into the solve, by sampling the shot array at the shifted UV in the
-   solve shader instead of pre-shifting the pixels. That moves the interpolation
-   onto the GPU's sampler and out of the data, and it makes alignment free to
-   apply and free to undo. Worth measuring before assuming it wins — bilinear is
-   all a GPU sampler gives, and §4.1 measured bilinear as the worst option.
+   downstream is calibrated against the synthetic weave until then, and it is now
+   the only item blocked on something other than time. It also gates the honesty of
+   every default in the tool, so it has risen to the top by everything else being
+   done rather than by growing in importance.
+2. **Fit the sphere's circle against the photometric residual.** §4.2 leaves circle
+   placement as the one hand-set number that still costs real accuracy (3px on a
+   small sphere is several degrees). Optimising `cx, cy, r` against the fit residual
+   is the validatable version of the silhouette fitter that was removed — three
+   parameters, an objective the tool already computes, and ground truth available in
+   the bench to score it against. Note the residual is blind to a *uniform* rotation
+   of the rig, so it can refine a circle but can never replace the sphere.
+3. **A resample-free correction path for registration.** §4.1 established that the
+   estimate is essentially exact and the whole remaining loss is interpolation (fit
+   0.78% against a 0.17% floor on the sub-pixel case). Rather than a better kernel,
+   fold each frame's sub-pixel offset into the solve by sampling the shot array at a
+   shifted UV in the solve shader. That moves interpolation onto the GPU's sampler
+   and makes alignment free to apply and undo. Measure before assuming it wins —
+   bilinear is all a GPU sampler gives, and §4.1 measured bilinear as the worst
+   option, so this may need a Lanczos tap in the shader to be worth doing.
 4. **Register rotation as well as translation.** Only worth it if a real capture
    turns out to need it; a tripod that rotated is usually a re-shoot.
 5. Preset/save system for light rigs — the first thing that will be missed in
@@ -345,7 +407,8 @@ a relief pipeline that traced brushwork beautifully and recovered nothing; an
 acceptance test that passed hardest on the capture that recovered nothing; a fit
 residual that read a perfect 0.00% precisely when it had no information; a frame
 matcher built on the textbook light-invariant feature that was confidently 3px out
-on a fifth of its comparisons.
+on a fifth of its comparisons; and a rig rotated bodily off the painting that fits
+every photograph perfectly at 0.17% while returning the wrong surface.
 
 The practice that caught all of them: **synthesise a surface whose truth you
 know, feed the tool only the render, and score the recovery numerically.** Do not
