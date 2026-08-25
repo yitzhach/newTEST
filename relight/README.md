@@ -145,7 +145,93 @@ itself. The bench now defaults to six exposures, reports `shots / unknowns /
 spare` on every rebuild, and says **"fit unmeasurable"** rather than printing a
 reassuring zero when nothing is spare.
 
-### 6. The proposed v1 acceptance test passes when the geometry is wrong
+### 6. Frame drift is correctable, and the thing that corrects it is colour
+
+The per-pixel solve assumes every exposure sees the same pixel. Uploaded capture
+sets were checked for matching dimensions and then trusted — a tripod held on
+faith. It is now measured and corrected, scored against a drift that is exact by
+construction: the painting is synthesised at 3x and each frame box-downsampled
+from a different integer offset on that fine grid, so one texel upstairs is
+exactly one third of a pixel downstairs with no interpolation anywhere in the
+ground truth.
+
+| case | | shift err | normals nx / ny | fit |
+|---|---|---|---|---|
+| clean | as shot | — | 0.9997 / 0.9997 | 0.17% |
+| | registered | 0.003 | 0.9997 / 0.9997 | 0.17% |
+| one frame 1.3px | as shot | — | 0.930 / 0.836 | 2.32% |
+| | registered | 0.020 | **0.993 / 0.984** | **0.78%** |
+| one frame 3px | as shot | — | 0.965 / 0.926 | 1.51% |
+| | registered | 0.003 | **0.9997 / 0.9997** | **0.17%** |
+| creep, 0-2px | as shot | — | 0.203 / 0.902 | 4.01% |
+| | registered | 0.005 | **0.985 / 0.976** | **1.14%** |
+
+Three things came out of building it that were not obvious going in.
+
+**Gradient magnitude is not light-invariant enough.** The exposures are lit
+differently by design, so the raw images disagree wherever there is relief. The
+standard repair is to match on the gradient *magnitude* of log luminance, on the
+grounds that a ridge is an edge under any light even though the sign of that edge
+flips. Over the 15 frame pairs of a six-shot capture that gets 12 right and lands
+3px out on the other three: |grad log L| is strongest *across* the light azimuth,
+so two frames lit 120 degrees apart emphasise different edges and correlate
+weakly and off-centre.
+
+What is invariant is **chromaticity**. Under the Lambertian model the solve
+already assumes, `I_c = albedo_c * (n·l + ambient)` — the shading is one scalar
+multiplying all three channels, so `r / (r+g+b)` cancels it exactly. Not
+approximately: the lamp divides out. Matching on the gradient of chromaticity
+gets all 15 pairs right at r = 0.999, and ignores the canvas weave for free,
+the weave being achromatic relief and so invisible to it.
+
+The feature is the sum of both at a **fixed** gain, not normalised. That is what
+makes it degrade correctly on a subject with no colour — a grisaille, a charcoal
+drawing, an underexposed frame. Normalising each term to unit variance would hand
+an achromatic frame's chroma *noise* the same authority as real structure;
+at fixed gain the term is simply small. Measured on a desaturated copy of the
+bench painting, every gain from 0 to 16 gives bit-identical output.
+
+**A coarse pyramid level has to be built by downsampling the feature, not by
+re-gradienting a downsampled photograph.** Both are one line and they behave
+completely differently: the second lands 2-4px off zero on frames that never
+moved. Take the gradient at quarter resolution and the pixel differences no
+longer straddle a ridge flank, they straddle the whole brushstroke, whose broad
+shading lobe leans toward whichever side the lamp is on and *moves when the lamp
+moves*.
+
+**What is left to improve is the resampler, not the measurement.** The harness
+corrects a third time by the drift that was actually applied, which separates the
+two: registered lands on that floor in every case, so the estimate is essentially
+exact and the remaining shortfall is interpolation. That made the kernel worth
+measuring rather than defaulting:
+
+| kernel | normals nx / ny | fit |
+|---|---|---|
+| uncorrected | 0.203 / 0.902 | 4.01% |
+| bilinear | 0.939 / 0.885 | 3.10% |
+| Catmull-Rom | 0.964 / 0.932 | 1.78% |
+| **Lanczos-3** | **0.985 / 0.976** | **1.13%** |
+
+Bilinear recovers barely half of what is available — a half-pixel bilinear shift
+is a low-pass filter whose knee sits inside the 2-7px band this whole engine works
+in. Lanczos-3 rings slightly at hard edges; that is the trade taken.
+
+Two consequences shape the implementation. Every pair is measured rather than
+every frame against frame 0, and the per-frame positions come out of a weighted
+least-squares fit over all of them — 15 measurements of 5 unknowns, so a pair that
+cannot see its partner can be outvoted rather than carrying its frame off alone,
+and the leftover disagreement is a confidence number that needs no ground truth.
+And anchoring is on the **median** position, so in the usual case — one frame
+knocked out of line while the rest held — the frames that held keep exact integer
+offsets, and an exact integer offset is a copy rather than a filter. That is why
+registering a clean set costs nothing measurable, which is the control row above.
+
+The verdict in the UI is the fit residual before against after. If it does not
+improve, the frames are put back and it says so: registration only corrects
+translation, and a rotated frame or a wrong light angle will not be fixed by
+shifting it.
+
+### 7. The proposed v1 acceptance test passes when the geometry is wrong
 
 §8 #7 proposes: a raking light must produce brushstroke shadowing that inverts when
 the light crosses to the other side. Run against the bench:
@@ -176,6 +262,7 @@ the along-azimuth component.
 | Lights | N lights, drag on canvas for X/Y, Distance for Z, Kelvin or custom colour, Power, Cone |
 | View | relit / fit / normals / height / albedo / original |
 | Photometric | N exposures, per-shot azimuth/elevation, ambient fit, highlight clamp, truth compare |
+| Alignment | measure and correct inter-frame drift, per-frame shift readout, revert to as-shot |
 | Fit view | per-pixel residual between the model and the photographs, false-coloured, with a headline percentage |
 | Export | format, scale, tiled full-resolution render with progress; honours whichever surface path is active |
 
@@ -204,7 +291,9 @@ Because the height field is known, recovery can be scored rather than admired.
 For the photometric path, shooting for the solver rather than for the eye:
 
 1. Fixed camera. A tripod, no reframing, no zoom change between exposures. The
-   solve is per pixel and assumes every exposure sees the same pixel.
+   solve is per pixel and assumes every exposure sees the same pixel. **Align
+   frames** measures what the tripod actually did and corrects it, but it only
+   corrects translation — a bumped tripod that rotated is a re-shoot.
 2. One light, moved. **Six exposures**, not four. Four is the museum convention
    and solves fine, but leaves nothing spare to check the answer with — see
    finding 5. The extra two exposures cost a minute and are what make the Fit
@@ -247,8 +336,18 @@ are computed in one place (`updateDerived`) rather than at each call site.
 - The synthetic source's canvas weave is coarse relative to the image, so it
   reads more strongly than a real linen would. Defaults are tuned around it and
   will want revisiting against real photographs.
-- Uploaded capture sets are assumed pre-aligned; the tool checks that dimensions
-  match but does not register the frames. A tripod is doing that work.
+- Uploaded capture sets are registered on demand, not automatically, and only for
+  **translation**. Rotation, scale and lens breathing are not corrected. The fit
+  residual will show them; nothing here will fix them.
+- Registration is measured at up to 1600px on the long edge and applied at full
+  resolution, because building the feature costs ~0.4s/megapixel and six 12MP
+  frames would otherwise spend half a minute before the first correlation. The
+  cost of that cap is measured: at 1/2 scale, recovery 0.9994/0.9990 against
+  0.9997/0.9996 at full; at 1/4, 0.9918/0.9860. Both still far ahead of the
+  0.914/0.829 of leaving the drift in.
+- Registering an achromatic subject falls back to luminance alone, where 2 of 15
+  frame pairs go wrong. The fit still lands because the other 13 outvote them, and
+  the discounted count is reported — but that is the weak case.
 - Light directions for uploaded shots are entered by hand. Estimating them from a
   chrome sphere in frame is the standard trick and is not implemented.
 - Tiled photometric export is not bit-exact against an untiled render (mean

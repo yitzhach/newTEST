@@ -46,6 +46,46 @@ await p.evaluate(()=>{window.__bench.state.viewMode=5;window.__bench.render();})
 const fit = await p.evaluate(()=>window.__bench.measureFit());
 check('fit measurable with 6 shots', fit && fit.mean>0 && fit.mean<0.05, fit? (fit.mean*100).toFixed(2)+'%':'null');
 
+// frame registration: knock one exposure out of line, then put it back.
+// The check is the fit residual, because that is what the feature is FOR — a real
+// capture has no ground truth and the residual is the only score it can produce.
+const fit0 = await p.evaluate(()=>window.__bench.measureFit());
+await p.evaluate(()=>window.__bench.shiftShot(1,3,0));
+await p.waitForTimeout(1500);
+const fit1 = await p.evaluate(()=>window.__bench.measureFit());
+check('3px drift shows in the fit', fit1 && fit1.mean > fit0.mean*3,
+  `${(fit0.mean*100).toFixed(2)}% -> ${(fit1.mean*100).toFixed(2)}%`);
+
+await p.click('#psAlign');
+await p.waitForFunction(()=>!document.getElementById('psAlign').disabled,null,{timeout:180000});
+await p.waitForTimeout(800);
+const fit2 = await p.evaluate(()=>window.__bench.measureFit());
+check('align recovers the fit', fit2 && fit2.mean < fit0.mean*1.6,
+  `${(fit1.mean*100).toFixed(2)}% -> ${(fit2.mean*100).toFixed(2)}% (clean was ${(fit0.mean*100).toFixed(2)}%)`);
+const shifted = await p.evaluate(()=>window.__bench.shotShifts());
+check('align reports the shift it found', shifted[1] && Math.abs(Math.abs(shifted[1].dx)-3) < 0.35,
+  JSON.stringify(shifted.map(v=>v&&[+v.dx.toFixed(2),+v.dy.toFixed(2)])));
+
+// Aligning twice must not shift twice. Correcting from the corrected frames would
+// measure ~0 the second time and look fine here while quietly halving the
+// resolution of anything it touched; correcting from the originals is what makes
+// the operation idempotent.
+await p.click('#psAlign');
+await p.waitForFunction(()=>!document.getElementById('psAlign').disabled,null,{timeout:180000});
+await p.waitForTimeout(800);
+const fit3 = await p.evaluate(()=>window.__bench.measureFit());
+const twice = await p.evaluate(()=>window.__bench.shotShifts());
+check('aligning twice does not compound', fit3 && fit3.mean < fit0.mean*1.15
+  && twice[1] && Math.abs(Math.abs(twice[1].dx)-3) < 0.35,
+  `fit ${(fit3.mean*100).toFixed(2)}%, shift ${twice[1]?twice[1].dx.toFixed(2):'?'}`);
+
+// "As shot" must put the drift back, not silently keep the correction
+await p.click('#psAlignReset');
+await p.waitForTimeout(900);
+const fit4 = await p.evaluate(()=>window.__bench.measureFit());
+check('as-shot restores the uncorrected frames', fit4 && fit4.mean > fit0.mean*3,
+  `${(fit3.mean*100).toFixed(2)}% -> ${(fit4.mean*100).toFixed(2)}%`);
+
 // photometric export
 dl = p.waitForEvent('download',{timeout:180000});
 await p.click('#exportBtn'); d = await dl;

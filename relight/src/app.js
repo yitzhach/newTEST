@@ -10,6 +10,7 @@ import { kelvinToLinearRGB, hexToLinearRGB, linearRGBToHex } from './kelvin.js';
 import { synthesizePainting, synthesizeCaptureSet, normalsToImageData } from './synth.js';
 import { Photometric, buildSolver, uploadShotArray, MAX_SHOTS } from './photometric.js';
 import { exportFullRes, downloadCanvas, requiredMargin } from './export.js';
+import { registerFrames, resample } from './register.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('gl');
@@ -17,7 +18,10 @@ const wrap = $('wrap');
 
 let glctx, gbuf, shader, photo, srcTex = null, targets = null;
 // Photometric capture: one texture per exposure plus its light direction.
-let shots = [];          // [{ source, az, elev, name }] — angles are editable
+// `source` is what gets solved; `original` is what was loaded. Alignment always
+// measures and corrects from `original`, so applying it twice cannot compound a
+// shift and reverting is a straight swap rather than an inverse resample.
+let shots = [];          // [{ source, original, az, elev, name, shift }]
 let shotArrayTex = null; // the exposures packed into one TEXTURE_2D_ARRAY
 let truthTex = null;     // ground-truth normals, when the source is synthetic
 let imgW = 0, imgH = 0;
@@ -492,19 +496,31 @@ async function boot() {
     dirty: () => { dirtySurface = true; },
     measureFit: () => photo.measureResidual(imgW, imgH),
     residualTarget: () => photo.targets && photo.targets.residual,
-    /** Displace one exposure, to model a tripod that moved between shots. */
+    /**
+     * Displace one exposure, to model a tripod that moved between shots.
+     *
+     * Replaces `original` as well as `source`: this is standing in for a frame
+     * that was *photographed* from a different position, not for an edit applied
+     * afterwards. Moving only `source` would leave alignment measuring an
+     * undisplaced original and "correcting" the drift by discarding it, which
+     * passes the fit check while testing none of the registration.
+     */
     shiftShot: async (i, dx, dy) => {
-      const src = shots[i].source;
+      const src = shots[i].original;
       const c = document.createElement('canvas');
       c.width = src.width || src.naturalWidth;
       c.height = src.height || src.naturalHeight;
       const cx = c.getContext('2d');
       cx.drawImage(src, dx, dy);
       shots[i].source = c;
+      shots[i].original = c;
+      shots[i].shift = null;
       packShots(c.width, c.height);
       dirtySurface = true;
       render();
     },
+    alignShots,
+    shotShifts: () => shots.map((s2) => s2.shift),
     photometricJob: () => ({
       mode: 'photometric',
       sources: shots.map((s2) => s2.source),
@@ -609,6 +625,124 @@ function wireExport() {
   });
 }
 
+// --------------------------------------------------------- frame registration
+
+/** A shot's pixels, read on demand so a full-resolution set is never all in RAM. */
+function readShot(src) {
+  const w = src.width || src.naturalWidth, h = src.height || src.naturalHeight;
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const cx = c.getContext('2d', { willReadFrequently: true });
+  cx.drawImage(src, 0, 0);
+  return cx.getImageData(0, 0, w, h).data;
+}
+
+function putShot(data, w, h) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  c.getContext('2d').putImageData(new ImageData(data, w, h), 0, 0);
+  return c;
+}
+
+/** Let the browser paint between the slow steps. */
+const yieldToUI = () => new Promise((r) => setTimeout(r, 0));
+
+/**
+ * Measure the drift between exposures and correct it.
+ *
+ * The verdict is the fit residual before against after. That is the point of
+ * doing this now rather than earlier: registration used to have no way to show it
+ * had helped, and the residual is an objective score that a real capture — which
+ * arrives with no ground truth — can actually produce. If it does not improve,
+ * this says so and leaves the frames alone rather than insisting.
+ */
+async function alignShots() {
+  const status = $('psStatus');
+  const btn = $('psAlign');
+  if (shots.length < 2) return;
+
+  const w = shots[0].original.width || shots[0].original.naturalWidth;
+  const h = shots[0].original.height || shots[0].original.naturalHeight;
+  const say = (html) => { if (status) status.innerHTML = html; };
+
+  if (btn) btn.disabled = true;
+  const beforeFit = solvableNow() ? photo.measureResidual(imgW, imgH) : null;
+
+  try {
+    const reg = await registerFrames(
+      shots.map((s2) => ({ width: w, height: h, read: () => readShot(s2.original) })),
+      {
+        onProgress: async (frac, msg) => {
+          say(`Aligning — ${msg} (${Math.round(frac * 100)}%)`);
+          await yieldToUI();
+        },
+      });
+
+    if (!reg.ok) { say(`<b>Cannot align.</b> ${reg.reason}`); return; }
+
+    for (let i = 0; i < shots.length; i++) {
+      say(`Aligning — correcting frame ${i + 1} of ${shots.length}`);
+      await yieldToUI();
+      const sh = reg.shifts[i];
+      shots[i].shift = sh;
+      shots[i].source = (Math.abs(sh.dx) < 1e-6 && Math.abs(sh.dy) < 1e-6)
+        ? shots[i].original
+        : putShot(resample(readShot(shots[i].original), w, h, sh.dx, sh.dy), w, h);
+    }
+    packShots(w, h);
+    renderShotList();
+    dirtySurface = true;
+    render();
+
+    const afterFit = solvableNow() ? photo.measureResidual(imgW, imgH) : null;
+    const px = (v) => `${v.toFixed(2)}px`;
+    let msg = `Aligned: drift up to ${px(reg.worst)}`
+      + (reg.reduce > 1 ? ` (measured at 1/${reg.reduce} scale)` : '')
+      + `. Pairs agree to ${px(reg.consistency)}`
+      + (reg.outliers ? `, ${reg.outliers} of ${reg.pairs} discounted` : '');
+
+    if (beforeFit && afterFit) {
+      const b = beforeFit.mean * 100, a = afterFit.mean * 100;
+      msg += ` · fit ${b.toFixed(2)}% → <b>${a.toFixed(2)}%</b>`;
+      if (a > b + 0.02) {
+        // Say it plainly and put it back. A correction that made the fit worse is
+        // a correction that was wrong, whatever the correlation peaks looked like.
+        msg += ' — <b>worse, so the frames have been put back.</b>'
+          + ' Registration only corrects translation; a rotated or rescaled frame,'
+          + ' or a light angle that is wrong, will not be fixed by shifting it.';
+        revertShots(w, h);
+      }
+    } else if (!beforeFit || !afterFit) {
+      msg += ' · fit unmeasurable — add a shot to check it';
+    }
+    if (!reg.reliable) {
+      msg += ' <b>Low confidence:</b> the frame pairs did not agree well.'
+        + ' Check the Fit view before trusting this.';
+    }
+    say(msg);
+  } catch (e) {
+    say('<b>Align failed.</b> See console.');
+    fail(e);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+function revertShots(w, h) {
+  shots.forEach((s2) => { s2.source = s2.original; s2.shift = null; });
+  packShots(w, h);
+  renderShotList();
+  dirtySurface = true;
+  render();
+}
+
+/** Whether a residual is meaningful right now: it needs spare degrees of freedom. */
+function solvableNow() {
+  if (state.mode !== 'photometric' || !photo || !photo.targets) return false;
+  const solver = buildSolver(shots.map(shotDir), { fitAmbient: state.psFitAmbient });
+  return solver.ok && solver.dof > 0;
+}
+
 // ------------------------------------------------------- photometric capture
 
 function shotDir(s2) {
@@ -673,7 +807,10 @@ async function loadSyntheticCapture() {
   });
 
   disposeShots();
-  shots = S.images.map((im, i) => ({ source: toCanvas(im), ...meta[i] }));
+  shots = S.images.map((im, i) => {
+    const c = toCanvas(im);
+    return { source: c, original: c, shift: null, ...meta[i] };
+  });
   packShots(S.width, S.rows);
   truthTex = uploadTex(toCanvas(normalsToImageData(S.normals, S.width, S.rows)));
   renderShotList();
@@ -690,7 +827,7 @@ async function loadUploadedCapture(files) {
   }
   disposeShots();
   shots = imgs.map((im, i) => ({
-    source: im,
+    source: im, original: im, shift: null,
     // A sensible starting rig; the user corrects it per shot below.
     az: (i * 360) / imgs.length,
     elev: 45 + (i % 2 ? 7 : -7),
@@ -727,6 +864,17 @@ function renderShotList() {
     row.append(lab,
       mk(s2.az, -360, 360, (v) => { s2.az = v; }, 'azimuth, degrees'),
       mk(s2.elev, 1, 89, (v) => { s2.elev = v; }, 'elevation, degrees'));
+    if (s2.shift) {
+      // The measured drift, per frame. Worth showing rather than folding into one
+      // headline: it says WHICH exposure moved, which is the thing a re-shoot
+      // needs to know.
+      const d = document.createElement('span');
+      d.className = 'note';
+      d.style.cssText = 'grid-column:1/-1;margin:0 0 4px;font:10px var(--mono);opacity:.75';
+      d.textContent = `shifted ${s2.shift.dx >= 0 ? '+' : ''}${s2.shift.dx.toFixed(2)}, `
+        + `${s2.shift.dy >= 0 ? '+' : ''}${s2.shift.dy.toFixed(2)} px`;
+      row.appendChild(d);
+    }
     box.appendChild(row);
   });
 }
@@ -752,6 +900,18 @@ function wirePhotometric() {
     if (state.psShowTruth && state.viewMode === 0) { state.viewMode = 1; rebuildViews(); }
     render();
   });
+  const alignBtn = $('psAlign');
+  if (alignBtn) alignBtn.addEventListener('click', () => { alignShots(); });
+  const resetBtn = $('psAlignReset');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (!shots.length) return;
+      const src = shots[0].original;
+      revertShots(src.width || src.naturalWidth, src.height || src.naturalHeight);
+      const st = $('psStatus');
+      if (st) st.textContent = 'Alignment cleared — frames are as shot.';
+    });
+  }
   $('psFiles').addEventListener('change', async (e) => {
     if (!e.target.files.length) return;
     try { await setSource(await loadUploadedCapture(e.target.files)); }

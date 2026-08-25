@@ -118,6 +118,10 @@
         </div>
         <div class="row"><label>Highlight clamp</label><input type="range" id="psClamp" min="0.1" max="1" step="0.02" value="1"><output></output></div>
         <input type="file" id="psFiles" accept="image/*" multiple class="full" style="display:none;margin-bottom:8px">
+        <div style="display:flex;gap:6px;margin:8px 0">
+          <button id="psAlign" title="Measure the drift between exposures and correct it. The solve is per pixel, so a tripod that shifted between shots corrupts it silently.">Align frames</button>
+          <button id="psAlignReset" title="Put the frames back exactly as they were loaded.">As shot</button>
+        </div>
         <div id="psShotList"></div>
         <p class="note" id="psStatus"></p>
         <p class="note">Measured normals and true albedo from N exposures with the light
@@ -126,6 +130,13 @@
           more exposure than there are unknowns (3 without the ambient term, 4 with it):
           with nothing spare the model fits perfectly by construction and the
           <b>Fit</b> view cannot tell you anything.</p>
+        <p class="note"><b>Align frames</b> measures how far each exposure drifted and
+          shifts it back. The solve is per pixel and assumes every exposure sees the same
+          pixel, so half a pixel of tripod movement corrupts it while still returning a
+          normal. Matching is on colour ratio, which the lighting divides out exactly, so
+          it is not confused by the exposures being lit differently. The verdict is the
+          <b>fit</b> percentage before against after — if it does not improve, the frames
+          are put back and it says so.</p>
       </div>
     </div>
 

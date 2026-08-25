@@ -129,13 +129,14 @@ Only relevant if Phase 5 is ever revived, which it should not be:
 
 ## 4. What exists
 
-~2,700 lines, plain ES modules, **no build step**, no dependencies.
+~4,000 lines, plain ES modules, **no build step**, no dependencies.
 
 | file | role |
 |---|---|
 | `src/gl.js` | WebGL2 scaffolding, float render targets, fullscreen-triangle passes |
 | `src/gbuffer.js` | Single-image surface recovery — the corrected integrate-then-differentiate pipeline, chroma reject, ratio-based albedo de-lighting |
 | `src/photometric.js` | Multi-shot measured surface — least-squares solve, ambient fit, Poisson height, fit residual |
+| `src/register.js` | Capture-frame alignment — chromaticity matching, all-pairs robust fit, Lanczos-3 correction. DOM-free, so the harness scores it without a browser |
 | `src/shade.js` | Cook-Torrance GGX, spot cones, inverse-square falloff, horizon-march cast shadows, occlusion, ACES |
 | `src/kelvin.js` | Colour temperature via the Planckian locus (Kim et al.) → CIE xy → XYZ → linear sRGB |
 | `src/export.js` | Tiled full-resolution render with overlap margin, for both surface paths |
@@ -157,6 +158,66 @@ relief resolves along the wrong axis rather than producing garbage.
 0.74 / −0.13 from one photograph, and true albedo falls out of the same solve —
 which is why the brief's Phase 4 (intrinsic decomposition) no longer needs to
 exist. Nothing is estimated.
+
+Frames are now **registered** rather than trusted — see §4.1.
+
+### 4.1 Frame registration, and the one thing that makes it work
+
+"A tripod is doing that work on trust" is no longer true: **Align frames**
+measures the drift between exposures and corrects it. Scored against a drift that
+is exact by construction — the painting is synthesised at 3× and each frame
+box-downsampled from a different integer offset on that fine grid, so one texel
+upstairs is exactly ⅓ px downstairs with no interpolation in the ground truth:
+
+| case | as shot (nx/ny, fit) | registered | shift err |
+|---|---|---|---|
+| clean | 0.9997 / 0.9997, 0.17% | 0.9997 / 0.9997, 0.17% | 0.003px |
+| one frame 1.3px | 0.930 / 0.836, 2.32% | **0.993 / 0.984, 0.78%** | 0.020px |
+| one frame 3px | 0.965 / 0.926, 1.51% | **0.9997 / 0.9997, 0.17%** | 0.003px |
+| creep 0–2px | 0.203 / 0.902, 4.01% | **0.985 / 0.976, 1.14%** | 0.005px |
+
+The load-bearing finding, and the one worth not re-deriving:
+
+**Match on chromaticity, not on gradient magnitude.** The obvious light-invariant
+feature is |∇ log L| — a ridge is an edge under any light, even though the sign of
+that edge flips. It gets 12 of the 15 frame pairs of a six-shot capture right and
+lands 3px out on the other three, because |∇ log L| is strongest *across* the
+light azimuth: two frames lit 120° apart emphasise different edges. Chromaticity
+is *exactly* invariant instead — under `I_c = albedo_c·(n·L + ambient)` the shading
+is one scalar on all three channels, so `r/(r+g+b)` divides the lamp out. All 15
+pairs, r = 0.999. It ignores the canvas weave for free, the weave being achromatic.
+
+The feature is `|∇ log L| + 8·|∇ chromaticity|` at **fixed** gain, deliberately not
+normalised: that is what makes an achromatic subject fall back to luminance
+instead of having its chroma *noise* promoted to equal authority. On a desaturated
+copy of the bench painting every gain from 0 to 16 is bit-identical.
+
+Three more, briefly, each of which cost a wrong result first:
+
+- **Build coarse pyramid levels by downsampling the feature**, never by
+  re-gradienting a downsampled photograph. The second lands 2–4px off zero on
+  frames that never moved: at ¼ scale the pixel differences straddle a whole
+  brushstroke rather than a ridge flank, and a brushstroke's shading lobe leans
+  toward the lamp and moves with it.
+- **Anchor on the median frame position**, not the mean and not frame 0. In the
+  usual case — one frame knocked out, the rest held — the median leaves the ones
+  that held on exact integer offsets, and an integer offset is a copy, not a
+  filter. That is why the clean row above costs nothing.
+- **Lanczos-3, not bilinear.** Correcting by the *known* drift isolates the
+  resampler from the estimate: uncorrected 0.203/0.902, bilinear 0.939/0.885,
+  Catmull-Rom 0.964/0.932, Lanczos-3 0.985/0.976. Bilinear throws away half of
+  what registration wins, because a half-pixel bilinear shift is a low-pass whose
+  knee is inside the 2–7px band this engine works in.
+
+Because registered lands on the correct-by-truth floor in every case, **the
+estimate is essentially exact and what remains to improve is interpolation.**
+
+Every pair is measured rather than every frame against frame 0, and positions come
+from a weighted least-squares fit over all of them — 15 measurements of 5 unknowns,
+so a pair that cannot see its partner is outvoted rather than carrying its frame
+off alone, and the leftover disagreement is a confidence number needing no ground
+truth. The verdict shown to the user is the **fit residual before against after**;
+if it does not improve, the frames are put back and it says so.
 
 ### Two capture rules enforced in code, not just documented
 
@@ -188,8 +249,8 @@ was photographed. Blue = the model matches. Clean capture 0.16%; one frame off b
 
 ```bash
 python3 -m http.server 8080          # then http://localhost:8080/relight/
-node relight/tools/validate.mjs      # ground-truth maths check, no browser
-node relight/tools/smoke.mjs         # end-to-end browser suite (needs playwright)
+node relight/tools/validate.mjs      # ground-truth maths + registration check, no browser
+node relight/tools/smoke.mjs         # end-to-end browser suite, 14 checks (needs playwright)
 ```
 
 Must be served over http(s) — ES modules will not load from `file://`.
@@ -214,16 +275,25 @@ bench refuses to start and says why.
 | 4 — Albedo recovery | partial single-image; **superseded** on the photometric path |
 | 5 — Host integration | **dropped** — standalone product |
 | 6 — Export | done, both paths |
-| 7 — Photometric stereo | done, and the strongest part of the tool |
+| 7 — Photometric stereo | done, and the strongest part of the tool; capture frames are now registered rather than trusted |
 | 8 — Tier 3 depth model | not started, and unnecessary for the stated use case |
 
 ---
 
 ## 7. Known limits
 
-- **Uploaded capture sets are assumed pre-aligned.** Dimensions are checked;
-  frames are not registered. A tripod is doing that work on trust. Sub-pixel
-  drift silently corrupts a per-pixel solve — though the Fit view will now show it.
+- **Registration corrects translation only.** Rotation, scale and lens breathing
+  are not corrected; the Fit view will show them, nothing here will fix them.
+  It also runs on demand rather than automatically — a 12MP six-shot set takes
+  ~15s, which is not something to spend without being asked.
+- **Registration is measured at up to 1600px on the long edge** and applied at full
+  resolution. The cost of that cap is measured: 0.9994/0.9990 at ½ scale against
+  0.9997/0.9996 at full, and 0.9918/0.9860 at ¼ — all still far ahead of the
+  0.914/0.829 of leaving the drift in.
+- **An achromatic subject is the weak case for registration.** With no colour it
+  falls back on luminance alone and 2 of 15 frame pairs go wrong. The other 13
+  outvote them and the answer still lands, but the discounted count is reported
+  for a reason.
 - **Light directions for uploaded shots are typed in by hand.** Estimating them
   from a chrome sphere in frame is the standard trick and is not implemented.
 - **Defaults are tuned to the synthetic canvas**, whose weave is coarser than real
@@ -244,27 +314,38 @@ bench refuses to start and says why.
 
 Ranked, with reasons rather than a bare list:
 
-1. **Register uploaded capture frames.** Now buildable, because the fit residual
-   gives it an objective function to minimise. Note that exposures are lit
-   *differently*, so direct cross-correlation is confounded by the shading change
-   — register on gradient *magnitude*, which is invariant to which side of a
-   brushstroke is lit.
-2. **Estimate light directions from a chrome sphere** placed in frame. Removes the
-   most error-prone manual step.
-3. **Retune defaults against a real photograph.** Blocked on the owner supplying a
+1. **Estimate light directions from a chrome sphere** placed in frame. Now the
+   most error-prone manual step left, and the one remaining input that is typed in
+   rather than measured — a light angle 40° out reads only 1.70% on the Fit view,
+   which is well inside the range a merely-imperfect capture produces, so a wrong
+   angle is not reliably visible. The sphere makes it measurable.
+2. **Retune defaults against a real photograph.** Blocked on the owner supplying a
    single-source raking-light shot of a painting with real impasto. Everything
-   downstream is calibrated against the synthetic weave until then.
-4. Preset/save system for light rigs — the first thing that will be missed in
+   downstream is calibrated against the synthetic weave until then. This is the
+   only item blocked on something other than time, and it gates the honesty of
+   every default in the tool.
+3. **A resample-free correction path.** §4.1 established that registration's
+   estimate is essentially exact and the whole remaining loss is interpolation
+   (fit 0.78% against a 0.17% floor on the sub-pixel case). Rather than a better
+   kernel, the real fix is not to resample at all: fold each frame's sub-pixel
+   offset into the solve, by sampling the shot array at the shifted UV in the
+   solve shader instead of pre-shifting the pixels. That moves the interpolation
+   onto the GPU's sampler and out of the data, and it makes alignment free to
+   apply and free to undo. Worth measuring before assuming it wins — bilinear is
+   all a GPU sampler gives, and §4.1 measured bilinear as the worst option.
+4. **Register rotation as well as translation.** Only worth it if a real capture
+   turns out to need it; a tripod that rotated is usually a re-shoot.
+5. Preset/save system for light rigs — the first thing that will be missed in
    sustained real use.
-
----
 
 ## 9. How this project has been worked, and why it matters
 
 Every significant finding here was something that **looked right and was wrong**:
 a relief pipeline that traced brushwork beautifully and recovered nothing; an
 acceptance test that passed hardest on the capture that recovered nothing; a fit
-residual that read a perfect 0.00% precisely when it had no information.
+residual that read a perfect 0.00% precisely when it had no information; a frame
+matcher built on the textbook light-invariant feature that was confidently 3px out
+on a fifth of its comparisons.
 
 The practice that caught all of them: **synthesise a surface whose truth you
 know, feed the tool only the render, and score the recovery numerically.** Do not
