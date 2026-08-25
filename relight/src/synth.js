@@ -108,57 +108,48 @@ function buildHeight(w, h, seed) {
   return H;
 }
 
+// Tuned so typical brushstroke flanks land around 15-25 degrees off normal, which
+// is the range real impasto occupies. Too shallow and the ground truth is
+// indistinguishable from a flat plane, which makes the comparison meaningless.
+const HEIGHT_TO_SLOPE = 1.2;
+
+const RIGS = {
+  // A proper archival copy-stand: two matched lights at equal and opposite
+  // angles. That geometry cancels first-order relief shading almost exactly —
+  // suppressing texture is what it is *for* — so it is the hardest case here,
+  // not the easiest.
+  symmetric: { dirs: [[-0.55, 0.45, 0.70], [0.55, -0.45, 0.70]], weights: [0.5, 0.5] },
+  single:    { dirs: [[-0.55, 0.45, 0.70]],                      weights: [1.0] },
+  raking:    { dirs: [[-0.90, 0.20, 0.35]],                      weights: [1.0] },
+};
+
+const AMBIENT = 0.18;
+
+function normalize3(d) {
+  const n = Math.hypot(d[0], d[1], d[2]) || 1;
+  return [d[0] / n, d[1] / n, d[2] / n];
+}
+
+function encodeSrgb(lin) {
+  const v = Math.min(1, Math.max(0, lin));
+  const c = v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+  return Math.round(c * 255);
+}
+
 /**
- * Render the height field as a copy-stand photograph would record it, and return
- * both that render and the ground-truth normals.
+ * Build the surface once: height field, true normals, and a pigment field that is
+ * deliberately uncorrelated with the relief. Shared by the single-shot and
+ * multi-shot generators so both describe the same physical painting.
  */
-/**
- * @param {object}  opts
- * @param {'symmetric'|'single'|'raking'} opts.lighting  How the repro shot was lit.
- *   'symmetric' models a proper archival copy-stand: two matched lights at equal
- *   and opposite angles. That geometry cancels first-order relief shading almost
- *   exactly — it is *designed* to suppress texture — so it is the hardest case,
- *   not the easiest. 'single' models an ordinary one-light shot. 'raking' is the
- *   easy case and is included mainly as an upper bound.
- * @param {number}  opts.pigmentDetail  How much fine-scale colour variation the
- *   paint itself carries, independent of relief. This is the adversary: it is
- *   high-frequency luminance that is *not* geometry.
- */
-export function synthesizePainting({ width = 900, height = 1100, seed = 7,
-                                     lighting = 'single', pigmentDetail = 0.35 } = {}) {
-  const w = width, h = height;
+function buildSurface(w, h, seed, pigmentDetail) {
   const H = buildHeight(w, h, seed);
   const rnd = mulberry32(seed + 991);
-
-  // Pigment field, uncorrelated with relief. Three broad colour zones plus a
-  // finer mottling, so there are strong colour edges sitting on flat surface.
   const nA = valueNoise(w, h, 5, rnd);
   const nB = valueNoise(w, h, 13, rnd);
   const nC = valueNoise(w, h, 31, rnd);
 
-  const img = new ImageData(w, h);
-  const px = img.data;
   const normals = new Float32Array(w * h * 3);
-
-  // Copy-stand lighting: two broad sources at ~45 degrees from opposite sides,
-  // which is what a flat repro shot uses to *suppress* relief. Deliberately a
-  // weak signal — if the extractor needs dramatic input lighting to work, it
-  // would be useless on exactly the photographs this tool targets.
-  const RIGS = {
-    symmetric: { dirs: [[-0.55, 0.45, 0.70], [0.55, -0.45, 0.70]], weights: [0.5, 0.5] },
-    single:    { dirs: [[-0.55, 0.45, 0.70]],                      weights: [1.0] },
-    raking:    { dirs: [[-0.90, 0.20, 0.35]],                      weights: [1.0] },
-  };
-  const rig = RIGS[lighting] || RIGS.single;
-  const dirs = rig.dirs.map((d) => {
-    const n = Math.hypot(d[0], d[1], d[2]);
-    return [d[0] / n, d[1] / n, d[2] / n];
-  });
-
-  // Tuned so typical brushstroke flanks land around 15-25 degrees off normal, which
-  // is the range real impasto occupies. Too shallow and the ground truth is
-  // indistinguishable from a flat plane, which makes the comparison meaningless.
-  const HEIGHT_TO_SLOPE = 1.2;
+  const albedo = new Float32Array(w * h * 3);
 
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -170,14 +161,7 @@ export function synthesizePainting({ width = 900, height = 1100, seed = 7,
 
       let nx = -dhdx * HEIGHT_TO_SLOPE, ny = dhdy * HEIGHT_TO_SLOPE, nz = 1;
       const inv = 1 / Math.hypot(nx, ny, nz);
-      nx *= inv; ny *= inv; nz *= inv;
-      normals[i * 3] = nx; normals[i * 3 + 1] = ny; normals[i * 3 + 2] = nz;
-
-      let shade = 0.18;
-      for (let k = 0; k < dirs.length; k++) {
-        const d = dirs[k];
-        shade += rig.weights[k] * Math.max(0, nx * d[0] + ny * d[1] + nz * d[2]);
-      }
+      normals[i * 3] = nx * inv; normals[i * 3 + 1] = ny * inv; normals[i * 3 + 2] = nz * inv;
 
       // Pigment: warm ochre ground, a cool blue passage, a red accent.
       const a = nA[i], b = nB[i], c = nC[i];
@@ -186,27 +170,83 @@ export function synthesizePainting({ width = 900, height = 1100, seed = 7,
       let g = (0.55 * mix + 0.26 * (1 - mix)) + 0.13 * (b - 0.5);
       let bl = (0.24 * mix + 0.52 * (1 - mix)) + 0.15 * (b - 0.5);
       if (a > 0.72) { r += 0.22; g -= 0.08; bl -= 0.10; }   // hard pigment edge
-      // Fine-scale pigment mottle. Chromatic by construction: a pigment change
-      // moves hue, whereas relief shading scales all three channels together.
-      // That difference is the only thing separating them, and it is what the
-      // extractor's chroma-reject term keys on.
+      // Fine-scale mottle, chromatic by construction: a pigment change moves hue,
+      // whereas relief shading scales all three channels together. That
+      // difference is the only thing separating them in a single image.
       const fine = (c - 0.5) * pigmentDetail;
       r += fine * 0.30; g -= fine * 0.10; bl -= fine * 0.26;
 
-      const enc = (lin) => {
-        const v = Math.min(1, Math.max(0, lin));
-        const s = v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
-        return Math.round(s * 255);
-      };
-      const o = i * 4;
-      px[o]     = enc(r * shade);
-      px[o + 1] = enc(g * shade);
-      px[o + 2] = enc(bl * shade);
-      px[o + 3] = 255;
+      albedo[i * 3] = r; albedo[i * 3 + 1] = g; albedo[i * 3 + 2] = bl;
     }
   }
+  return { H, normals, albedo };
+}
 
-  return { image: img, normals, height: H, width: w, rows: h };
+/** Render one exposure of a prepared surface under the given light directions. */
+function renderUnder(surface, w, h, dirs, weights, ambient = AMBIENT) {
+  const { normals, albedo } = surface;
+  const img = new ImageData(w, h);
+  const px = img.data;
+  for (let i = 0; i < w * h; i++) {
+    const nx = normals[i * 3], ny = normals[i * 3 + 1], nz = normals[i * 3 + 2];
+    let shade = ambient;
+    for (let k = 0; k < dirs.length; k++) {
+      const d = dirs[k];
+      shade += weights[k] * Math.max(0, nx * d[0] + ny * d[1] + nz * d[2]);
+    }
+    const o = i * 4;
+    px[o]     = encodeSrgb(albedo[i * 3] * shade);
+    px[o + 1] = encodeSrgb(albedo[i * 3 + 1] * shade);
+    px[o + 2] = encodeSrgb(albedo[i * 3 + 2] * shade);
+    px[o + 3] = 255;
+  }
+  return img;
+}
+
+/**
+ * A single flat-lit photograph, for testing single-image relief recovery.
+ *
+ * @param {'symmetric'|'single'|'raking'} opts.lighting  How the repro shot was lit.
+ * @param {number} opts.pigmentDetail  Fine colour variation carried by the paint
+ *   itself. This is the adversary: high-frequency luminance that is not geometry.
+ */
+export function synthesizePainting({ width = 900, height = 1100, seed = 7,
+                                     lighting = 'single', pigmentDetail = 0.35 } = {}) {
+  const w = width, h = height;
+  const surface = buildSurface(w, h, seed, pigmentDetail);
+  const rig = RIGS[lighting] || RIGS.single;
+  const image = renderUnder(surface, w, h, rig.dirs.map(normalize3), rig.weights);
+  return { image, normals: surface.normals, height: surface.H, width: w, rows: h };
+}
+
+/**
+ * A photometric-stereo capture set: the same painting shot N times from a fixed
+ * camera with the light moved between exposures.
+ *
+ * This is the capture a single photograph cannot substitute for. One image
+ * constrains only the slope along its own light azimuth; N images with spread
+ * azimuths constrain both in-plane components, and solving the resulting system
+ * yields true albedo as a by-product — which removes the need to guess at an
+ * intrinsic decomposition later.
+ *
+ * @param {number[][]} opts.lightDirs  Unnormalised light directions. The default
+ *   is the museum convention: four exposures at 90-degree azimuth spacing and
+ *   roughly 45-degree elevation.
+ */
+export function synthesizeCaptureSet({ width = 700, height = 800, seed = 7,
+                                       pigmentDetail = 0.35, lightDirs = null,
+                                       ambient = AMBIENT } = {}) {
+  const w = width, h = height;
+  const surface = buildSurface(w, h, seed, pigmentDetail);
+  const dirs = (lightDirs || [
+    [ 1, 0, 1], [0,  1, 1], [-1, 0, 1], [0, -1, 1],
+  ]).map(normalize3);
+  const images = dirs.map((d) => renderUnder(surface, w, h, [d], [1.0], ambient));
+  return {
+    images, lightDirs: dirs, ambient,
+    normals: surface.normals, albedo: surface.albedo, height: surface.H,
+    width: w, rows: h,
+  };
 }
 
 /** Ground-truth normals as a viewable image, for side-by-side comparison. */

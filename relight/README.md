@@ -80,7 +80,40 @@ needs is a *single*-source shot, ideally a raking one.
 Compare the two recovered normal maps in the bench: switch **Shot with** between
 *Raking* and *Archival copy-stand* and select **View → Normals**.
 
-### 4. The proposed v1 acceptance test passes when the geometry is wrong
+### 4. A four-shot capture recovers the surface essentially exactly
+
+Photometric stereo — the same painting shot N times from a fixed camera with the
+light moved — solves `I_k = albedo·(N·L_k)` per pixel for known `L_k`. Measured
+against the same ground truth:
+
+| method | nx | ny |
+|---|---|---|
+| single photograph, corrected pipeline | 0.74 | −0.13 |
+| 4-shot photometric stereo (GPU path) | **0.9995** | **0.9994** |
+
+True albedo falls out of the same solve, which also disposes of the separate
+intrinsic-decomposition step the brief scoped as Phase 4 — there is nothing left
+to estimate.
+
+Two capture rules came out of the measurements and are enforced in code rather
+than left to be discovered:
+
+- **Ambient light flattens the result.** It biases recovered tilt to 9.7° against
+  a true 12.2°. It can be fitted as a fourth unknown, but only if the lights
+  differ in **elevation**. At one elevation the `Lz` column is a constant multiple
+  of the ambient column, the system is rank-deficient, and the solve collapses to
+  zero. `buildSolver` detects this and refuses with that explanation instead of
+  returning a plausible-looking wrong surface. Vary elevation ~15° and recovered
+  tilt lands exactly on truth.
+- **Do not drop extreme samples to reject glints.** It costs two equations; with
+  the ambient unknown that leaves no redundancy and recovery degrades from 1.000
+  to 0.23. Highlights are handled by clamping sample values instead, which leaves
+  the design matrix — and the precomputed inverse — intact.
+
+Height for the shadow march and occlusion comes from a Poisson solve over the
+measured gradients (Jacobi relaxation, ~48 sweeps, built once per capture).
+
+### 5. The proposed v1 acceptance test passes when the geometry is wrong
 
 §8 #7 proposes: a raking light must produce brushstroke shadowing that inverts when
 the light crosses to the other side. Run against the bench:
@@ -110,6 +143,7 @@ the along-azimuth component.
 | Material | relief amount, depth, roughness, specular, cast shadow, occlusion, ambient, exposure |
 | Lights | N lights, drag on canvas for X/Y, Distance for Z, Kelvin or custom colour, Power, Cone |
 | View | relit / normals / height / albedo / original |
+| Photometric | N exposures, per-shot azimuth/elevation, ambient fit, highlight clamp, truth compare |
 | Export | format, scale, tiled full-resolution render with progress |
 
 Shading is Cook-Torrance GGX in linear light with height-correlated Smith
@@ -132,6 +166,20 @@ Because the height field is known, recovery can be scored rather than admired.
 
 ---
 
+## Capture protocol
+
+For the photometric path, shooting for the solver rather than for the eye:
+
+1. Fixed camera. A tripod, no reframing, no zoom change between exposures. The
+   solve is per pixel and assumes every exposure sees the same pixel.
+2. One light, moved. Four exposures at roughly 90° azimuth spacing is the museum
+   convention and is plenty.
+3. **Vary the light height** between exposures by ~15°. Constant elevation makes
+   the ambient term unrecoverable.
+4. Fixed exposure, white balance, and focus. Shoot raw or at least uncompressed;
+   the solve is linear and JPEG at fine detail is not.
+5. Kill the room light if you can. What you cannot kill, fit — see rule 3.
+
 ## Known limits
 
 - Auto-estimating the source azimuth is unreliable when a regular canvas weave is
@@ -148,6 +196,12 @@ Because the height field is known, recovery can be scored rather than admired.
 - The synthetic source's canvas weave is coarse relative to the image, so it
   reads more strongly than a real linen would. Defaults are tuned around it and
   will want revisiting against real photographs.
+- Uploaded capture sets are assumed pre-aligned; the tool checks that dimensions
+  match but does not register the frames. A tripod is doing that work.
+- Light directions for uploaded shots are entered by hand. Estimating them from a
+  chrome sphere in frame is the standard trick and is not implemented.
+- The photometric path is preview-resolution only so far; export still runs the
+  single-image pipeline.
 
 ## Status against the brief's phase skeleton
 
@@ -168,7 +222,8 @@ Because the height field is known, recovery can be scored rather than admired.
 - **Phase 6 — Export.** Done. Tiled full-resolution render with an overlap
   margin; a 56-tile render matches a single-tile render to 3.4e-6 on the channel
   sum. PNG or JPEG, with a scale control.
-- **Phase 7 — Photometric stereo.** Not started, and promoted. Finding 2 makes
-  this the difference between half a surface and a whole one.
+- **Phase 7 — Photometric stereo.** Done, and it is the strongest part of the
+  tool: 0.9995 / 0.9994 against ground truth, versus 0.74 / −0.13 from one
+  photograph. Supersedes Phase 4, since true albedo comes out of the same solve.
 - **Phase 8 — Tier 3 depth model.** Not started, and unnecessary for the stated
   use case.

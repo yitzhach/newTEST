@@ -7,14 +7,19 @@ import { createGL } from './gl.js';
 import { GBuffer } from './gbuffer.js';
 import { Shader, MAX_LIGHTS } from './shade.js';
 import { kelvinToLinearRGB, hexToLinearRGB, linearRGBToHex } from './kelvin.js';
-import { synthesizePainting } from './synth.js';
+import { synthesizePainting, synthesizeCaptureSet, normalsToImageData } from './synth.js';
+import { Photometric, buildSolver, uploadShotArray, MAX_SHOTS } from './photometric.js';
 import { exportFullRes, downloadCanvas, requiredMargin } from './export.js';
 
 const $ = (id) => document.getElementById(id);
 const canvas = $('gl');
 const wrap = $('wrap');
 
-let glctx, gbuf, shader, srcTex = null, targets = null;
+let glctx, gbuf, shader, photo, srcTex = null, targets = null;
+// Photometric capture: one texture per exposure plus its light direction.
+let shots = [];          // [{ source, az, elev, name }] — angles are editable
+let shotArrayTex = null; // the exposures packed into one TEXTURE_2D_ARRAY
+let truthTex = null;     // ground-truth normals, when the source is synthetic
 let imgW = 0, imgH = 0;
 // The untouched source is kept so export can go back to native resolution;
 // the preview only ever sees a downscaled copy.
@@ -30,6 +35,10 @@ const state = {
   ambientColor: [1, 1, 1],
   viewMode: 0,
   selected: 0,
+  mode: 'single',           // 'single' | 'photometric'
+  psFitAmbient: true,
+  psClamp: 1.0,
+  psShowTruth: false,
   lights: [],
 };
 
@@ -296,8 +305,32 @@ function render() {
   try {
     updateDerived(imgW);
     if (dirtySurface) {
-      targets = gbuf.build(srcTex, imgW, imgH, state);
+      if (state.mode === 'photometric') {
+        const solver = buildSolver(shots.map(shotDir), { fitAmbient: state.psFitAmbient });
+        const status = $('psStatus');
+        if (!solver.ok) {
+          // Refuse loudly rather than rendering a silently-wrong surface.
+          if (status) status.innerHTML = `<b>Cannot solve.</b> ${solver.reason}`;
+          return;
+        }
+        if (status) {
+          status.textContent = `${solver.count} shots, ${solver.fitAmbient ? 'ambient fitted' : 'no ambient term'}`
+            + `, condition ${solver.cond.toFixed(0)}`
+            + (solver.cond > 800 ? ' — poorly spread rig, widen the azimuths' : '');
+        }
+        targets = photo.build(shotArrayTex, solver, imgW, imgH, {
+          highlightClamp: state.psClamp,
+          heightGain: 1.0,
+        });
+      } else {
+        targets = gbuf.build(srcTex, imgW, imgH, state);
+      }
       dirtySurface = false;
+    }
+    if (state.mode === 'photometric' && state.psShowTruth && truthTex) {
+      // Swap the recovered normals for the known ones, so the two can be compared
+      // in the same view without re-rendering anything else.
+      targets = Object.assign({}, targets, { normal: { tex: truthTex } });
     }
     shader.draw(targets, state, imgH / imgW, imgW, imgH);
   } catch (e) { fail(e); }
@@ -327,6 +360,7 @@ async function boot() {
     glctx = createGL(canvas);
     gbuf = new GBuffer(glctx);
     shader = new Shader(glctx);
+    photo = new Photometric(glctx);
   } catch (e) { return fail(e); }
 
   $('hint').textContent =
@@ -342,10 +376,20 @@ async function boot() {
     .forEach((id) => bind(id, id, false));
 
   $('src').addEventListener('change', async () => {
-    const isSynth = $('src').value === 'synth';
-    $('synthOpts').style.display = isSynth ? '' : 'none';
-    $('file').style.display = isSynth ? 'none' : '';
-    if (isSynth) await setSource(await loadSynthetic());
+    const v = $('src').value;
+    const photometric = v === 'psynth' || v === 'pupload';
+    state.mode = photometric ? 'photometric' : 'single';
+    $('synthOpts').style.display = v === 'synth' ? '' : 'none';
+    $('file').style.display = v === 'upload' ? '' : 'none';
+    $('psOpts').style.display = photometric ? '' : 'none';
+    $('psFiles').style.display = v === 'pupload' ? '' : 'none';
+    // Surface-recovery controls only drive the single-image path; the measured
+    // path takes its geometry from the capture instead.
+    document.querySelectorAll('#panel .grp')[1].style.opacity = photometric ? 0.35 : 1;
+
+    dirtySurface = true;
+    if (v === 'synth') await setSource(await loadSynthetic());
+    else if (v === 'psynth') await setSource(await loadSyntheticCapture());
   });
   $('synthLight').addEventListener('change', async () => setSource(await loadSynthetic()));
   $('pigment').addEventListener('input', async () => setSource(await loadSynthetic()));
@@ -359,6 +403,7 @@ async function boot() {
   await setSource(await loadSynthetic());
 
   wireExport();
+  wirePhotometric();
 
   // Test hook. The §8 #7 acceptance criterion — brushstroke shadows must invert
   // when the light crosses to the other side — is a claim about pixels, so it
@@ -437,6 +482,156 @@ function wireExport() {
       render();
       btn.disabled = false;
     }
+  });
+}
+
+// ------------------------------------------------------- photometric capture
+
+function shotDir(s2) {
+  const a = (s2.az * Math.PI) / 180, e = (s2.elev * Math.PI) / 180;
+  return [Math.cos(a) * Math.cos(e), Math.sin(a) * Math.cos(e), Math.sin(e)];
+}
+
+function uploadTex(canvasOrImg) {
+  const { gl } = glctx;
+  const t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, canvasOrImg);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return t;
+}
+
+function disposeShots() {
+  const { gl } = glctx;
+  shots = [];
+  if (shotArrayTex) { gl.deleteTexture(shotArrayTex); shotArrayTex = null; }
+  if (truthTex) { gl.deleteTexture(truthTex); truthTex = null; }
+}
+
+/** Rebuild the array texture. Only needed when the image set changes — moving a
+ *  light angle re-solves but re-uses the same pixels. */
+function packShots(w, h) {
+  const { gl } = glctx;
+  if (shotArrayTex) gl.deleteTexture(shotArrayTex);
+  shotArrayTex = uploadShotArray(gl, shots.map((s2) => s2.source), w, h);
+}
+
+function toCanvas(imageData) {
+  const c = document.createElement('canvas');
+  c.width = imageData.width; c.height = imageData.height;
+  c.getContext('2d').putImageData(imageData, 0, 0);
+  return c;
+}
+
+async function loadSyntheticCapture() {
+  const n = parseInt($('psShots').value, 10);
+  const elev = parseFloat($('psElev').value);
+  const spread = parseFloat($('psSpread').value);
+
+  const dirs = [], meta = [];
+  for (let i = 0; i < n; i++) {
+    const az = (i * 360) / n;
+    // Alternate the elevation so the ambient unknown is separable. With every
+    // light at one height the Lz column matches the ambient column exactly.
+    const e = elev + (i % 2 ? spread : -spread) * 0.5;
+    const a = (az * Math.PI) / 180, er = (e * Math.PI) / 180;
+    dirs.push([Math.cos(a) * Math.cos(er), Math.sin(a) * Math.cos(er), Math.sin(er)]);
+    meta.push({ az, elev: e, name: `shot ${i + 1}` });
+  }
+
+  const S = synthesizeCaptureSet({
+    width: 700, height: 800, seed: 7,
+    pigmentDetail: parseFloat($('pigment').value),
+    lightDirs: dirs,
+  });
+
+  disposeShots();
+  shots = S.images.map((im, i) => ({ source: toCanvas(im), ...meta[i] }));
+  packShots(S.width, S.rows);
+  truthTex = uploadTex(toCanvas(normalsToImageData(S.normals, S.width, S.rows)));
+  renderShotList();
+  return shots[0].source;
+}
+
+async function loadUploadedCapture(files) {
+  const imgs = await Promise.all([...files].slice(0, MAX_SHOTS).map(loadFile));
+  const w = imgs[0].naturalWidth, h = imgs[0].naturalHeight;
+  const mismatched = imgs.filter((im) => im.naturalWidth !== w || im.naturalHeight !== h);
+  if (mismatched.length) {
+    throw new Error('All exposures must be the same size and framing — photometric stereo '
+      + 'assumes a fixed camera. Re-export them at matching dimensions.');
+  }
+  disposeShots();
+  shots = imgs.map((im, i) => ({
+    source: im,
+    // A sensible starting rig; the user corrects it per shot below.
+    az: (i * 360) / imgs.length,
+    elev: 45 + (i % 2 ? 7 : -7),
+    name: files[i].name.slice(0, 22),
+  }));
+  packShots(w, h);
+  renderShotList();
+  return imgs[0];
+}
+
+function renderShotList() {
+  const box = $('psShotList');
+  if (!box) return;
+  box.innerHTML = '';
+  shots.forEach((s2, i) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.gridTemplateColumns = '68px 1fr 1fr';
+    const lab = document.createElement('label');
+    lab.textContent = s2.name;
+    lab.title = s2.name;
+    lab.style.overflow = 'hidden';
+    lab.style.textOverflow = 'ellipsis';
+
+    const mk = (val, min, max, onset, title) => {
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.value = Math.round(val); inp.min = min; inp.max = max;
+      inp.title = title;
+      inp.style.cssText = 'width:100%;background:var(--panel2);color:var(--ink);'
+        + 'border:1px solid var(--line);border-radius:5px;padding:3px 5px;font:11px var(--mono)';
+      inp.oninput = () => { onset(parseFloat(inp.value) || 0); dirtySurface = true; render(); };
+      return inp;
+    };
+    row.append(lab,
+      mk(s2.az, -360, 360, (v) => { s2.az = v; }, 'azimuth, degrees'),
+      mk(s2.elev, 1, 89, (v) => { s2.elev = v; }, 'elevation, degrees'));
+    box.appendChild(row);
+  });
+}
+
+function wirePhotometric() {
+  const set = (id, fn) => { const el = $(id); if (el) el.addEventListener('input', fn); };
+  ['psShots', 'psElev', 'psSpread'].forEach((id) => set(id, async () => {
+    if (state.mode === 'photometric' && $('src').value === 'psynth') {
+      syncOutputs();
+      await setSource(await loadSyntheticCapture());
+    }
+  }));
+  set('psClamp', () => { state.psClamp = parseFloat($('psClamp').value); dirtySurface = true; syncOutputs(); render(); });
+
+  $('psAmbient').addEventListener('click', () => {
+    state.psFitAmbient = !state.psFitAmbient;
+    $('psAmbient').className = state.psFitAmbient ? 'on' : '';
+    dirtySurface = true; render();
+  });
+  $('psTruth').addEventListener('click', () => {
+    state.psShowTruth = !state.psShowTruth;
+    $('psTruth').className = state.psShowTruth ? 'on' : '';
+    if (state.psShowTruth && state.viewMode === 0) { state.viewMode = 1; rebuildViews(); }
+    render();
+  });
+  $('psFiles').addEventListener('change', async (e) => {
+    if (!e.target.files.length) return;
+    try { await setSource(await loadUploadedCapture(e.target.files)); }
+    catch (err) { $('psStatus').innerHTML = `<b>${err.message}</b>`; }
   });
 }
 
