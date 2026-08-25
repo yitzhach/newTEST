@@ -250,7 +250,7 @@ was photographed. Blue = the model matches. Clean capture 0.16%; one frame off b
 ```bash
 python3 -m http.server 8080          # then http://localhost:8080/relight/
 node relight/tools/validate.mjs      # ground-truth maths + registration check, no browser
-node relight/tools/smoke.mjs         # end-to-end browser suite, 14 checks (needs playwright)
+node relight/tools/smoke.mjs         # end-to-end browser suite, 15 checks (needs playwright)
 ```
 
 Must be served over http(s) — ES modules will not load from `file://`.

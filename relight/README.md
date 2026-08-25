@@ -338,7 +338,9 @@ are computed in one place (`updateDerived`) rather than at each call site.
   will want revisiting against real photographs.
 - Uploaded capture sets are registered on demand, not automatically, and only for
   **translation**. Rotation, scale and lens breathing are not corrected. The fit
-  residual will show them; nothing here will fix them.
+  residual will show them; nothing here will fix them — a 0.6-degree rotation on one
+  frame of six reads 2.78% against a clean 0.16%, and correcting it by translation
+  makes it 2.82%, so the attempt is detected and reverted rather than kept.
 - Registration is measured at up to 1600px on the long edge and applied at full
   resolution, because building the feature costs ~0.4s/megapixel and six 12MP
   frames would otherwise spend half a minute before the first correlation. The

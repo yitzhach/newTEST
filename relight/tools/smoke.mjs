@@ -86,6 +86,39 @@ const fit4 = await p.evaluate(()=>window.__bench.measureFit());
 check('as-shot restores the uncorrected frames', fit4 && fit4.mean > fit0.mean*3,
   `${(fit3.mean*100).toFixed(2)}% -> ${(fit4.mean*100).toFixed(2)}%`);
 
+// A correction that cannot help must not be applied. Rotation is the case
+// registration is blind to — it only corrects translation — so it will find some
+// plausible shift, and the fit residual is what has to catch that and put the
+// frames back.
+await p.evaluate(async ()=>{
+  const s = window.__bench.shots(), src = s[1].original;
+  const w = src.width, h = src.height;
+  const c = document.createElement('canvas'); c.width=w; c.height=h;
+  const cx = c.getContext('2d');
+  cx.translate(w/2,h/2); cx.rotate(0.6*Math.PI/180); cx.translate(-w/2,-h/2);
+  cx.drawImage(src,0,0);
+  s[1].original = c;
+  await window.__bench.shiftShot(1,0,0);
+});
+await p.waitForTimeout(1200);
+const fitRot = await p.evaluate(()=>window.__bench.measureFit());
+await p.click('#psAlign');
+await p.waitForFunction(()=>!document.getElementById('psAlign').disabled,null,{timeout:180000});
+await p.waitForTimeout(1000);
+const fitRot2 = await p.evaluate(()=>window.__bench.measureFit());
+const rotMsg = await p.textContent('#psStatus');
+const rotShifts = await p.evaluate(()=>window.__bench.shotShifts());
+check('a correction that makes the fit worse is reverted',
+  Math.abs(fitRot2.mean-fitRot.mean) < fitRot.mean*0.01 && /put back/.test(rotMsg)
+    && rotShifts.every(v=>!v),
+  `${(fitRot.mean*100).toFixed(2)}% -> ${(fitRot2.mean*100).toFixed(2)}%, ${/put back/.test(rotMsg)?'reverted':'KEPT'}`);
+
+// back to a clean capture for the export check
+await p.selectOption('#src','synth');
+await p.waitForTimeout(600);
+await p.selectOption('#src','psynth');
+await p.waitForTimeout(3000);
+
 // photometric export
 dl = p.waitForEvent('download',{timeout:180000});
 await p.click('#exportBtn'); d = await dl;
