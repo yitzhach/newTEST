@@ -50,6 +50,9 @@ function makeBlur(w, h) {
 
 const AZ = { symmetric: [-0.55, 0.45], single: [-0.55, 0.45], raking: [-0.90, 0.20] };
 
+/** Size-agnostic Gaussian, for the sections below. */
+const blurF = (src, w, h, sigma) => makeBlur(w, h)(src, sigma);
+
 function prepare(lighting, pigmentDetail, size = 400) {
   const S = synthesizePainting({ width: size, height: size, seed: 7, lighting, pigmentDetail });
   const w = S.width, h = S.rows;
@@ -376,6 +379,164 @@ for (const [name, drifts, note, capOpts] of CASES) {
     + `${reg.outliers}/${reg.pairs} discounted${reg.reliable ? '' : '; FLAGGED UNRELIABLE'}]`);
   regSummary.push({ name, sBefore, sAfter, before: before.residual, after: after.residual, errWorst, consistency: reg.consistency });
 }
+
+// ===========================================================================
+// Real material: grey grain, and a correction to finding 2
+// ===========================================================================
+//
+// Prompted by the first real photograph the project has seen — cast cement and
+// plaster, heavily textured, largely achromatic. Two things came out of it.
+
+const HP_SIGMA = 3;
+
+function linPlanes(d, w, h) {
+  const r = new Float32Array(w * h), g = new Float32Array(w * h), b = new Float32Array(w * h);
+  for (let i = 0, p = 0; i < w * h; i++, p += 4) { r[i] = LIN[d[p]]; g[i] = LIN[d[p + 1]]; b[i] = LIN[d[p + 2]]; }
+  return { r, g, b };
+}
+function highpassLog(d, w, h, sigma = HP_SIGMA) {
+  const { r, g, b } = linPlanes(d, w, h);
+  const L = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) L[i] = 0.2126 * r[i] + 0.7152 * g[i] + 0.0722 * b[i];
+  const lo = blurF(L, w, h, sigma), hp = new Float32Array(w * h);
+  for (let i = 0; i < w * h; i++) hp[i] = Math.log(Math.max(L[i], 1e-4)) - Math.log(Math.max(lo[i], 1e-4));
+  return hp;
+}
+function sdOf(a) { let s1 = 0, s2 = 0; for (const v of a) { s1 += v; s2 += v * v; }
+  const m = s1 / a.length; return Math.sqrt(Math.max(s2 / a.length - m * m, 1e-14)); }
+function integrate(hp, w, h, ax, ay, taps = 8) {
+  const H = new Float32Array(w * h);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    let acc = 0;
+    for (let t = 1; t <= taps; t++) {
+      const sx = Math.round(x - ax * t), sy = Math.round(y - ay * t);
+      if (sx < 0 || sx >= w || sy < 0 || sy >= h) break;
+      acc += -hp[sy * w + sx] * (1 - (t - 1) / taps);
+    }
+    H[y * w + x] = acc;
+  }
+  return H;
+}
+/**
+ * Recovery resolved ALONG and ACROSS the light azimuth.
+ *
+ * Not along x and y. Finding 2 scored the two rigs it compares as nx / ny under
+ * headings that say "along azimuth / perpendicular", which is only the same thing
+ * when the azimuth happens to lie on an image axis. It does not for the `single`
+ * rig (141 degrees), and the mislabelling is what made a modest elevation effect
+ * look like a large one.
+ */
+function alongAcross(H, N, w, h, ax, ay) {
+  const P = [], PT = [], Q = [], QT = [];
+  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+    const i = y * w + x;
+    const gx = H[i - 1] - H[i + 1], gy = H[(y - 1) * w + x] - H[(y + 1) * w + x];
+    const tx = N[i * 3], ty = N[i * 3 + 1];
+    P.push(gx * ax + gy * ay); PT.push(tx * ax + ty * ay);
+    Q.push(-gx * ay + gy * ax); QT.push(-tx * ay + ty * ax);
+  }
+  return { along: pearson(P, PT), across: pearson(Q, QT) };
+}
+/** Score one rendered exposure whose light direction is known. */
+function scoreShot(data, normals, size, dir) {
+  const hp = highpassLog(data, size, size);
+  const an = Math.hypot(dir[0], dir[1]) || 1;
+  const ax = dir[0] / an, ay = dir[1] / an;
+  return { ...alongAcross(integrate(hp, size, size, ax, ay), normals, size, size, ax, ay),
+           contrast: sdOf(hp) };
+}
+/**
+ * Render many light directions from ONE surface.
+ *
+ * synthesizeCaptureSet builds the height field, normals and albedo once and then
+ * renders each direction, so a 35-cell sweep costs one surface rather than 35.
+ */
+function sweep(dirs, opts = {}) {
+  const size = opts.size || 380;
+  const S = synthesizeCaptureSet({ width: size, height: size, seed: 7,
+    pigmentDetail: opts.pigmentDetail ?? 0.35, grain: opts.grain || 0, lightDirs: dirs });
+  return { S, size, score: (k) => scoreShot(S.images[k].data, S.normals, size, S.lightDirs[k]) };
+}
+function singleShot(dir, opts = {}) {
+  const r = sweep([dir], opts);
+  return { ...r.score(0), S: r.S, size: r.size };
+}
+const dirFrom = (azDeg, elDeg) => {
+  const a = azDeg * Math.PI / 180, e = elDeg * Math.PI / 180;
+  return [Math.cos(a) * Math.cos(e), Math.sin(a) * Math.cos(e), Math.sin(e)];
+};
+
+// --- 1. elevation matters far less than finding 2 implies -------------------
+console.log('\n\nSingle-image recovery ALONG the light azimuth (not along x)\n');
+const ELEV = [10, 20, 30, 45, 60, 75, 89];
+process.stdout.write('   azimuth  ');
+for (const e of ELEV) process.stdout.write(String(e + 'd').padStart(8));
+console.log();
+console.log('  ' + '-'.repeat(66));
+{
+  const AZS = [0, 45, 90, 141, 160];
+  const dirs = [];
+  for (const az of AZS) for (const el of ELEV) dirs.push(dirFrom(az, el));
+  const sw = sweep(dirs);
+  let k = 0;
+  for (const az of AZS) {
+    process.stdout.write(`   ${String(az + 'deg').padStart(7)}  `);
+    for (let i = 0; i < ELEV.length; i++) process.stdout.write(sw.score(k++).along.toFixed(3).padStart(8));
+    console.log();
+  }
+}
+{
+  const rk = singleShot([-0.90, 0.20, 0.35], {}), sg = singleShot([-0.55, 0.45, 0.70], {});
+  console.log(`\n  the two rigs finding 2 compares, scored along/across their own azimuth:`);
+  console.log(`    raking (167deg, 21deg elev)  along ${rk.along.toFixed(3)}  across ${rk.across.toFixed(3)}`);
+  console.log(`    single (141deg, 45deg elev)  along ${sg.along.toFixed(3)}  across ${sg.across.toFixed(3)}`);
+  console.log('    Finding 2 reports these as 0.74/-0.13 and 0.45/0.26 — those are nx and ny,');
+  console.log('    which are along/across only for the raking rig, whose azimuth happens to');
+  console.log(`    sit near an image axis. The real elevation penalty is ${rk.along.toFixed(2)} -> ${sg.along.toFixed(2)},`);
+  console.log('    not 0.74 -> 0.45, and the "0.26 perpendicular" is genuine across-azimuth');
+  console.log('    recovery rather than leakage.');
+}
+
+// --- 2. grey grain, and why no image-only gate can catch it -----------------
+console.log('\n\nGrey grain: achromatic surface texture that is not relief\n');
+console.log('  light        grain    single-image     photometric      high-pass  chromatic');
+console.log('               amount   along / across   nx / ny          contrast   part');
+console.log('  ' + '-'.repeat(86));
+for (const [label, el] of [['raking 20d', 20], ['frontal 89d', 89]]) {
+  for (const grain of [0, 0.08, 0.20]) {
+    const dir = dirFrom(160, el);
+    const one = singleShot(dir, { grain });
+    // Photometric, same surface and same grain, six exposures.
+    const dirs = rig(6);
+    const cap = synthesizeCaptureSet({ width: 300, height: 300, seed: 7,
+      pigmentDetail: 0.35, grain, lightDirs: dirs });
+    const ps = cpuSolve(cap.images.map((im) => ({ data: im.data })), dirs, 300, 300);
+    const sc = scoreNormals(ps.N, cap.normals, 300, 300);
+    const { r, g, b } = linPlanes(one.S.images[0].data, one.size, one.size);
+    const c1 = new Float32Array(r.length), c2 = new Float32Array(r.length);
+    for (let i = 0; i < r.length; i++) { const t = r[i] + g[i] + b[i] + 1e-4; c1[i] = r[i] / t; c2[i] = g[i] / t; }
+    const b1 = blurF(c1, one.size, one.size, HP_SIGMA), b2 = blurF(c2, one.size, one.size, HP_SIGMA);
+    const ch = new Float32Array(r.length);
+    for (let i = 0; i < r.length; i++) ch[i] = Math.hypot(c1[i] - b1[i], c2[i] - b2[i]);
+    console.log(`  ${label.padEnd(13)}${grain.toFixed(2)}     `
+      + `${one.along.toFixed(3).padStart(6)} / ${one.across.toFixed(3).padStart(6)}   `
+      + `${sc.x.toFixed(4)} / ${sc.y.toFixed(4)}   ${one.contrast.toFixed(4)}     ${sdOf(ch).toFixed(4)}`);
+  }
+}
+console.log('\n  Reading:');
+console.log('  * Grain is the adversary the bench did not have. The chromatic pigment field');
+console.log('    was built to be caught — it shifts hue, so chroma reject can find it. Grain');
+console.log('    shifts no hue at all, so in ONE photograph nothing separates it from relief.');
+console.log('  * It defeats a contrast-based "is this shot usable" gate, which is why no such');
+console.log('    gate is shipped. Under frontal light, grain takes the contrast statistic UP');
+console.log('    0.027 -> 0.075 while recovery goes DOWN 0.096 -> 0.035: the statistic moves');
+console.log('    the wrong way, so no threshold on it separates the two. The first real');
+console.log('    photograph measures 0.67-0.86 there — above every synthetic case, on a much');
+console.log('    rougher surface — and its recovered normals are speckle. Any threshold');
+console.log('    calibrated on this bench would wave it through.');
+console.log('  * Photometric stereo is untouched by grain, because grain is albedo and albedo');
+console.log('    is what the solve separates out. For grainy achromatic material the multi-shot');
+console.log('    path is not an upgrade, it is the only sound option.\n');
 
 // ===========================================================================
 // Light directions from a chrome sphere

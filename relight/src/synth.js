@@ -141,12 +141,22 @@ function encodeSrgb(lin) {
  * deliberately uncorrelated with the relief. Shared by the single-shot and
  * multi-shot generators so both describe the same physical painting.
  */
-function buildSurface(w, h, seed, pigmentDetail) {
+function buildSurface(w, h, seed, pigmentDetail, grain = 0) {
   const H = buildHeight(w, h, seed);
   const rnd = mulberry32(seed + 991);
   const nA = valueNoise(w, h, 5, rnd);
   const nB = valueNoise(w, h, 13, rnd);
   const nC = valueNoise(w, h, 31, rnd);
+  // Grey grain: fine ACHROMATIC albedo variation, the kind cement, plaster, sand
+  // and paper have. It belongs to the albedo rather than to any one exposure, so a
+  // capture set sees the same grain in every shot — which is what makes the
+  // photometric path able to solve it away and the single-image path unable to.
+  //
+  // This is the adversary the bench was missing. The chromatic pigment field above
+  // is deliberately hue-shifting, so chroma reject can find it; grain shifts no hue
+  // at all, which by construction makes it indistinguishable from relief shading in
+  // one photograph. Every high-frequency statistic reads it as texture.
+  const gr = grain > 0 ? valueNoise(w, h, Math.max(2, Math.round(Math.min(w, h) / 3)), rnd) : null;
 
   const normals = new Float32Array(w * h * 3);
   const albedo = new Float32Array(w * h * 3);
@@ -176,6 +186,11 @@ function buildSurface(w, h, seed, pigmentDetail) {
       const fine = (c - 0.5) * pigmentDetail;
       r += fine * 0.30; g -= fine * 0.10; bl -= fine * 0.26;
 
+      if (gr) {
+        // One multiplier on all three channels: no hue shift, by construction.
+        const k = 1 + grain * (gr[i] - 0.5) * 2;
+        r *= k; g *= k; bl *= k;
+      }
       albedo[i * 3] = r; albedo[i * 3 + 1] = g; albedo[i * 3 + 2] = bl;
     }
   }
@@ -252,12 +267,17 @@ function renderUnder(surface, w, h, dirs, weights, ambient = AMBIENT) {
  *
  * @param {'symmetric'|'single'|'raking'} opts.lighting  How the repro shot was lit.
  * @param {number} opts.pigmentDetail  Fine colour variation carried by the paint
- *   itself. This is the adversary: high-frequency luminance that is not geometry.
+ *   itself — high-frequency detail that is not geometry, but which shifts hue and
+ *   so can at least be separated from shading in principle.
+ * @param {number} opts.grain  Fine ACHROMATIC albedo variation — cement, plaster,
+ *   sand. The harder adversary, because nothing in a single photograph can tell it
+ *   apart from relief shading. See tools/validate.mjs.
  */
 export function synthesizePainting({ width = 900, height = 1100, seed = 7,
-                                     lighting = 'single', pigmentDetail = 0.35 } = {}) {
+                                     lighting = 'single', pigmentDetail = 0.35,
+                                     grain = 0 } = {}) {
   const w = width, h = height;
-  const surface = buildSurface(w, h, seed, pigmentDetail);
+  const surface = buildSurface(w, h, seed, pigmentDetail, grain);
   const rig = RIGS[lighting] || RIGS.single;
   const image = renderUnder(surface, w, h, rig.dirs.map(normalize3), rig.weights);
   return { image, normals: surface.normals, height: surface.H, width: w, rows: h };
@@ -280,9 +300,9 @@ export function synthesizePainting({ width = 900, height = 1100, seed = 7,
 export function synthesizeCaptureSet({ width = 700, height = 800, seed = 7,
                                        pigmentDetail = 0.35, lightDirs = null,
                                        ambient = AMBIENT, sphere = null,
-                                       sphereOpts = {} } = {}) {
+                                       sphereOpts = {}, grain = 0 } = {}) {
   const w = width, h = height;
-  const surface = buildSurface(w, h, seed, pigmentDetail);
+  const surface = buildSurface(w, h, seed, pigmentDetail, grain);
   const dirs = (lightDirs || [
     [ 1, 0, 1], [0,  1, 1], [-1, 0, 1], [0, -1, 1],
   ]).map(normalize3);

@@ -61,7 +61,7 @@ Only the slope component *along* the source azimuth is recoverable. Perpendicula
 is unconstrained — the shape-from-shading ambiguity the brief correctly identifies
 for *form*, appearing at *relief* scale too:
 
-| source lighting | along azimuth | perpendicular |
+| source lighting | nx | ny |
 |---|---|---|
 | raking | 0.74 | −0.13 |
 | single soft light | 0.45 | 0.26 |
@@ -69,6 +69,14 @@ for *form*, appearing at *relief* scale too:
 This weakens "relief is free". Relief is *half* free, from one image. A second shot
 with the light moved recovers both components — which is the real argument for the
 photometric-stereo path, and moves it from "differentiator" toward "load-bearing".
+
+> **Corrected later — see finding 9.** Those columns are `nx` and `ny`, image axes.
+> They are the along/across-azimuth decomposition only when the azimuth lies on an
+> image axis, which holds for the raking rig (167°) and not for the single one
+> (141°). Scored along each rig's own azimuth the numbers are **0.76 / −0.09** and
+> **0.67 / 0.26**. The conclusion above survives — one photograph still buys mostly
+> one component — but the *elevation* penalty is 0.76 → 0.67, not 0.74 → 0.45, and
+> the "0.26 perpendicular" is genuine across-azimuth recovery rather than leakage.
 
 ### 3. A good repro photograph is the worst input
 
@@ -348,6 +356,43 @@ the along-azimuth component.
 
 ---
 
+### 9. Grey grain is the adversary the bench did not have
+
+Prompted by the first real photograph the project has seen: cast cement and plaster,
+heavily textured, largely achromatic, in soft light. At the shipped defaults the
+recovered normals were **speckle** — the extractor reading cement grain and sensor
+noise as relief — while the relit render looked entirely convincing. Finding 1 again,
+on real material.
+
+The synthetic painting could not have predicted this, because its high-frequency
+adversary is *chromatic by construction*. Pigment detail there shifts hue, which is
+exactly what lets chroma reject find it. Cement shifts no hue at all:
+
+| light | grain | single image (along / across) | photometric (nx / ny) | contrast |
+|---|---|---|---|---|
+| raking 20° | 0.00 | 0.773 / 0.157 | 0.9970 / 0.9990 | 0.286 |
+| raking 20° | 0.20 | 0.748 / 0.148 | 0.9975 / 0.9989 | 0.294 |
+| frontal 89° | 0.00 | 0.096 / −0.011 | 0.9970 / 0.9990 | 0.027 |
+| frontal 89° | 0.20 | **0.035** / −0.007 | **0.9975** / 0.9989 | **0.075** |
+
+`synth.js` now carries a `grain` parameter for it, and two things follow.
+
+**No image-only "is this shot usable?" gate is shipped, because none is sound.** The
+obvious candidate is the contrast of the high-passed log-luminance — on a fixed
+surface it tracks how raking the light was, cleanly. Grain breaks it: under frontal
+light it takes contrast *up* 0.027 → 0.075 while recovery goes *down* 0.096 → 0.035.
+The statistic moves the wrong way, so no threshold on it separates the two cases. The
+real photograph measures 0.67–0.86 there — above every synthetic case, on a much
+rougher surface — so a threshold calibrated on this bench would wave it through and
+then hand back speckle. Fourth time here that the plausible diagnostic was loudest
+where it knew least.
+
+**Photometric stereo is untouched by grain.** 0.9975 / 0.9989 at every grain level,
+because grain is albedo and albedo is precisely what the solve separates out. For
+achromatic, heavily-grained material the multi-shot path is not an upgrade over one
+photograph — it is the only sound option, and that is a property of the material
+rather than a tuning problem.
+
 ## What's in the bench
 
 | Control group | Covers |
@@ -397,9 +442,20 @@ For the photometric path, shooting for the solver rather than for the eye:
    view mean anything.
 3. **Vary the light height** between exposures by ~15°. Constant elevation makes
    the ambient term unrecoverable.
+4. **Put a chrome sphere in the frame, and make it big.** It is the only thing that
+   catches a rig that is uniformly wrong, which is what typed-in angles produce and
+   what nothing else here can see — finding 7. Accuracy scales with its radius in
+   pixels; aim for 300px or more. Take the reading before cropping it out.
 5. Fixed exposure, white balance, and focus. Shoot raw or at least uncompressed;
    the solve is linear and JPEG at fine detail is not.
 6. Kill the room light if you can. What you cannot kill, fit — see rule 3.
+
+For the **single-image** path, the one that matters is a single source with the
+azimuth dial set to match it. A grazing angle helps a little and not as much as
+finding 2 originally suggested — across azimuths 0–160° and elevations 10–60° the
+along-azimuth recovery barely moves, falling only past 75°. What it cannot survive is
+two opposing lights (finding 3), a near-frontal source, or achromatic grainy material
+(finding 9).
 
 ## Why the two paths rescale differently on export
 
@@ -433,6 +489,13 @@ are computed in one place (`updateDerived`) rather than at each call site.
 - The synthetic source's canvas weave is coarse relative to the image, so it
   reads more strongly than a real linen would. Defaults are tuned around it and
   will want revisiting against real photographs.
+- **Achromatic, grainy material breaks single-image recovery and cannot be checked.**
+  Cement, plaster, sand and paper carry fine albedo texture that shifts no hue, so
+  nothing in one photograph separates it from relief — see finding 9. Use the
+  photometric path for such work; it is unaffected.
+- Real material measured so far is **broadband**: the first photograph carries texture
+  energy from 2px out to 190px with no dominant scale, where the synthetic weave has a
+  clear 7px period. One `relief scale` default cannot be right for both.
 - Uploaded capture sets are registered on demand, not automatically, and only for
   **translation**. Rotation, scale and lens breathing are not corrected. The fit
   residual will show them; nothing here will fix them — a 0.6-degree rotation on one

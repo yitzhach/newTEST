@@ -80,13 +80,21 @@ Only the slope *along* the source azimuth is recoverable; perpendicular is
 unconstrained. This is the shape-from-shading ambiguity the brief correctly
 identifies for *form*, appearing at *relief* scale too.
 
-| source lighting | along azimuth | perpendicular |
+| source lighting | nx | ny |
 |---|---|---|
 | raking | 0.74 | −0.13 |
 | single soft light | 0.45 | 0.26 |
 
 "Relief is free" is really "half of relief is free." This is what promoted
 photometric stereo from differentiator to load-bearing.
+
+**Corrected — see §4.3.** Those columns are `nx` and `ny`, image axes, and they are
+the along/across-azimuth decomposition only when the azimuth lies on an image axis.
+That holds for the raking rig (167°) and not for the single one (141°). Scored along
+each rig's own azimuth: **0.76 / −0.09** and **0.67 / 0.26**. The conclusion stands,
+but the elevation penalty is 0.76 → 0.67, not 0.74 → 0.45. Do not repeat the
+0.74/0.45 comparison as evidence that a raking light is essential — it is not what
+the bench says.
 
 ### 3.3 The brief asks you to gather the worst possible reference photo
 
@@ -276,6 +284,47 @@ checks catch that: readings that all agree cannot be readings of a mirror (the l
 moved between exposures — a circle on paint returns six directions within 4.2° of
 each other), and the fit residual before against after (0.16% → 6.35%).
 
+### 4.3 What the first real photograph changed
+
+The first real material the project has seen: cast cement and plaster, heavily
+textured, largely achromatic, in soft light. At the shipped defaults the recovered
+normals were **speckle** and the relit render looked entirely convincing — §3.1
+again, on real material rather than on a synthetic bench built to demonstrate it.
+
+**Grey grain is the adversary the bench did not have.** The synthetic painting's
+high-frequency adversary is chromatic *by construction*, which is what makes chroma
+reject able to find it. Cement shifts no hue:
+
+| light | grain | single image (along/across) | photometric (nx/ny) | contrast |
+|---|---|---|---|---|
+| raking 20° | 0.00 | 0.773 / 0.157 | 0.9970 / 0.9990 | 0.286 |
+| frontal 89° | 0.00 | 0.096 / −0.011 | 0.9970 / 0.9990 | 0.027 |
+| frontal 89° | 0.20 | **0.035** | **0.9975** / 0.9989 | **0.075** |
+
+`synth.js` has a `grain` parameter now. Two consequences, both load-bearing:
+
+- **No image-only "is this shot usable?" gate exists, and one was tried.** The
+  obvious statistic — contrast of the high-passed log-luminance — tracks rakingness
+  cleanly on a fixed surface, and grain breaks it: under frontal light contrast goes
+  *up* 0.027 → 0.075 while recovery goes *down* 0.096 → 0.035. It moves the wrong
+  way, so no threshold separates the cases. The real photograph reads 0.67–0.86,
+  above every synthetic case, and returns speckle. Do not rebuild this.
+- **Photometric stereo does not care about grain at all** (0.9975 at every level),
+  because grain is albedo and albedo is what the solve separates out. For achromatic
+  grainy material the multi-shot path is not an upgrade — it is the only sound
+  option, and that is a fact about the material, not a tuning problem.
+
+**Elevation matters much less than §3.2 implied**, once recovery is scored along the
+azimuth rather than along x. Across azimuths 0–160° and elevations 10–60° the
+along-azimuth recovery sits between 0.66 and 0.85 and barely moves; it falls at 75°
+and collapses only at 89°. Advise a single source and a correctly-set azimuth dial;
+do not insist on a grazing angle.
+
+**Real material is broadband.** The photograph carries texture energy from 2px to
+190px with no dominant scale, where the synthetic weave has a clear 7px period. The
+default `relief scale` of 3px reads a band that on cement is grain. There is no
+single right default across materials, which is why this is still open.
+
 ### Two capture rules enforced in code, not just documented
 
 1. **Ambient light must be fitted, and that needs varied light elevation.**
@@ -358,7 +407,11 @@ bench refuses to start and says why.
   strongly coloured light or a very short lens biases it; neither is measured.
 - **Defaults are tuned to the synthetic canvas**, whose weave is coarser than real
   linen. The prominent dotted texture in every screenshot so far is that synthetic
-  weave, not a real painting.
+  weave, not a real painting. Measured against real cement (§4.3) the default relief
+  scale reads grain rather than relief; real material is broadband and no single
+  default fits both.
+- **Single-image recovery is unsound on achromatic grainy material** — cement,
+  plaster, sand, paper — and there is no image-only test that will tell you so. §4.3.
 - **Tiled photometric export is not bit-exact** against an untiled render (mean
   0.026/765, max 21, no coherent seam). Cause is Jacobi convergence, not margin:
   after N sweeps only features up to ~N texels have settled. The mean-removal blur
@@ -374,31 +427,30 @@ bench refuses to start and says why.
 
 Ranked, with reasons rather than a bare list:
 
-1. **Retune defaults against a real photograph.** Blocked on the owner supplying a
-   single-source raking-light shot of a painting with real impasto. Everything
-   downstream is calibrated against the synthetic weave until then, and it is now
-   the only item blocked on something other than time. It also gates the honesty of
-   every default in the tool, so it has risen to the top by everything else being
-   done rather than by growing in importance.
-2. **Fit the sphere's circle against the photometric residual.** §4.2 leaves circle
-   placement as the one hand-set number that still costs real accuracy (3px on a
-   small sphere is several degrees). Optimising `cx, cy, r` against the fit residual
-   is the validatable version of the silhouette fitter that was removed — three
-   parameters, an objective the tool already computes, and ground truth available in
-   the bench to score it against. Note the residual is blind to a *uniform* rotation
-   of the rig, so it can refine a circle but can never replace the sphere.
-3. **A resample-free correction path for registration.** §4.1 established that the
-   estimate is essentially exact and the whole remaining loss is interpolation (fit
-   0.78% against a 0.17% floor on the sub-pixel case). Rather than a better kernel,
-   fold each frame's sub-pixel offset into the solve by sampling the shot array at a
-   shifted UV in the solve shader. That moves interpolation onto the GPU's sampler
-   and makes alignment free to apply and undo. Measure before assuming it wins —
-   bilinear is all a GPU sampler gives, and §4.1 measured bilinear as the worst
-   option, so this may need a Lanczos tap in the shader to be worth doing.
-4. **Register rotation as well as translation.** Only worth it if a real capture
-   turns out to need it; a tripod that rotated is usually a re-shoot.
-5. Preset/save system for light rigs — the first thing that will be missed in
-   sustained real use.
+1. **Get a photometric capture of the owner's real material.** §4.3 established that
+   their work — cast cement and plaster, achromatic and heavily grained — is the case
+   single-image recovery cannot do and cannot self-check, while photometric stereo is
+   entirely unaffected by the thing that breaks it. That makes a six-exposure capture
+   of a real piece the highest-value input the project can receive, and it exercises
+   registration and the sphere reader at the same time. Everything below is tuning;
+   this is the one that decides whether the tool works on the material it is for.
+2. **Retune the single-image defaults against real photographs.** Still open, and now
+   better understood: real material is broadband where the synthetic weave is not, so
+   the answer is probably not a different constant but a control that shows which
+   band is being read. Blocked on more real photographs, ideally of the same piece
+   under known lighting.
+3. **Fit the sphere's circle against the photometric residual.** §4.2 leaves circle
+   placement as the one hand-set number that still costs real accuracy. Three
+   parameters, an objective the tool already computes, ground truth in the bench.
+   Note the residual is blind to a *uniform* rotation of the rig, so this refines a
+   circle but never replaces the sphere.
+4. **A resample-free correction path for registration.** §4.1: the estimate is
+   essentially exact and the whole remaining loss is interpolation. Fold each frame's
+   sub-pixel offset into the solve shader's UV rather than pre-shifting pixels.
+   Measure first — a GPU sampler gives bilinear, which §4.1 measured as the worst
+   kernel, so this may need a Lanczos tap in the shader to be worth doing.
+5. **Register rotation as well as translation.** Only if a real capture needs it.
+6. Preset/save system for light rigs.
 
 ## 9. How this project has been worked, and why it matters
 
@@ -407,8 +459,9 @@ a relief pipeline that traced brushwork beautifully and recovered nothing; an
 acceptance test that passed hardest on the capture that recovered nothing; a fit
 residual that read a perfect 0.00% precisely when it had no information; a frame
 matcher built on the textbook light-invariant feature that was confidently 3px out
-on a fifth of its comparisons; and a rig rotated bodily off the painting that fits
-every photograph perfectly at 0.17% while returning the wrong surface.
+on a fifth of its comparisons; a rig rotated bodily off the painting that fits every
+photograph perfectly at 0.17% while returning the wrong surface; and a shot-quality
+gate whose statistic rose while the thing it was meant to measure fell.
 
 The practice that caught all of them: **synthesise a surface whose truth you
 know, feed the tool only the render, and score the recovery numerically.** Do not
