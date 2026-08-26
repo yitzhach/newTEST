@@ -1,28 +1,31 @@
-# Relight Bench — Phase 0/1
+# Relight Engine — findings
 
-An isolated WebGL2 bench for the relighting engine described in `RELIGHT-BRIEF.md`.
+A WebGL2 tool that relights a photograph of an artwork and exports the result.
 No build step: serve this directory and open `index.html`.
+
+**Start with `HANDOFF.md`** if you are picking the project up — it carries the
+current state, the queue, and what not to rebuild. This file is the long-form
+record of what was measured and why the tool is shaped the way it is.
 
 ```
 python3 -m http.server 8080      # then open http://localhost:8080/relight/
-node relight/tools/validate.mjs  # ground-truth check on the surface maths
-node relight/tools/smoke.mjs     # end-to-end browser check (needs playwright)
+node relight/tools/validate.mjs  # ground truth: relief, registration, sphere, grain (~65s)
+node relight/tools/smoke.mjs     # end-to-end browser suite, 18 checks (needs playwright)
 ```
 
 Deploying it anywhere — Cloudflare Pages included — is covered in `DEPLOY.md`.
 There is no build step; it needs a static host and nothing else.
 
-Built per §8 #1 (standalone bench before touching shipping code) so that surface
-response can be judged before anything is wired into a host app.
-
 ---
 
-## What this phase was supposed to answer
+## What this was supposed to answer
 
 > Does high-pass relief extraction look convincing on a real painting?
 
-That question turned out to be the wrong one, and the reason is the main result
-below. "Looks convincing" and "is correct" come apart here — sharply.
+That question turned out to be the wrong one, and the reason is the first result
+below. "Looks convincing" and "is correct" come apart here — sharply, and they came
+apart again on the first real photograph the project saw (finding 9), in exactly
+the same way and for exactly the same reason.
 
 ---
 

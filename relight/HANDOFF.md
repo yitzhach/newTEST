@@ -6,9 +6,15 @@ claims were tested during the build and turned out to be wrong. Those correction
 are in §3 below. A session that follows the brief's §4, §7.1 or §8 #7 as written
 will rebuild something that does not work and looks like it does.
 
-**Status:** working, deployable, validated against ground truth.
-**Repo:** `yitzhach/newTEST` · **Branch:** `claude/getting-started-jf5cub` · **Path:** `relight/`
+**Status:** working, deployable, validated against ground truth. The photometric
+path is sound and now measures everything it used to assume. The single-image path
+has met real material and does not survive it — see §4.3, which is the most
+important thing in this document.
+
+**Repo:** `yitzhach/newTEST` · **Branch:** `claude/artwork-relighting-engine-ak4yae` · **Path:** `relight/`
 **Predecessor brief:** `yitzhach/dm-t1`, branch `claude/photo-relighting-app-ge73k7`, file `RELIGHT-BRIEF.md`
+**Earlier branch:** `claude/getting-started-jf5cub` — superseded; its history is contained
+in the current branch, so there is nothing to merge and no reason to check it out.
 
 ---
 
@@ -19,15 +25,42 @@ will rebuild something that does not work and looks like it does.
 > feature inside another app.
 >
 > The code is in this repo under `relight/` on branch
-> `claude/getting-started-jf5cub`. **Read `relight/HANDOFF.md` in full before
-> responding.** It supersedes the older `RELIGHT-BRIEF.md` (which lives in a
-> different repo, `yitzhach/dm-t1`) on every technical point where they disagree —
-> §3 of the handoff lists exactly what the old brief got wrong and why, all of it
-> measured rather than argued.
+> `claude/artwork-relighting-engine-ak4yae`. **Read `relight/HANDOFF.md` in full
+> before responding**, and §4.3 twice — it is the finding that changes what the
+> tool is for. The handoff supersedes the older `RELIGHT-BRIEF.md` (which lives in
+> a different repo, `yitzhach/dm-t1`) on every technical point where they disagree.
 >
-> Don't re-derive those findings and don't trust the old brief's algorithm. Pick
-> up from "What's next" at the end of the handoff, or tell me if you think
-> something else deserves to jump the queue.
+> Everything in there was measured, not argued, and several entries record things
+> that were built and then deliberately removed. Don't re-derive them, don't trust
+> the old brief's algorithm, and don't rebuild anything the handoff says was tried.
+>
+> Pick up from "What's next" at the end, or tell me if you think something else
+> deserves to jump the queue.
+
+### What the owner needs to supply, and why it is item #1
+
+The project is no longer blocked on code. It is blocked on **one six-exposure
+photometric capture of a real piece.**
+
+The owner makes cast cement and plaster work: heavily textured, almost achromatic,
+relief at centimetre scale. §4.3 established by measurement that this is precisely
+the material the single-image path cannot handle *and cannot self-check on*, while
+photometric stereo is completely unaffected by the thing that breaks it. So a real
+capture is worth more than any amount of further tuning, and it exercises frame
+registration (§4.1) and the sphere reader (§4.2) at the same time.
+
+The protocol is in `README.md` under **Capture protocol**. The short version:
+fixed camera on a tripod, one light moved between **six** exposures, light height
+varied by ~15° between them (constant elevation makes the ambient term
+unrecoverable and the solve refuses), manual exposure/WB/focus, room light killed,
+and a chrome sphere in frame — large, 300px radius or more — read before cropping.
+
+A note on this session's environment: image uploads did not reliably reach disk.
+Only the first attachment of the conversation was written to
+`/root/.claude/uploads/…`; later ones were visible to the model but not present as
+files, so no pixel measurement was possible on them. If that recurs, ask for one
+attachment per message, or a fetchable link, and **verify the file exists before
+promising analysis.** Do not fall back to judging images by eye — §9.
 
 ---
 
@@ -38,9 +71,11 @@ will rebuild something that does not work and looks like it does.
   "See It On Your Wall" app in `yitzhach/dm-t1` — is **dropped, not deferred.**
 - **Personal tool first.** No accounts, billing, or multi-user anything.
 - **Eventually** the owner wants to fold this into a separate 35mm project. Not
-  scoped yet. One technical note for when it happens: film grain is fine
-  achromatic high-frequency detail, which is exactly what the single-image
-  extractor reads as relief. That path will need different defaults.
+  scoped yet. The technical note filed here speculatively — that film grain is fine
+  achromatic high-frequency detail, exactly what the single-image extractor reads as
+  relief — has since been **measured and confirmed** on real cement (§4.3). It is not
+  a defaults problem. On grainy achromatic material the single-image path is unsound
+  and no image-only test will tell you so.
 - **Minimise generative AI** remains the constraint, and it has been met
   completely: there is no model of any kind in this codebase. Nothing here needs
   one, because the geometry is either measured or recovered classically.
@@ -137,7 +172,7 @@ Only relevant if Phase 5 is ever revived, which it should not be:
 
 ## 4. What exists
 
-~4,800 lines, plain ES modules, **no build step**, no dependencies.
+~5,000 lines, plain ES modules, **no build step**, no dependencies.
 
 | file | role |
 |---|---|
@@ -149,10 +184,10 @@ Only relevant if Phase 5 is ever revived, which it should not be:
 | `src/shade.js` | Cook-Torrance GGX, spot cones, inverse-square falloff, horizon-march cast shadows, occlusion, ACES |
 | `src/kelvin.js` | Colour temperature via the Planckian locus (Kim et al.) → CIE xy → XYZ → linear sRGB |
 | `src/export.js` | Tiled full-resolution render with overlap margin, for both surface paths |
-| `src/synth.js` | Procedural painting with known height field; single shots and capture sets |
+| `src/synth.js` | Procedural painting with known height field; single shots, capture sets, optional chrome sphere and achromatic `grain` |
 | `src/app.js` | UI, light rig, state, export wiring |
-| `tools/validate.mjs` | Ground-truth correlation harness (Node, no browser) |
-| `tools/smoke.mjs` | End-to-end browser suite via Playwright — 9 checks |
+| `tools/validate.mjs` | Ground-truth harness — relief, registration, sphere, grain (Node, no browser, ~65s) |
+| `tools/smoke.mjs` | End-to-end browser suite via Playwright — 18 checks |
 | `DEPLOY.md` | Cloudflare Pages and alternatives |
 
 ### The two surface paths
@@ -325,6 +360,42 @@ do not insist on a grazing angle.
 default `relief scale` of 3px reads a band that on cement is grain. There is no
 single right default across materials, which is why this is still open.
 
+### 4.4 Built, measured, and deliberately removed — do not rebuild these
+
+Three plausible features were implemented, scored against ground truth, and then
+deleted. Each is the kind of thing a fresh session reaches for in the first hour.
+
+**A silhouette fitter for the chrome sphere's circle.** Hand-placing the circle
+genuinely costs accuracy (3px of centre error on an 80px sphere is 5.07°), so
+snapping it to the sphere's outline is the obvious repair. The bench cannot judge
+one: it would be scoring an edge detector against `synth.js`'s own model of a
+sphere's edge. And on that render there is no edge — luminance just inside the rim
+(~0.26) is indistinguishable from the painting just outside (0.23–0.40), because a
+mirror near its silhouette reflects the room at grazing angles. What rescues
+placement instead is that error scales with circle-error / **radius**, so the fix is
+a big sphere. §4.2.
+
+**A contrast-based "is this photograph usable?" gate.** The statistic — contrast of
+the high-passed log-luminance — tracks how raking the light was, cleanly, on a fixed
+surface. Achromatic grain breaks it: under frontal light it takes contrast *up*
+0.027 → 0.075 while recovery goes *down* 0.096 → 0.035. It moves the wrong way, so
+no threshold separates the cases. §4.3.
+
+**An automatic source-azimuth estimator.** Under `I ≈ Lz − |Lxy|·∂h/∂â` a bump is
+dark on the side away from the lamp and bright toward it, so the directional
+derivative of the high-pass should have maximum skew along the light azimuth. It is
+sound reasoning and it does not work. Validated against the bench's known rigs:
+
+| rig | true azimuth | estimated | error | its own confidence |
+|---|---|---|---|---|
+| raking | 167° | 170° | 3° | 1.64 |
+| single | 141° | 185° | **44°** | 1.82 |
+| copy-stand | 141° | 115° | 26° | **2.24** |
+
+It reports its *highest* confidence on the copy-stand shot, which by finding 3 has
+no recoverable direction at all. Same shape as §3.4 and §4.3: the diagnostic is
+loudest where it knows least. The azimuth stays a dial the user sets.
+
 ### Two capture rules enforced in code, not just documented
 
 1. **Ambient light must be fitted, and that needs varied light elevation.**
@@ -375,7 +446,7 @@ bench refuses to start and says why.
 | phase | state |
 |---|---|
 | 0 — Bench | done |
-| 1 — Relief | done, algorithm corrected and the correction measured |
+| 1 — Relief | algorithm corrected and the correction measured — but **unsound on achromatic grainy material** (§4.3), which is what the owner makes |
 | 2 — Light rig | done — N lights, canvas handles, Power/Distance/Cone/Kelvin |
 | 3 — Shadows & AO | done — horizon march + height-derived occlusion |
 | 4 — Albedo recovery | partial single-image; **superseded** on the photometric path |
@@ -417,8 +488,10 @@ bench refuses to start and says why.
   after N sweeps only features up to ~N texels have settled. The mean-removal blur
   is cut at exactly that reach to discard the unconverged band. Zero needs
   multigrid.
-- **Single-image auto-azimuth is unreliable** in the presence of a regular weave.
-  Shipped as a dial.
+- **Single-image auto-azimuth is unreliable**, and now measurably so — an estimator
+  was built and scored 44° out on a plain single-light shot while reporting its
+  highest confidence on the copy-stand shot that has no direction at all (§4.4).
+  Shipped as a dial the user sets.
 - No preset system, no save/load of light rigs, no undo.
 
 ---
