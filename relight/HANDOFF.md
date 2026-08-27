@@ -79,6 +79,13 @@ promising analysis.** Do not fall back to judging images by eye — §9.
 - **Minimise generative AI** remains the constraint, and it has been met
   completely: there is no model of any kind in this codebase. Nothing here needs
   one, because the geometry is either measured or recovered classically.
+  **Reaffirmed explicitly** after the trade-off was put plainly: §3.2 means one
+  photograph constrains only the slope along the light azimuth, and a learned prior
+  is the only thing that fills the other half, so this constraint and
+  "works on any photograph you upload" cannot both hold. The owner chose the
+  constraint, to be revisited once the physics-only path is mature. Build for
+  excellence where the physics reaches and refusal where it does not — do not
+  quietly reopen this to chase generality.
 
 ---
 
@@ -186,7 +193,12 @@ Only relevant if Phase 5 is ever revived, which it should not be:
 | `src/export.js` | Tiled full-resolution render with overlap margin, for both surface paths |
 | `src/synth.js` | Procedural painting with known height field; single shots, capture sets, optional chrome sphere and achromatic `grain` |
 | `src/app.js` | UI, light rig, state, export wiring |
+| `tools/recover.js` | CPU reference implementations of both surface paths, shared by the benches so real and synthetic numbers come from identical code |
 | `tools/validate.mjs` | Ground-truth harness — relief, registration, sphere, grain (Node, no browser, ~65s) |
+| `tools/score-real.mjs` | Scores recovery against a **real** photometric capture; preflight, sphere read, relief-scale sweep, `--json` |
+| `tools/fixture.mjs` | Writes a synthetic capture to disk as a real bundle — the worked example, and the self-test's input |
+| `tools/selftest-real.mjs` | The real-capture chain end to end, 20 checks, no browser |
+| `tools/png.js` | PNG encode/decode on `node:zlib`, no dependencies |
 | `tools/smoke.mjs` | End-to-end browser suite via Playwright — 18 checks |
 | `DEPLOY.md` | Cloudflare Pages and alternatives |
 
@@ -396,6 +408,58 @@ It reports its *highest* confidence on the copy-stand shot, which by finding 3 h
 no recoverable direction at all. Same shape as §3.4 and §4.3: the diagnostic is
 loudest where it knows least. The azimuth stays a dial the user sets.
 
+### 4.5 The real-capture harness
+
+Every single-image number above this line was measured on `synth.js`. §4.3 is the
+record of what that is worth: the one real photograph the project has seen behaved
+unlike every synthetic case, reading a high-pass contrast of 0.67–0.86 — above every
+bench value — while returning speckle. Bench numbers do not transfer to real
+material, and until now there was no way to get a real one.
+
+`tools/score-real.mjs` is that way. It reads a capture bundle off disk, registers
+the frames, reads the sphere, solves — and then runs the **single-image** path on
+each individual exposure and scores it against the normals that solve measured. One
+six-exposure shoot yields six (photograph → known normals) pairs on real material.
+
+The recovery maths lives in `tools/recover.js` and is imported by **both**
+`validate.mjs` and `score-real.mjs`. That is not tidiness. A second copy of
+`integrate` in the real harness would drift from the bench's silently, and the real
+column and the synthetic column would stop measuring the same thing while still
+appearing in the same table. The extraction was verified by diffing `validate.mjs`'s
+full output before and against after: bit-identical, same md5.
+
+Three things worth not re-deriving:
+
+- **The registration verdict must exclude the sphere's disc.** Registration is
+  judged on the fit residual before against after (§4.1), and a mirror is not
+  Lambertian: with the disc left in, a clean capture reads **3.70%** where the same
+  capture reads **0.17%** with it excluded. That is §4.2's finding applied to a
+  second diagnostic — large enough to swamp the improvement the comparison exists to
+  detect. Both ends of the comparison now use the same exclusion the solve does.
+- **Preflight is separate from scoring, and runs before the lights come down.** Two
+  faults cannot be repaired afterwards: a rig at constant elevation, which
+  `buildSolver` refuses outright, and a sphere too small or clipped by the frame. The
+  check asks `buildSolver` rather than reimplementing its test, so it cannot disagree
+  with the thing that will actually run.
+- **A sphere-less capture is scored but flagged three times over.** Without a sphere,
+  "ground truth" means "the surface implied by the angles typed into the manifest",
+  and §4.2 is exactly the argument that a low fit residual does not establish those
+  angles. The harness says so at preflight, at the solve, and under the results
+  table rather than printing a confident number.
+
+`tools/selftest-real.mjs` runs the whole chain against `tools/fixture.mjs`, which
+writes a synthetic capture out as real PNG files with the true height field known —
+20 checks, no browser, ~90s. Two of its assertions are pinned findings rather than
+plumbing tests: that grain leaves photometric stereo alone while degrading the
+single-image path, and that **high-pass contrast rises while recovery falls**. That
+second one is the statistic §4.4's deleted gate was built on, and it is the finding a
+fresh session is most likely to un-learn by rebuilding it.
+
+Confirmed independently by the new harness, on file-based data rather than in-memory
+arrays: grain 0.35 leaves the photometric fit at 0.20% against 0.17% clean, drops
+single-image recovery 0.615 → 0.459, and takes contrast 0.131 → 0.170 — up, while
+recovery falls.
+
 ### Two capture rules enforced in code, not just documented
 
 1. **Ambient light must be fitted, and that needs varied light elevation.**
@@ -428,7 +492,17 @@ was photographed. Blue = the model matches. Clean capture 0.16%; one frame off b
 python3 -m http.server 8080          # then http://localhost:8080/relight/
 node relight/tools/validate.mjs      # ground-truth maths, registration and sphere, no browser
 node relight/tools/smoke.mjs         # end-to-end browser suite, 18 checks (needs playwright)
+node relight/tools/selftest-real.mjs # real-capture harness end to end, 20 checks, no browser
+
+node relight/tools/fixture.mjs /tmp/cap --sphere        # a worked capture bundle
+node relight/tools/score-real.mjs /tmp/cap --preflight  # is this capture solvable?
+node relight/tools/score-real.mjs /tmp/cap              # score single-image against truth
+node relight/tools/score-real.mjs /tmp/cap --sweep      # which band carries the relief
+node relight/tools/score-real.mjs /tmp/cap --json       # same, machine-readable
 ```
+
+The capture bundle format is in `README.md` under **Capture bundles**. PNG is read
+with no dependencies; JPEG and WebP need `playwright` installed to decode.
 
 Must be served over http(s) — ES modules will not load from `file://`.
 Deployment (Cloudflare Pages included) is in `DEPLOY.md`. Build output directory
@@ -498,32 +572,81 @@ bench refuses to start and says why.
 
 ## 8. What's next
 
-Ranked, with reasons rather than a bare list:
+**A decision was taken this session and is not open:** the "minimise generative AI"
+constraint of §2 stays. No learned model, for now, to be revisited once the
+physics-only path is mature. That settles a tension worth naming — §3.2 is the
+mathematical fact that one photograph constrains only the slope *along* the light
+azimuth, and a learned prior is the only thing that fills the other half. A tool
+that takes any photograph and returns something plausible (ClipDrop and similar)
+buys its generality that way. This one will be excellent where the physics reaches
+and will refuse where it does not, and that is now a chosen position rather than an
+accident.
 
-1. **Get a photometric capture of the owner's real material.** §4.3 established that
-   their work — cast cement and plaster, achromatic and heavily grained — is the case
-   single-image recovery cannot do and cannot self-check, while photometric stereo is
-   entirely unaffected by the thing that breaks it. That makes a six-exposure capture
-   of a real piece the highest-value input the project can receive, and it exercises
-   registration and the sphere reader at the same time. Everything below is tuning;
-   this is the one that decides whether the tool works on the material it is for.
-2. **Retune the single-image defaults against real photographs.** Still open, and now
-   better understood: real material is broadband where the synthetic weave is not, so
-   the answer is probably not a different constant but a control that shows which
-   band is being read. Blocked on more real photographs, ideally of the same piece
-   under known lighting.
-3. **Fit the sphere's circle against the photometric residual.** §4.2 leaves circle
+The owner's order, with what each is actually worth:
+
+1. **Run the single-image path on a real painting, by hand.** Zero code; the tool
+   ships this as its default mode. It answers the one question that governs
+   everything else: is this material in the 0.77 bucket or the 0.03 bucket? Note the
+   bound, which is §9's whole lesson — **this test can falsify but it cannot
+   confirm.** Speckle is real signal. A convincing render is "not obviously broken",
+   which is much weaker than it will feel, because §3.1, §3.4 and §4.3 are all cases
+   where the wrong answer looked entirely right.
+2. **Shoot the six-exposure capture.** Its purpose has changed and the change
+   matters: not to make the photometric path better, but to produce the project's
+   first non-synthetic score for the *single-image* path. `tools/score-real.mjs`
+   (§4.5) is what converts the shoot into that number, and it exists now — run
+   `--preflight` before striking the lights, because a rank-deficient rig and an
+   undersized sphere are the two faults that cannot be repaired afterwards.
+   Nothing here trains anything: the capture makes the single-image path *measured*,
+   not smarter. It will behave identically afterwards.
+3. **Retune the single-image defaults against that capture.** `--sweep` is the tool.
+   §4.3 left this open because real material is broadband where the synthetic weave
+   has a clean 7px period; the sweep asks the ground truth which band to read. It
+   returns 3px on the bench — the shipped default, and the bench's own weave period —
+   which is the check that it measures what it claims.
+4. **A shot-quality warning, approached honestly.** §4.3 killed a gate built on
+   high-pass contrast, and §4.5 now pins that failure as a regression test. Do not
+   rebuild it. But note precisely what was established: that *statistic* fails, and
+   the bench could not validate any gate because it lacked the adversary. Whether
+   *some* image-only gate exists is not settled — though the honest prior is poor,
+   since grain and relief are genuinely indistinguishable in one photograph. Real
+   (photograph → truth) pairs from step 2 are what would let a candidate be tested
+   against truth rather than guessed at. Effort belongs on the conditions that
+   already work (raking, 45°), not on rescuing frontal or copy-stand input, which
+   §3.3 measured at r = 0.00 and which no amount of tuning reaches.
+5. **Keep every capture as a labelled bundle** (`README.md`, Capture bundles).
+   Cheap now, impossible to reconstruct once the paint has been rephotographed. And
+   if the model decision is ever revisited, a solved bundle is exactly the training
+   pair a single-image estimator needs — at r ≈ 0.9995 per pair, with §4.1 and §4.2
+   being what make the labels trustworthy rather than silently rotated.
+
+Still open from before, unchanged in priority:
+
+6. **Fit the sphere's circle against the photometric residual.** §4.2 leaves circle
    placement as the one hand-set number that still costs real accuracy. Three
    parameters, an objective the tool already computes, ground truth in the bench.
-   Note the residual is blind to a *uniform* rotation of the rig, so this refines a
-   circle but never replaces the sphere.
-4. **A resample-free correction path for registration.** §4.1: the estimate is
-   essentially exact and the whole remaining loss is interpolation. Fold each frame's
+   The residual is blind to a *uniform* rotation of the rig, so this refines a circle
+   but never replaces the sphere.
+7. **A resample-free correction path for registration.** §4.1: the estimate is
+   essentially exact and the remaining loss is interpolation. Fold each frame's
    sub-pixel offset into the solve shader's UV rather than pre-shifting pixels.
-   Measure first — a GPU sampler gives bilinear, which §4.1 measured as the worst
-   kernel, so this may need a Lanczos tap in the shader to be worth doing.
-5. **Register rotation as well as translation.** Only if a real capture needs it.
-6. Preset/save system for light rigs.
+   Measure first — a GPU sampler gives bilinear, the worst kernel measured.
+8. **Register rotation as well as translation.** Only if a real capture needs it.
+9. Preset/save system for light rigs.
+
+### A note on getting images into a session
+
+Two delivery routes failed outright this session and cost real time, so: image
+attachments did not reach disk on any of three attempts (`/root/.claude/uploads/`
+did not exist), and `isaacandersonart.com` is refused by the sandbox's egress policy
+at the CONNECT stage — a 403 from the proxy, not a network error, and not something
+to route around.
+
+**Commit the photographs to the repository instead.** That path is known to work, it
+versions the capture alongside the manifest that explains it, and it is the same
+`captures/<painting>/` layout `score-real.mjs` already reads. A bundle in git is not
+a workaround for the upload problem; it is the storage format the project wanted
+anyway.
 
 ## 9. How this project has been worked, and why it matters
 

@@ -15,43 +15,14 @@ globalThis.ImageData = class {
   constructor(w, h) { this.width = w; this.height = h; this.data = new Uint8ClampedArray(w * h * 4); }
 };
 const { synthesizePainting } = await import(new URL('../src/synth.js', import.meta.url));
+import {
+  srgbToLin, LIN, pearson, makeBlur, blurF, HP_SIGMA, linPlanes, highpassLog,
+  sdOf, integrate, alongAcross, scoreShot, cpuSolve, scoreNormals,
+} from './recover.js';
 
-const srgbToLin = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
-
-function pearson(a, b) {
-  const n = a.length;
-  let ma = 0, mb = 0;
-  for (let i = 0; i < n; i++) { ma += a[i]; mb += b[i]; }
-  ma /= n; mb /= n;
-  let sa = 0, sb = 0, sab = 0;
-  for (let i = 0; i < n; i++) { const u = a[i] - ma, v = b[i] - mb; sa += u * u; sb += v * v; sab += u * v; }
-  return sab / Math.sqrt(sa * sb + 1e-20);
-}
-
-function makeBlur(w, h) {
-  return (src, sigma) => {
-    const rad = Math.ceil(sigma * 3), k = [];
-    let ks = 0;
-    for (let i = -rad; i <= rad; i++) { const v = Math.exp(-i * i / (2 * sigma * sigma)); k.push(v); ks += v; }
-    const t = new Float32Array(w * h), o = new Float32Array(w * h);
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-      let s = 0;
-      for (let i = -rad; i <= rad; i++) { const xx = Math.min(w - 1, Math.max(0, x + i)); s += src[y * w + xx] * k[i + rad]; }
-      t[y * w + x] = s / ks;
-    }
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-      let s = 0;
-      for (let i = -rad; i <= rad; i++) { const yy = Math.min(h - 1, Math.max(0, y + i)); s += t[yy * w + x] * k[i + rad]; }
-      o[y * w + x] = s / ks;
-    }
-    return o;
-  };
-}
 
 const AZ = { symmetric: [-0.55, 0.45], single: [-0.55, 0.45], raking: [-0.90, 0.20] };
 
-/** Size-agnostic Gaussian, for the sections below. */
-const blurF = (src, w, h, sigma) => makeBlur(w, h)(src, sigma);
 
 function prepare(lighting, pigmentDetail, size = 400) {
   const S = synthesizePainting({ width: size, height: size, seed: 7, lighting, pigmentDetail });
@@ -143,11 +114,9 @@ console.log('    first-order term by design, so almost nothing survives to recov
 // the ground truth.
 
 const { registerFrames, applyShifts } = await import(new URL('../src/register.js', import.meta.url));
-const { buildSolver } = await import(new URL('../src/photometric.js', import.meta.url));
 const { synthesizeCaptureSet } = await import(new URL('../src/synth.js', import.meta.url));
 
 const SUB = 3;
-const LIN = (() => { const t = new Float32Array(256); for (let i = 0; i < 256; i++) t[i] = srgbToLin(i); return t; })();
 const encSrgb = (v) => {
   const c = v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(Math.max(v, 0), 1 / 2.4) - 0.055;
   return Math.max(0, Math.min(255, Math.round(c * 255)));
@@ -256,71 +225,6 @@ function driftedCapture(driftsHi, { size = 300, pigmentDetail = 0.35, seed = 7, 
   };
 }
 
-/**
- * The photometric solve on the CPU — the same normal equations the shader runs,
- * so the effect of registration can be scored without a GPU.
- */
-function cpuSolve(frames, dirs, w, h, { fitAmbient = true, margin = 14 } = {}) {
-  const solver = buildSolver(dirs, { fitAmbient });
-  if (!solver.ok) throw new Error(solver.reason);
-  const n = frames.length;
-  const lum = frames.map((f) => {
-    const L = new Float32Array(w * h);
-    for (let i = 0, p = 0; i < w * h; i++, p += 4) {
-      L[i] = 0.2126 * LIN[f.data[p]] + 0.7152 * LIN[f.data[p + 1]] + 0.0722 * LIN[f.data[p + 2]];
-    }
-    return L;
-  });
-  const Ln = dirs.map((d) => { const m = Math.hypot(d[0], d[1], d[2]) || 1; return [d[0] / m, d[1] / m, d[2] / m]; });
-  const N = new Float32Array(w * h * 3);
-  let resSum = 0, resN = 0;
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const i = y * w + x;
-      let gx = 0, gy = 0, gz = 0, amb = 0, mean = 0;
-      for (let k = 0; k < n; k++) {
-        const v = lum[k][i];
-        gx += solver.P[k * 4] * v; gy += solver.P[k * 4 + 1] * v;
-        gz += solver.P[k * 4 + 2] * v; amb += solver.P[k * 4 + 3] * v;
-        mean += v;
-      }
-      mean /= n;
-      const m = Math.hypot(gx, gy, gz);
-      let a = 0, b = 0, c = 1;
-      if (m > 1e-5) { a = gx / m; b = gy / m; c = gz / m; }
-      if (c < 0) { a = -a; b = -b; c = -c; }
-      N[i * 3] = a; N[i * 3 + 1] = b; N[i * 3 + 2] = c;
-      // Interior only: after a shift the border rows are clamped copies, and
-      // scoring them would mix a resampling edge artefact into the verdict.
-      if (x >= margin && y >= margin && x < w - margin && y < h - margin) {
-        let sse = 0;
-        for (let k = 0; k < n; k++) {
-          const pred = gx * Ln[k][0] + gy * Ln[k][1] + gz * Ln[k][2] + (fitAmbient ? amb : 0);
-          const e = lum[k][i] - pred;
-          sse += e * e;
-        }
-        resSum += Math.sqrt(sse / n) / Math.max(mean, 1e-3);
-        resN++;
-      }
-    }
-  }
-  return { N, residual: resSum / Math.max(resN, 1), solver };
-}
-
-function scoreNormals(N, truth, w, h, margin = 14) {
-  const ax = [], bx = [], ay = [], by = [];
-  let angSum = 0, angN = 0;
-  for (let y = margin; y < h - margin; y++) {
-    for (let x = margin; x < w - margin; x++) {
-      const i = y * w + x;
-      ax.push(N[i * 3]); bx.push(truth[i * 3]);
-      ay.push(N[i * 3 + 1]); by.push(truth[i * 3 + 1]);
-      const d = N[i * 3] * truth[i * 3] + N[i * 3 + 1] * truth[i * 3 + 1] + N[i * 3 + 2] * truth[i * 3 + 2];
-      angSum += Math.acos(Math.max(-1, Math.min(1, d))); angN++;
-    }
-  }
-  return { x: pearson(ax, bx), y: pearson(ay, by), ang: (angSum / angN) * 180 / Math.PI };
-}
 
 const CASES = [
   ['clean', [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]],
@@ -387,64 +291,7 @@ for (const [name, drifts, note, capOpts] of CASES) {
 // Prompted by the first real photograph the project has seen — cast cement and
 // plaster, heavily textured, largely achromatic. Two things came out of it.
 
-const HP_SIGMA = 3;
 
-function linPlanes(d, w, h) {
-  const r = new Float32Array(w * h), g = new Float32Array(w * h), b = new Float32Array(w * h);
-  for (let i = 0, p = 0; i < w * h; i++, p += 4) { r[i] = LIN[d[p]]; g[i] = LIN[d[p + 1]]; b[i] = LIN[d[p + 2]]; }
-  return { r, g, b };
-}
-function highpassLog(d, w, h, sigma = HP_SIGMA) {
-  const { r, g, b } = linPlanes(d, w, h);
-  const L = new Float32Array(w * h);
-  for (let i = 0; i < w * h; i++) L[i] = 0.2126 * r[i] + 0.7152 * g[i] + 0.0722 * b[i];
-  const lo = blurF(L, w, h, sigma), hp = new Float32Array(w * h);
-  for (let i = 0; i < w * h; i++) hp[i] = Math.log(Math.max(L[i], 1e-4)) - Math.log(Math.max(lo[i], 1e-4));
-  return hp;
-}
-function sdOf(a) { let s1 = 0, s2 = 0; for (const v of a) { s1 += v; s2 += v * v; }
-  const m = s1 / a.length; return Math.sqrt(Math.max(s2 / a.length - m * m, 1e-14)); }
-function integrate(hp, w, h, ax, ay, taps = 8) {
-  const H = new Float32Array(w * h);
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    let acc = 0;
-    for (let t = 1; t <= taps; t++) {
-      const sx = Math.round(x - ax * t), sy = Math.round(y - ay * t);
-      if (sx < 0 || sx >= w || sy < 0 || sy >= h) break;
-      acc += -hp[sy * w + sx] * (1 - (t - 1) / taps);
-    }
-    H[y * w + x] = acc;
-  }
-  return H;
-}
-/**
- * Recovery resolved ALONG and ACROSS the light azimuth.
- *
- * Not along x and y. Finding 2 scored the two rigs it compares as nx / ny under
- * headings that say "along azimuth / perpendicular", which is only the same thing
- * when the azimuth happens to lie on an image axis. It does not for the `single`
- * rig (141 degrees), and the mislabelling is what made a modest elevation effect
- * look like a large one.
- */
-function alongAcross(H, N, w, h, ax, ay) {
-  const P = [], PT = [], Q = [], QT = [];
-  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
-    const i = y * w + x;
-    const gx = H[i - 1] - H[i + 1], gy = H[(y - 1) * w + x] - H[(y + 1) * w + x];
-    const tx = N[i * 3], ty = N[i * 3 + 1];
-    P.push(gx * ax + gy * ay); PT.push(tx * ax + ty * ay);
-    Q.push(-gx * ay + gy * ax); QT.push(-tx * ay + ty * ax);
-  }
-  return { along: pearson(P, PT), across: pearson(Q, QT) };
-}
-/** Score one rendered exposure whose light direction is known. */
-function scoreShot(data, normals, size, dir) {
-  const hp = highpassLog(data, size, size);
-  const an = Math.hypot(dir[0], dir[1]) || 1;
-  const ax = dir[0] / an, ay = dir[1] / an;
-  return { ...alongAcross(integrate(hp, size, size, ax, ay), normals, size, size, ax, ay),
-           contrast: sdOf(hp) };
-}
 /**
  * Render many light directions from ONE surface.
  *
@@ -455,7 +302,7 @@ function sweep(dirs, opts = {}) {
   const size = opts.size || 380;
   const S = synthesizeCaptureSet({ width: size, height: size, seed: 7,
     pigmentDetail: opts.pigmentDetail ?? 0.35, grain: opts.grain || 0, lightDirs: dirs });
-  return { S, size, score: (k) => scoreShot(S.images[k].data, S.normals, size, S.lightDirs[k]) };
+  return { S, size, score: (k) => scoreShot(S.images[k].data, S.normals, size, size, S.lightDirs[k]) };
 }
 function singleShot(dir, opts = {}) {
   const r = sweep([dir], opts);

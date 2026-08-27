@@ -460,6 +460,88 @@ along-azimuth recovery barely moves, falling only past 75°. What it cannot surv
 two opposing lights (finding 3), a near-frontal source, or achromatic grainy material
 (finding 9).
 
+## Capture bundles
+
+A capture is kept as a directory with a `capture.json` beside its exposures. The
+point of writing it down is that a shoot is expensive and a mislabelled one is
+worthless: six frames with no record of which lamp position produced which file
+cannot be solved at all, and a solve is only as good as the angles it is given.
+
+```
+captures/abstract-1/
+  capture.json
+  shot-01.png  shot-02.png  shot-03.png
+  shot-04.png  shot-05.png  shot-06.png
+```
+
+```json
+{
+  "painting": "abstract-1",
+  "material": "cast cement and plaster on panel",
+  "shot": "2026-08-27",
+  "notes": "room light off; one 5600K LED moved between exposures",
+  "exposures": [
+    { "file": "shot-01.png", "azimuth": 0,   "elevation": 37.5 },
+    { "file": "shot-02.png", "azimuth": 60,  "elevation": 52.5 },
+    { "file": "shot-03.png", "azimuth": 120, "elevation": 37.5 },
+    { "file": "shot-04.png", "azimuth": 180, "elevation": 52.5 },
+    { "file": "shot-05.png", "azimuth": 240, "elevation": 37.5 },
+    { "file": "shot-06.png", "azimuth": 300, "elevation": 52.5 }
+  ],
+  "sphere": { "cx": 1840, "cy": 1210, "r": 330 }
+}
+```
+
+`azimuth` and `elevation` are degrees, and they are **nominal** — what the rig was
+meant to be. When `sphere` is present those typed angles are replaced by directions
+measured off the chrome sphere, and the two are printed side by side so a rig that
+was uniformly wrong shows up as a column of matching deltas. That comparison is the
+only thing in the project that can catch the error in finding 7; without it the
+angles in this file are load-bearing and unverifiable.
+
+`sphere` is `{cx, cy, r}` in pixels of the **uncropped** frame, y measured down.
+PNG is preferred — it is lossless, and it is what the tools read with no
+dependencies. JPEG and WebP are decoded through a headless browser if `playwright`
+is installed.
+
+### Scoring one
+
+```bash
+node relight/tools/fixture.mjs /tmp/cap --sphere   # a worked example, truth known
+node relight/tools/score-real.mjs /tmp/cap --preflight
+node relight/tools/score-real.mjs /tmp/cap
+node relight/tools/score-real.mjs /tmp/cap --sweep
+```
+
+`--preflight` checks the capture is solvable and stops. Run it **before striking the
+lights**: it catches the faults that cannot be repaired afterwards — exposures that
+differ in framing, a rig at constant elevation (which `buildSolver` refuses, rule 3
+above), too few exposures to leave the fit residual any meaning (finding 5), and a
+sphere too small or clipped by the frame.
+
+Without `--preflight` the tool registers the frames, reads the sphere, solves, and
+then does the thing it exists for: runs the **single-image** path on each individual
+exposure and scores it against the normals the six-shot solve measured. That is a
+real (photograph → known normals) pair, on real material, which every number in
+`tools/validate.mjs` is not — finding 9 recorded that the one real photograph the
+project has seen behaved unlike every synthetic case.
+
+`--sweep` varies the relief scale and asks the ground truth which spatial band of
+*this* material carries relief. On the synthetic bench it returns 3px, which is the
+shipped default and the period of the bench's own weave — the check that the sweep
+is measuring what it claims. Real material is broadband and is not expected to agree.
+
+### What a bundle is worth later
+
+Nothing in this project trains anything, and a capture does not make the
+single-image path smarter — it makes it *measured*. But a solved capture is also
+exactly the labelled pair a learned single-image estimator would need, at
+r ≈ 0.9995 per pair, and findings 7 and 8 are what make those labels trustworthy: an
+unmeasured rig silently rotates every normal in the set while every diagnostic reads
+perfect. Keeping the exposures, the manifest and the solved normals together costs
+nothing now and cannot be reconstructed after the paint has been rephotographed under
+different lights.
+
 ## Why the two paths rescale differently on export
 
 Single-image recovery is parameterised in **pixels** of the working image, so its
