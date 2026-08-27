@@ -524,8 +524,9 @@ height field — they should agree for real relief and not for noise. Controls g
 0.046–0.119 for the recovering cases and −0.046–0.103 for the non-recovering ones.
 Overlapping. Discarded.
 
-So the count is now **five** shot-quality diagnostics built and deleted. The pattern
-is stable enough to state as a rule: *nothing computed from a single photograph has
+That is five diagnostics built and deleted across the project — §4.4's three plus
+these two, of which four were attempts to judge a capture or a shot from the data
+alone. The pattern is stable enough to state as a rule: *nothing computed from a single photograph has
 yet been able to say whether that photograph will yield relief.* Treat any new
 candidate as guilty until it separates bench controls, and expect it not to.
 
