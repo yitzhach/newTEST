@@ -195,6 +195,8 @@ Only relevant if Phase 5 is ever revived, which it should not be:
 | `src/app.js` | UI, light rig, state, export wiring |
 | `tools/recover.js` | CPU reference implementations of both surface paths, shared by the benches so real and synthetic numbers come from identical code |
 | `tools/validate.mjs` | Ground-truth harness — relief, registration, sphere, grain (Node, no browser, ~65s) |
+| `tools/decode.js` | Image input — PNG in-process, JPEG/WebP via headless Chromium, native resolution and optional native-res crop |
+| `tools/spectrum.mjs` | Describes a photograph: which band its texture occupies, whether chroma reject can work, JPEG blocking. Descriptive only — predicts nothing |
 | `tools/score-real.mjs` | Scores recovery against a **real** photometric capture; preflight, sphere read, relief-scale sweep, `--json` |
 | `tools/fixture.mjs` | Writes a synthetic capture to disk as a real bundle — the worked example, and the self-test's input |
 | `tools/selftest-real.mjs` | The real-capture chain end to end, 20 checks, no browser |
@@ -459,6 +461,73 @@ Confirmed independently by the new harness, on file-based data rather than in-me
 arrays: grain 0.35 leaves the photometric fit at 0.20% against 0.17% clean, drops
 single-image recovery 0.615 → 0.459, and takes contrast 0.131 → 0.170 — up, while
 recovery falls.
+
+### 4.6 The first real photograph, measured rather than looked at
+
+A 9.3MP JPEG of a cast cement piece (`relight/captures/test/3.jpg`), shot outdoors
+under overcast sky. `tools/spectrum.mjs` describes it; nothing here predicts
+recovery, for reasons that become clear below.
+
+**The JPEG was not the problem.** A reasonable first suspicion — the file is a JPEG
+and the user had relief scale at 2px, right where 8×8 block ringing lives — is
+wrong, and measurably so. Luma quantisation table sums to 463 with a maximum
+coefficient of 13 (light compression), and the blocking test finds **no excess
+gradient energy on the 8px grid**: ratios 0.93–1.00 across four crops. Chroma is
+4:2:0, which halves chroma resolution, but see below — there is no chroma to lose.
+
+**The material is achromatic to a degree the bench never modelled.** Fine-scale
+chroma against fine-scale luma:
+
+| crop | luma sd | chroma sd | ratio |
+|---|---|---|---|
+| 179,149 | 0.338 | 0.0077 | **0.023** |
+| 1801,619 | 0.480 | 0.0071 | **0.015** |
+| 798,1090 | 0.327 | 0.0077 | **0.024** |
+| 2421,1560 | 0.434 | 0.0068 | **0.016** |
+
+Mean 0.019. **Chroma reject is inert on this material** — the mechanism that
+separates pigment from relief has a signal thirty to seventy times weaker than the
+thing it is meant to arbitrate. §4.3 said grain "shifts no hue"; this is the number.
+
+**The spectrum is broadband with no characteristic scale.** Energy added by each
+band peaks at the *finest* one (1–1.5px) in every crop and decays monotonically
+outward. There is no bump at the scale of the trowel marks. That is what §4.3 meant
+by broadband, and it has a consequence worth stating plainly: **no choice of relief
+scale isolates relief from grain here, because they overlap continuously rather
+than occupying different bands.** Retuning the default (§8) cannot fix this material
+— it can only trade which mixture you read.
+
+### 4.7 Two more diagnostics built, calibrated, and thrown away
+
+§4.4 records three. Two more were tried against this photograph and killed by the
+same method: compute the statistic on bench cases whose true recovery is known
+*first*, and only interpret real material if the controls separate. Neither did.
+
+**Anisotropy of the recovered height field.** Integrating an isotropic field along â
+turns it into a 1-D random walk along â, so across/along gradient energy should
+distinguish "read a surface" from "smeared noise". Controls:
+
+| case | true r | across/along |
+|---|---|---|
+| raking 20°, no grain | 0.771 | 1.175 |
+| raking 20°, grain 0.20 | 0.748 | 1.228 |
+| 45° single, grain 0.20 | 0.594 | 2.248 |
+| frontal 89°, no grain | 0.131 | 2.000 |
+| frontal 89°, grain 0.20 | 0.041 | 1.807 |
+| **pure achromatic noise** | — | **1.236** |
+
+Pure noise lands *between* two recovering cases. No threshold separates them.
+
+**Cross-azimuth agreement.** One photograph constrains only the along-azimuth slope,
+so integrating the same image along several azimuths recovers partial views of one
+height field — they should agree for real relief and not for noise. Controls give
+0.046–0.119 for the recovering cases and −0.046–0.103 for the non-recovering ones.
+Overlapping. Discarded.
+
+So the count is now **five** shot-quality diagnostics built and deleted. The pattern
+is stable enough to state as a rule: *nothing computed from a single photograph has
+yet been able to say whether that photograph will yield relief.* Treat any new
+candidate as guilty until it separates bench controls, and expect it not to.
 
 ### Two capture rules enforced in code, not just documented
 
