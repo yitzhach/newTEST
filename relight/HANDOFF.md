@@ -469,6 +469,13 @@ chrome binary rather than reinstalling.
 
 ## 9. What's next
 
+> **Note on the existing raking shots.** `captures/test/25-28.png` cannot be pressed
+> into service as a photometric capture. The LEGO reference was added and removed
+> between 25, 26 and 27, so the *subject* changed between exposures, and 28 is a
+> different light position. Photometric stereo requires that **nothing move between
+> frames except the lamp** — not the camera, not the piece, not anything sitting on
+> it. They remain useful as single-image inputs.
+
 1. **A six-exposure photometric capture of a real piece.** This is no longer one
    option among several — §7 established over six independent attempts that nothing
    computed from a single photograph can say whether recovery worked. A capture is
@@ -498,6 +505,29 @@ chrome binary rather than reinstalling.
    sampler gives bilinear, the worst kernel measured.
 6. **Register rotation as well as translation.** Only if a real capture needs it.
 7. Preset/save system for light rigs.
+
+### One observation, reported by the owner
+
+After the raking shots were taken, the owner tried them in the tool across several
+pieces and reported the effect "quite good" and markedly better than the
+overcast-lit input. That is an impression, not a measurement, and §11 (how this is
+worked) is a list of impressions that were wrong.
+
+It is recorded anyway, for one reason: **the prediction preceded it.** §3.2
+(achromatic grain) says raking should beat diffuse by roughly 22× on this material,
+and that was measured on the bench before any raking photograph existed. Every
+earlier "looks right" in this project arrived *before* a number and was then killed
+by one. This is the first time an observation has confirmed a standing prediction
+rather than substituted for one. Weak evidence, pointing the same way as the theory.
+
+Worth separating two questions a fresh session should not conflate:
+
+- **Is the recovered geometry veridical?** Unknown, and only a capture answers it.
+- **Does the tool produce images the owner wants?** For a personal tool whose stated
+  purpose is "load an image, light it, export a file", the owner's judgement of
+  their own work is a legitimate acceptance signal. Geometric rigour is what stops
+  the tool fooling anyone and what would let it generalise; it is not the only thing
+  that makes the product worth having.
 
 ### Open question worth stating plainly
 
