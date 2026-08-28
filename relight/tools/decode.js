@@ -51,7 +51,23 @@ const MIME = { jpg: 'jpeg', jpeg: 'jpeg', webp: 'webp', png: 'png', gif: 'gif', 
  */
 export async function decodeImage(path, { region = null } = {}) {
   const ext = extname(path).slice(1).toLowerCase();
-  if (ext === 'png' && !region) return decodePNG(readFileSync(path));
+  if (ext === 'png') {
+    // Crop in-process too. Routing a PNG through the browser just to take a
+    // rectangle out of it would make the documented "PNG needs no dependencies"
+    // false for every caller that samples crops — which is both of them.
+    const img = decodePNG(readFileSync(path));
+    if (!region) return img;
+    const x0 = Math.max(0, Math.min(img.width - 1, region.x));
+    const y0 = Math.max(0, Math.min(img.height - 1, region.y));
+    const w = Math.max(1, Math.min(region.w, img.width - x0));
+    const h = Math.max(1, Math.min(region.h, img.height - y0));
+    const out = new Uint8ClampedArray(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      const src = ((y0 + y) * img.width + x0) * 4;
+      out.set(img.data.subarray(src, src + w * 4), y * w * 4);
+    }
+    return { data: out, width: w, height: h, sourceSize: [img.width, img.height] };
+  }
 
   await ensureBrowser();
   const mime = MIME[ext] || ext;
@@ -74,7 +90,13 @@ export async function decodeImage(path, { region = null } = {}) {
 /** Native size without moving any pixels. Cheap enough to call before cropping. */
 export async function imageSize(path) {
   const ext = extname(path).slice(1).toLowerCase();
-  if (ext === 'png') { const d = decodePNG(readFileSync(path)); return { width: d.width, height: d.height }; }
+  if (ext === 'png') {
+    // Straight out of IHDR. Inflating a 12MP image to learn its width is a
+    // second or two of pure waste, and callers ask before every crop.
+    const head = readFileSync(path).subarray(0, 33);
+    if (head.length < 24) throw new Error(`imageSize: ${path} is too short to be a PNG`);
+    return { width: head.readUInt32BE(16), height: head.readUInt32BE(20) };
+  }
   await ensureBrowser();
   const b64 = readFileSync(path).toString('base64');
   return page.evaluate(async ({ b64, mime }) => {

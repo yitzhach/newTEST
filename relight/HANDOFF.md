@@ -192,6 +192,7 @@ Only relevant if Phase 5 is ever revived, which it should not be:
 | `src/kelvin.js` | Colour temperature via the Planckian locus (Kim et al.) → CIE xy → XYZ → linear sRGB |
 | `src/export.js` | Tiled full-resolution render with overlap margin, for both surface paths |
 | `src/synth.js` | Procedural painting with known height field; single shots, capture sets, optional chrome sphere and achromatic `grain` |
+| `src/measure.js` | Descriptive measurement of the loaded photograph - chroma signal against luma. Predicts nothing; DOM-free so the harness scores the same code |
 | `src/app.js` | UI, light rig, state, export wiring |
 | `tools/recover.js` | CPU reference implementations of both surface paths, shared by the benches so real and synthetic numbers come from identical code |
 | `tools/validate.mjs` | Ground-truth harness — relief, registration, sphere, grain (Node, no browser, ~65s) |
@@ -529,6 +530,77 @@ these two, of which four were attempts to judge a capture or a shot from the dat
 alone. The pattern is stable enough to state as a rule: *nothing computed from a single photograph has
 yet been able to say whether that photograph will yield relief.* Treat any new
 candidate as guilty until it separates bench controls, and expect it not to.
+
+### 4.8 Raking light, and four more dead ends
+
+Four raking-lit shots of a cast cement piece (`relight/captures/test/25-28.png`,
+12MP PNG from HEIC, one lamp in a dark room, upper-left for 25/26/27 and side-on
+for 28; 26 and 27 carry a LEGO brick as a height reference). The lighting is
+finally right. What could be learned from them is less than expected.
+
+**The exposure statistics look alarming and do not matter.** Against the flat-lit
+`3.jpg`, the raking shots clip far harder at both ends:
+
+| file | clipped high | clipped low | share in codes 0-25 | shadow/mid noise |
+|---|---|---|---|---|
+| 25 | 2.75% | 1.38% | 13.0% | 2.20x |
+| 26 | 2.53% | 1.57% | 14.8% | 2.24x |
+| 27 | 2.66% | 1.11% | 12.8% | 2.19x |
+| 28 | 1.63% | 0.76% | 10.1% | 2.32x |
+| 3.jpg | 1.65% | 0.00% | 0.1% | 1.40x |
+
+An eighth of the frame sits where 8-bit quantisation is a large fraction of the
+value and `log(L/blur(L))` amplifies it to an sd of 1.64 against a midtone 0.27.
+That looks like it must be corrupting the integrator. **It is not.** Measured on the
+bench: clipping 10% of the frame costs 0.7625 -> 0.7573, and underexposing until
+98% of pixels fall in codes 0-25 costs 0.7625 -> 0.7516. The pipeline is far more
+robust to exposure than to lighting direction. **Do not send anyone back to reshoot
+for exposure**, and do not read the clipping percentages as a fault.
+
+Four more repairs were built and measured away:
+
+- **Masking clipped pixels out of the slope field.** Worse in every case, badly:
+  raking at "as shot" clipping went 0.7626 -> 0.7505, and with weight
+  renormalisation 0.7195. Removing pixels removes signal along with the damage,
+  and the integration is a running sum whose chain the mask breaks.
+- **Down-weighting dark pixels** by an 8-bit knee. Best case +0.0004 (noise) at a
+  knee of 26, harmful above that: -0.0106 at 40, -0.0331 at 64.
+- **Anisotropy of the recovered height field** and **cross-azimuth agreement**
+  (both in 4.7), which failed their bench controls.
+- **Mid-band against fine-band energy**, on the reasoning that grain is
+  scale-invariant while relief shading appears at the scale of the relief. It
+  orders the bench cases **backwards** - frontal 89deg (recovery 0.052) scores the
+  highest mid/fine at 0.999 while raking 20deg (recovery 0.7625) scores the lowest
+  at 0.380 - and is not even monotonic. Discarded. Note the trap: the real shots
+  read 0.77-0.79, which *looks* like a verdict, and would have been reported as one
+  had the controls not been run first.
+
+**That is six diagnostics deleted across the project, four of them in one session.**
+The rule stated in 4.7 now has a lot of evidence: nothing computed from a single
+photograph has been able to say whether that photograph will yield relief. Treat any
+new candidate as guilty, run the bench controls before looking at real material, and
+expect to throw it away.
+
+**The consequence is not pessimism, it is prioritisation.** Since no statistic can
+adjudicate, the only instrument that can is a photometric capture - six exposures of
+one piece, which `tools/score-real.mjs` turns into a real recovery number. Everything
+else is guessing with extra steps.
+
+### 4.9 What did ship: a descriptive readout
+
+`src/measure.js` measures fine-scale chroma against fine-scale luma on the working
+image and reports it under the Chroma reject slider. It is descriptive, which is
+what distinguishes it from the six above: it says whether that control has any
+signal to act on, never whether recovery will succeed.
+
+The distinction matters because on this material the control is inert and there was
+no way to know it from inside the tool - dragging a slider that does nothing feels
+exactly like tuning. Measured: `3.jpg` 0.020, the raking shots 0.037-0.052. Chroma
+reject separates pigment from relief by noticing hue shifts, and it is arbitrating
+with a signal twenty to fifty times weaker than the luma it judges.
+
+Cross-checked against `tools/spectrum.mjs` on identical pixels: agreement to 0.000%.
+The app and the harness must not tell the user different things about one image.
 
 ### Two capture rules enforced in code, not just documented
 

@@ -9,6 +9,7 @@ import { Shader, MAX_LIGHTS } from './shade.js';
 import { kelvinToLinearRGB, hexToLinearRGB, linearRGBToHex } from './kelvin.js';
 import { synthesizePainting, synthesizeCaptureSet, normalsToImageData } from './synth.js';
 import { Photometric, buildSolver, uploadShotArray, MAX_SHOTS } from './photometric.js';
+import { chromaSignal } from './measure.js';
 import { exportFullRes, downloadCanvas, requiredMargin } from './export.js';
 import { registerFrames, resample } from './register.js';
 import { estimateLight, spherePointFromLight } from './sphere.js';
@@ -52,6 +53,7 @@ const state = {
   // Null until placed; placing it is a deliberate act, since a circle in the wrong
   // spot produces confident wrong light directions.
   sphere: null,
+  chroma: null,          // descriptive measurement of the loaded image
   placingSphere: false,
   lights: [],
 };
@@ -130,6 +132,18 @@ async function setSource(src) {
   c.width = imgW; c.height = imgH;
   c.getContext('2d').drawImage(src, 0, 0, imgW, imgH);
 
+  // Measure the working image, not the original file: this reports what the
+  // shader will actually see. Descriptive only — it says whether Chroma reject
+  // has any signal to act on, never whether recovery will succeed. Five
+  // statistics claiming the latter have been built and deleted.
+  try {
+    const px = c.getContext('2d').getImageData(0, 0, imgW, imgH);
+    state.chroma = chromaSignal(px.data, imgW, imgH);
+  } catch (e) {
+    state.chroma = null;   // a cross-origin source taints the canvas; not fatal
+  }
+  updateChromaNote();
+
   if (srcTex) gl.deleteTexture(srcTex);
   srcTex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, srcTex);
@@ -144,6 +158,35 @@ async function setSource(src) {
 
   dirtySurface = true;
   render();
+}
+
+/**
+ * Report what Chroma reject has to work with on this particular photograph.
+ *
+ * The control separates pigment from relief by noticing that a pigment change
+ * shifts hue while shading does not. Where the fine detail carries no chroma, it
+ * is inert — and on achromatic material that is a fact about the paint, not a
+ * setting to be found. Cast cement measures about 0.02 here, meaning the chroma
+ * signal is fifty times weaker than the luma signal the control is arbitrating.
+ */
+function updateChromaNote() {
+  const el = $('chromaNote');
+  if (!el) return;
+  const m = state.chroma;
+  if (!m || state.mode === 'photometric') { el.style.display = 'none'; return; }
+  el.style.display = '';
+  const r = m.ratio.toFixed(3);
+  if (m.verdict === 'inert') {
+    el.innerHTML = `Chroma signal <b>${r}</b> of luma \u2014 this image is achromatic at fine `
+      + 'scale, so the control above has almost nothing to act on. Pigment and relief are '
+      + 'not separable in one photograph of this material.';
+  } else if (m.verdict === 'weak') {
+    el.innerHTML = `Chroma signal <b>${r}</b> of luma \u2014 weak. The control will have `
+      + 'limited effect on this image.';
+  } else {
+    el.innerHTML = `Chroma signal <b>${r}</b> of luma \u2014 there is colour detail here for `
+      + 'the control to separate from shading.';
+  }
 }
 
 /**
@@ -471,6 +514,7 @@ async function boot() {
     // Surface-recovery controls only drive the single-image path; the measured
     // path takes its geometry from the capture instead.
     document.querySelectorAll('#panel .grp')[1].style.opacity = photometric ? 0.35 : 1;
+    updateChromaNote();
 
     dirtySurface = true;
     if (v === 'synth') await setSource(await loadSynthetic());
