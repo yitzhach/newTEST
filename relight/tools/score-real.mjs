@@ -291,8 +291,35 @@ say(`Source:  ${dir}`);
 say(`         ${M.exposures.length} exposures\n`);
 
 const files = M.exposures.map((e) => join(dir, e.file));
+
+// A manifest whose exposures do not exist yet is a PLAN, not a broken capture, and
+// it is the normal state of a bundle in the days before a shoot. This tool cannot
+// help with one — every check below reads pixels — but failing with "missing
+// exposure file" invited exactly the wrong conclusion, that the geometry could not
+// be checked either. It can: tools/plan.mjs checks it with no photographs at all.
+//
+// The distinction is worth making precisely, because README.md said "run this
+// before you strike the lights", meaning before the set comes down, and that is one
+// word away from "before you shoot", which was never possible here.
+const missing = files.filter((f) => !existsSync(f));
+if (missing.length === files.length) {
+  console.error(`\nNone of the ${files.length} exposures exist yet in ${dir}`);
+  console.error('\nThis is a plan, not a capture. Everything in it that can be checked');
+  console.error('without photographs — a rank-deficient rig, elevations that do not vary,');
+  console.error('azimuths bunched in one quadrant, an undersized sphere — is checked by:');
+  console.error(`\n    node relight/tools/plan.mjs --check ${DIR}\n`);
+  console.error('Come back here once the frames exist, while the rig is still standing:');
+  console.error('this tool reads the pixels, and catches reframing and a circle that is not');
+  console.error('on the sphere, which no plan can predict.\n');
+  process.exit(2);
+}
 for (const f of files) {
-  if (!existsSync(f)) { console.error(`missing exposure file: ${f}`); process.exit(2); }
+  if (!existsSync(f)) {
+    console.error(`missing exposure file: ${f}`);
+    console.error(`(${files.length - missing.length} of ${files.length} exposures are present — `
+      + 'a partial capture cannot be solved.)');
+    process.exit(2);
+  }
   if (statSync(f).size === 0) { console.error(`empty exposure file: ${f}`); process.exit(2); }
 }
 

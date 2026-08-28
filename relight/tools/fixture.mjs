@@ -62,12 +62,18 @@ const dirFrom = (azDeg, elDeg) => {
   return [Math.cos(a) * Math.cos(e), Math.sin(a) * Math.cos(e), Math.sin(e)];
 };
 
-// Azimuths right round the circle, elevation alternating by 15° — the protocol's
-// rig. Under --flat every elevation is the same and the solve must refuse.
+// Azimuths right round the circle, elevation alternating 30/60 — the protocol's
+// rig, and the one the bench measures as best (README.md, "Capture protocol",
+// rule 3: 0.21 degrees of angular error against 0.25 for the 37.5/52.5 split this
+// used to use, while also leaving a better raking frame for the single-image path).
+//
+// Alternating rather than ramping matters on its own: the same six elevations
+// paired to azimuths in order recover at 0.546 degrees against 0.281 re-paired.
+// Under --flat every elevation is the same and the solve must refuse.
 const rig = [];
 for (let i = 0; i < SHOTS; i++) {
   const az = (i * 360) / SHOTS;
-  const el = FLAT ? 45 : (i % 2 ? 52.5 : 37.5);
+  const el = FLAT ? 45 : (i % 2 ? 60 : 30);
   rig.push({ az, el });
 }
 

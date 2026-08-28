@@ -608,3 +608,90 @@ console.log('    lands, because fifteen measurements of five unknowns can outvot
 console.log('    them — which is the argument for measuring every pair rather than every');
 console.log('    frame against frame 0, where a bad pair would have carried its frame off');
 console.log('    on its own. The discounted count is what reports that it happened.\n');
+
+// --- rig geometry: what the six lamp positions are worth --------------------
+//
+// The capture protocol asked for "vary the light height by ~15°" and left
+// everything else to recollection. Three things turned out to be measurable, and
+// one of them contradicts the instinct that raking light is always better.
+//
+// The rig is also doing two jobs at once, which is what makes it a trade rather
+// than an optimisation: the six-shot solve is the ground truth, AND each frame is
+// separately a single-image test case (HANDOFF.md §9, item 1). Those two want
+// opposite lamp heights. The numbers below are what settles the split.
+//
+// Guarded here rather than only written down because §11 is explicit: a
+// surface-recovery finding that is not in this file drifts out of date silently.
+
+console.log('\n\nRig geometry: lamp elevation, and the two jobs it has to serve\n');
+{
+  const SIZE = 340, MARGIN = 14, GRAIN = 0.20;
+  const d2r = Math.PI / 180;
+  const dirFrom = (az, el) => [Math.cos(az * d2r) * Math.cos(el * d2r),
+                               Math.sin(az * d2r) * Math.cos(el * d2r),
+                               Math.sin(el * d2r)];
+  const solveRig = (exposures) => {
+    const dirs = exposures.map((e) => dirFrom(e[0], e[1]));
+    const S = synthesizeCaptureSet({ width: SIZE, height: SIZE, seed: 7,
+                                     pigmentDetail: 0.35, grain: GRAIN, lightDirs: dirs });
+    const R = cpuSolve(S.images.map((im) => ({ data: im.data })), dirs, SIZE, SIZE,
+                       { fitAmbient: true, margin: MARGIN });
+    const sc = scoreNormals(R.N, S.normals, SIZE, SIZE, MARGIN);
+    const singles = S.images.map((im, i) => scoreShot(im.data, S.normals, SIZE, SIZE, dirs[i]).along);
+    return { ang: sc.ang, nx: sc.x, ny: sc.y, best: Math.max(...singles) };
+  };
+  const ring = (low, high) => [[0, low], [60, high], [120, low], [180, high], [240, low], [300, high]];
+
+  console.log('  mean elev   normals nx / ny    ang err   best single frame');
+  console.log('  ' + '-'.repeat(62));
+  for (const mean of [22.5, 32.5, 45, 52.5, 62.5]) {
+    const r = solveRig(ring(mean - 7.5, mean + 7.5));
+    console.log(`  ${String(mean + '°').padStart(9)}   ${r.nx.toFixed(4)} / ${r.ny.toFixed(4)}`
+      + `      ${r.ang.toFixed(2)}°      ${r.best.toFixed(4)}`);
+  }
+
+  console.log('\n  Candidate rigs, both jobs at once\n');
+  console.log('  rig                         normals nx / ny    ang err   best single frame');
+  console.log('  ' + '-'.repeat(72));
+  for (const [name, ex] of [
+    ['alternating 30/60 (default)', ring(30, 60)],
+    ['alternating 37.5/52.5 (old)', ring(37.5, 52.5)],
+    ['all raking 20/30', ring(20, 30)],
+  ]) {
+    const r = solveRig(ex);
+    console.log(`  ${name.padEnd(28)}${r.nx.toFixed(4)} / ${r.ny.toFixed(4)}`
+      + `      ${r.ang.toFixed(2)}°      ${r.best.toFixed(4)}`);
+  }
+
+  // The controlled pair: identical elevations, identical azimuths, only the
+  // assignment between them changed. Anything that differs is the pairing.
+  console.log('\n  The same six elevations, paired to azimuths two ways\n');
+  const els = [25, 33, 41, 49, 57, 65];
+  const azs = [0, 60, 120, 180, 240, 300];
+  const ramp = azs.map((a, i) => [a, els[i]]);
+  const shuffled = [[0, 25], [180, 33], [60, 41], [240, 49], [120, 57], [300, 65]];
+  const rr = solveRig(ramp), rs = solveRig(shuffled);
+  console.log(`  ramped in azimuth order   ${rr.nx.toFixed(4)} / ${rr.ny.toFixed(4)}      ${rr.ang.toFixed(2)}°`);
+  console.log(`  re-paired                 ${rs.nx.toFixed(4)} / ${rs.ny.toFixed(4)}      ${rs.ang.toFixed(2)}°`);
+
+  console.log('\nReading:');
+  console.log('  * The photometric solve wants HEIGHT and the single-image path wants');
+  console.log('    RAKING, monotonically and in opposite directions. A rig lit the way');
+  console.log('    finding 2 recommends for one photograph (all raking) recovers normals');
+  console.log('    at ~1.2° — it degrades the ground truth the single-image scoring would');
+  console.log('    then be measured against, which is self-defeating.');
+  console.log('  * Low lamps break the model with their own cast shadows. Nothing in the');
+  console.log('    Lambertian solve represents a shadow, so the residual absorbs it.');
+  console.log('  * Alternating 30/60 is the split that serves both: the best photometric');
+  console.log('    number measured, and a best single frame within 0.03 of the all-raking');
+  console.log('    rig that throws the truth away to get it.');
+  console.log('  * The last pair is a controlled experiment, not a comparison of rigs: the');
+  console.log('    six elevations and six azimuths are identical in both rows and only the');
+  console.log('    pairing differs. So the gap is caused by elevation tracking azimuth, and');
+  console.log('    the fix is free — alternate neighbours instead of raising the lamp as you');
+  console.log('    walk round. tools/plan.mjs warns above a correlation of 0.85, which is');
+  console.log('    where 41 sampled pairings separate with no overlap.');
+  console.log('  * NOT reported as a score: buildSolver\'s condition number. Against these');
+  console.log('    same known-recovery cases it correlates at r = -0.06, sign backwards.');
+  console.log('    It is a refusal test, not a quality metric — §7.\n');
+}

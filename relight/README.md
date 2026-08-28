@@ -433,7 +433,20 @@ Because the height field is known, recovery can be scored rather than admired.
 
 ## Capture protocol
 
-For the photometric path, shooting for the solver rather than for the eye:
+For the photometric path, shooting for the solver rather than for the eye.
+
+**Check the rig before you shoot it.** Every fault that cannot be repaired
+afterwards is geometric, and none of them needs a photograph to detect:
+
+```bash
+node relight/tools/plan.mjs                 # the recommended rig, as a shot list
+node relight/tools/plan.mjs --write <dir>   # a capture.json to shoot into
+node relight/tools/plan.mjs --check <dir>   # validate a plan, no images needed
+node relight/tools/plan.mjs --sphere --frame-width=600 --image-width=4032
+```
+
+`score-real.mjs --preflight` reads the exposures, so it cannot run until the shoot
+is over — it is the check to run *before the set comes down*, not before it goes up.
 
 1. Fixed camera. A tripod, no reframing, no zoom change between exposures. The
    solve is per pixel and assumes every exposure sees the same pixel. **Align
@@ -443,15 +456,53 @@ For the photometric path, shooting for the solver rather than for the eye:
    and solves fine, but leaves nothing spare to check the answer with — see
    finding 5. The extra two exposures cost a minute and are what make the Fit
    view mean anything.
-3. **Vary the light height** between exposures by ~15°. Constant elevation makes
-   the ambient term unrecoverable.
-4. **Put a chrome sphere in the frame, and make it big.** It is the only thing that
+3. **Alternate the lamp between 30° and 60° of elevation**, high and low on
+   neighbouring positions. Three separate measurements land on that band:
+
+   | mean lamp elevation | 22.5° | 32.5° | 45° | 52.5° | 62.5° |
+   |---|---|---|---|---|---|
+   | photometric angular error | 0.93° | 0.45° | **0.25°** | 0.28° | 0.37° |
+   | best single-image frame | 0.822 | 0.814 | 0.769 | 0.731 | 0.657 |
+
+   Constant elevation is refused outright — it makes the ambient term
+   unrecoverable. Beyond that the two paths want *opposite* things, and this is
+   the finding that decides the rig: **the photometric solve wants height and the
+   single-image path wants raking**. An all-raking rig (20/30°) gives the best
+   single frames at 0.824 and recovers normals at 1.16° — it degrades the ground
+   truth those frames would be scored against, which is self-defeating.
+   Alternating 30/60 measures 0.21° with a best frame of 0.799, and serves both.
+
+   Raking light is right for a *single* photograph, and finding 2 says so. It is
+   the wrong instinct here.
+4. **Do not raise the lamp as you walk it round.** Elevation must not track
+   azimuth. Six elevations ramped in azimuth order recover at 0.546°; the *same
+   six* re-paired to different azimuths recover at 0.281°. Only the pairing
+   changed. `plan.mjs` warns above a correlation of 0.85, where 41 sampled
+   pairings separate with no overlap.
+5. **Put a chrome sphere in the frame, and make it big.** It is the only thing that
    catches a rig that is uniformly wrong, which is what typed-in angles produce and
    what nothing else here can see — finding 7. Accuracy scales with its radius in
    pixels; aim for 300px or more. Take the reading before cropping it out.
-5. Fixed exposure, white balance, and focus. Shoot raw or at least uncompressed;
-   the solve is linear and JPEG at fine detail is not.
-6. Kill the room light if you can. What you cannot kill, fit — see rule 3.
+
+   Sizing is a proportion, not a lens calculation: if the sphere sits in the plane
+   of the piece and the piece fills the frame, `radius_px / image_width_px =
+   (diameter_mm / 2) / frame_width_mm`. A 600mm piece at 4032px needs an **89mm
+   sphere** for 300px of radius — bigger than most people assume. A 50mm ball there
+   reads r = 168px.
+
+   Moving a small sphere *nearer the camera* to make it bigger is a bad trade, and
+   `--sphere` costs it out: gaining 300px that way puts the sphere ~190mm forward,
+   where a lamp 1.5m out subtends a direction 3.6–6.2° different from the one at the
+   piece. That error goes straight into every solved normal, and it is larger than
+   the placement error it was meant to fix. Get a bigger ball, keep it in the plane.
+6. Fixed exposure, white balance, and focus. Shoot raw or at least uncompressed;
+   the solve is linear and JPEG at fine detail is not. HEIC cannot be decoded here
+   — set the phone to Settings → Camera → Formats → **Most Compatible**, or convert
+   with `sips -s format png in.HEIC --out out.png`.
+7. Kill the room light if you can. What you cannot kill, fit — see rule 3.
+
+Reproduce every number above with `node relight/tools/validate.mjs` (the
+"Rig geometry" section).
 
 For the **single-image** path, the one that matters is a single source with the
 azimuth dial set to match it. A grazing angle helps a little and not as much as

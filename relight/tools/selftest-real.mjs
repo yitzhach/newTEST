@@ -22,7 +22,7 @@
 // likely to un-learn by rebuilding the gate, so it is pinned here as a test.
 
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -148,6 +148,71 @@ try {
   check('sweep returns the shipped default on the surface it was tuned for',
     sw.sweep.best === sw.sweep.shippedDefault,
     `best ${sw.sweep.best}px, shipped default ${sw.sweep.shippedDefault}px`);
+  // ---------------------------------------------------------------- plan.mjs
+  //
+  // The pre-shoot checks. What is pinned here is that they run with NO
+  // photographs on disk, because that is the entire point of the tool and the
+  // thing a refactor would quietly break by reaching for a pixel.
+  console.log('\nPlanning a capture before it is shot');
+
+  const runPlan = (args) => {
+    try {
+      return { out: execFileSync(process.execPath, [join(HERE, 'plan.mjs'), ...args],
+        { stdio: 'pipe', encoding: 'utf8' }), code: 0 };
+    } catch (e) {
+      return { out: `${e.stdout || ''}${e.stderr || ''}`, code: e.status };
+    }
+  };
+  const planDir = (name, exposures, sphere) => {
+    const d = join(root, name);
+    mkdirSync(d, { recursive: true });
+    writeFileSync(join(d, 'capture.json'),
+      JSON.stringify({ painting: name, exposures, ...(sphere ? { sphere } : {}) }, null, 2));
+    return d;
+  };
+  const planRing = (low, high) => [0, 60, 120, 180, 240, 300].map((az, i) =>
+    ({ file: `shot-0${i + 1}.png`, azimuth: az, elevation: i % 2 ? high : low }));
+
+  const goodPlan = planDir('plan-goodPlan', planRing(30, 60), { cx: 2000, cy: 1300, r: 320 });
+  const okPlan = runPlan(['--check', goodPlan]);
+  check('a sound plan passes with no exposures on disk', okPlan.code === 0, `exit ${okPlan.code}`);
+  check('it says so, rather than implying the frames were checked',
+    /0 of 6 exposure files on disk/.test(okPlan.out));
+
+  const flatPlan = planDir('plan-flatPlan', planRing(45, 45));
+  const flatRes = runPlan(['--check', flatPlan]);
+  check('a constant-elevation rig is refused before the shoot', flatRes.code === 1,
+    `exit ${flatRes.code}`);
+  check('and it is refused by name',
+    /collinear|rank|elevation varies by only/i.test(flatRes.out));
+
+  // The controlled case from validate.mjs, as a threshold test: a rig whose
+  // elevation ramps with azimuth must be caught, and the default must not be.
+  const rampPlan = planDir('plan-rampPlan', [0, 36, 72, 108, 144, 180].map((az, i) =>
+    ({ file: `shot-0${i + 1}.png`, azimuth: az, elevation: 25 + i * 8 })));
+  check('a rig whose lamp height tracks its azimuth is warned about',
+    /tracks its azimuth/.test(runPlan(['--check', rampPlan]).out));
+  check('the default rig is not', !/WARN.*tracks its azimuth/.test(okPlan.out));
+
+  // score-real.mjs must hand a plan over rather than dying on a missing file:
+  // the message it used to print invited the conclusion that nothing could be
+  // checked yet, which is the opposite of true.
+  const handoffOut = (() => {
+    try {
+      execFileSync(process.execPath, [join(HERE, 'score-real.mjs'), goodPlan, '--preflight'],
+        { stdio: 'pipe', encoding: 'utf8' });
+      return '';
+    } catch (e) { return `${e.stdout || ''}${e.stderr || ''}`; }
+  })();
+  check('score-real sends an unshot plan to plan.mjs instead of failing obscurely',
+    /plan\.mjs --check/.test(handoffOut), handoffOut.split('\n').slice(0, 2).join(' '));
+
+  // The sizing calculator is arithmetic, but it is arithmetic someone buys a
+  // chrome ball on: 4032px across 600mm is 6.72px/mm, so 300px of radius needs
+  // an 89mm sphere. A regression here is a wrong-sized sphere and a re-shoot.
+  const sizingOut = runPlan(['--sphere', '--frame-width=600', '--image-width=4032']).out;
+  check('sphere sizing puts 300px radius at an ~89mm sphere', /\b89 mm/.test(sizingOut),
+    sizingOut.split('\n').find((l) => l.includes('300px')) || '');
 } finally {
   rmSync(root, { recursive: true, force: true });
 }

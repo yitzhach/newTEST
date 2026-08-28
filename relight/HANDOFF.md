@@ -49,6 +49,10 @@ If the session cannot reach the repo, the four files that carry the argument are
   exist). The model can see attached images in conversation but cannot open them as
   files, so no measurement is possible. **Verify a file exists before promising
   analysis of it**, and never fall back on judging an image by eye — §10.
+- **`--preflight` runs after the shoot, not before it.** It decodes every exposure,
+  so it cannot check a rig that has not been photographed yet. README once said "run
+  it before you strike the lights", meaning before the set comes down — one word from
+  being read as "before you shoot". `tools/plan.mjs` is the pre-shoot half.
 - **Outbound fetches are restricted by egress policy.** `isaacandersonart.com` and
   `github.io` were both refused at the CONNECT stage (403 from the proxy). Do not
   retry or route around a policy denial; report the blocked host.
@@ -196,6 +200,7 @@ lamp position, not the histogram.
 | `tools/validate.mjs` | Ground-truth harness — relief, registration, sphere, grain (~65s, no browser) |
 | `tools/score-real.mjs` | Scores recovery against a **real** photometric capture; preflight, sphere read, relief sweep, `--json` |
 | `tools/spectrum.mjs` | Describes a photograph: band structure, chroma signal, JPEG blocking |
+| `tools/plan.mjs` | Pre-shoot rig planning and checking — runs with **no photographs**; shot list, geometry check, chrome-sphere sizing |
 | `tools/fixture.mjs` | Writes a synthetic capture to disk as a real bundle — worked example and test input |
 | `tools/selftest-real.mjs` | The real-capture chain end to end, 20 checks, no browser |
 | `tools/smoke.mjs` | End-to-end browser suite, 18 checks (needs playwright) |
@@ -268,7 +273,7 @@ Three things worth not re-deriving:
   moved between exposures — a circle on paint returns six directions within 4.2° of
   each other), and the fit residual before against after (0.16% → 6.35%).
 
-### Two capture rules enforced in code
+### Four capture rules enforced in code
 
 1. **Ambient must be fitted, and that needs varied light elevation.** Ambient biases
    recovered tilt to 9.7° against a true 12.2°. Fitting it as a fourth unknown fixes
@@ -280,6 +285,40 @@ Three things worth not re-deriving:
    fits perfectly by construction, and the residual is identically zero *however
    wrong the capture is*. A 3px misalignment reads **3.39% on six shots and 0.00% on
    four**. The default rig is six.
+
+3. **Alternate the lamp between 30° and 60°, and do not raise it as you walk it
+   round.** Both halves are measured, and the first is counter-intuitive.
+
+   | mean lamp elevation | 22.5° | 32.5° | 45° | 52.5° | 62.5° |
+   |---|---|---|---|---|---|
+   | photometric angular error | 0.93° | 0.45° | **0.25°** | 0.28° | 0.37° |
+   | best single-image frame | 0.822 | 0.814 | 0.769 | 0.731 | 0.657 |
+
+   **The photometric solve wants height; the single-image path wants raking.** They
+   are monotonic and opposed. Low lamps cast their own shadows and nothing in a
+   Lambertian solve represents a shadow, so an all-raking rig (20/30°) recovers
+   normals at **1.16°** — it degrades the very ground truth its frames would then be
+   scored against. Alternating 30/60 measures **0.21°** while still leaving a 0.799
+   raking frame, and is the shipped default in `tools/fixture.mjs` and `plan.mjs`.
+
+   §3.1 says raking light is right for *one* photograph. It is the wrong instinct
+   for a capture, and that is the trap this rule exists to disarm.
+
+   Separately: elevation must not correlate with azimuth. The same six elevations
+   ramped in azimuth order recover at **0.546°**; re-paired, **0.281°**. Only the
+   pairing changed. `plan.mjs` warns past a correlation of 0.85, calibrated on 41
+   sampled pairings — that is where the classes separate with no overlap. Below 0.6
+   nothing is said, because between 0.6 and 0.85 the effect is real on average and
+   unreliable case by case.
+4. **The sphere is sized before the shoot or not at all.** Radius in pixels is a
+   proportion of the framing, not a lens property: for a sphere in the plane of the
+   piece, `radius_px / image_width_px = (diameter_mm/2) / frame_width_mm`. A 600mm
+   piece at 4032px needs an **89mm sphere** for the 300px the protocol asks for; a
+   50mm ball reads r = 168px. Moving a small sphere toward the camera to enlarge it
+   is a **bad trade** — reaching 300px that way puts it ~190mm forward, where a lamp
+   1.5m out subtends a direction 3.6–6.2° away from the one at the piece, which is
+   larger than the placement error it was meant to fix. `plan.mjs --sphere` prints
+   both sides.
 
 ### The Fit view
 
@@ -344,7 +383,7 @@ full 0.9997/0.9996, ½ 0.9994/0.9990, ¼ 0.9918/0.9860 — all far ahead of the
 
 ## 7. The graveyard — do not rebuild these
 
-Six diagnostics and two repairs, each built, calibrated against bench cases with
+Six diagnostics, two repairs, and one rig statistic — each built, calibrated against bench cases with
 **known** recovery, and deleted. This is the most valuable section for a fresh
 session, because every one of them is what you reach for in the first hour.
 
@@ -397,14 +436,40 @@ and it is not monotonic. **The trap worth recording:** the real shots read 0.77�
 which *looks* like a verdict and would have been reported as one had the controls not
 been run first.
 
+### A rig statistic that looked like a grade
+
+**7. `buildSolver`'s condition number, as a way to rank capture rigs.** A different
+class from the six above — it judges the *lighting geometry*, not a photograph — and
+it fails the same way, which is why it belongs here. The number is already computed
+and sitting unused in the solver, ranking rigs by it is the obvious next move, and
+against eleven rigs with known recovery it correlates with angular error at
+**r = −0.06**: no signal, and the sign backwards.
+
+| rig | cond | angular error |
+|---|---|---|
+| alternating 15/60 | **26** (best conditioned) | 0.59° |
+| alternating 30/60 | 85 | **0.21°** (best recovery) |
+| alternating 37.5/52.5 | 340 | 0.25° |
+| alternating 55/70 | **972** (worst conditioned) | 0.37° |
+
+The best-conditioned rig tested recovers *worse* than one thirteen times more
+ill-conditioned. `buildSolver` is a **refusal test** — when it cannot invert the
+system it says so, and that is the only thing its output means. `tools/plan.mjs`
+prints the condition number with that sentence attached, deliberately, so the next
+session does not rediscover it as a metric.
+
+What *does* predict recovery, on the same cases: lamp elevation, monotonically
+(§5), and whether elevation tracks azimuth (r = 0.646, positive, and calibrated to a
+0.85 threshold where the sampled classes separate cleanly).
+
 ### Repairs that made recovery worse
 
-**7. Masking clipped pixels out of the slope field.** Worse in every case: raking at
+**8. Masking clipped pixels out of the slope field.** Worse in every case: raking at
 as-shot clipping 0.7626 → 0.7505, and 0.7195 with weight renormalisation. Removing
 pixels removes signal along with the damage, and the integration is a running sum
 whose chain the mask breaks.
 
-**8. Down-weighting dark pixels** by an 8-bit knee. Best case +0.0004 (noise) at knee
+**9. Down-weighting dark pixels** by an 8-bit knee. Best case +0.0004 (noise) at knee
 26; harmful above — −0.0106 at 40, −0.0331 at 64.
 
 ### The rule this establishes
@@ -442,6 +507,11 @@ python3 -m http.server 8080          # then http://localhost:8080/relight/
 node relight/tools/validate.mjs      # ground-truth maths, ~65s, no browser
 node relight/tools/selftest-real.mjs # real-capture chain, 20 checks, no browser
 node relight/tools/smoke.mjs         # browser suite, 18 checks (needs playwright)
+
+node relight/tools/plan.mjs                             # the recommended rig, as a shot list
+node relight/tools/plan.mjs --write <dir>              # a capture.json to shoot into
+node relight/tools/plan.mjs --check <dir>              # check a rig with NO photographs
+node relight/tools/plan.mjs --sphere --frame-width=600 --image-width=4032
 
 node relight/tools/spectrum.mjs <image>                 # describe a photograph
 node relight/tools/fixture.mjs /tmp/cap --sphere        # a worked capture bundle
@@ -481,9 +551,20 @@ chrome binary rather than reinstalling.
    computed from a single photograph can say whether recovery worked. A capture is
    the only instrument that can. It also yields six (photograph → known normals)
    pairs on real material, which is the first non-synthetic score the single-image
-   path would ever have. `tools/score-real.mjs --preflight` before striking the
-   lights: a rank-deficient rig and an undersized sphere are the two faults that
-   cannot be repaired afterwards. Protocol in `README.md`.
+   path would ever have.
+
+   **Before the shoot**, `node relight/tools/plan.mjs` prints the rig as a shot list
+   and `--check` validates one with no photographs on disk; `--sphere` sizes the
+   chrome ball, which is a purchasing decision and cannot be fixed afterwards. The
+   rig is alternating 30/60° elevation, six azimuths 60° apart — §5 rule 3 for why,
+   and note that it is deliberately *not* the raking light §3.1 recommends for a
+   single photograph.
+
+   **After the shoot, before the set comes down**, `tools/score-real.mjs --preflight`
+   reads the actual frames and catches what a plan cannot: reframing, an undersized
+   or clipped sphere, a circle that is not on the sphere. It cannot run earlier — it
+   decodes every exposure — and it now says so and points at `plan.mjs` rather than
+   failing on a missing file. Protocol in `README.md`.
 2. **Retune single-image defaults against that capture.** `--sweep` is the tool. It
    returns 3px on the bench — the shipped default, and the bench's own weave period —
    which is the check that it measures what it claims. §3.3 says real material is
