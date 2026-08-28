@@ -3,17 +3,20 @@
 //   node relight/tools/spectrum.mjs <image> [--crops=5] [--size=768]
 //
 // This DESCRIBES a photograph. It does not predict whether relief recovery will
-// work on it, and the distinction is the whole point: §4.3 records a shot-quality
+// work on it, and the distinction is the whole point: §3.2 (achromatic grain) records a
+// shot-quality
 // gate that was built, measured and deleted because its statistic moved the wrong
 // way, and two further candidates were built and killed the same way afterwards
-// (§4.4). Nothing here is a gate. Every number below is a property of the image
+// (§7, the graveyard). Nothing here is a gate. Every number below is a property of the
+// image
 // that can be checked directly, with no claim about recovery attached.
 //
 // Two things it answers that are worth knowing before touching a slider:
 //
 //   1. WHICH BAND the material's texture occupies. The relief-scale default of 3px
 //      was tuned on a synthetic weave with a clean 7px period. Real material was
-//      found to be broadband (§4.3) and there is no single right default, so the
+//      found to be broadband (§3.2, achromatic grain) and there is no single right
+// default, so the
 //      honest move is to look at the actual distribution rather than guess.
 //
 //   2. WHETHER CHROMA REJECT CAN DO ANYTHING. It separates pigment from relief by
@@ -102,7 +105,7 @@ for (const row of rows) {
 const modal = peaks.sort((a, b) => peaks.filter((v) => v === a).length - peaks.filter((v) => v === b).length).pop();
 console.log(`\n  * = band contributing most energy. Modal peak: ${SIGMAS[modal]}-${SIGMAS[modal + 1]}px.`);
 console.log('  A spectrum that only decays, with its peak at the finest band, has no');
-console.log('  characteristic scale — that is what "broadband" means in §4.3, and it means');
+console.log('  characteristic scale — that is what "broadband" means in §3.2 (achromatic grain), and it means');
 console.log('  no choice of relief scale isolates relief from grain, because they overlap');
 console.log('  continuously rather than sitting in different bands.');
 
@@ -135,7 +138,7 @@ console.log(`\n  mean ratio ${mean.toFixed(3)} — `
   + (mean < 0.05
     ? 'ACHROMATIC. Chroma reject is inert on this material: the fine detail\n'
       + '  shifts no hue, so nothing distinguishes pigment grain from relief in one\n'
-      + '  photograph. This is the §4.3 case, and it is a property of the material.'
+      + '  photograph. This is the §3.2 (achromatic grain) case, and it is a property of the material.'
     : mean < 0.15
       ? 'nearly achromatic — chroma reject has little to work with.'
       : 'there is usable chroma; chroma reject can separate pigment from shading.'));

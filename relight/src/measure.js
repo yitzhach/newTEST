@@ -3,7 +3,8 @@
 // DESCRIPTIVE, and the distinction is load-bearing. Five statistics that claimed
 // to predict whether relief recovery would succeed have been built, calibrated
 // against bench cases with known recovery, and deleted because they could not
-// separate the good from the bad (README findings 10; HANDOFF §4.4, §4.7). Nothing
+// separate the good from the bad (README findings 10; HANDOFF §7 (the graveyard), §7
+// (the graveyard)). Nothing
 // here predicts recovery. Everything here is a property of the pixels that can be
 // checked directly against tools/spectrum.mjs.
 //

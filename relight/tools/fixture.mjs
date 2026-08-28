@@ -11,7 +11,8 @@
 //    synthetic bench in validate.mjs, which hands arrays straight to the maths.
 //    Here the surface's true normals are known, so the whole chain can be run
 //    end to end and the answer checked against truth. It is the same practice as
-//    HANDOFF.md §9, applied to the file plumbing rather than to the algorithm.
+//    HANDOFF.md §11 (how this is worked), applied to the file plumbing rather than to
+// the algorithm.
 //
 // 2. It shows what a capture bundle looks like before you shoot one. Reading a
 //    worked example beats reading a schema, and the two faults that cannot be

@@ -7,13 +7,15 @@
 // tools/validate.mjs scores surface recovery against a surface it synthesised, so
 // the truth is exact and free. A real painting comes with no truth at all. This
 // harness manufactures one: a six-exposure photometric capture solves to normals
-// at r ~ 0.9995 (HANDOFF.md §4), and each individual exposure of that same capture
+// at r ~ 0.9995 (HANDOFF.md §4 (what exists)), and each individual exposure of that
+// same capture
 // is also a valid single-photo input. So one shoot yields six (photograph -> known
 // normals) pairs, and the single-image path can finally be scored on real material
 // instead of on synth.js.
 //
 // That matters because every single-image number in this project is synthetic, and
-// §4.3 recorded that the one real photograph the project has seen behaved unlike
+// §3.2 (achromatic grain) recorded that the one real photograph the project has seen
+// behaved unlike
 // every synthetic case — its high-pass contrast read 0.67-0.86, above every bench
 // value, while returning speckle. Numbers from the bench do not transfer.
 //
@@ -22,7 +24,8 @@
 // would drift from the bench's silently, and then the real column and the
 // synthetic column in the same table would no longer be measuring the same thing.
 //
-// WHAT THIS CANNOT DO, stated up front because §4.2 is unintuitive: the photometric
+// WHAT THIS CANNOT DO, stated up front because §5 (rig rotation) is unintuitive: the
+// photometric
 // normals are ground truth only as far as the light directions are. Rotate the
 // whole rig by one angle and the solve reproduces every photograph perfectly — the
 // fit residual reads an identical 0.17% at every angle — while handing back a
@@ -65,7 +68,8 @@ const NO_REGISTER = flags.has('--no-register');
 // script can consume them without parsing prose. The prose is the primary output:
 // this harness exists to be read by a person deciding whether a capture is sound.
 const JSON_MODE = flags.has('--json');
-// A measurement, not an export. §7 records what measuring at reduced resolution
+// A measurement, not an export. §10 (known limits) records what measuring at reduced
+// resolution
 // costs on the photometric path: 0.9994/0.9990 at half scale against 0.9997/0.9996
 // at full — far smaller than the effects being looked for here, and the difference
 // between a solve that finishes in seconds and one that does not finish.
@@ -81,7 +85,7 @@ score-real.mjs — score surface recovery against a real photometric capture
                   strike the lights: it catches the two faults that cannot be
                   fixed afterwards (a rank-deficient rig, an undersized sphere).
   --sweep         also sweep the relief scale, to find which spatial band of this
-                  material actually carries relief (§4.3: real material is
+                  material actually carries relief (§3.2 (achromatic grain): real material is
                   broadband, and the 3px default was tuned on a synthetic weave).
   --no-register   skip frame alignment.
   --max-dim=N     long edge for the measurement (default ${MAX_DIM}).
@@ -193,7 +197,7 @@ function preflight(imgs) {
       + 'A reframe or a zoom change between shots is a re-shoot.');
   }
 
-  // 2. Enough exposures to leave something spare. §4.4 rule 2: an exactly
+  // 2. Enough exposures to leave something spare. §5 (capture rules): an exactly
   //    determined system fits perfectly by construction, so the fit residual
   //    reads 0.00% however wrong the capture is.
   const unknowns = 4; // three for the normal, one for ambient
@@ -202,7 +206,7 @@ function preflight(imgs) {
   } else if (n === unknowns) {
     warnings.push(`${n} exposures is exactly determined — the fit residual will read `
       + '0.00% whatever is wrong with the capture, and means nothing. Six is the default '
-      + 'for this reason (§4.4).');
+      + 'for this reason (§7, the graveyard).');
   } else {
     notes.push(`${n} exposures, ${n - unknowns} spare — the fit residual carries information.`);
   }
@@ -240,18 +244,20 @@ function preflight(imgs) {
     notes.push(`largest azimuth gap ${biggestGap.toFixed(0)}° — the lights go round the piece.`);
   }
 
-  // 5. The sphere. §4.2 — the one fault nothing else in this tool can see is a
+  // 5. The sphere. §5 (rig rotation) — the one fault nothing else in this tool can see
+  // is a
   //    rig that is uniformly wrong, and only a sphere measures against the room.
   if (!M.sphere) {
     warnings.push('NO CHROME SPHERE in this capture. The light directions are whatever was '
       + 'typed into capture.json. A rig uniformly rotated by 40° reproduces every '
       + 'photograph at an identical 0.17% fit residual while returning a surface rotated '
-      + 'off the painting (§4.2), and nothing computed from the exposures can detect it. '
+      + 'off the painting (§5, rig rotation), and nothing computed from the exposures can detect it. '
       + 'Every number this tool prints is conditional on those angles being right.');
   } else {
     const { r } = M.sphere;
     // Error scales with circle-error / radius, not with pixels: 3px of centre
-    // error costs 9.63° at r=40 and 1.60° at r=300 (§4.2). Never a hard failure —
+    // error costs 9.63° at r=40 and 1.60° at r=300 (§5, rig rotation). Never a hard
+    // failure —
     // a small sphere degrades the reading, it does not stop the capture solving,
     // and the reading is cross-checked against the nominal angles below anyway.
     if (r < 60) {
@@ -315,7 +321,7 @@ if (pf.problems.length) {
   say(line());
   say('This capture will not produce a trustworthy surface. Nothing below would');
   say('mean anything, so it is not computed. Refusing rather than approximating is');
-  say('the convention here (HANDOFF.md §9) — every one of these faults otherwise');
+  say('the convention here (HANDOFF.md §11 (how this is worked)) — every one of these faults otherwise');
   say('yields confident, plausible, wrong output.\n');
   await closeDecoder();
   process.exit(1);
@@ -372,7 +378,7 @@ if (M.sphere) {
     dirs = reads.map((r) => r.dir);
     // A circle that is not on a sphere still returns confident directions. The
     // check that catches it: the lamp moved between exposures, so readings that
-    // all agree cannot be readings of a mirror (§4.2).
+    // all agree cannot be readings of a mirror (§5, rig rotation).
     let maxPair = 0;
     for (let i = 0; i < dirs.length; i++) for (let j = i + 1; j < dirs.length; j++) {
       const d = Math.acos(Math.max(-1, Math.min(1,
@@ -385,7 +391,7 @@ if (M.sphere) {
         + `${maxPair.toFixed(1)}°.`);
       say('  The lamp moved between exposures, so a real mirror cannot return six');
       say('  near-identical directions — the circle is almost certainly not on the');
-      say('  sphere. Falling back to the nominal angles from capture.json. (§4.2)');
+      say('  sphere. Falling back to the nominal angles from capture.json. (§5, rig rotation)');
       dirs = nominal;
       sphereRead = null;
     } else {
@@ -405,7 +411,8 @@ let frames = imgs.map((im) => ({ width: im.width, height: im.height, data: im.da
 // Exclude the sphere's disc from every residual, including the one registration
 // is judged by. A mirror is not Lambertian and its pixels dominate the fit: a
 // clean capture reads 1.49% with the sphere left in against 0.16% with it
-// excluded (§4.2), which is more than enough to hide the improvement — or the
+// excluded (§5, rig rotation), which is more than enough to hide the improvement — or
+// the
 // fault — that the before/after comparison exists to reveal.
 const excl = M.sphere ? (() => {
   const cx = M.sphere.cx / scaleFactor, cy = M.sphere.cy / scaleFactor;
@@ -425,7 +432,7 @@ if (!NO_REGISTER && frames.length >= 2) {
     });
     if (!reg.reliable) {
       say('\n  Registration reports itself UNRELIABLE. An achromatic subject is the weak');
-      say('  case (§7): with no colour the matcher falls back on luminance alone. The');
+      say('  case (§10, known limits): with no colour the matcher falls back on luminance alone. The');
       say('  decisive test is the fit residual before against after, below.');
     }
     const corrected = await applyShifts(frames, reg.shifts);
@@ -440,7 +447,7 @@ if (!NO_REGISTER && frames.length >= 2) {
       frames = corrected;
       say('  Registration helped; keeping the corrected frames.');
     } else {
-      say('  Registration did not help; putting the frames back as shot. (§4.1)');
+      say('  Registration did not help; putting the frames back as shot. (§6, registration)');
     }
     say('');
   } else {
@@ -467,7 +474,7 @@ if (!sphereRead) {
   say('  CAVEAT, and it is not a small one: without a sphere reading this residual is');
   say('  blind to a uniform rotation of the whole rig. It reads an identical 0.17% at');
   say('  0° and at 40° of rig rotation while the recovered surface rots from 0.9997 to');
-  say('  0.78 (§4.2). A low number here does NOT establish the geometry is right.');
+  say('  0.78 (§5, rig rotation). A low number here does NOT establish the geometry is right.');
 }
 say('');
 
@@ -507,8 +514,8 @@ Reading:
     the component one photograph actually constrains. "across" is the
     perpendicular, which is only weakly constrained: the bench measures 0.14 for a
     raking rig and 0.26 for a 45° single source, and its sign is not meaningful.
-    A small or negative "across" is normal, not a fault (§3.2, §4.3). Scoring
-    along the azimuth rather than along x is the correction §4.3 made.
+    A small or negative "across" is normal, not a fault (§3.1, §3.2). Scoring
+    along the azimuth rather than along x is the correction §3.2 (achromatic grain) made.
 
   * For scale, the synthetic bench gets 0.77 along under a 20° raking light and
     0.67 under a 45° single source, falling to 0.09 under frontal light and 0.00
@@ -518,11 +525,11 @@ Reading:
   * If these rows land near the bench's raking figure, the single-image path
     works on this material and the tool can take one photograph. If they land
     near 0.1, it does not, and no amount of tuning the existing algorithm will
-    change that — the information is not in the photograph (§4.3).
+    change that — the information is not in the photograph (§3.2, achromatic grain).
 
   * Contrast is the statistic that a shot-quality gate was built on and failed:
     grain drives it UP while recovery goes DOWN, so it moves the wrong way and no
-    threshold separates the cases (§4.4). It is printed to accumulate real
+    threshold separates the cases (§7, the graveyard). It is printed to accumulate real
     evidence about whether that holds off the bench, NOT as a quality score.`);
 
 if (!sphereRead) {
@@ -539,7 +546,7 @@ say('');
 if (SWEEP) {
   say(line());
   say('\nWhich spatial band carries the relief\n');
-  say('  §4.3: the default relief scale of 3px was tuned against a synthetic weave with');
+  say('  §3.2 (achromatic grain): the default relief scale of 3px was tuned against a synthetic weave with');
   say('  a clean 7px period, while real material carries texture energy from 2px to');
   say('  190px with no dominant scale. On cement the default reads grain. This sweep');
   say('  asks the ground truth which band to read instead.\n');

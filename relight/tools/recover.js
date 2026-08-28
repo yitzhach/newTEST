@@ -5,7 +5,8 @@
 // makes the two comparable. A real number and a synthetic number are only worth
 // putting in the same table if the thing that produced them is identical, and a
 // second copy of `integrate` living in the real harness would drift from this one
-// silently — which is exactly the class of error HANDOFF.md §9 is about.
+// silently — which is exactly the class of error HANDOFF.md §11 (how this is worked) is
+// about.
 //
 // Everything here is DOM-free and dependency-free so it runs under plain node.
 // Nothing in here is GPU code: these mirror the shaders in src/gbuffer.js and
@@ -89,7 +90,8 @@ export function sdOf(a) {
 
 /**
  * Reconstruct height by walking back along the source azimuth accumulating
- * −slope. Integrate, do not differentiate — HANDOFF.md §3.1. The linear taper
+ * −slope. Integrate, do not differentiate — HANDOFF.md §3.1 (integrate, don't
+ * differentiate). The linear taper
  * band-limits the integral so it does not accumulate unbounded DC drift.
  */
 export function integrate(hp, w, h, ax, ay, taps = 8) {
@@ -109,7 +111,8 @@ export function integrate(hp, w, h, ax, ay, taps = 8) {
 /**
  * Recovery resolved ALONG and ACROSS the light azimuth.
  *
- * Not along x and y. HANDOFF.md §3.2 originally scored two rigs as nx / ny under
+ * Not along x and y. HANDOFF.md §3.1 (half the surface) originally scored two rigs as
+ * nx / ny under
  * headings that said "along azimuth / perpendicular", which is only the same
  * thing when the azimuth lies on an image axis. It does not for the 141° rig, and
  * that mislabelling made a modest elevation effect look like a large one.
@@ -148,7 +151,8 @@ export function scoreShot(data, normals, w, h, dir, { sigma = HP_SIGMA, taps = 8
  * an ambient term when the rig's elevations vary enough to support one.
  *
  * `residual` is the Fit view's number: how well the Lambertian model reproduces
- * the photographs that produced it. HANDOFF.md §4.2 — it is blind to a *uniform*
+ * the photographs that produced it. HANDOFF.md §5 (rig rotation) — it is blind to a
+ * *uniform*
  * rotation of the whole rig, which is why a sphere reading is not optional.
  */
 export function cpuSolve(frames, dirs, w, h, { fitAmbient = true, margin = 14, exclude = null } = {}) {
@@ -184,7 +188,7 @@ export function cpuSolve(frames, dirs, w, h, { fitAmbient = true, margin = 14, e
       // Interior only: after a shift the border rows are clamped copies, and
       // scoring them would mix a resampling edge artefact into the verdict.
       // `exclude` additionally drops a chrome sphere's disc — a mirror is not
-      // Lambertian and its pixels otherwise dominate the residual (§4.2).
+      // Lambertian and its pixels otherwise dominate the residual (§5, rig rotation).
       const inside = x >= margin && y >= margin && x < w - margin && y < h - margin;
       if (inside && !(exclude && exclude(x, y))) {
         let sse = 0;
