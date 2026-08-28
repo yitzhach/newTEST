@@ -504,6 +504,22 @@ PNG is preferred — it is lossless, and it is what the tools read with no
 dependencies. JPEG and WebP are decoded through a headless browser if `playwright`
 is installed.
 
+### Describing a photograph before you shoot a capture
+
+```bash
+node relight/tools/spectrum.mjs path/to/photo.jpg
+```
+
+Reports, for native-resolution crops spread across the frame: which spatial band
+carries the texture energy, whether the fine detail is achromatic (and therefore
+whether chroma reject can do anything at all), and whether JPEG blocking is present.
+
+It **describes** the photograph. It does not predict whether relief recovery will
+work on it, and that limit is deliberate — five separate shot-quality statistics
+have now been built, calibrated against bench cases with known recovery, and thrown
+away because they could not separate the good from the bad (findings 10, and the two
+in the handoff's §4.7). Any number here that looks like a quality score is not one.
+
 ### Scoring one
 
 ```bash

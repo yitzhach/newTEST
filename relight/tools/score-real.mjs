@@ -32,8 +32,8 @@
 // right, and this tool says so loudly rather than printing a confident table.
 
 import { readFileSync, existsSync, statSync } from 'node:fs';
-import { resolve, join, extname } from 'node:path';
-import { decodePNG } from './png.js';
+import { resolve, join } from 'node:path';
+import { decodeImage, closeDecoder } from './decode.js';
 import {
   LIN, HP_SIGMA, scoreShot, cpuSolve, pearson,
 } from './recover.js';
@@ -132,63 +132,12 @@ const RESULT = { painting: M.painting || null, dir, preflight: {}, exposures: []
 // -------------------------------------------------------------- image input
 
 /**
- * Decode one file to { data, width, height }.
- *
- * PNG is handled in-process with zero dependencies. Anything else goes through a
- * headless Chromium, which is already what tools/smoke.mjs requires — a camera
- * JPEG or a site WebP should not have to be converted by hand first.
+ * Read every exposure. Sequential rather than parallel: six 24MP frames as RGBA is
+ * 576MB held at once, and the decoder shares one browser page anyway.
  */
-let browser = null;
-async function decodeViaBrowser(paths) {
-  let chromium;
-  try {
-    ({ chromium } = await import('playwright'));
-  } catch {
-    throw new Error(
-      'Non-PNG exposures need a headless browser to decode.\n'
-      + '  Either:  npm i playwright        (the browser binary is usually already present)\n'
-      + '  or:      export the exposures as PNG, which this tool reads with no dependencies.\n'
-      + 'PNG is also what the capture protocol asks for — the solve is linear and JPEG\n'
-      + 'at fine detail is not (README.md, Capture protocol, rule 5).');
-  }
-  if (!browser) {
-    browser = await chromium.launch({
-      executablePath: process.env.CHROME || undefined,
-      args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
-    });
-  }
-  const page = await browser.newPage();
-  const out = [];
-  for (const p of paths) {
-    const b64 = readFileSync(p).toString('base64');
-    const ext = extname(p).slice(1).toLowerCase();
-    const mime = ext === 'jpg' ? 'jpeg' : ext;
-    const r = await page.evaluate(async ({ b64, mime }) => {
-      const blob = await (await fetch(`data:image/${mime};base64,${b64}`)).blob();
-      const bmp = await createImageBitmap(blob);
-      const c = new OffscreenCanvas(bmp.width, bmp.height);
-      const ctx = c.getContext('2d', { willReadFrequently: true });
-      ctx.drawImage(bmp, 0, 0);
-      const id = ctx.getImageData(0, 0, bmp.width, bmp.height);
-      return { w: bmp.width, h: bmp.height, bytes: Array.from(id.data) };
-    }, { b64, mime });
-    out.push({ data: new Uint8ClampedArray(r.bytes), width: r.w, height: r.h });
-  }
-  await page.close();
-  return out;
-}
-
 async function loadAll(files) {
-  const out = new Array(files.length);
-  const viaBrowser = [];
-  files.forEach((f, i) => {
-    if (extname(f).toLowerCase() === '.png') out[i] = decodePNG(readFileSync(f));
-    else viaBrowser.push(i);
-  });
-  if (viaBrowser.length) {
-    const got = await decodeViaBrowser(viaBrowser.map((i) => files[i]));
-    viaBrowser.forEach((i, k) => { out[i] = got[k]; });
-  }
+  const out = [];
+  for (const f of files) out.push(await decodeImage(f));
   return out;
 }
 
@@ -346,7 +295,7 @@ try {
   raw = await loadAll(files);
 } catch (e) {
   console.error(`\n${e.message}\n`);
-  if (browser) await browser.close();
+  await closeDecoder();
   process.exit(2);
 }
 
@@ -368,14 +317,14 @@ if (pf.problems.length) {
   say('mean anything, so it is not computed. Refusing rather than approximating is');
   say('the convention here (HANDOFF.md §9) — every one of these faults otherwise');
   say('yields confident, plausible, wrong output.\n');
-  if (browser) await browser.close();
+  await closeDecoder();
   process.exit(1);
 }
 
 if (PREFLIGHT_ONLY) {
   if (JSON_MODE) console.log(JSON.stringify(RESULT, null, 2));
   say('Preflight only. The capture is solvable.\n');
-  if (browser) await browser.close();
+  await closeDecoder();
   process.exit(0);
 }
 
@@ -614,4 +563,4 @@ if (SWEEP) {
 }
 
 if (JSON_MODE) console.log(JSON.stringify(RESULT, null, 2));
-if (browser) await browser.close();
+await closeDecoder();
