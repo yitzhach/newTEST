@@ -4,7 +4,10 @@ A photorealistic relighting engine for photographs of textured artwork. Standalo
 browser tool, no build step, no dependencies, no model of any kind. Load an image,
 place virtual lights, export a finished render.
 
-**Repo:** `yitzhach/newTEST` · **Branch:** `claude/relighting-engine-feasibility-g8v71j` · **Path:** `relight/`
+**Repo:** `yitzhach/newTEST` · **Branch:** `claude/relighting-capture-prep-oywx4r` · **Path:** `relight/`
+
+> The branch moved. `claude/relighting-engine-feasibility-g8v71j` is the old name and
+> is an ancestor of this one — nothing was lost, but push to the branch above.
 
 Everything below was **measured, not argued**. Where a number appears, it is
 reproducible from `relight/tools/`. Section 7 lists what has been built and deleted;
@@ -17,21 +20,40 @@ hour, and every one of them was tried and failed against ground truth.
 
 ### Kickoff prompt for a new session
 
+Paste this, unchanged, as the first message:
+
 > I'm continuing work on a photorealistic relighting engine for photographs of
 > textured artwork — cast cement and plaster, heavily grained, largely achromatic.
-> It's a standalone browser tool that exports a finished image.
+> It's a standalone browser tool, no build step and no dependencies, that loads an
+> image, lights it, and exports a finished render.
 >
 > The code is in this repo under `relight/` on branch
-> `claude/relighting-engine-feasibility-g8v71j`. **Read `relight/HANDOFF.md` in full
-> before responding.** Read §3 twice — it is the finding that decides what the tool
-> can and cannot be — and §7, which lists six diagnostics that were built,
-> calibrated against ground truth, and deleted.
+> `claude/relighting-capture-prep-oywx4r`. **Read `relight/HANDOFF.md` in full
+> before responding.**
+>
+> **This session is for the app and the interface** — §8 is the map of it. Read §3
+> twice anyway: it is the finding that decides what the tool can and cannot be, and
+> a UI change that promises more than §3 allows is a bug, not a feature. Read §7,
+> which is nine things that were built, calibrated against ground truth, and
+> deleted — three of them reported their highest confidence exactly where they knew
+> least.
 >
 > Everything in that document was measured. Don't re-derive it, don't rebuild
 > anything §7 says was tried, and don't trust a plausible statistic until it has
 > been run against the bench's known cases.
 >
-> Pick up from §9 "What's next", or tell me if something else should jump the queue.
+> Before changing anything in `src/`, get the browser suite running — §8.2 has the
+> exact commands, including the two things that are not obvious (playwright is not
+> installed, and Chromium is already on disk). It is 18 checks and it is the only
+> thing standing between a UI edit and a silently broken solve.
+>
+> Start with §9 item 1, which is a real inconsistency I left you: the app's
+> synthetic capture defaults still describe the rig the protocol no longer
+> recommends, and the slider cannot even reach the one it does. Then tell me what
+> you'd do next, or I'll tell you what I want changed.
+
+If instead you are picking this up to **shoot the six-exposure capture**, the
+prompt is the same but start at §9 item 5, and read §5 and §6 first.
 
 ### Files to bring
 
@@ -181,7 +203,7 @@ lamp position, not the histogram.
 
 ## 4. What exists
 
-~6,500 lines, plain ES modules, **no build step**, no dependencies.
+~7,200 lines, plain ES modules, **no build step**, no dependencies.
 
 | file | role |
 |---|---|
@@ -202,8 +224,8 @@ lamp position, not the histogram.
 | `tools/spectrum.mjs` | Describes a photograph: band structure, chroma signal, JPEG blocking |
 | `tools/plan.mjs` | Pre-shoot rig planning and checking — runs with **no photographs**; shot list, geometry check, chrome-sphere sizing |
 | `tools/fixture.mjs` | Writes a synthetic capture to disk as a real bundle — worked example and test input |
-| `tools/selftest-real.mjs` | The real-capture chain end to end, 20 checks, no browser |
-| `tools/smoke.mjs` | End-to-end browser suite, 18 checks (needs playwright) |
+| `tools/selftest-real.mjs` | The real-capture chain end to end, 28 checks, no browser |
+| `tools/smoke.mjs` | End-to-end browser suite, 18 checks — drives the real UI. Install playwright by hand, §8.2 |
 | `tools/decode.js` | Image input — PNG in-process, JPEG/WebP via headless Chromium |
 | `tools/png.js` | PNG encode/decode on `node:zlib`, no dependencies |
 
@@ -499,16 +521,63 @@ The app and the harness must never tell the user different things about one imag
 
 ---
 
-## 8. Running it
+## 8. The app, and how to run it
+
+### 8.1 The interface, as it stands
+
+One page, no framework, no build. `index.html` is the markup and the CSS; `src/app.js`
+(~1,200 lines) is all of the behaviour. Controls are plain `<input type="range">` and
+`<button>` wired by id — there is no component layer and no state library, so a
+control is added by adding the element and one `bind()` call.
+
+**Layout.** A fixed left `#stage` holding the WebGL canvas (`#gl`), and a scrolling
+right `#panel` of six groups:
+
+| group | what it holds |
+|---|---|
+| **Source** | `#src` picks synthetic / file / photometric-synthetic / photometric-files. `#synthOpts` and `#psOpts` show or hide beneath it. The capture controls live here: `#psShots`, `#psElev`, `#psSpread`, align, sphere placement, the shot list |
+| **Surface recovery** | The single-image path: `#reliefScale`, `#azimuth`, `#taps`, `#reliefStrength`, `#chromaReject`, `#albedoSuppress` |
+| **Material & frame** | Shading: relief amount, depth, roughness, specular, cast shadow, shadow reach, occlusion, ambient, exposure |
+| **Lights** | `#tabs` per light, `#lightPanel` rebuilt per selection. Handles are dragged on the canvas itself (`rebuildHandles`) |
+| **Export** | Format, scale, and the tiled full-resolution render |
+| **View** | The six view modes below |
+
+**The six views** (`VIEWS` in `app.js`, near line 340). Each is a shader mode plus a
+one-line note shown under the buttons:
+
+| view | mode | what it is for |
+|---|---|---|
+| Relit | 0 | the deliverable |
+| **Fit** | 5 | photometric only — how well the Lambertian model reproduces what was photographed. **The one view that says whether to trust the others** (§5) |
+| Normals | 1 | should trace individual brushstrokes, not the composition |
+| Height | 2 | relief after integration along the azimuth |
+| Albedo | 3 | base colour with fine-scale shading divided out |
+| Original | 4 | untouched source, for before/after |
+
+**Functions worth knowing before editing** — all in `src/app.js`:
+`setSource` (line ~116) swaps input mode, `rebuildLightPanel` (~246) and
+`rebuildHandles` (~305) redraw the light UI, `render` (~389) is the draw call,
+`bind` (~458) wires a slider to state, `boot` (~486) is startup and capability
+checks, `wireExport` (~597), `wireSpherePlacement` (~703), `alignShots` (~905),
+`loadSyntheticCapture` (~1038).
+
+**Two UI rules this project has already paid for.** `src/measure.js` and
+`tools/spectrum.mjs` are cross-checked to agree to 0.000% on identical pixels,
+because **the app and the harness must never tell the user different things about
+one image** (§7). And where the maths is degenerate the UI must *refuse and say why*
+rather than render something plausible — a singular rig, a missing GPU extension, a
+fit with no degrees of freedom. Both are load-bearing, and both are easy to break
+with an innocent-looking interface change.
+
+### 8.2 Running it
 
 ```bash
 python3 -m http.server 8080          # then http://localhost:8080/relight/
 
-node relight/tools/validate.mjs      # ground-truth maths, ~65s, no browser
-node relight/tools/selftest-real.mjs # real-capture chain, 20 checks, no browser
-node relight/tools/smoke.mjs         # browser suite, 18 checks (needs playwright)
+node relight/tools/validate.mjs      # ground-truth maths, ~62s, no browser
+node relight/tools/selftest-real.mjs # real-capture chain, 28 checks, no browser
 
-node relight/tools/plan.mjs                             # the recommended rig, as a shot list
+node relight/tools/plan.mjs                            # the recommended rig, as a shot list
 node relight/tools/plan.mjs --write <dir>              # a capture.json to shoot into
 node relight/tools/plan.mjs --check <dir>              # check a rig with NO photographs
 node relight/tools/plan.mjs --sphere --frame-width=600 --image-width=4032
@@ -521,6 +590,25 @@ node relight/tools/score-real.mjs /tmp/cap --sweep      # which band carries rel
 node relight/tools/score-real.mjs /tmp/cap --json       # machine-readable
 ```
 
+**The browser suite, which is the one that matters for UI work.** It drives the real
+interface — renders both surface paths, downloads from both export paths, and
+confirms an unsolvable rig is still refused. Two things are not obvious and cost a
+session time if rediscovered:
+
+```bash
+npm install --no-save playwright     # NOT installed by default; --no-save keeps the
+                                     # root package.json (an unrelated Vite site) clean
+python3 -m http.server 842 --directory relight &
+CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome \
+  node relight/tools/smoke.mjs       # 18 checks
+```
+
+Chromium is **already on disk** at that path — do not run `playwright install`.
+Verified end to end in the capture-prep session: 18/18, with the software GL flags
+`smoke.mjs` already passes (`--use-angle=swiftshader`). It must resolve `playwright`
+from an ancestor directory of `relight/tools/`, so the repo root is the place to
+install it; `NODE_PATH` does not work, because ES modules ignore it.
+
 Must be served over http(s) — ES modules will not load from `file://`. Requires
 WebGL2 with `EXT_color_buffer_float`; without it the signed height field clamps to
 [0,1] and relief goes wrong while still looking like relief, so the bench refuses to
@@ -532,91 +620,86 @@ instead. `DEPLOY.md` has the details. For Cloudflare Pages direct upload, zip
 `index.html`, `_headers` and `src/` only; the `.md` files and Node harnesses are repo
 content, not things to publish.
 
-**If playwright's browser build does not match the machine's**, set `CHROME` to the
-chrome binary rather than reinstalling.
-
 ---
 
 ## 9. What's next
 
-> **Note on the existing raking shots.** `captures/test/25-28.png` cannot be pressed
-> into service as a photometric capture. The LEGO reference was added and removed
-> between 25, 26 and 27, so the *subject* changed between exposures, and 28 is a
-> different light position. Photometric stereo requires that **nothing move between
-> frames except the lamp** — not the camera, not the piece, not anything sitting on
-> it. They remain useful as single-image inputs.
+Ordered for an **app/interface** session. Items 5-8 are the capture track, unchanged
+and still the only thing that answers the open question below; they are lower here
+because they need a lamp and a room, not because they matter less.
 
-1. **A six-exposure photometric capture of a real piece.** This is no longer one
-   option among several — §7 established over six independent attempts that nothing
-   computed from a single photograph can say whether recovery worked. A capture is
-   the only instrument that can. It also yields six (photograph → known normals)
-   pairs on real material, which is the first non-synthetic score the single-image
-   path would ever have.
+1. **The app's capture defaults now contradict the protocol.** A real
+   inconsistency, left deliberately for a UI session because it is small, concrete
+   and load-bearing. `index.html` has `#psElev` default 45 and `#psSpread` default
+   15, and `loadSyntheticCapture` builds `elev ± spread/2` — so the app demonstrates
+   the **37.5/52.5** rig that §5 rule 3 has just measured as second-best. Worse,
+   `#psSpread` has `max="25"`, so the recommended **30/60** rig cannot be dialled in
+   at all. Fix: raise the spread maximum past 30 and move the defaults to 45 / 30.
+   While there, `#psSpread` can still be set to 0, which is the rank-deficient case —
+   it is correctly refused by `buildSolver`, so this is a question of whether the
+   slider should let you ask, not a correctness bug. §7 is the argument for leaving
+   a refusal visible rather than making it unreachable.
+2. **Surface the capture-planning numbers in the app.** `tools/plan.mjs` knows
+   things the interface does not: which elevations the rig should use, that
+   elevation must not track azimuth, how big the chrome sphere has to be for the
+   framing. The sphere sizing in particular is a purchasing decision made away from
+   the computer. A small "plan a capture" panel would put it where it is needed —
+   but note what it must NOT become: a score. §7 item 7 is the condition number,
+   which is already computed, looks exactly like a grade, and correlates with
+   recovery at r = -0.06.
+3. **A preset / save-load system for light rigs.** Listed in §10 as a known
+   absence. Nothing measured blocks it; it is straightforwardly missing.
+4. **The Fit view is the most important control in the app and the least
+   discoverable.** It is one tab among six, and §5 is the argument that it is the
+   only diagnostic a real capture has. Worth considering whether a bad fit should
+   announce itself rather than waiting to be visited. Careful: "announce" must mean
+   reporting the residual, never grading the photograph — §7.
+5. **A six-exposure photometric capture of a real piece.** §7 established over six
+   independent attempts that nothing computed from a single photograph can say
+   whether recovery worked. A capture is the only instrument that can, and it also
+   yields six (photograph → known normals) pairs on real material — the first
+   non-synthetic score the single-image path would ever have.
 
    **Before the shoot**, `node relight/tools/plan.mjs` prints the rig as a shot list
    and `--check` validates one with no photographs on disk; `--sphere` sizes the
-   chrome ball, which is a purchasing decision and cannot be fixed afterwards. The
-   rig is alternating 30/60° elevation, six azimuths 60° apart — §5 rule 3 for why,
-   and note that it is deliberately *not* the raking light §3.1 recommends for a
-   single photograph.
+   chrome ball, which cannot be fixed afterwards. The rig is alternating 30/60°
+   elevation, six azimuths 60° apart — §5 rule 3 for why, and note it is
+   deliberately *not* the raking light §3.1 recommends for a single photograph.
 
    **After the shoot, before the set comes down**, `tools/score-real.mjs --preflight`
    reads the actual frames and catches what a plan cannot: reframing, an undersized
-   or clipped sphere, a circle that is not on the sphere. It cannot run earlier — it
-   decodes every exposure — and it now says so and points at `plan.mjs` rather than
-   failing on a missing file. Protocol in `README.md`.
-2. **Retune single-image defaults against that capture.** `--sweep` is the tool. It
+   or clipped sphere, a circle that is not on the sphere.
+6. **Retune single-image defaults against that capture.** `--sweep` is the tool. It
    returns 3px on the bench — the shipped default, and the bench's own weave period —
    which is the check that it measures what it claims. §3.3 says real material is
    broadband and no single default fits, so expect a control that shows which band is
    being read rather than a better constant.
-3. **Fit the sphere's circle against the photometric residual.** The one hand-set
+7. **Fit the sphere's circle against the photometric residual.** The one hand-set
    number that still costs real accuracy. Three parameters, an objective the tool
    already computes, ground truth in the bench. Note the residual is blind to a
    *uniform* rotation of the rig, so this refines a circle but never replaces the
    sphere.
-4. **Keep every capture as a labelled bundle** (`README.md`, "Capture bundles").
+8. **Keep every capture as a labelled bundle** (`README.md`, "Capture bundles").
    Cheap now, impossible to reconstruct once the paint has been rephotographed. If
    the no-model decision is ever revisited, a solved bundle is exactly the training
    pair a single-image estimator needs — at r ≈ 0.9995 per pair, with §5 and §6 being
    what make the labels trustworthy rather than silently rotated.
-5. **A resample-free correction path for registration.** The estimate is essentially
+9. **A resample-free correction path for registration.** The estimate is essentially
    exact and the remaining loss is interpolation. Fold each frame's sub-pixel offset
    into the solve shader's UV rather than pre-shifting pixels. Measure first — a GPU
    sampler gives bilinear, the worst kernel measured.
-6. **Register rotation as well as translation.** Only if a real capture needs it.
-7. Preset/save system for light rigs.
-
-### One observation, reported by the owner
-
-After the raking shots were taken, the owner tried them in the tool across several
-pieces and reported the effect "quite good" and markedly better than the
-overcast-lit input. That is an impression, not a measurement, and §11 (how this is
-worked) is a list of impressions that were wrong.
-
-It is recorded anyway, for one reason: **the prediction preceded it.** §3.2
-(achromatic grain) says raking should beat diffuse by roughly 22× on this material,
-and that was measured on the bench before any raking photograph existed. Every
-earlier "looks right" in this project arrived *before* a number and was then killed
-by one. This is the first time an observation has confirmed a standing prediction
-rather than substituted for one. Weak evidence, pointing the same way as the theory.
-
-Worth separating two questions a fresh session should not conflate:
-
-- **Is the recovered geometry veridical?** Unknown, and only a capture answers it.
-- **Does the tool produce images the owner wants?** For a personal tool whose stated
-  purpose is "load an image, light it, export a file", the owner's judgement of
-  their own work is a legitimate acceptance signal. Geometric rigour is what stops
-  the tool fooling anyone and what would let it generalise; it is not the only thing
-  that makes the product worth having.
+10. **Register rotation as well as translation.** Only if a real capture needs it.
 
 ### Open question worth stating plainly
 
 Whether the single-image path is usable on cast cement **is still unknown.** The
 raking shots exist and are well exposed, the lighting is finally right, and nothing
 in the tool can score them. That is not a gap in the analysis — it is §7's rule. The
-capture in item 1 is what answers it, in either direction, and a clear negative would
+capture in item 5 is what answers it, in either direction, and a clear negative would
 be as valuable as a positive.
+
+Nothing about it is time-decaying. The tool does not get worse while the lamp stays
+in its box, and §9 items 1-4 are all real work that does not need it.
 
 ---
 
@@ -640,7 +723,14 @@ be as valuable as a positive.
   0.026/765, max 21, no coherent seam). Cause is Jacobi convergence, not margin. Zero
   needs multigrid.
 - **Single-image auto-azimuth is unreliable** and shipped as a dial. §7.
+- **The app's synthetic-capture defaults lag the protocol.** `#psElev` 45 /
+  `#psSpread` 15 builds the 37.5/52.5 rig, and the spread slider stops at 25 so the
+  recommended 30/60 cannot be reached. Harness and docs are correct; the interface is
+  not. §9 item 1.
 - No preset system, no save/load of light rigs, no undo.
+- **`smoke.mjs` needs playwright installed by hand** — it is not a dependency and the
+  repo has no lockfile for it. §8.2 has the working invocation, including the
+  already-present Chromium.
 
 ---
 
