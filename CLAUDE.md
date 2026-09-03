@@ -1,0 +1,11 @@
+# Working agreement — read this first, every session
+
+1. **Be brief.** Short answers. No preamble, no recaps, no bullet lists of
+   options I didn't ask for. Save tokens.
+2. **Push for fresh chats.** When a chat gets long or we finish a chunk of
+   work, say so and recommend starting a new one.
+3. **Before ending a chat:** save all work to files, commit, and update
+   `PROJECT_STATE.md` so the next chat can pick up cold.
+4. **Read `PROJECT_STATE.md`** at the start of every session — it's the
+   handoff doc.
+5. Branch for this work: `claude/artist-show-tracker-5pavpl`.

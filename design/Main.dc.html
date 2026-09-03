@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin:0; font-family: Spectral, Georgia, serif; background:#faf8f3; color:#2b2a27; }
+    a { color:#2f5d4f; } a:hover { color:#1d3b31; }
+    .mono { font-family:'IBM Plex Mono', 'Courier New', monospace; }
+  </style>
+</helmet>
+
+<div style="width:1280px; min-height:920px; background:#faf8f3; display:flex; flex-direction:column;">
+
+  <div style="display:flex; align-items:baseline; justify-content:space-between; padding:26px 40px 18px; border-bottom:1px solid #ddd9d0;">
+    <div style="display:flex; align-items:baseline; gap:14px;">
+      <div style="font-size:20px; letter-spacing:0.3px;">Show Ledger</div>
+      <div class="mono" style="font-size:11px; color:#8b897f; letter-spacing:1px; text-transform:uppercase;">Isaac Anderson &middot; 2027 season</div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div class="mono" style="font-size:11px; color:#8b897f;">Zapplication &middot; last synced 2 hrs ago</div>
+      <div style="border:1px solid #ddd9d0; background:#fff; padding:7px 14px; font-size:13px; border-radius:2px;">Import from Zapp</div>
+      <div style="background:#2f5d4f; color:#fff; padding:8px 16px; font-size:13px; border-radius:2px;">+ Add show</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:0; flex:1; align-items:stretch;">
+
+    <div style="flex:1; padding:0 0 0 40px;">
+      <div style="display:flex; gap:22px; padding:16px 0 12px; align-items:center;">
+        <div style="font-size:13px; border-bottom:2px solid #2b2a27; padding-bottom:5px;">Upcoming (12)</div>
+        <div style="font-size:13px; color:#8b897f; padding-bottom:5px;">Applied (5)</div>
+        <div style="font-size:13px; color:#8b897f; padding-bottom:5px;">Deadlines (3 soon)</div>
+        <div style="font-size:13px; color:#8b897f; padding-bottom:5px;">Archive</div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:52px 1fr 150px 118px 96px 28px; gap:0 14px; padding:10px 0 8px; border-bottom:1px solid #ddd9d0;" class="mono">
+        <div style="font-size:10px; color:#8b897f; letter-spacing:1px;">STOP</div>
+        <div style="font-size:10px; color:#8b897f; letter-spacing:1px;">SHOW</div>
+        <div style="font-size:10px; color:#8b897f; letter-spacing:1px;">DATES</div>
+        <div style="font-size:10px; color:#8b897f; letter-spacing:1px;">DEADLINE</div>
+        <div style="font-size:10px; color:#8b897f; letter-spacing:1px;">STATUS</div>
+        <div></div>
+      </div>
+
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+        <div style="display:grid; grid-template-columns:52px 1fr 150px 118px 96px 28px; gap:0 14px; padding:13px 0; border-bottom:1px solid #eeebe4; align-items:baseline;">
+          <div class="mono" style="font-size:12px; color:{{r.numColor}};">{{r.num}}</div>
+          <div>
+            <div style="font-size:15px;">{{r.name}}</div>
+            <div style="font-size:12px; color:#8b897f; margin-top:2px;">{{r.place}}</div>
+          </div>
+          <div class="mono" style="font-size:12px; color:#5c5a52;">{{r.dates}}</div>
+          <div class="mono" style="font-size:12px; color:{{r.dlColor}};">{{r.deadline}}</div>
+          <div><span style="font-size:11px; background:{{r.pillBg}}; color:{{r.pillFg}}; padding:3px 9px; border-radius:10px;">{{r.status}}</span></div>
+          <div style="font-size:14px; color:#c3bfb4;">&#8942;</div>
+        </div>
+      </sc-for>
+
+      <div style="padding:14px 0 30px; font-size:13px; color:#8b897f; font-style:italic;">Click any row to edit in place &middot; drag to reorder the route</div>
+    </div>
+
+    <div style="width:392px; border-left:1px solid #ddd9d0; padding:16px 40px 40px 26px; background:#f5f2eb;">
+      <div class="mono" style="font-size:10px; letter-spacing:1px; color:#8b897f; margin-bottom:10px;">ROUTE &middot; JAN&#8211;APR</div>
+      <div style="background:#eef0e6; border:1px solid #ddd9d0; height:300px; position:relative; border-radius:2px;">
+        <svg viewBox="0 0 320 300" style="width:100%; height:100%;">
+          <path d="M 36 26 L 96 34 L 130 52 L 160 47 L 196 60 L 214 86 L 228 132 L 238 144 L 234 173 L 262 207 L 266 231 L 291 257 L 300 282 L 306 250 L 308 232 L 310 204 L 297 159 L 287 138 L 269 84 L 256 50 L 246 30 L 227 15 L 143 12 Z" fill="#e3e7d6" stroke="#b9c2ab" stroke-width="1"/>
+          <path d="M266,231 L267,222 L303,255 L299,93 L234,174 L305,220 L302,252 L266,231" fill="none" stroke="#2f5d4f" stroke-width="1.6"/>
+          <g fill="#2f5d4f"><circle cx="266" cy="231" r="5"/><circle cx="267" cy="222" r="5"/><circle cx="303" cy="255" r="5"/><circle cx="299" cy="93" r="5"/><circle cx="234" cy="174" r="5"/><circle cx="305" cy="220" r="5"/></g>
+          <circle cx="290" cy="196" r="4.5" fill="#faf8f3" stroke="#993c1d" stroke-width="1.5"/>
+          <text x="24" y="250" font-family="Spectral, serif" font-size="10" fill="#8b897f">Gulf</text>
+        </svg>
+      </div>
+      <div style="display:flex; gap:16px; margin-top:10px; font-size:11px; color:#8b897f;" class="mono">
+        <div>&#9679; route</div><div>&#9711; alternate</div>
+      </div>
+
+      <div class="mono" style="font-size:10px; letter-spacing:1px; color:#8b897f; margin:26px 0 10px;">NEXT DEADLINES</div>
+      <sc-for list="{{deadlines}}" as="d" hint-placeholder-count="3">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; padding:9px 0; border-bottom:1px solid #e4e0d7;">
+          <div style="font-size:13px;">{{d.name}}</div>
+          <div class="mono" style="font-size:11px; color:{{d.color}};">{{d.due}}</div>
+        </div>
+      </sc-for>
+
+      <div style="margin-top:24px; border:1px solid #ddd9d0; background:#fff; padding:14px; border-radius:2px;">
+        <div style="font-size:13px; margin-bottom:6px;">Travel notes</div>
+        <div style="font-size:12px; color:#8b897f; line-height:1.5;">Naples &#8594; Bonita, 35 min. Lodging and van rental links will hang off each leg here later.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#2f5d4f","options":["#2f5d4f","#993c1d","#3a4a6b","#6b4a2f"]}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const pill = (s) => s === 'Accepted' ? ['#e7efe9','#2f5d4f'] : s === 'Applied' ? ['#eae7f0','#4b4468'] : s === 'Waitlist' ? ['#f6ead9','#8a4a1f'] : ['#efece5','#7a776d'];
+    const raw = [
+      ['1', "Naples New Year's Art Fair", 'Naples, FL', 'Jan 2–3', 'closed', 'Accepted'],
+      ['2a', 'Bonita Springs National — Show 1', 'Bonita Springs, FL', 'Jan 9–10', 'Sep 15', 'Applied'],
+      ['2b', 'Las Olas Art Fair Part I', 'Fort Lauderdale, FL — alternate', 'Jan 9–10', 'Oct 1', 'Not applied'],
+      ['3', 'Beaux Arts Festival of Art', 'Coral Gables, FL', 'Jan 16–17', 'Sep 30', 'Applied'],
+      ['4', 'IMAGES: A Festival of the Arts', 'New Smyrna Beach, FL', 'Jan 22–24', 'Oct 12', 'Not applied'],
+      ['5', 'St. Armands Circle Art Festival', 'Sarasota, FL', 'Jan 30–31', 'Nov 3', 'Not applied'],
+      ['6a', 'Boca Raton Museum Art Festival', 'Boca Raton, FL', 'Feb 6–7', 'Sep 23', 'Waitlist'],
+      ['6b', 'ArtiGras Fine Arts Festival', 'Palm Beach Gardens, FL — alternate', 'Feb 6–7', 'Sep 23', 'Not applied'],
+      ['7', 'Coconut Grove Arts Festival', 'Coconut Grove, Miami, FL', 'Feb 13–15', 'Sep 8', 'Applied']
+    ];
+    return {
+      rows: raw.map(([num, name, place, dates, deadline, status]) => {
+        const [pillBg, pillFg] = pill(status);
+        const alt = /[b-c]$/.test(num);
+        return { num, name, place, dates, deadline, status, pillBg, pillFg,
+          numColor: alt ? '#993c1d' : '#2f5d4f',
+          dlColor: deadline === 'closed' ? '#b3afa5' : (deadline === 'Sep 8' || deadline === 'Sep 15') ? '#8a4a1f' : '#5c5a52' };
+      }),
+      deadlines: [
+        { name: 'Coconut Grove Arts Festival', due: 'Sep 8 — 5 days', color: '#8a4a1f' },
+        { name: 'Bonita Springs — Show 1', due: 'Sep 15', color: '#8a4a1f' },
+        { name: 'ArtiGras', due: 'Sep 23', color: '#5c5a52' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

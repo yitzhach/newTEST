@@ -1,0 +1,13 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1280, "h": 920, "title": "A — Show Ledger" },
+    { "file": "SeasonBoard.dc.html", "x": 1400, "y": 0, "w": 1280, "h": 920, "title": "B — Season Board" },
+    { "file": "RouteFirst.dc.html", "x": 2800, "y": 0, "w": 1280, "h": 920, "title": "C — Route First" }
+  ],
+  "annotations": [
+    { "id": "note-a", "x": 0, "y": -150, "w": 420, "text": "A — Show Ledger\nList-first, closest to your existing road-trip pages. Everything is one editable table; map + deadlines ride the right rail. Best if the spreadsheet is really the product.\nTradeoff: the route is secondary." },
+    { "id": "note-b", "x": 1400, "y": -150, "w": 420, "text": "B — Season Board\nData-first dashboard. Gantt of the whole season with apply-by markers, so overlaps and deadline crunches are visible at a glance.\nTradeoff: densest to build and to edit in." },
+    { "id": "note-c", "x": 2800, "y": -150, "w": 420, "text": "C — Route First\nMap is the page; itinerary in date order beside it; editing happens in a panel on the right.\nTradeoff: less good for 30+ shows or deadline triage." }
+  ],
+  "launch": { "view": "canvas" }
+}

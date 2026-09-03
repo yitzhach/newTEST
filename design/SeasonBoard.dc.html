@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin:0; font-family:'Space Grotesk', system-ui, sans-serif; background:#111310; color:#e8e6df; }
+    a { color:#c9e265; } a:hover { color:#dff08f; }
+    .m { font-family:'JetBrains Mono', ui-monospace, monospace; }
+  </style>
+</helmet>
+
+<div style="width:1280px; min-height:920px; background:#111310; display:flex; flex-direction:column;">
+
+  <div style="display:flex; justify-content:space-between; align-items:center; padding:20px 32px; border-bottom:1px solid #23261f;">
+    <div style="display:flex; align-items:center; gap:18px;">
+      <div style="font-weight:700; font-size:17px; letter-spacing:-0.2px;">SEASON<span style="color:#c9e265;">/</span>BOARD</div>
+      <div class="m" style="font-size:11px; color:#6f7466;">2027 &middot; 18 shows tracked</div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div class="m" style="font-size:11px; color:#6f7466; display:flex; align-items:center; gap:7px;"><span style="width:7px; height:7px; border-radius:50%; background:#c9e265; display:inline-block;"></span>Zapp sync live</div>
+      <div style="border:1px solid #2e332a; padding:7px 13px; font-size:13px; border-radius:6px; color:#b9bdae;">Filters</div>
+      <div style="background:#c9e265; color:#161811; padding:8px 15px; font-size:13px; font-weight:500; border-radius:6px;">New show</div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:1px; background:#23261f; border-bottom:1px solid #23261f;">
+    <sc-for list="{{stats}}" as="s" hint-placeholder-count="4">
+      <div style="background:#111310; padding:18px 24px;">
+        <div class="m" style="font-size:10px; letter-spacing:1.2px; color:#6f7466;">{{s.label}}</div>
+        <div style="font-size:26px; font-weight:500; margin-top:6px; color:{{s.color}};">{{s.value}}</div>
+        <div style="font-size:12px; color:#8d9382; margin-top:2px;">{{s.note}}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="padding:24px 32px 8px; display:flex; justify-content:space-between; align-items:baseline;">
+    <div style="font-size:14px; font-weight:500;">Season timeline</div>
+    <div class="m" style="font-size:11px; color:#6f7466;">bar = show &nbsp; caret = apply by</div>
+  </div>
+
+  <div style="padding:0 32px;">
+    <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); border-bottom:1px solid #23261f; padding-bottom:6px;" class="m">
+      <div style="font-size:11px; color:#6f7466;">JAN</div><div style="font-size:11px; color:#6f7466;">FEB</div><div style="font-size:11px; color:#6f7466;">MAR</div><div style="font-size:11px; color:#6f7466;">APR</div>
+    </div>
+    <sc-for list="{{bars}}" as="b" hint-placeholder-count="8">
+      <div style="position:relative; height:30px; border-bottom:1px solid #1a1d17;">
+        <div style="position:absolute; left:{{b.left}}; top:7px; height:16px; width:{{b.width}}; background:{{b.bg}}; border-radius:3px; display:flex; align-items:center; padding-left:8px; overflow:hidden;">
+          <span style="font-size:11px; color:{{b.fg}}; white-space:nowrap;">{{b.name}}</span>
+        </div>
+        <div style="position:absolute; left:{{b.dl}}; top:4px; width:1px; height:22px; background:#e2703a;"></div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 400px; gap:24px; padding:26px 32px 32px;">
+    <div style="border:1px solid #23261f; border-radius:8px; overflow:hidden;">
+      <div style="padding:12px 16px; border-bottom:1px solid #23261f; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:13px; font-weight:500;">Drive order</div>
+        <div class="m" style="font-size:11px; color:#6f7466;">1,410 mi &middot; 11 legs</div>
+      </div>
+      <div style="height:260px; background:#161911; position:relative;">
+        <svg viewBox="0 0 460 260" style="width:100%; height:100%;">
+          <path d="M 50 24 L 130 34 L 176 54 L 216 48 L 266 63 L 290 96 L 310 152 L 323 167 L 318 203 L 355 244 L 358 254 L 400 250 L 420 232 L 424 205 L 420 172 L 405 108 L 392 66 L 380 40 L 355 20 L 240 15 Z" fill="#1c2016" stroke="#2f3629" stroke-width="1"/>
+          <path d="M358,244 L360,235 L410,244 L406,68 L318,204 L414,196 L410,242" fill="none" stroke="#c9e265" stroke-width="1.8"/>
+          <g fill="#c9e265"><circle cx="358" cy="244" r="4.5"/><circle cx="360" cy="235" r="4.5"/><circle cx="410" cy="244" r="4.5"/><circle cx="406" cy="68" r="4.5"/><circle cx="318" cy="204" r="4.5"/><circle cx="414" cy="196" r="4.5"/></g>
+          <circle cx="396" cy="168" r="4" fill="#161911" stroke="#e2703a" stroke-width="1.5"/>
+          <text x="60" y="200" font-family="JetBrains Mono, monospace" font-size="10" fill="#4d5346">GULF</text>
+        </svg>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:13px; font-weight:500; margin-bottom:10px;">Apply queue</div>
+      <sc-for list="{{queue}}" as="q" hint-placeholder-count="4">
+        <div style="display:flex; gap:12px; align-items:center; padding:11px 13px; border:1px solid #23261f; border-radius:7px; margin-bottom:8px; background:#141711;">
+          <div style="width:38px; text-align:center;">
+            <div class="m" style="font-size:15px; color:{{q.color}};">{{q.days}}</div>
+            <div class="m" style="font-size:9px; color:#6f7466;">DAYS</div>
+          </div>
+          <div style="flex-grow:1;">
+            <div style="font-size:13px;">{{q.name}}</div>
+            <div class="m" style="font-size:11px; color:#6f7466;">{{q.meta}}</div>
+          </div>
+          <div style="font-size:11px; border:1px solid #2e332a; color:#b9bdae; padding:4px 9px; border-radius:5px;">Apply</div>
+        </div>
+      </sc-for>
+      <div style="margin-top:14px; border:1px dashed #2e332a; border-radius:7px; padding:14px; color:#8d9382; font-size:12px; line-height:1.5;">
+        Lodging, van rental and flight quotes attach per leg &mdash; parked until the core tracker is solid.
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#c9e265","options":["#c9e265","#e2703a","#6ec8d6","#d6a66e"]}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const a = this.props.accent ?? '#c9e265';
+    const shows = [
+      ["Naples New Year's", 0, 3, -14, 'in'],
+      ['Bonita Springs 1', 7, 3, -20, 'in'],
+      ['Beaux Arts', 14, 3, -8, 'in'],
+      ['IMAGES New Smyrna', 20, 4, 4, 'out'],
+      ['St. Armands Circle', 28, 3, 10, 'out'],
+      ['Boca Raton Museum', 36, 3, -30, 'wait'],
+      ['Coconut Grove', 43, 4, -46, 'in'],
+      ['Naples National', 49, 4, 12, 'out'],
+      ['Under the Oaks', 70, 4, 30, 'out'],
+      ['Winter Park Sidewalk', 77, 4, 26, 'out'],
+      ['Chain of Parks', 106, 3, 60, 'out']
+    ];
+    const span = 120;
+    const bg = { in: a, wait: '#3c4430', out: '#23261f' };
+    const fg = { in: '#161811', wait: '#c9cbbe', out: '#a7ac9c' };
+    return {
+      stats: [
+        { label: 'BOOKED', value: '6', note: 'accepted, deposits paid', color: a },
+        { label: 'PENDING', value: '4', note: 'jury results due', color: '#e8e6df' },
+        { label: 'DEADLINES < 30D', value: '3', note: 'earliest Sep 8', color: '#e2703a' },
+        { label: 'PROJECTED FEES', value: '$2,140', note: 'booth + jury', color: '#e8e6df' }
+      ],
+      bars: shows.map(([name, start, len, dl, state]) => ({
+        name,
+        left: (start / span * 100).toFixed(1) + '%',
+        width: Math.max(len / span * 100, 6).toFixed(1) + '%',
+        dl: (Math.max(dl, 0) / span * 100).toFixed(1) + '%',
+        bg: bg[state], fg: fg[state]
+      })),
+      queue: [
+        { days: '5', name: 'Coconut Grove Arts Festival', meta: '$65 jury · Feb 13–15', color: '#e2703a' },
+        { days: '12', name: 'Bonita Springs — Show 1', meta: '$45 jury · Jan 9–10', color: '#e2703a' },
+        { days: '20', name: 'ArtiGras Fine Arts', meta: '$50 jury · Feb 6–7', color: '#d6c96e' },
+        { days: '41', name: 'Under the Oaks', meta: '$40 jury · Mar 12–14', color: '#8d9382' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

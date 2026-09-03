@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Archivo:wght@400;500;600&display=swap">
+  <style>
+    body { margin:0; font-family:Archivo, system-ui, sans-serif; background:#f2efe9; color:#1f1d1a; }
+    a { color:#b4471f; } a:hover { color:#8c3616; }
+    .ser { font-family:'Instrument Serif', Georgia, serif; font-weight:400; }
+  </style>
+</helmet>
+
+<div style="width:1280px; min-height:920px; background:#f2efe9; display:flex; flex-direction:column;">
+
+  <div style="display:flex; justify-content:space-between; align-items:center; padding:22px 34px 18px;">
+    <div>
+      <div class="ser" style="font-size:30px; line-height:1;">The 2027 Run</div>
+      <div style="font-size:12px; color:#7d776c; margin-top:5px;">Jan 2 &ndash; Apr 18 &middot; 12 stops &middot; 1,410 miles</div>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div style="font-size:12px; color:#7d776c;">Pull shows from Zapplication</div>
+      <div style="background:#1f1d1a; color:#f2efe9; padding:10px 18px; font-size:13px; border-radius:999px;">Add a show</div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 360px 330px; gap:18px; padding:0 34px 34px; align-items:start;">
+
+    <div style="background:#e7e9dd; border-radius:14px; height:760px; position:relative; overflow:hidden;">
+      <svg viewBox="0 0 420 760" style="width:100%; height:100%;">
+        <path d="M 40 70 L 130 92 L 180 126 L 224 116 L 280 142 L 308 200 L 330 300 L 346 326 L 340 390 L 380 466 L 384 520 L 412 578 L 420 640 L 430 560 L 434 520 L 436 460 L 418 360 L 402 316 L 378 196 L 358 122 L 342 76 L 314 40 L 190 30 Z" fill="#d9dccc" stroke="#b9c0a8" stroke-width="1.4"/>
+        <path d="M384,520 L386,500 L424,590 L416,214 L340,392 L430,494 L426,584 L384,520" fill="none" stroke="#b4471f" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M386,500 L436,530" fill="none" stroke="#b4471f" stroke-width="1.4" stroke-dasharray="5 4" opacity="0.6"/>
+        <g font-family="Archivo, sans-serif" font-size="11" fill="#fff" text-anchor="middle">
+          <g><circle cx="384" cy="520" r="13" fill="#b4471f"/><text x="384" y="524">1</text></g>
+          <g><circle cx="386" cy="500" r="13" fill="#b4471f"/><text x="386" y="504">2</text></g>
+          <g><circle cx="424" cy="590" r="13" fill="#b4471f"/><text x="424" y="594">3</text></g>
+          <g><circle cx="416" cy="214" r="13" fill="#b4471f"/><text x="416" y="218">4</text></g>
+          <g><circle cx="340" cy="392" r="13" fill="#b4471f"/><text x="340" y="396">5</text></g>
+          <g><circle cx="430" cy="494" r="13" fill="#1f1d1a"/><text x="430" y="498">6</text></g>
+        </g>
+        <text x="60" y="470" class="ser" font-size="15" fill="#9a9a8c" font-family="Instrument Serif, serif">Gulf of Mexico</text>
+      </svg>
+      <div style="position:absolute; left:18px; bottom:18px; background:#f2efe9; border-radius:10px; padding:12px 16px; box-shadow:0 2px 10px rgba(0,0,0,0.08);">
+        <div style="font-size:12px; color:#7d776c;">Longest leg</div>
+        <div style="font-size:14px; margin-top:3px;">Winter Park &#8594; Tallahassee &middot; 4h 20m</div>
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px; color:#7d776c; text-transform:uppercase; letter-spacing:1.1px; margin-bottom:10px;">In date order</div>
+      <sc-for list="{{stops}}" as="s" hint-placeholder-count="6">
+        <div style="display:flex; gap:13px; padding:14px 0; border-bottom:1px solid #e0dbd1;">
+          <div style="width:26px; height:26px; border-radius:50%; background:{{s.dot}}; color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">{{s.n}}</div>
+          <div style="flex-grow:1;">
+            <div style="font-size:14px; font-weight:500;">{{s.name}}</div>
+            <div style="font-size:12px; color:#7d776c; margin-top:2px;">{{s.place}} &middot; {{s.dates}}</div>
+            <div style="font-size:12px; color:{{s.driveColor}}; margin-top:5px;">{{s.drive}}</div>
+          </div>
+        </div>
+      </sc-for>
+      <div style="padding:14px 0; font-size:13px; color:#b4471f;">Show 6 more &#8595;</div>
+    </div>
+
+    <div style="background:#fff; border-radius:14px; padding:20px; box-shadow:0 2px 14px rgba(0,0,0,0.06);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div class="ser" style="font-size:21px;">Edit stop 5</div>
+        <div style="font-size:16px; color:#a9a49a;">&times;</div>
+      </div>
+      <sc-for list="{{fields}}" as="f" hint-placeholder-count="5">
+        <div style="margin-bottom:13px;">
+          <div style="font-size:11px; color:#7d776c; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:5px;">{{f.label}}</div>
+          <div style="border:1px solid #ddd7cc; border-radius:8px; padding:10px 12px; font-size:13px; color:{{f.color}}; background:{{f.bg}};">{{f.value}}</div>
+        </div>
+      </sc-for>
+      <div style="display:flex; gap:8px; margin:6px 0 16px;">
+        <div style="font-size:12px; background:#f4e6df; color:#b4471f; padding:5px 11px; border-radius:999px;">Applied</div>
+        <div style="font-size:12px; background:#f0eee9; color:#7d776c; padding:5px 11px; border-radius:999px;">Accepted</div>
+        <div style="font-size:12px; background:#f0eee9; color:#7d776c; padding:5px 11px; border-radius:999px;">Waitlist</div>
+      </div>
+      <div style="border-top:1px solid #eae5dc; padding-top:14px; font-size:12px; color:#7d776c; line-height:1.5;">
+        Pulled from Zapplication on Sep 1. Booth fee and jury fee update automatically; anything you type here wins.
+      </div>
+      <div style="display:flex; gap:8px; margin-top:16px;">
+        <div style="background:#1f1d1a; color:#f2efe9; padding:10px 18px; font-size:13px; border-radius:999px;">Save</div>
+        <div style="border:1px solid #ddd7cc; padding:10px 18px; font-size:13px; border-radius:999px; color:#7d776c;">Cancel</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"accent":{"editor":"color","default":"#b4471f","options":["#b4471f","#2f5d4f","#3a4a6b","#7a5c2e"]}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const a = this.props.accent ?? '#b4471f';
+    const raw = [
+      ['1', "Naples New Year's Art Fair", 'Naples, FL', 'Jan 2–3', 'Start of the season'],
+      ['2', 'Bonita Springs National — Show 1', 'Bonita Springs, FL', 'Jan 9–10', '35 min from stop 1'],
+      ['3', 'Beaux Arts Festival of Art', 'Coral Gables, FL', 'Jan 16–17', '2h 05m drive'],
+      ['4', 'IMAGES: A Festival of the Arts', 'New Smyrna Beach, FL', 'Jan 22–24', '3h 40m drive'],
+      ['5', 'St. Armands Circle', 'Sarasota, FL', 'Jan 30–31', '3h 10m drive'],
+      ['6', 'Boca Raton Museum Art Festival', 'Boca Raton, FL', 'Feb 6–7', '3h 15m drive']
+    ];
+    return {
+      stops: raw.map(([n, name, place, dates, drive], i) => ({
+        n, name, place, dates, drive,
+        dot: i === 4 ? '#1f1d1a' : a,
+        driveColor: i === 0 ? '#7d776c' : a
+      })),
+      fields: [
+        { label: 'Show name', value: 'St. Armands Circle Art Festival', color: '#1f1d1a', bg: '#fff' },
+        { label: 'Location', value: 'St. Armands Circle, Sarasota, FL', color: '#1f1d1a', bg: '#fff' },
+        { label: 'Show dates', value: 'Jan 30 – Jan 31, 2027', color: '#1f1d1a', bg: '#fff' },
+        { label: 'Apply by', value: 'Nov 3, 2026', color: '#1f1d1a', bg: '#fff' },
+        { label: 'Booth / jury fee', value: '$525  ·  $40', color: '#7d776c', bg: '#faf8f5' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
