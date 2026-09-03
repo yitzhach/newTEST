@@ -74,6 +74,7 @@
         referrerpolicy="no-referrer"></script>
 <script src="core.js"></script>
 <script src="map.js"></script>
+<script src="store-supabase.js"></script>
 <script type="module">
 /* ==========================================================================
    FULL-PAGE MAP
@@ -182,6 +183,22 @@ window.addEventListener('hashchange', () => {
 });
 
 Theme.init();
+
+/* Same Store swap as the ledger: if a Supabase project is configured this
+   page reads the synced season, otherwise it reads localStorage. Either way
+   the code below is unchanged. */
+let syncStore = null;
+function reloadShows() {
+  return Store.list().then(shows => {
+    state.shows = shows;
+    renderItinerary();
+    renderMap();
+    if (state.selectedId) selectStop(state.selectedId, { pan: false });
+  });
+}
+if (window.ASTSupabase) {
+  syncStore = ASTSupabase.connect({ onShows: () => reloadShows() });
+}
 
 Store.list().then(shows => {
   state.shows = shows;

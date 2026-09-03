@@ -274,7 +274,13 @@ html[data-theme="dark"] .leaflet-tile-pane {
 
 /* ---- Rail panel shell ---------------------------------------------------- */
 .map-shell { position:relative; }
-.map-canvas { height:320px; border:1px solid var(--line); background:var(--surface); }
+/* z-index:0 on a positioned element makes the map its own stacking context, so
+   Leaflet's controls (z-index 800) stay inside it. Without this they float
+   above the drawer and the overlay and swallow clicks on them. */
+.map-canvas {
+  position:relative; z-index:0;
+  height:320px; border:1px solid var(--line); background:var(--surface);
+}
 .map-sheet-head { display:none; }
 .map-empty {
   display:flex; align-items:center; justify-content:center; height:100%;
@@ -354,3 +360,33 @@ html[data-theme="dark"] .leaflet-tile-pane {
    As a class it also re-colours itself on a theme switch for free. */
 .route-line { stroke:var(--accent); fill:none; }
 .route-spur { stroke:var(--warn); fill:none; }
+
+/* ==========================================================================
+   SYNC + ACCOUNT (Phase 3)
+   ========================================================================== */
+.sync-pill {
+  display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 14px;
+  border:1px solid var(--line); background:var(--bg);
+  font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--muted);
+}
+.sync-pill:hover { border-color:var(--ink); color:var(--ink); }
+.sync-dot { width:7px; height:7px; border-radius:50%; background:var(--muted); flex:0 0 auto; }
+[data-state="synced"]  .sync-dot { background:var(--s-accepted); }
+[data-state="syncing"] .sync-dot { background:var(--s-applied); }
+[data-state="offline"] .sync-dot { background:var(--warn); }
+[data-state="error"]   .sync-dot { background:var(--danger); }
+[data-state="synced"]  { color:var(--ink); }
+[data-state="error"]   { color:var(--danger); }
+
+.sync-state {
+  display:flex; align-items:center; gap:10px; padding:12px 14px; margin-bottom:22px;
+  border:1px solid var(--line); background:var(--surface); font-size:13px;
+}
+@media (max-width:767px) {
+  .sync-pill { padding:0 10px; }
+  .sync-pill #syncText { display:none; }
+}
+
+.btn-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.btn-row .btn { flex:1 1 auto; }

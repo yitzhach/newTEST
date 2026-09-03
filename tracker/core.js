@@ -12,9 +12,11 @@ window.AST = (function () {
   'use strict';
 
   /* ---- 1. MODEL + CONSTANTS --------------------------------------------- */
-  var SCHEMA_VERSION = 1;
+  var SCHEMA_VERSION = 2;
   var DB_KEY = 'artShowTracker.db';
   var THEME_KEY = 'artShowTracker.theme';
+  var CONFIG_KEY = 'artShowTracker.supabase';
+  var SESSION_KEY = 'artShowTracker.session';
 
   var STATUSES = [
     { value:'interested',   label:'Interested' },
@@ -54,6 +56,9 @@ window.AST = (function () {
       notes: input.notes || '',
       url: input.url || '',
       source: ['manual','zapp_paste','csv'].indexOf(input.source) !== -1 ? input.source : 'manual',
+      // Tombstone. Sync is last-write-wins on updatedAt, so a delete has to
+      // stay as a row or the other device simply pushes the show back.
+      deletedAt: input.deletedAt || null,
       createdAt: input.createdAt || now,
       updatedAt: input.updatedAt || now
     };
@@ -99,7 +104,14 @@ window.AST = (function () {
     if (!Array.isArray(d.shows)) d.shows = [];
     // v0 (pre-versioning: a bare array or no version) -> v1
     if (!d.schemaVersion) d.schemaVersion = 1;
-    // Future: if (d.schemaVersion < 2) { ...; d.schemaVersion = 2; }
+    // v1 -> v2: soft deletes, so cross-device sync can carry a deletion.
+    if (d.schemaVersion < 2) {
+      d.shows = d.shows.map(function (row) {
+        if (row && row.deletedAt === undefined) row.deletedAt = null;
+        return row;
+      });
+      d.schemaVersion = 2;
+    }
     d.shows = d.shows.map(makeShow);
     d.schemaVersion = SCHEMA_VERSION;
     return d;
@@ -114,7 +126,12 @@ window.AST = (function () {
       var parsed;
       try { parsed = JSON.parse(raw); } catch (_) { parsed = null; }
       if (Array.isArray(parsed)) parsed = { shows: parsed };
-      return migrate(parsed);
+      var was = parsed && parsed.schemaVersion;
+      var db = migrate(parsed);
+      // Persist the upgrade now rather than waiting for the next write, so a
+      // stale version cannot sit on disk being re-migrated on every read.
+      if (was !== SCHEMA_VERSION) { try { write(db); } catch (_) {} }
+      return db;
     }
     function write(db) {
       db.schemaVersion = SCHEMA_VERSION;
@@ -125,12 +142,22 @@ window.AST = (function () {
     function load() {
       var db = read();
       if (db) return db;
-      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED });
+      // A brand-new device gets the demo season. Flag it: the seed is not the
+      // user's data, so on first sign-in it must not be pushed up as if it
+      // were — a second device would duplicate the whole season.
+      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, pristineSeed: true });
     }
+    /** Any real write means this device's data is no longer the untouched seed. */
+    function touch(db) { db.pristineSeed = false; return db; }
+    function live(rows) { return rows.filter(function (s) { return !s.deletedAt; }); }
+
     return {
-      list: function () { return Promise.resolve(load().shows.slice()); },
+      /** The app's view of the data: tombstones never reach the UI. */
+      list: function () { return Promise.resolve(live(load().shows)); },
+      /** Everything including tombstones — for sync only. */
+      listAll: function () { return Promise.resolve(load().shows.slice()); },
       get: function (id) {
-        return Promise.resolve(load().shows.filter(function (s) { return s.id === id; })[0] || null);
+        return Promise.resolve(live(load().shows).filter(function (s) { return s.id === id; })[0] || null);
       },
       upsert: function (show) {
         var db = load();
@@ -138,26 +165,95 @@ window.AST = (function () {
         rec.updatedAt = new Date().toISOString();
         var i = db.shows.findIndex(function (s) { return s.id === rec.id; });
         if (i === -1) db.shows.push(rec); else db.shows[i] = Object.assign({}, db.shows[i], rec);
-        write(db);
+        write(touch(db));
         return Promise.resolve(rec);
       },
+      /**
+       * Soft delete. Returns the record as it was BEFORE the tombstone, so
+       * an undo can simply upsert it back.
+       */
       remove: function (id) {
         var db = load();
         var i = db.shows.findIndex(function (s) { return s.id === id; });
         if (i === -1) return Promise.resolve(null);
-        var gone = db.shows.splice(i, 1)[0];
-        write(db);
-        return Promise.resolve(gone);
+        var before = Object.assign({}, db.shows[i]);
+        db.shows[i] = Object.assign({}, db.shows[i], {
+          deletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        write(touch(db));
+        return Promise.resolve(before);
+      },
+      /** Sync writes rows verbatim — no updatedAt stamping, no tombstone filter. */
+      putRaw: function (rows) {
+        var db = load();
+        rows.forEach(function (rec) {
+          var i = db.shows.findIndex(function (s) { return s.id === rec.id; });
+          if (i === -1) db.shows.push(makeShow(rec));
+          else db.shows[i] = makeShow(rec);
+        });
+        write(touch(db));
+        return Promise.resolve(db.shows.slice());
       },
       replaceAll: function (shows) {
-        var db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow) };
+        var db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow), pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
-      }
+      },
+      /** True while this device still holds nothing but the untouched seed. */
+      isPristineSeed: function () { return !!load().pristineSeed; },
+      /** Throws away the seed and takes the account's season verbatim. */
+      adoptRemote: function (rows) {
+        var db = { schemaVersion: SCHEMA_VERSION, shows: rows.map(makeShow), pristineSeed: false };
+        write(db);
+        return Promise.resolve(db.shows.slice());
+      },
+      markUsed: function () { var db = load(); write(touch(db)); }
     };
   })();
 
-  var Store = LocalStore;
+
+  /* ---- 3b. SETTINGS + STORE FACADE ---------------------------------------
+     `AST.Store` is a stable object the pages hold on to; `useStore` swaps the
+     backend underneath it, so Phase 3 can move from LocalStore to the
+     Supabase-backed sync store without any page re-binding its reference.
+     Settings are small key/value prefs (Supabase URL, anon key, session) and
+     live here for the same reason the show data does: one place touches
+     localStorage.                                                          */
+  function readJSON(key) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) { return null; }
+  }
+  function writeJSON(key, value) {
+    try {
+      if (value === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch (_) { return false; }
+  }
+
+  var Settings = {
+    /** { url, anonKey } — the anon key is public by design; a service key is not. */
+    getConfig: function () { return readJSON(CONFIG_KEY); },
+    setConfig: function (cfg) { return writeJSON(CONFIG_KEY, cfg); },
+    clearConfig: function () { return writeJSON(CONFIG_KEY, null); },
+    getSession: function () { return readJSON(SESSION_KEY); },
+    setSession: function (sess) { return writeJSON(SESSION_KEY, sess); },
+    clearSession: function () { return writeJSON(SESSION_KEY, null); }
+  };
+
+  var backend = LocalStore;
+  var Store = {
+    list:       function ()      { return backend.list(); },
+    get:        function (id)    { return backend.get(id); },
+    upsert:     function (show)  { return backend.upsert(show); },
+    remove:     function (id)    { return backend.remove(id); },
+    replaceAll: function (shows) { return backend.replaceAll(shows); }
+  };
+  function useStore(next) { backend = next || LocalStore; return Store; }
+  function currentStore() { return backend; }
 
   /* ---- 4. DATES + FORMATTING -------------------------------------------- */
   var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -261,7 +357,8 @@ window.AST = (function () {
     SCHEMA_VERSION: SCHEMA_VERSION,
     STATUSES: STATUSES, STATUS_LABEL: STATUS_LABEL,
     makeShow: makeShow, numOrNull: numOrNull, clampRating: clampRating, migrate: migrate,
-    SEED: SEED, Store: Store,
+    SEED: SEED, Store: Store, LocalStore: LocalStore,
+    useStore: useStore, currentStore: currentStore, Settings: Settings,
     setNotifier: function (fn) { notify = fn; },
     parseISO: parseISO, today: today, daysUntil: daysUntil,
     fmtDay: fmtDay, fmtRange: fmtRange, fmtCountdown: fmtCountdown,

@@ -21,6 +21,10 @@
     <span class="sub" id="brandSub">Isaac Anderson &middot; 2027 season</span>
   </div>
   <div class="header-actions">
+    <button class="sync-pill" id="syncPill" type="button" data-state="local"
+            title="Sync status — click for account settings">
+      <span class="sync-dot" aria-hidden="true"></span><span id="syncText">On this device</span>
+    </button>
     <button class="btn btn-quiet" id="btnExport" type="button">Export JSON</button>
     <button class="btn btn-quiet" id="btnImport" type="button">Import JSON</button>
     <input type="file" id="fileImport" accept="application/json,.json" hidden>
@@ -235,6 +239,75 @@
   </div>
 </section>
 
+<section class="drawer" id="settingsDrawer" role="dialog" aria-modal="true"
+         aria-labelledby="settingsTitle" hidden>
+  <div class="drawer-head">
+    <h2 id="settingsTitle">Account &amp; sync</h2>
+    <button class="btn btn-icon" id="btnCloseSettings" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="drawer-body">
+    <div class="sync-state" id="syncState">
+      <span class="sync-dot" aria-hidden="true"></span>
+      <span id="syncStateText"></span>
+    </div>
+
+    <div class="form-row">
+      <span class="label">Signed in as</span>
+      <p id="acctEmail" style="margin:6px 0 0; font-size:14px;">Not signed in</p>
+    </div>
+
+    <div class="form-row" id="signInRow">
+      <label class="label" for="f_email">Email for the sign-in link</label>
+      <input class="control" id="f_email" type="email" inputmode="email"
+             autocomplete="email" placeholder="you@example.com">
+      <div class="err" id="e_email" hidden></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnMagicLink" type="button">Email me a sign-in link</button>
+      </div>
+      <div class="hint">Supabase sends a one-time link. Opening it on your phone
+        signs that device in to the same season.</div>
+    </div>
+
+    <div class="btn-row" id="signedInActions" hidden>
+      <button class="btn" id="btnSyncNow" type="button">Sync now</button>
+      <button class="btn btn-quiet" id="btnSignOut" type="button">Sign out</button>
+    </div>
+
+    <hr style="border:none; border-top:1px solid var(--line); margin:26px 0;">
+
+    <h3 class="label" style="margin:0 0 12px;">Supabase project</h3>
+    <div class="form-row">
+      <label class="label" for="f_supaUrl">Project URL</label>
+      <input class="control" id="f_supaUrl" inputmode="url" autocomplete="off"
+             placeholder="https://xxxxxxxx.supabase.co">
+      <div class="err" id="e_supaUrl" hidden></div>
+    </div>
+    <div class="form-row">
+      <label class="label" for="f_supaKey">Anon key</label>
+      <textarea class="control" id="f_supaKey" style="min-height:88px;"
+                autocomplete="off" spellcheck="false"></textarea>
+      <div class="err" id="e_supaKey" hidden></div>
+      <div class="hint">Use the <strong>anon</strong> public key. It is meant to be
+        in the browser — row level security is what protects your rows. Never paste
+        a service key here; it bypasses RLS entirely.</div>
+    </div>
+    <p class="hint">Run <code>docs/supabase-schema.sql</code> in the Supabase SQL
+      editor once before signing in.</p>
+  </div>
+
+  <div class="drawer-foot">
+    <button class="btn btn-primary" id="btnSaveSettings" type="button">Save project</button>
+    <button class="btn btn-quiet" id="btnCloseSettings2" type="button">Close</button>
+    <span class="spacer"></span>
+    <button class="btn btn-quiet btn-danger" id="btnForgetProject" type="button">Forget</button>
+  </div>
+</section>
+
 <div class="toast" id="toast" hidden>
   <span class="t-msg" id="toastMsg"></span>
   <button class="t-act" id="toastAct" type="button" hidden></button>
@@ -246,6 +319,7 @@
         referrerpolicy="no-referrer"></script>
 <script src="core.js"></script>
 <script src="map.js"></script>
+<script src="store-supabase.js"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE
@@ -698,12 +772,145 @@ Theme.onChange(t => {
 });
 
 /* ==========================================================================
+   14. SYNC + ACCOUNT (Phase 3)
+   The Store swap happens in core.js (`AST.useStore`), so nothing here — and
+   nothing in the render code — knows whether it is talking to localStorage or
+   to Supabase. Writes always land locally first, so the app keeps working
+   with no network and syncs when it comes back.
+   ========================================================================== */
+const { Settings } = window.AST;
+let syncStore = null;
+
+const SYNC_COPY = {
+  local:      ['local',      'On this device',   'Saved on this device only. Add a Supabase project below to sync to your phone.'],
+  signed_out: ['local',      'Not signed in',    'Project saved. Sign in with a magic link to sync this season across devices.'],
+  syncing:    ['syncing',    'Syncing…',         'Syncing with Supabase…'],
+  synced:     ['synced',     'Synced',           'Synced with Supabase.'],
+  offline:    ['offline',    'Offline',          'Offline — changes are saved locally and will sync when the connection is back.'],
+  error:      ['error',      'Sync problem',     'Sync failed.']
+};
+
+function paintSync(state, detail) {
+  const [tone, short, long] = SYNC_COPY[state] || SYNC_COPY.local;
+  const pill = $('#syncPill');
+  pill.dataset.state = tone;
+  $('#syncText').textContent = short;
+  pill.title = long;
+  $('#syncState').dataset.state = tone;
+  $('#syncStateText').textContent = detail ? long + ' ' + detail : long;
+}
+
+function paintAccount() {
+  const cfg = Settings.getConfig();
+  const sess = Settings.getSession();
+  $('#f_supaUrl').value = cfg ? cfg.url : '';
+  $('#f_supaKey').value = cfg ? cfg.anonKey : '';
+  $('#acctEmail').textContent = (sess && sess.user && sess.user.email) || 'Not signed in';
+  $('#signInRow').hidden = !!sess;
+  $('#signedInActions').hidden = !sess;
+  $('#btnForgetProject').hidden = !cfg;
+  if (!cfg) paintSync('local');
+  else if (!sess) paintSync('signed_out');
+}
+
+function openSettings() {
+  lastFocus = document.activeElement;
+  paintAccount();
+  $('#overlay').hidden = false;
+  $('#settingsDrawer').hidden = false;
+  $((Settings.getConfig() ? '#f_email' : '#f_supaUrl')).focus();
+}
+function closeSettings() {
+  $('#settingsDrawer').hidden = true;
+  $('#overlay').hidden = true;
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+
+function fieldError(field, msg) {
+  const e = document.getElementById('e_' + field);
+  const i = document.getElementById('f_' + field);
+  if (e) { e.textContent = msg || ''; e.hidden = !msg; }
+  if (i) { if (msg) i.setAttribute('aria-invalid', 'true'); else i.removeAttribute('aria-invalid'); }
+}
+
+function saveProject() {
+  const url = $('#f_supaUrl').value.trim().replace(/\/+$/, '');
+  const key = $('#f_supaKey').value.trim();
+  fieldError('supaUrl', ''); fieldError('supaKey', '');
+  let ok = true;
+  if (!/^https:\/\/\S+$/i.test(url)) { fieldError('supaUrl', 'Use the https:// project URL from Supabase.'); ok = false; }
+  if (!key) { fieldError('supaKey', 'Paste the anon public key.'); ok = false; }
+  else if (/service_role/.test(key)) {
+    fieldError('supaKey', 'That looks like a service key — it bypasses row level security. Use the anon key.');
+    ok = false;
+  }
+  if (!ok) return;
+  Settings.setConfig({ url, anonKey: key });
+  startSync();
+  paintAccount();
+  toast('Supabase project saved.', null, null, 2600);
+}
+
+function forgetProject() {
+  if (!confirm('Forget this Supabase project and sign out on this device? Your shows stay saved locally.')) return;
+  const cfg = Settings.getConfig(), sess = Settings.getSession();
+  if (cfg && sess) ASTSupabase.Auth.signOut(cfg, sess);
+  Settings.clearSession();
+  Settings.clearConfig();
+  syncStore = null;
+  window.AST.useStore(null);
+  paintAccount();
+  toast('Back to this device only.', null, null, 2600);
+}
+
+async function sendMagicLink() {
+  const cfg = Settings.getConfig();
+  if (!cfg) { fieldError('email', 'Save a Supabase project first.'); return; }
+  const email = $('#f_email').value.trim();
+  fieldError('email', '');
+  if (!/^\S+@\S+\.\S+$/.test(email)) { fieldError('email', 'Enter a valid email address.'); return; }
+  const btn = $('#btnMagicLink');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  try {
+    await ASTSupabase.Auth.sendMagicLink(cfg, email, location.origin + location.pathname);
+    toast('Sign-in link sent to ' + email + '. Open it on any device.', null, null, 9000);
+    closeSettings();
+  } catch (err) {
+    fieldError('email', err.message || 'Could not send the link.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Email me a sign-in link';
+  }
+}
+
+async function signOut() {
+  const cfg = Settings.getConfig(), sess = Settings.getSession();
+  if (cfg && sess) await ASTSupabase.Auth.signOut(cfg, sess);
+  Settings.clearSession();
+  if (syncStore) syncStore.setStatus('signed_out');
+  paintAccount();
+  toast('Signed out on this device. Your shows are still here.', null, null, 3200);
+}
+
+/** Connects (or reconnects) the Supabase-backed store. Safe to call repeatedly. */
+function startSync() {
+  syncStore = ASTSupabase.connect({
+    onStatus: (state, detail) => paintSync(state, detail),
+    onShows: () => refresh(),
+    onSession: () => paintAccount()
+  });
+  if (!syncStore) paintSync('local');
+  return syncStore;
+}
+
+/* ==========================================================================
    12. EVENTS
    ========================================================================== */
 $('#btnAdd').addEventListener('click', () => openDrawer(null));
 $('#btnCloseDrawer').addEventListener('click', closeDrawer);
 $('#btnCancel').addEventListener('click', closeDrawer);
-$('#overlay').addEventListener('click', closeDrawer);
+$('#overlay').addEventListener('click', () => { closeDrawer(); closeSettings(); });
 $('#btnSave').addEventListener('click', saveShow);
 $('#btnDelete').addEventListener('click', deleteShow);
 $('#showForm').addEventListener('submit', e => { e.preventDefault(); saveShow(); });
@@ -744,6 +951,19 @@ track.addEventListener('keydown', e => {
 });
 $('#btnClearRating').addEventListener('click', () => { setRating(0); track.focus(); });
 
+$('#syncPill').addEventListener('click', openSettings);
+$('#btnCloseSettings').addEventListener('click', closeSettings);
+$('#btnCloseSettings2').addEventListener('click', closeSettings);
+$('#btnSaveSettings').addEventListener('click', saveProject);
+$('#btnForgetProject').addEventListener('click', forgetProject);
+$('#btnMagicLink').addEventListener('click', sendMagicLink);
+$('#btnSignOut').addEventListener('click', signOut);
+$('#btnSyncNow').addEventListener('click', () => { if (syncStore) syncStore.sync(); });
+
+/* Come back from a dead connection without the user having to do anything. */
+window.addEventListener('online', () => { if (syncStore) syncStore.sync(); });
+window.addEventListener('offline', () => { if (syncStore) syncStore.setStatus('offline'); });
+
 $('#btnExport').addEventListener('click', exportJSON);
 $('#btnImport').addEventListener('click', () => $('#fileImport').click());
 $('#fileImport').addEventListener('change', e => {
@@ -756,6 +976,7 @@ $('#btnTheme').addEventListener('click', () => Theme.toggle());
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
+  else if (e.key === 'Escape' && !$('#settingsDrawer').hidden) closeSettings();
   else if (e.key === 'Escape' && $('#mapShell').classList.contains('is-sheet')) setSheet(false);
   if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey &&
       $('#drawer').hidden && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
@@ -787,17 +1008,21 @@ mqPhone.addEventListener('change', syncMapChrome);
 mqNarrow.addEventListener('change', syncMapChrome);
 window.addEventListener('resize', () => { if (routeMap) routeMap.invalidateSize(); });
 
-/* Keep focus inside the drawer while it is open. */
-$('#drawer').addEventListener('keydown', e => {
-  if (e.key !== 'Tab') return;
-  const items = $('#drawer').querySelectorAll(
-    'button:not([hidden]), input:not([hidden]), select, textarea, [tabindex="0"]');
-  const list = Array.from(items).filter(el => el.offsetParent !== null);
-  if (!list.length) return;
-  const first = list[0], last = list[list.length - 1];
-  if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
-  else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
-});
+/* Keep focus inside whichever drawer is open. */
+function trapFocus(root) {
+  root.addEventListener('keydown', e => {
+    if (e.key !== 'Tab') return;
+    const items = root.querySelectorAll(
+      'button:not([hidden]), input:not([hidden]), select, textarea, [tabindex="0"]');
+    const list = Array.from(items).filter(el => el.offsetParent !== null);
+    if (!list.length) return;
+    const first = list[0], last = list[list.length - 1];
+    if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+    else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+  });
+}
+trapFocus($('#drawer'));
+trapFocus($('#settingsDrawer'));
 
 /* ==========================================================================
    13. BOOT
@@ -806,6 +1031,12 @@ Theme.init();
 fillStatusSelect();
 setRating(0, { silent: true });
 syncMapChrome();
+
+/* A failed magic link comes back with the reason in the fragment. */
+const linkError = ASTSupabase.Auth.errorFromHash();
+startSync();
+paintAccount();
+if (linkError) toast('Sign-in link failed: ' + linkError, null, null, 9000);
 refresh().catch(err => {
   console.error(err);
   toast('Could not load saved shows.');
