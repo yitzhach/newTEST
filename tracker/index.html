@@ -1,0 +1,1090 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Show Ledger — Isaac Anderson</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
+<style>
+/* ==========================================================================
+   TOKENS
+   ========================================================================== */
+:root {
+  --bg:#ffffff; --surface:#fafaf9; --ink:#171717; --muted:#737373;
+  --line:#e5e5e5; --accent:#2f5d4f; --accent-ink:#ffffff;
+  --s-applied:#6366f1; --s-accepted:#2f5d4f; --s-waitlist:#b45309;
+  --s-declined:#737373; --s-interested:#0f766e; --s-not_applying:#a3a3a3;
+  --danger:#b42318; --warn:#b45309;
+  --font:"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --shadow:0 10px 40px rgba(0,0,0,.12);
+}
+html[data-theme="dark"] {
+  --bg:#0f0f0f; --surface:#171717; --ink:#f5f5f4; --muted:#a3a3a3;
+  --line:#262626; --accent:#7fb09c; --accent-ink:#0f0f0f;
+  --s-applied:#818cf8; --s-accepted:#7fb09c; --s-waitlist:#d97706;
+  --s-declined:#a3a3a3; --s-interested:#2dd4bf; --s-not_applying:#525252;
+  --danger:#f87171; --warn:#fbbf24;
+  --shadow:0 10px 40px rgba(0,0,0,.6);
+}
+* { box-sizing:border-box; }
+html, body { height:100%; }
+body {
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--font);
+  font-weight:300; font-size:15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button, input, select, textarea { font:inherit; color:inherit; }
+button { background:none; border:none; cursor:pointer; }
+a { color:var(--accent); }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.label {
+  font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--muted);
+}
+.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.app-header {
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:22px 32px; border-bottom:1px solid var(--line); flex-wrap:wrap;
+}
+.brand { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+.brand h1 {
+  margin:0; font-size:15px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+}
+.brand .sub { font-size:11px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
+.header-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.btn {
+  display:inline-flex; align-items:center; gap:8px; justify-content:center;
+  min-height:44px; padding:0 16px; border:1px solid var(--line); background:var(--bg);
+  font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+}
+.btn:hover { border-color:var(--ink); }
+.btn-primary { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+.btn-primary:hover { filter:brightness(1.08); border-color:var(--accent); }
+.btn-quiet { border-color:transparent; color:var(--muted); }
+.btn-quiet:hover { color:var(--ink); border-color:var(--line); }
+.btn-danger { color:var(--danger); }
+.btn-icon { width:44px; min-height:44px; padding:0; border-color:transparent; }
+.btn-icon:hover { border-color:var(--line); }
+svg { display:block; }
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+.main { display:grid; grid-template-columns:minmax(0,1fr) 392px; align-items:start; }
+.ledger { padding:18px 8px 64px 32px; min-width:0; }
+.rail {
+  border-left:1px solid var(--line); background:var(--surface);
+  padding:18px 32px 64px 26px; min-height:calc(100vh - 88px);
+}
+@media (max-width:1023px) {
+  .main { grid-template-columns:minmax(0,1fr); }
+  .ledger { padding:18px 24px 32px; }
+  .rail { border-left:none; border-top:1px solid var(--line); padding:24px; min-height:0; }
+}
+@media (max-width:767px) {
+  .app-header { padding:16px; }
+  .ledger { padding:12px 16px 32px; }
+  .rail { padding:20px 16px 48px; }
+}
+
+/* ==========================================================================
+   TOOLBAR
+   ========================================================================== */
+.toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 0 14px; }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip {
+  min-height:36px; padding:0 12px; border:1px solid var(--line); background:var(--bg);
+  font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+}
+.chip[aria-pressed="true"] { border-color:var(--ink); color:var(--ink); font-weight:600; }
+.spacer { flex:1 1 auto; }
+.field-inline { display:flex; align-items:center; gap:8px; }
+select.control, input.control, textarea.control {
+  background:var(--bg); border:1px solid var(--line); color:var(--ink);
+  padding:10px 12px; min-height:44px; width:100%; border-radius:0;
+}
+textarea.control { min-height:110px; resize:vertical; line-height:1.6; }
+.control:hover { border-color:var(--muted); }
+
+/* ==========================================================================
+   SHOW LIST
+   ========================================================================== */
+.row-grid {
+  display:grid; grid-template-columns:52px minmax(0,1fr) 148px 116px 104px 116px;
+  gap:0 14px; align-items:baseline;
+}
+.list-head { padding:10px 0 8px; border-bottom:1px solid var(--line); }
+.list-head > div { font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.show-row {
+  width:100%; text-align:left; padding:14px 0; border-bottom:1px solid var(--line);
+  background:none; cursor:pointer;
+}
+.show-row:hover { background:var(--surface); }
+.show-row .num { font-size:12px; font-weight:600; letter-spacing:.08em; color:var(--accent); }
+.show-row .num.alt { color:var(--warn); }
+.show-row .name { font-size:15px; font-weight:400; }
+.show-row .place { font-size:12px; color:var(--muted); margin-top:2px; }
+.show-row .meta { font-size:12px; color:var(--muted); letter-spacing:.04em; }
+.show-row .meta.due-soon { color:var(--warn); font-weight:600; }
+.show-row .meta.due-past { color:var(--muted); opacity:.6; }
+.pill {
+  display:inline-block; font-size:10px; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; padding:4px 9px; border:1px solid currentColor; white-space:nowrap;
+}
+.pill[data-status="applied"] { color:var(--s-applied); }
+.pill[data-status="accepted"] { color:var(--s-accepted); }
+.pill[data-status="waitlist"] { color:var(--s-waitlist); }
+.pill[data-status="declined"] { color:var(--s-declined); }
+.pill[data-status="interested"] { color:var(--s-interested); }
+.pill[data-status="not_applying"] { color:var(--s-not_applying); }
+.empty { padding:48px 0; color:var(--muted); font-size:14px; }
+.list-note { padding:14px 0 0; font-size:12px; color:var(--muted); }
+@media (max-width:767px) {
+  .list-head { display:none; }
+  .row-grid { grid-template-columns:44px minmax(0,1fr); gap:2px 12px; }
+  .show-row .r-dates { grid-column:2; }
+  .show-row .r-deadline { grid-column:2; }
+  .show-row .r-status { grid-column:2; margin-top:6px; }
+  .show-row .r-rating { grid-column:2; margin-top:4px; }
+}
+
+/* ==========================================================================
+   RATING
+   ========================================================================== */
+.stars { display:inline-flex; align-items:center; gap:2px; }
+.rating-control { display:inline-flex; align-items:center; gap:10px; min-height:44px; }
+.rating-track { display:inline-flex; gap:2px; cursor:pointer; padding:4px 0; }
+.rating-value { font-size:11px; letter-spacing:.12em; color:var(--muted); min-width:56px; }
+
+/* ==========================================================================
+   RAIL PANELS
+   ========================================================================== */
+.panel + .panel { margin-top:32px; }
+.panel h2 { margin:0 0 10px; font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.deadline-row {
+  display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+  padding:11px 0; border-bottom:1px solid var(--line);
+}
+.deadline-row .d-name { font-size:13px; }
+.deadline-row .d-when { font-size:11px; letter-spacing:.08em; text-align:right; white-space:nowrap; }
+.d-critical { color:var(--danger); font-weight:600; }
+.d-soon { color:var(--warn); font-weight:600; }
+.d-ok { color:var(--muted); }
+.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px 12px; }
+.stat .n { font-size:22px; font-weight:300; }
+.stat .k { font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
+
+/* ==========================================================================
+   DRAWER
+   ========================================================================== */
+.overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.35); border:none; padding:0; margin:0;
+  z-index:40;
+}
+html[data-theme="dark"] .overlay { background:rgba(0,0,0,.6); }
+.drawer {
+  position:fixed; top:0; right:0; bottom:0; width:min(460px,100vw); z-index:50;
+  background:var(--bg); border-left:1px solid var(--line); box-shadow:var(--shadow);
+  display:flex; flex-direction:column;
+}
+.drawer-head {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:18px 20px; border-bottom:1px solid var(--line);
+}
+.drawer-head h2 { margin:0; font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; }
+.drawer-body { flex:1; overflow-y:auto; padding:20px; }
+.drawer-foot {
+  display:flex; gap:8px; align-items:center; padding:16px 20px; border-top:1px solid var(--line);
+}
+.form-row { margin-bottom:18px; }
+.form-row > .label { display:block; margin-bottom:6px; }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
+.check { display:flex; align-items:center; gap:10px; min-height:44px; }
+.check input { width:18px; height:18px; accent-color:var(--accent); }
+.err { color:var(--danger); font-size:12px; margin-top:6px; }
+.hint { color:var(--muted); font-size:12px; margin-top:6px; }
+.control[aria-invalid="true"] { border-color:var(--danger); }
+@media (max-width:767px) { .drawer { width:100vw; border-left:none; } .grid-2 { grid-template-columns:1fr; } }
+
+/* ==========================================================================
+   TOAST
+   ========================================================================== */
+.toast {
+  position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:60;
+  display:flex; align-items:center; gap:14px; padding:12px 12px 12px 18px;
+  background:var(--ink); color:var(--bg); box-shadow:var(--shadow); max-width:calc(100vw - 32px);
+}
+.toast .t-msg { font-size:13px; }
+.toast .t-act {
+  min-height:36px; padding:0 12px; border:1px solid currentColor;
+  font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+}
+[hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<!-- ==========================================================================
+     HEADER
+     ========================================================================== -->
+<header class="app-header">
+  <div class="brand">
+    <h1>Show Ledger</h1>
+    <span class="sub" id="brandSub">Isaac Anderson &middot; 2027 season</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-quiet" id="btnExport" type="button">Export JSON</button>
+    <button class="btn btn-quiet" id="btnImport" type="button">Import JSON</button>
+    <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    <button class="btn btn-icon" id="btnTheme" type="button" aria-label="Switch theme" title="Switch theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" id="iconSun">
+        <circle cx="10" cy="10" r="3.6"/>
+        <path d="M10 1.6v2.2M10 16.2v2.2M2.6 10H4.8M15.2 10h2.2M4.8 4.8l1.6 1.6M13.6 13.6l1.6 1.6M15.2 4.8l-1.6 1.6M6.4 13.6l-1.6 1.6"/>
+      </svg>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" stroke-linejoin="round" id="iconMoon" hidden>
+        <path d="M16.5 11.8A6.9 6.9 0 0 1 8.2 3.5a6.9 6.9 0 1 0 8.3 8.3z"/>
+      </svg>
+    </button>
+    <button class="btn btn-primary" id="btnAdd" type="button">+ Add show</button>
+  </div>
+</header>
+
+<!-- ==========================================================================
+     MAIN
+     ========================================================================== -->
+<div class="main">
+  <main class="ledger">
+    <div class="toolbar">
+      <div class="chips" id="statusFilters" role="group" aria-label="Filter by status"></div>
+      <span class="spacer"></span>
+      <div class="field-inline">
+        <label class="label" for="sortBy">Sort</label>
+        <select class="control" id="sortBy" style="width:auto; min-width:150px;">
+          <option value="date">Show date</option>
+          <option value="deadline">Apply-by date</option>
+          <option value="rating">Rating</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row-grid list-head" aria-hidden="true">
+      <div>Stop</div><div>Show</div><div>Dates</div><div>Deadline</div><div>Status</div><div>Rating</div>
+    </div>
+
+    <div id="showList"></div>
+    <p class="list-note" id="listNote"></p>
+  </main>
+
+  <!-- ==========================================================================
+       RIGHT RAIL
+       ========================================================================== -->
+  <aside class="rail">
+    <section class="panel">
+      <h2>Next deadlines</h2>
+      <div id="deadlinePanel"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Season at a glance</h2>
+      <div class="stat-grid" id="statPanel"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Route map</h2>
+      <p class="hint" style="margin:0;">Leaflet map with numbered markers lands in Phase&nbsp;2.</p>
+    </section>
+  </aside>
+</div>
+
+<!-- ==========================================================================
+     DRAWER
+     ========================================================================== -->
+<div class="overlay" id="overlay" hidden></div>
+<section class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
+  <div class="drawer-head">
+    <h2 id="drawerTitle">Add show</h2>
+    <button class="btn btn-icon" id="btnCloseDrawer" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+
+  <form class="drawer-body" id="showForm" novalidate>
+    <div class="form-row">
+      <label class="label" for="f_name">Show name</label>
+      <input class="control" id="f_name" name="name" autocomplete="off">
+      <div class="err" id="e_name" hidden></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_city">City</label>
+        <input class="control" id="f_city" name="city" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_state">State</label>
+        <input class="control" id="f_state" name="state" maxlength="2" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_startDate">Start date</label>
+        <input class="control" id="f_startDate" name="startDate" type="date">
+        <div class="err" id="e_startDate" hidden></div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_endDate">End date</label>
+        <input class="control" id="f_endDate" name="endDate" type="date">
+        <div class="err" id="e_endDate" hidden></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_applyBy">Apply by</label>
+        <input class="control" id="f_applyBy" name="applyBy" type="date">
+        <div class="err" id="e_applyBy" hidden></div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_status">Status</label>
+        <select class="control" id="f_status" name="status"></select>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_routeNumber">Stop number</label>
+        <input class="control" id="f_routeNumber" name="routeNumber" placeholder="1, 2a, 6c" autocomplete="off">
+        <div class="hint">Sets route order on the map. Reorder the season by editing these.</div>
+      </div>
+      <div class="form-row">
+        <span class="label">Alternate</span>
+        <label class="check"><input type="checkbox" id="f_isAlternate" name="isAlternate">
+          <span style="font-size:13px;">Backup for an overlapping weekend</span></label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <span class="label" id="ratingLabel">Rating</span>
+      <div class="rating-control">
+        <div class="rating-track" id="ratingTrack" role="slider" tabindex="0"
+             aria-labelledby="ratingLabel" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"
+             aria-valuetext="Unrated"></div>
+        <span class="rating-value" id="ratingValue">Unrated</span>
+        <button class="btn btn-quiet" id="btnClearRating" type="button" style="min-height:36px;">Clear</button>
+      </div>
+      <div class="hint">Arrow keys adjust, Home/End for 0&ndash;10, Delete clears.</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_juryFee">Jury fee ($)</label>
+        <input class="control" id="f_juryFee" name="juryFee" inputmode="decimal" autocomplete="off">
+        <div class="err" id="e_juryFee" hidden></div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_boothFee">Booth fee ($)</label>
+        <input class="control" id="f_boothFee" name="boothFee" inputmode="decimal" autocomplete="off">
+        <div class="err" id="e_boothFee" hidden></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_lat">Latitude</label>
+        <input class="control" id="f_lat" name="lat" inputmode="decimal" autocomplete="off">
+        <div class="err" id="e_lat" hidden></div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_lng">Longitude</label>
+        <input class="control" id="f_lng" name="lng" inputmode="decimal" autocomplete="off">
+        <div class="err" id="e_lng" hidden></div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="f_url">Link</label>
+      <input class="control" id="f_url" name="url" inputmode="url" placeholder="https://" autocomplete="off">
+      <div class="err" id="e_url" hidden></div>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="f_notes">Notes</label>
+      <textarea class="control" id="f_notes" name="notes"></textarea>
+      <div class="hint" id="notesHint">Autosaved.</div>
+    </div>
+
+    <p class="hint" id="metaHint"></p>
+  </form>
+
+  <div class="drawer-foot">
+    <button class="btn btn-primary" id="btnSave" type="button">Save show</button>
+    <button class="btn btn-quiet" id="btnCancel" type="button">Cancel</button>
+    <span class="spacer"></span>
+    <button class="btn btn-quiet btn-danger" id="btnDelete" type="button" hidden>Delete</button>
+  </div>
+</section>
+
+<div class="toast" id="toast" hidden>
+  <span class="t-msg" id="toastMsg"></span>
+  <button class="t-act" id="toastAct" type="button" hidden></button>
+</div>
+<script type="module">
+/* ==========================================================================
+   1. MODEL + CONSTANTS
+   ========================================================================== */
+const SCHEMA_VERSION = 1;
+const DB_KEY = 'artShowTracker.db';
+const THEME_KEY = 'artShowTracker.theme';
+
+const STATUSES = [
+  { value:'interested',   label:'Interested' },
+  { value:'applied',      label:'Applied' },
+  { value:'accepted',     label:'Accepted' },
+  { value:'waitlist',     label:'Waitlist' },
+  { value:'declined',     label:'Declined' },
+  { value:'not_applying', label:'Not applying' }
+];
+const STATUS_LABEL = Object.fromEntries(STATUSES.map(s => [s.value, s.label]));
+
+function newId() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+}
+
+/** Every record that enters the app goes through here, so the shape is one thing. */
+function makeShow(input = {}) {
+  const now = new Date().toISOString();
+  return {
+    id: input.id || newId(),
+    name: input.name || '',
+    city: input.city || '',
+    state: input.state || '',
+    lat: numOrNull(input.lat),
+    lng: numOrNull(input.lng),
+    startDate: input.startDate || '',
+    endDate: input.endDate || '',
+    applyBy: input.applyBy || '',
+    status: STATUS_LABEL[input.status] ? input.status : 'interested',
+    rating: clampRating(input.rating),
+    juryFee: numOrNull(input.juryFee),
+    boothFee: numOrNull(input.boothFee),
+    routeNumber: input.routeNumber == null ? '' : String(input.routeNumber),
+    isAlternate: !!input.isAlternate,
+    notes: input.notes || '',
+    url: input.url || '',
+    source: ['manual','zapp_paste','csv'].includes(input.source) ? input.source : 'manual',
+    createdAt: input.createdAt || now,
+    updatedAt: input.updatedAt || now
+  };
+}
+function numOrNull(v) {
+  if (v === null || v === undefined || v === '') return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function clampRating(v) {
+  const n = Math.round(Number(v));
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  return Math.min(10, n);
+}
+
+/* ==========================================================================
+   2. SEED — Isaac's 2027 Florida season
+   Stops 1-7 as signed off in design/Main.dc.html. Later stops (8-12,
+   through Apr 18) are not in the repo docs yet; add them in the drawer.
+   ========================================================================== */
+const SEED = [
+  ['1',  "Naples New Year's Art Fair",        'Naples','FL',          26.1420,-81.7948,'2027-01-02','2027-01-03','',           'accepted',   false],
+  ['2a', 'Bonita Springs National — Show 1',  'Bonita Springs','FL',  26.3398,-81.7787,'2027-01-09','2027-01-10','2026-09-15','applied',    false],
+  ['2b', 'Las Olas Art Fair Part I',          'Fort Lauderdale','FL', 26.1224,-80.1373,'2027-01-09','2027-01-10','2026-10-01','not_applying',true],
+  ['3',  'Beaux Arts Festival of Art',        'Coral Gables','FL',    25.7215,-80.2684,'2027-01-16','2027-01-17','2026-09-30','applied',    false],
+  ['4',  'IMAGES: A Festival of the Arts',    'New Smyrna Beach','FL',29.0258,-80.9270,'2027-01-22','2027-01-24','2026-10-12','interested', false],
+  ['5',  'St. Armands Circle Art Festival',   'Sarasota','FL',        27.3206,-82.5760,'2027-01-30','2027-01-31','2026-11-03','interested', false],
+  ['6a', 'Boca Raton Museum Art Festival',    'Boca Raton','FL',      26.3683,-80.1289,'2027-02-06','2027-02-07','2026-09-23','waitlist',   false],
+  ['6b', 'ArtiGras Fine Arts Festival',       'Palm Beach Gardens','FL',26.8234,-80.1387,'2027-02-06','2027-02-07','2026-09-23','interested',true],
+  ['7',  'Coconut Grove Arts Festival',       'Coconut Grove, Miami','FL',25.7282,-80.2434,'2027-02-13','2027-02-15','2026-09-08','applied', false]
+].map(([routeNumber,name,city,state,lat,lng,startDate,endDate,applyBy,status,isAlternate]) =>
+  makeShow({ routeNumber,name,city,state,lat,lng,startDate,endDate,applyBy,status,isAlternate,source:'manual' })
+);
+
+/* ==========================================================================
+   3. STORE ADAPTER
+   Nothing outside this block touches storage. Phase 3 adds SupabaseStore
+   with the same async surface: list/get/upsert/remove/replaceAll.
+   ========================================================================== */
+function migrate(db) {
+  let d = db;
+  if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [] };
+  if (!Array.isArray(d.shows)) d.shows = [];
+  // v0 (pre-versioning: a bare array or no version) -> v1
+  if (!d.schemaVersion) d.schemaVersion = 1;
+  // Future: if (d.schemaVersion < 2) { ...; d.schemaVersion = 2; }
+  d.shows = d.shows.map(makeShow);
+  d.schemaVersion = SCHEMA_VERSION;
+  return d;
+}
+
+const LocalStore = (() => {
+  function read() {
+    let raw = null;
+    try { raw = localStorage.getItem(DB_KEY); } catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [] }; }
+    if (raw === null) return null;
+    let parsed;
+    try { parsed = JSON.parse(raw); } catch (_) { parsed = null; }
+    if (Array.isArray(parsed)) parsed = { shows: parsed };
+    return migrate(parsed);
+  }
+  function write(db) {
+    db.schemaVersion = SCHEMA_VERSION;
+    try { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+    catch (err) { toast('Could not save — storage is unavailable or full.'); throw err; }
+    return db;
+  }
+  function load() {
+    const db = read();
+    if (db) return db;
+    return write({ schemaVersion: SCHEMA_VERSION, shows: SEED });
+  }
+  return {
+    async list() { return load().shows.slice(); },
+    async get(id) { return load().shows.find(s => s.id === id) || null; },
+    async upsert(show) {
+      const db = load();
+      const rec = makeShow(show);
+      rec.updatedAt = new Date().toISOString();
+      const i = db.shows.findIndex(s => s.id === rec.id);
+      if (i === -1) db.shows.push(rec); else db.shows[i] = { ...db.shows[i], ...rec };
+      write(db);
+      return rec;
+    },
+    async remove(id) {
+      const db = load();
+      const i = db.shows.findIndex(s => s.id === id);
+      if (i === -1) return null;
+      const [gone] = db.shows.splice(i, 1);
+      write(db);
+      return gone;
+    },
+    async replaceAll(shows) {
+      const db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow) };
+      write(db);
+      return db.shows.slice();
+    }
+  };
+})();
+
+const Store = LocalStore;
+
+/* ==========================================================================
+   4. DATES + FORMATTING
+   ========================================================================== */
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+function parseISO(s) {
+  if (!s || !ISO_RE.test(s)) return null;
+  const [y, m, d] = s.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  return (dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d) ? dt : null;
+}
+function today() { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
+function daysUntil(iso) {
+  const d = parseISO(iso);
+  if (!d) return null;
+  return Math.round((d - today()) / 86400000);
+}
+function fmtDay(iso) { const d = parseISO(iso); return d ? MONTHS[d.getMonth()] + ' ' + d.getDate() : ''; }
+function fmtRange(startISO, endISO) {
+  const a = parseISO(startISO), b = parseISO(endISO);
+  if (!a) return '—';
+  const year = a.getFullYear();
+  if (!b || +a === +b) return MONTHS[a.getMonth()] + ' ' + a.getDate() + ', ' + year;
+  if (a.getMonth() === b.getMonth()) {
+    return MONTHS[a.getMonth()] + ' ' + a.getDate() + '–' + b.getDate() + ', ' + year;
+  }
+  return MONTHS[a.getMonth()] + ' ' + a.getDate() + ' – ' + MONTHS[b.getMonth()] + ' ' + b.getDate() + ', ' + year;
+}
+function fmtCountdown(n) {
+  if (n === null) return '';
+  if (n < 0) return 'closed';
+  if (n === 0) return 'today';
+  if (n === 1) return '1 day';
+  return n + ' days';
+}
+function esc(s) {
+  return String(s === null || s === undefined ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function place(show) {
+  const p = [show.city, show.state].filter(Boolean).join(', ');
+  return show.isAlternate ? (p ? p + ' — alternate' : 'alternate') : p;
+}
+
+/* ==========================================================================
+   5. RATING WIDGET
+   ========================================================================== */
+const STAR_PATH = 'M10 1.8l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.42l-4.94 2.6.94-5.5-4-3.9 5.53-.8z';
+let starUid = 0;
+
+/** rating is 0-10; each star is worth 2 (so 10 half-star steps). */
+function starsSVG(rating, size) {
+  const r = clampRating(rating);
+  let out = '';
+  for (let i = 0; i < 5; i++) {
+    const frac = Math.max(0, Math.min(2, r - i * 2)) / 2;
+    const id = 'star' + (++starUid);
+    out += '<svg width="' + size + '" height="' + size + '" viewBox="0 0 20 20" aria-hidden="true">' +
+      (frac > 0 ? '<defs><clipPath id="' + id + '"><rect x="0" y="0" width="' + (frac * 20) + '" height="20"/></clipPath></defs>' : '') +
+      '<path d="' + STAR_PATH + '" fill="none" stroke="currentColor" stroke-width="1.1" opacity="' + (frac > 0 ? '.85' : '.4') + '"/>' +
+      (frac > 0 ? '<path d="' + STAR_PATH + '" fill="currentColor" clip-path="url(#' + id + ')"/>' : '') +
+      '</svg>';
+  }
+  return '<span class="stars">' + out + '</span>';
+}
+function ratingText(r) { return r ? (r + ' / 10') : 'Unrated'; }
+
+/* ==========================================================================
+   6. APP STATE
+   ========================================================================== */
+const state = { shows: [], filter: 'all', sort: 'date', editingId: null, lastDeleted: null };
+const $ = sel => document.querySelector(sel);
+
+function sortedShows() {
+  const list = state.filter === 'all'
+    ? state.shows.slice()
+    : state.shows.filter(s => s.status === state.filter);
+  const far = '9999-12-31';
+  if (state.sort === 'rating') {
+    list.sort((a, b) => (b.rating - a.rating) || (a.startDate || far).localeCompare(b.startDate || far));
+  } else if (state.sort === 'deadline') {
+    list.sort((a, b) => (a.applyBy || far).localeCompare(b.applyBy || far) ||
+                        (a.startDate || far).localeCompare(b.startDate || far));
+  } else {
+    list.sort((a, b) => (a.startDate || far).localeCompare(b.startDate || far) ||
+                        a.routeNumber.localeCompare(b.routeNumber, undefined, { numeric: true }));
+  }
+  return list;
+}
+
+/* ==========================================================================
+   7. RENDER
+   ========================================================================== */
+function renderFilters() {
+  const counts = { all: state.shows.length };
+  STATUSES.forEach(s => { counts[s.value] = state.shows.filter(x => x.status === s.value).length; });
+  const items = [{ value:'all', label:'All' }].concat(STATUSES);
+  $('#statusFilters').innerHTML = items.map(it =>
+    '<button type="button" class="chip" data-filter="' + it.value + '" aria-pressed="' +
+    (state.filter === it.value) + '">' + esc(it.label) + ' ' + (counts[it.value] || 0) + '</button>'
+  ).join('');
+}
+
+function renderList() {
+  const list = sortedShows();
+  const host = $('#showList');
+  if (!list.length) {
+    host.innerHTML = '<p class="empty">' + (state.shows.length
+      ? 'No shows with that status.'
+      : 'No shows yet. Add your first one, or import a JSON backup.') + '</p>';
+    $('#listNote').textContent = '';
+    return;
+  }
+  host.innerHTML = list.map(s => {
+    const dl = daysUntil(s.applyBy);
+    let dlClass = 'meta', dlText = '—';
+    if (s.applyBy) {
+      dlText = fmtDay(s.applyBy);
+      if (dl < 0) { dlClass = 'meta due-past'; dlText = 'closed'; }
+      else if (dl <= 14) { dlClass = 'meta due-soon'; dlText = fmtDay(s.applyBy) + ' · ' + fmtCountdown(dl); }
+    }
+    return '<button type="button" class="show-row row-grid" data-id="' + esc(s.id) + '">' +
+      '<span class="num' + (s.isAlternate ? ' alt' : '') + '">' + esc(s.routeNumber || '–') + '</span>' +
+      '<span><span class="name">' + esc(s.name || 'Untitled show') + '</span>' +
+        '<span class="place" style="display:block;">' + esc(place(s)) + '</span></span>' +
+      '<span class="meta r-dates">' + esc(fmtRange(s.startDate, s.endDate)) + '</span>' +
+      '<span class="' + dlClass + ' r-deadline">' + esc(dlText) + '</span>' +
+      '<span class="r-status"><span class="pill" data-status="' + esc(s.status) + '">' +
+        esc(STATUS_LABEL[s.status]) + '</span></span>' +
+      '<span class="r-rating" style="color:' + (s.rating ? 'var(--ink)' : 'var(--muted)') + '" ' +
+        'title="' + ratingText(s.rating) + '">' + starsSVG(s.rating, 13) +
+        '<span class="sr">' + ratingText(s.rating) + '</span></span>' +
+      '</button>';
+  }).join('');
+  $('#listNote').textContent = list.length + ' of ' + state.shows.length +
+    ' shows · click a row to edit · stop numbers set the route order';
+}
+
+function renderDeadlines() {
+  const upcoming = state.shows
+    .filter(s => s.applyBy && daysUntil(s.applyBy) >= 0)
+    .sort((a, b) => a.applyBy.localeCompare(b.applyBy))
+    .slice(0, 5);
+  const host = $('#deadlinePanel');
+  if (!upcoming.length) { host.innerHTML = '<p class="hint" style="margin:0;">No open deadlines.</p>'; return; }
+  host.innerHTML = upcoming.map(s => {
+    const n = daysUntil(s.applyBy);
+    const cls = n <= 3 ? 'd-critical' : n <= 14 ? 'd-soon' : 'd-ok';
+    return '<div class="deadline-row"><span class="d-name">' + esc(s.name) +
+      (s.status === 'applied' || s.status === 'accepted'
+        ? ' <span class="hint" style="margin:0;">· ' + esc(STATUS_LABEL[s.status]) + '</span>' : '') +
+      '</span><span class="d-when ' + cls + '">' + esc(fmtDay(s.applyBy)) + ' · ' +
+      esc(fmtCountdown(n)) + '</span></div>';
+  }).join('');
+}
+
+function renderStats() {
+  const rated = state.shows.filter(s => s.rating > 0);
+  const avg = rated.length ? (rated.reduce((t, s) => t + s.rating, 0) / rated.length).toFixed(1) : '—';
+  const fees = state.shows.reduce((t, s) => t + (s.juryFee || 0) + (s.boothFee || 0), 0);
+  const cells = [
+    ['Shows', state.shows.length],
+    ['Accepted', state.shows.filter(s => s.status === 'accepted').length],
+    ['Avg rating', avg],
+    ['Fees', '$' + fees.toLocaleString()]
+  ];
+  $('#statPanel').innerHTML = cells.map(([k, n]) =>
+    '<div class="stat"><div class="n">' + esc(n) + '</div><div class="k">' + esc(k) + '</div></div>').join('');
+}
+
+function render() { renderFilters(); renderList(); renderDeadlines(); renderStats(); }
+
+/* ==========================================================================
+   8. TOAST (with undo)
+   ========================================================================== */
+let toastTimer = null;
+function toast(msg, actionLabel, onAction, ms = 8000) {
+  clearTimeout(toastTimer);
+  $('#toastMsg').textContent = msg;
+  const act = $('#toastAct');
+  act.hidden = !actionLabel;
+  act.textContent = actionLabel || '';
+  act.onclick = () => { hideToast(); if (onAction) onAction(); };
+  $('#toast').hidden = false;
+  toastTimer = setTimeout(hideToast, ms);
+}
+function hideToast() { clearTimeout(toastTimer); $('#toast').hidden = true; }
+
+/* ==========================================================================
+   9. DRAWER — add / edit
+   ========================================================================== */
+const FIELDS = ['name','city','state','startDate','endDate','applyBy','status','routeNumber',
+                'juryFee','boothFee','lat','lng','url','notes'];
+let draftRating = 0;
+let notesTimer = null;
+let lastFocus = null;
+
+function fillStatusSelect() {
+  $('#f_status').innerHTML = STATUSES.map(s =>
+    '<option value="' + s.value + '">' + esc(s.label) + '</option>').join('');
+}
+
+function setRating(r, { silent = false } = {}) {
+  draftRating = clampRating(r);
+  const track = $('#ratingTrack');
+  track.innerHTML = starsSVG(draftRating, 26);
+  track.style.color = draftRating ? 'var(--ink)' : 'var(--muted)';
+  track.setAttribute('aria-valuenow', String(draftRating));
+  track.setAttribute('aria-valuetext', ratingText(draftRating));
+  $('#ratingValue').textContent = ratingText(draftRating);
+  if (!silent) queueAutosave();
+}
+
+function clearErrors() {
+  FIELDS.forEach(f => {
+    const e = document.getElementById('e_' + f);
+    if (e) { e.hidden = true; e.textContent = ''; }
+    const i = document.getElementById('f_' + f);
+    if (i) i.removeAttribute('aria-invalid');
+  });
+}
+function showError(field, msg) {
+  const e = document.getElementById('e_' + field);
+  if (e) { e.textContent = msg; e.hidden = false; }
+  const i = document.getElementById('f_' + field);
+  if (i) i.setAttribute('aria-invalid', 'true');
+}
+
+function openDrawer(show) {
+  lastFocus = document.activeElement;
+  state.editingId = show ? show.id : null;
+  const s = show || makeShow({});
+  clearErrors();
+  $('#drawerTitle').textContent = show ? 'Edit show' : 'Add show';
+  $('#f_name').value = s.name;
+  $('#f_city').value = s.city;
+  $('#f_state').value = s.state;
+  $('#f_startDate').value = s.startDate;
+  $('#f_endDate').value = s.endDate;
+  $('#f_applyBy').value = s.applyBy;
+  $('#f_status').value = s.status;
+  $('#f_routeNumber').value = s.routeNumber;
+  $('#f_isAlternate').checked = s.isAlternate;
+  $('#f_juryFee').value = s.juryFee === null ? '' : s.juryFee;
+  $('#f_boothFee').value = s.boothFee === null ? '' : s.boothFee;
+  $('#f_lat').value = s.lat === null ? '' : s.lat;
+  $('#f_lng').value = s.lng === null ? '' : s.lng;
+  $('#f_url').value = s.url;
+  $('#f_notes').value = s.notes;
+  setRating(s.rating, { silent: true });
+  $('#btnDelete').hidden = !show;
+  $('#notesHint').textContent = show ? 'Autosaved.' : 'Saved when you save the show.';
+  $('#metaHint').textContent = show
+    ? 'Source: ' + s.source + ' · updated ' + new Date(s.updatedAt).toLocaleString()
+    : '';
+  $('#overlay').hidden = false;
+  $('#drawer').hidden = false;
+  $('#f_name').focus();
+}
+
+function closeDrawer() {
+  clearTimeout(notesTimer);
+  state.editingId = null;
+  $('#drawer').hidden = true;
+  $('#overlay').hidden = true;
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+
+/** Reads the form into a Show, or returns null and paints the errors. */
+function collect() {
+  clearErrors();
+  const v = id => document.getElementById('f_' + id).value.trim();
+  let ok = true;
+  const name = v('name');
+  if (!name) { showError('name', 'A show needs a name.'); ok = false; }
+
+  const startDate = v('startDate'), endDate = v('endDate'), applyBy = v('applyBy');
+  if (!startDate) { showError('startDate', 'A start date is required.'); ok = false; }
+  else if (!parseISO(startDate)) { showError('startDate', 'Use a real date.'); ok = false; }
+  if (endDate && !parseISO(endDate)) { showError('endDate', 'Use a real date.'); ok = false; }
+  else if (endDate && startDate && endDate < startDate) {
+    showError('endDate', 'End date is before the start date.'); ok = false;
+  }
+  if (applyBy && !parseISO(applyBy)) { showError('applyBy', 'Use a real date.'); ok = false; }
+  else if (applyBy && startDate && applyBy > startDate) {
+    showError('applyBy', 'Apply-by falls after the show starts.'); ok = false;
+  }
+
+  const nums = { juryFee: v('juryFee'), boothFee: v('boothFee'), lat: v('lat'), lng: v('lng') };
+  for (const [k, raw] of Object.entries(nums)) {
+    if (raw === '') continue;
+    const n = Number(raw);
+    if (!Number.isFinite(n)) { showError(k, 'Numbers only.'); ok = false; continue; }
+    if ((k === 'juryFee' || k === 'boothFee') && n < 0) { showError(k, 'Cannot be negative.'); ok = false; }
+    if (k === 'lat' && Math.abs(n) > 90) { showError('lat', 'Latitude runs −90 to 90.'); ok = false; }
+    if (k === 'lng' && Math.abs(n) > 180) { showError('lng', 'Longitude runs −180 to 180.'); ok = false; }
+  }
+  const url = v('url');
+  if (url && !/^https?:\/\/\S+$/i.test(url)) { showError('url', 'Start with http:// or https://'); ok = false; }
+  if (!ok) return null;
+
+  const existing = state.shows.find(s => s.id === state.editingId);
+  return makeShow({
+    ...(existing || {}),
+    id: state.editingId || undefined,
+    name, city: v('city'), state: v('state').toUpperCase(),
+    lat: nums.lat, lng: nums.lng,
+    startDate, endDate, applyBy,
+    status: $('#f_status').value,
+    rating: draftRating,
+    juryFee: nums.juryFee, boothFee: nums.boothFee,
+    routeNumber: v('routeNumber'),
+    isAlternate: $('#f_isAlternate').checked,
+    notes: $('#f_notes').value,
+    url,
+    source: existing ? existing.source : 'manual'
+  });
+}
+
+async function refresh() { state.shows = await Store.list(); render(); }
+
+async function saveShow() {
+  const rec = collect();
+  if (!rec) return;
+  const isNew = !state.editingId;
+  await Store.upsert(rec);
+  await refresh();
+  closeDrawer();
+  toast(isNew ? 'Show added.' : 'Changes saved.', null, null, 2600);
+}
+
+/** Autosave for the fields that should not need a Save click on an existing show. */
+function queueAutosave() {
+  if (!state.editingId) return;
+  clearTimeout(notesTimer);
+  notesTimer = setTimeout(async () => {
+    const existing = state.shows.find(s => s.id === state.editingId);
+    if (!existing) return;
+    await Store.upsert({ ...existing, notes: $('#f_notes').value, rating: draftRating });
+    await refresh();
+    $('#notesHint').textContent = 'Autosaved ' + new Date().toLocaleTimeString() + '.';
+  }, 600);
+}
+
+async function deleteShow() {
+  const id = state.editingId;
+  if (!id) return;
+  const gone = await Store.remove(id);
+  if (!gone) return;
+  state.lastDeleted = gone;
+  await refresh();
+  closeDrawer();
+  toast('Deleted "' + gone.name + '".', 'Undo', async () => {
+    await Store.upsert(state.lastDeleted);
+    state.lastDeleted = null;
+    await refresh();
+    toast('Restored.', null, null, 2200);
+  });
+}
+
+/* ==========================================================================
+   10. EXPORT / IMPORT
+   ========================================================================== */
+function exportJSON() {
+  const payload = { schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), shows: state.shows };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'show-ledger-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function importJSON(file) {
+  let parsed;
+  try { parsed = JSON.parse(await file.text()); }
+  catch (_) { toast('That file is not valid JSON.'); return; }
+  const rows = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.shows) ? parsed.shows : null);
+  if (!rows) { toast('No shows found in that file.'); return; }
+  if (!confirm('Replace all ' + state.shows.length + ' shows with the ' + rows.length + ' in this file?')) return;
+  const previous = state.shows.slice();
+  await Store.replaceAll(rows);
+  await refresh();
+  toast('Imported ' + rows.length + ' shows.', 'Undo', async () => {
+    await Store.replaceAll(previous);
+    await refresh();
+  });
+}
+
+/* ==========================================================================
+   11. THEME
+   ========================================================================== */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  $('#iconSun').hidden = theme === 'dark';
+  $('#iconMoon').hidden = theme !== 'dark';
+  $('#btnTheme').setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem(THEME_KEY); } catch (_) {}
+  const system = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  applyTheme(saved === 'dark' || saved === 'light' ? saved : system);
+}
+
+/* ==========================================================================
+   12. EVENTS
+   ========================================================================== */
+$('#btnAdd').addEventListener('click', () => openDrawer(null));
+$('#btnCloseDrawer').addEventListener('click', closeDrawer);
+$('#btnCancel').addEventListener('click', closeDrawer);
+$('#overlay').addEventListener('click', closeDrawer);
+$('#btnSave').addEventListener('click', saveShow);
+$('#btnDelete').addEventListener('click', deleteShow);
+$('#showForm').addEventListener('submit', e => { e.preventDefault(); saveShow(); });
+
+$('#showList').addEventListener('click', e => {
+  const row = e.target.closest('.show-row');
+  if (!row) return;
+  const show = state.shows.find(s => s.id === row.dataset.id);
+  if (show) openDrawer(show);
+});
+
+$('#statusFilters').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  state.filter = chip.dataset.filter;
+  render();
+});
+
+$('#sortBy').addEventListener('change', e => { state.sort = e.target.value; renderList(); });
+$('#f_notes').addEventListener('input', queueAutosave);
+
+/* Rating: pointer over the track picks a half-star; arrows work without a mouse. */
+const track = $('#ratingTrack');
+function ratingFromEvent(e) {
+  const box = track.getBoundingClientRect();
+  const pct = (e.clientX - box.left) / box.width;
+  return Math.max(1, Math.min(10, Math.ceil(pct * 10)));
+}
+track.addEventListener('click', e => setRating(ratingFromEvent(e)));
+track.addEventListener('keydown', e => {
+  const k = e.key;
+  if (k === 'ArrowRight' || k === 'ArrowUp') { setRating(draftRating + 1); e.preventDefault(); }
+  else if (k === 'ArrowLeft' || k === 'ArrowDown') { setRating(Math.max(0, draftRating - 1)); e.preventDefault(); }
+  else if (k === 'Home') { setRating(0); e.preventDefault(); }
+  else if (k === 'End') { setRating(10); e.preventDefault(); }
+  else if (k === 'Delete' || k === 'Backspace') { setRating(0); e.preventDefault(); }
+  else if (/^[0-9]$/.test(k)) { setRating(k === '0' ? 10 : Number(k)); e.preventDefault(); }
+});
+$('#btnClearRating').addEventListener('click', () => { setRating(0); track.focus(); });
+
+$('#btnExport').addEventListener('click', exportJSON);
+$('#btnImport').addEventListener('click', () => $('#fileImport').click());
+$('#fileImport').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if (f) importJSON(f);
+  e.target.value = '';
+});
+
+$('#btnTheme').addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
+  if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey &&
+      $('#drawer').hidden && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
+    e.preventDefault(); openDrawer(null);
+  }
+});
+
+/* Keep focus inside the drawer while it is open. */
+$('#drawer').addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  const items = $('#drawer').querySelectorAll(
+    'button:not([hidden]), input:not([hidden]), select, textarea, [tabindex="0"]');
+  const list = Array.from(items).filter(el => el.offsetParent !== null);
+  if (!list.length) return;
+  const first = list[0], last = list[list.length - 1];
+  if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+  else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+});
+
+/* ==========================================================================
+   13. BOOT
+   ========================================================================== */
+initTheme();
+fillStatusSelect();
+setRating(0, { silent: true });
+refresh().catch(err => {
+  console.error(err);
+  toast('Could not load saved shows.');
+});
+</script>
+</body>
+</html>
