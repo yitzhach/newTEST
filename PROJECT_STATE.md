@@ -7,6 +7,16 @@ A tracker for Isaac Anderson's art show season: upcoming shows, a route map
 in date order, and easy add/edit. Later: pull shows from Zapplication,
 deadline tracking, and travel (lodging/rentals/flights) tie-ins.
 
+## Branches
+One line of history again, on **`claude/artist-show-tracker-5pavpl`**.
+Phases 4 and 5 were built on branches stacked off it
+(`claude/art-show-tracker-phase-4-38h09w`, then
+`claude/art-show-tracker-phase-5-u99p8m`). Because the stack was strictly
+linear — each branch was the one below it plus its own commit, with no
+divergence — consolidating on 2026-09-03 was a fast-forward, not a merge:
+no merge commits, and every phase commit kept intact. The two phase branches
+are now redundant and can be deleted whenever you like.
+
 ## Where things stand
 - **Design concepts (done).** Three homepage directions on a canvas:
   https://claude.ai/code/artifact/f9a1a8a5-ba14-4dcd-a1f7-ff06b18f0121
@@ -396,11 +406,30 @@ failure handling are all verified; what is not is that
 `nominatim.openstreetmap.org` returns what is expected for these particular
 city names. Run one import on a real connection to confirm.
 
-**Montserrat has never loaded here** — Google Fonts is blocked from the build
-sandbox — so every card in these checks was drawn in the fallback stack. The
-wait-for-the-webfont path and its fallback message are verified; what is not
-is how the card looks in the real typeface. Open the panel on a real
-connection and download one card.
+**Montserrat now verified (2026-09-03).** Google Fonts had been blocked from
+the build sandbox; `fonts.googleapis.com` and `fonts.gstatic.com` are now
+reachable, so the real webfont was fetched and the card was drawn in it at
+last — square and story, light and dark. It looks right: the wide-tracked
+kicker, the light-weight display name and the hairline all read as intended.
+
+Getting there exposed a real bug, now fixed. `ensureFonts()` decided whether
+the webfont had arrived with `document.fonts.check('400 100px Montserrat')`,
+**which is always true.** Per the CSS Font Loading spec `check()` reports
+whether the text could be rendered *at all*, and an unmatched family simply
+resolves down the fallback stack — so it returns true for a family that is
+entirely absent, on a blank page with no `@font-face` rule anywhere. (Checked
+directly: it returns true for a randomly generated family name.) The card was
+therefore drawing in Helvetica while reporting that Montserrat was in, and the
+"Montserrat did not load" message in the share panel could never fire — the
+one safeguard this was supposed to have.
+
+`ensureFonts()` now measures instead: it draws a mixed-glyph probe in
+Montserrat and in a family guaranteed not to exist, over each of the three
+generic tails (`serif`, `sans-serif`, `monospace`), and calls the font present
+only when it displaces all three. Verified in both directions against the real
+woff2 — served, `ensureFonts()` is true and the panel shows no warning;
+blocked, it is false and the warning appears. The old code returned true in
+both cases.
 
 Phase 3 has never touched a **real** Supabase project — only a mock
 implementing the same endpoints. Before trusting it: create a project, run
@@ -414,10 +443,17 @@ written.
 All five phases in `docs/BUILD_PROMPT.md` are built. What is left is real-data
 and real-service work, not new phases:
 
-- **Backfill stops 8-12** (through Apr 18). The CSV import exists: save the
-  xlsx's Application Calendar tab as CSV, open **Import shows → CSV file**,
-  map the columns, and commit. This is the first thing to do with Phase 4 on
-  real data, and the share card is thin until it is done.
+- **Backfill stops 8-12** (through Apr 18) — *still the first thing to do, and
+  still blocked on the source file.* The CSV import exists: save the xlsx's
+  Application Calendar tab as CSV, open **Import shows → CSV file**, map the
+  columns, and commit. Attempted 2026-09-03 and could not be started:
+  `Isaac_Anderson_2027_Art_Show_Application_Calendar.xlsx` is not in the repo
+  and was not available to the session, and stops 8-12 exist nowhere in the
+  repo either (`tracker/core.js` seeds 1-7 and says so). The data cannot be
+  reconstructed — inventing show names, dates, deadlines and fees would put
+  fiction into the source of truth. **Attach the xlsx (or a CSV of the
+  Application Calendar tab) and this is a ten-minute job.** The share card is
+  thin until it is done: it currently shows six stops ending Feb 6.
 - **Point Phase 3 at a real Supabase project** and sign in on two devices —
   see the caveat under Verified. Two things only a real project can confirm:
   the magic-link redirect URL is allow-listed (Authentication → URL
@@ -426,9 +462,16 @@ and real-service work, not new phases:
   expected for these city names — see the caveat under Verified.
 - **Open the map on a real connection** to confirm OpenStreetMap tiles paint;
   neither cdnjs nor the tile host is reachable from the build sandbox.
-- **Add verified Subresource Integrity hashes** to the two Leaflet tags.
-- **Look at one share card with Montserrat actually loaded** — every card
-  drawn here used the fallback typeface.
+- **Add verified Subresource Integrity hashes** to the two Leaflet tags. Still
+  blocked as of 2026-09-03: `cdnjs.cloudflare.com`, `api.cdnjs.com` (which
+  serves the official hashes), jsDelivr and unpkg are all refused by the
+  sandbox gateway, so no hash can be computed against the bytes cdnjs will
+  actually serve. Deliberately not guessed from the npm tarball — a wrong SRI
+  hash does not degrade, it stops Leaflet loading altogether, and the map
+  works today.
+- ~~Look at one share card with Montserrat actually loaded~~ — **done
+  2026-09-03**, and it turned up a bug in the webfont detection that is now
+  fixed. See "Montserrat now verified" under Verified.
 - **Publish the embed**: paste the self-contained snippet into
   isaacandersonart.com, or upload `embed.html`, `core.js`, `share.js` and
   `shows.json` and use the iframe snippet.

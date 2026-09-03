@@ -150,6 +150,45 @@ window.ASTShare = (function () {
 
   var FAMILY = '"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
+  /* A string with enough varied glyphs that two different typefaces are
+     vanishingly unlikely to measure the same. */
+  var FONT_PROBE = 'Isaac Anderson 2027 HAMBURGEFONSTIV whqx';
+
+  /**
+   * Is Montserrat actually available to canvas, or are we on the fallback?
+   *
+   * `document.fonts.check()` cannot answer this. Per the CSS Font Loading
+   * spec it reports whether the text could be rendered *at all*, and an
+   * unmatched family just resolves down the fallback stack — so it returns
+   * true for a family that is entirely absent, even on a blank page with no
+   * @font-face rule anywhere. (Verified: it returns true for a randomly
+   * generated family name.) Trusting it meant the card silently drew in
+   * Helvetica while reporting that the webfont was in.
+   *
+   * Measuring is the reliable test: draw the probe in Montserrat and in a
+   * family that certainly does not exist, over the same generic tail. If
+   * Montserrat is missing both fall to that generic and measure identically.
+   * All three generics must shift, so a face whose metrics happen to match
+   * one of them cannot produce a false positive.
+   */
+  function montserratIsLoaded() {
+    try {
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext && canvas.getContext('2d');
+      if (!ctx || !ctx.measureText) return false;
+      var sentinel = '"ASTAbsentFace' + Math.random().toString(36).slice(2) + '"';
+      var generics = ['serif', 'sans-serif', 'monospace'];
+      for (var i = 0; i < generics.length; i++) {
+        ctx.font = '400 100px ' + sentinel + ', ' + generics[i];
+        var fallbackWidth = ctx.measureText(FONT_PROBE).width;
+        ctx.font = '400 100px "Montserrat", ' + generics[i];
+        var montserratWidth = ctx.measureText(FONT_PROBE).width;
+        if (Math.abs(montserratWidth - fallbackWidth) <= 0.5) return false;
+      }
+      return true;
+    } catch (_) { return false; }
+  }
+
   /**
    * Montserrat is a webfont; canvas will silently fall back to Helvetica if
    * it is asked to draw before the face has loaded. Await this first.
@@ -161,10 +200,8 @@ window.ASTShare = (function () {
     var faces = ['300 100px Montserrat', '400 100px Montserrat', '600 100px Montserrat'];
     return Promise.all(faces.map(function (f) {
       return document.fonts.load(f).catch(function () { return []; });
-    })).then(function () {
-      try { return document.fonts.check('400 100px Montserrat'); }
-      catch (_) { return false; }
-    });
+    })).then(function () { return montserratIsLoaded(); },
+             function () { return false; });
   }
 
   function font(weight, px) { return weight + ' ' + px + 'px ' + FAMILY; }
