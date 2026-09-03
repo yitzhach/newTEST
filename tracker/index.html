@@ -7,226 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<style>
-/* ==========================================================================
-   TOKENS
-   ========================================================================== */
-:root {
-  --bg:#ffffff; --surface:#fafaf9; --ink:#171717; --muted:#737373;
-  --line:#e5e5e5; --accent:#2f5d4f; --accent-ink:#ffffff;
-  --s-applied:#6366f1; --s-accepted:#2f5d4f; --s-waitlist:#b45309;
-  --s-declined:#737373; --s-interested:#0f766e; --s-not_applying:#a3a3a3;
-  --danger:#b42318; --warn:#b45309;
-  --font:"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --shadow:0 10px 40px rgba(0,0,0,.12);
-}
-html[data-theme="dark"] {
-  --bg:#0f0f0f; --surface:#171717; --ink:#f5f5f4; --muted:#a3a3a3;
-  --line:#262626; --accent:#7fb09c; --accent-ink:#0f0f0f;
-  --s-applied:#818cf8; --s-accepted:#7fb09c; --s-waitlist:#d97706;
-  --s-declined:#a3a3a3; --s-interested:#2dd4bf; --s-not_applying:#525252;
-  --danger:#f87171; --warn:#fbbf24;
-  --shadow:0 10px 40px rgba(0,0,0,.6);
-}
-* { box-sizing:border-box; }
-html, body { height:100%; }
-body {
-  margin:0; background:var(--bg); color:var(--ink); font-family:var(--font);
-  font-weight:300; font-size:15px; line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-}
-button, input, select, textarea { font:inherit; color:inherit; }
-button { background:none; border:none; cursor:pointer; }
-a { color:var(--accent); }
-:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-.label {
-  font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
-  color:var(--muted);
-}
-.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
-
-/* ==========================================================================
-   HEADER
-   ========================================================================== */
-.app-header {
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
-  padding:22px 32px; border-bottom:1px solid var(--line); flex-wrap:wrap;
-}
-.brand { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
-.brand h1 {
-  margin:0; font-size:15px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
-}
-.brand .sub { font-size:11px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
-.header-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.btn {
-  display:inline-flex; align-items:center; gap:8px; justify-content:center;
-  min-height:44px; padding:0 16px; border:1px solid var(--line); background:var(--bg);
-  font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
-}
-.btn:hover { border-color:var(--ink); }
-.btn-primary { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
-.btn-primary:hover { filter:brightness(1.08); border-color:var(--accent); }
-.btn-quiet { border-color:transparent; color:var(--muted); }
-.btn-quiet:hover { color:var(--ink); border-color:var(--line); }
-.btn-danger { color:var(--danger); }
-.btn-icon { width:44px; min-height:44px; padding:0; border-color:transparent; }
-.btn-icon:hover { border-color:var(--line); }
-svg { display:block; }
-
-/* ==========================================================================
-   LAYOUT
-   ========================================================================== */
-.main { display:grid; grid-template-columns:minmax(0,1fr) 392px; align-items:start; }
-.ledger { padding:18px 8px 64px 32px; min-width:0; }
-.rail {
-  border-left:1px solid var(--line); background:var(--surface);
-  padding:18px 32px 64px 26px; min-height:calc(100vh - 88px);
-}
-@media (max-width:1023px) {
-  .main { grid-template-columns:minmax(0,1fr); }
-  .ledger { padding:18px 24px 32px; }
-  .rail { border-left:none; border-top:1px solid var(--line); padding:24px; min-height:0; }
-}
-@media (max-width:767px) {
-  .app-header { padding:16px; }
-  .ledger { padding:12px 16px 32px; }
-  .rail { padding:20px 16px 48px; }
-}
-
-/* ==========================================================================
-   TOOLBAR
-   ========================================================================== */
-.toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 0 14px; }
-.chips { display:flex; gap:6px; flex-wrap:wrap; }
-.chip {
-  min-height:36px; padding:0 12px; border:1px solid var(--line); background:var(--bg);
-  font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
-}
-.chip[aria-pressed="true"] { border-color:var(--ink); color:var(--ink); font-weight:600; }
-.spacer { flex:1 1 auto; }
-.field-inline { display:flex; align-items:center; gap:8px; }
-select.control, input.control, textarea.control {
-  background:var(--bg); border:1px solid var(--line); color:var(--ink);
-  padding:10px 12px; min-height:44px; width:100%; border-radius:0;
-}
-textarea.control { min-height:110px; resize:vertical; line-height:1.6; }
-.control:hover { border-color:var(--muted); }
-
-/* ==========================================================================
-   SHOW LIST
-   ========================================================================== */
-.row-grid {
-  display:grid; grid-template-columns:52px minmax(0,1fr) 148px 116px 104px 116px;
-  gap:0 14px; align-items:baseline;
-}
-.list-head { padding:10px 0 8px; border-bottom:1px solid var(--line); }
-.list-head > div { font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
-.show-row {
-  width:100%; text-align:left; padding:14px 0; border-bottom:1px solid var(--line);
-  background:none; cursor:pointer;
-}
-.show-row:hover { background:var(--surface); }
-.show-row .num { font-size:12px; font-weight:600; letter-spacing:.08em; color:var(--accent); }
-.show-row .num.alt { color:var(--warn); }
-.show-row .name { font-size:15px; font-weight:400; }
-.show-row .place { font-size:12px; color:var(--muted); margin-top:2px; }
-.show-row .meta { font-size:12px; color:var(--muted); letter-spacing:.04em; }
-.show-row .meta.due-soon { color:var(--warn); font-weight:600; }
-.show-row .meta.due-past { color:var(--muted); opacity:.6; }
-.pill {
-  display:inline-block; font-size:10px; font-weight:600; letter-spacing:.12em;
-  text-transform:uppercase; padding:4px 9px; border:1px solid currentColor; white-space:nowrap;
-}
-.pill[data-status="applied"] { color:var(--s-applied); }
-.pill[data-status="accepted"] { color:var(--s-accepted); }
-.pill[data-status="waitlist"] { color:var(--s-waitlist); }
-.pill[data-status="declined"] { color:var(--s-declined); }
-.pill[data-status="interested"] { color:var(--s-interested); }
-.pill[data-status="not_applying"] { color:var(--s-not_applying); }
-.empty { padding:48px 0; color:var(--muted); font-size:14px; }
-.list-note { padding:14px 0 0; font-size:12px; color:var(--muted); }
-@media (max-width:767px) {
-  .list-head { display:none; }
-  .row-grid { grid-template-columns:44px minmax(0,1fr); gap:2px 12px; }
-  .show-row .r-dates { grid-column:2; }
-  .show-row .r-deadline { grid-column:2; }
-  .show-row .r-status { grid-column:2; margin-top:6px; }
-  .show-row .r-rating { grid-column:2; margin-top:4px; }
-}
-
-/* ==========================================================================
-   RATING
-   ========================================================================== */
-.stars { display:inline-flex; align-items:center; gap:2px; }
-.rating-control { display:inline-flex; align-items:center; gap:10px; min-height:44px; }
-.rating-track { display:inline-flex; gap:2px; cursor:pointer; padding:4px 0; }
-.rating-value { font-size:11px; letter-spacing:.12em; color:var(--muted); min-width:56px; }
-
-/* ==========================================================================
-   RAIL PANELS
-   ========================================================================== */
-.panel + .panel { margin-top:32px; }
-.panel h2 { margin:0 0 10px; font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
-.deadline-row {
-  display:flex; justify-content:space-between; align-items:baseline; gap:12px;
-  padding:11px 0; border-bottom:1px solid var(--line);
-}
-.deadline-row .d-name { font-size:13px; }
-.deadline-row .d-when { font-size:11px; letter-spacing:.08em; text-align:right; white-space:nowrap; }
-.d-critical { color:var(--danger); font-weight:600; }
-.d-soon { color:var(--warn); font-weight:600; }
-.d-ok { color:var(--muted); }
-.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px 12px; }
-.stat .n { font-size:22px; font-weight:300; }
-.stat .k { font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
-
-/* ==========================================================================
-   DRAWER
-   ========================================================================== */
-.overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,.35); border:none; padding:0; margin:0;
-  z-index:40;
-}
-html[data-theme="dark"] .overlay { background:rgba(0,0,0,.6); }
-.drawer {
-  position:fixed; top:0; right:0; bottom:0; width:min(460px,100vw); z-index:50;
-  background:var(--bg); border-left:1px solid var(--line); box-shadow:var(--shadow);
-  display:flex; flex-direction:column;
-}
-.drawer-head {
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  padding:18px 20px; border-bottom:1px solid var(--line);
-}
-.drawer-head h2 { margin:0; font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; }
-.drawer-body { flex:1; overflow-y:auto; padding:20px; }
-.drawer-foot {
-  display:flex; gap:8px; align-items:center; padding:16px 20px; border-top:1px solid var(--line);
-}
-.form-row { margin-bottom:18px; }
-.form-row > .label { display:block; margin-bottom:6px; }
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
-.check { display:flex; align-items:center; gap:10px; min-height:44px; }
-.check input { width:18px; height:18px; accent-color:var(--accent); }
-.err { color:var(--danger); font-size:12px; margin-top:6px; }
-.hint { color:var(--muted); font-size:12px; margin-top:6px; }
-.control[aria-invalid="true"] { border-color:var(--danger); }
-@media (max-width:767px) { .drawer { width:100vw; border-left:none; } .grid-2 { grid-template-columns:1fr; } }
-
-/* ==========================================================================
-   TOAST
-   ========================================================================== */
-.toast {
-  position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:60;
-  display:flex; align-items:center; gap:14px; padding:12px 12px 12px 18px;
-  background:var(--ink); color:var(--bg); box-shadow:var(--shadow); max-width:calc(100vw - 32px);
-}
-.toast .t-msg { font-size:13px; }
-.toast .t-act {
-  min-height:36px; padding:0 12px; border:1px solid currentColor;
-  font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
-}
-[hidden] { display:none !important; }
-</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+      referrerpolicy="no-referrer">
+<link rel="stylesheet" href="app.css">
 </head>
 <body>
 <!-- ==========================================================================
@@ -296,9 +79,27 @@ html[data-theme="dark"] .overlay { background:rgba(0,0,0,.6); }
       <div class="stat-grid" id="statPanel"></div>
     </section>
 
-    <section class="panel">
-      <h2>Route map</h2>
-      <p class="hint" style="margin:0;">Leaflet map with numbered markers lands in Phase&nbsp;2.</p>
+    <section class="panel map-panel">
+      <div class="panel-head">
+        <h2>Route map</h2>
+        <button class="btn-mini" id="btnMapToggle" type="button" hidden>Open map</button>
+      </div>
+      <div class="map-shell" id="mapShell">
+        <div class="map-sheet-head">
+          <span class="label">Route map</span>
+          <button class="btn-mini" id="btnMapClose" type="button">Close</button>
+        </div>
+        <div class="map-canvas" id="mapCanvas" role="application" aria-label="Route map"></div>
+      </div>
+      <div class="map-actions">
+        <a class="btn" id="btnGoogle" href="#" target="_blank" rel="noopener">Open route in Google Maps</a>
+        <a class="btn" id="btnApple" href="#" target="_blank" rel="noopener">Open in Apple Maps</a>
+      </div>
+      <ul class="leg-list" id="legList" hidden></ul>
+      <p class="map-note" id="mapNote"></p>
+      <div class="map-actions">
+        <a class="btn btn-quiet" href="map.html">Open full-page map</a>
+      </div>
     </section>
   </aside>
 </div>
@@ -438,221 +239,29 @@ html[data-theme="dark"] .overlay { background:rgba(0,0,0,.6); }
   <span class="t-msg" id="toastMsg"></span>
   <button class="t-act" id="toastAct" type="button" hidden></button>
 </div>
+<!-- Leaflet 1.9.4 from cdnjs, no API key. Pinned to an exact version; no
+     Subresource Integrity hash because cdnjs is unreachable from the build
+     sandbox and an unverified hash would break the map outright. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
+        referrerpolicy="no-referrer"></script>
+<script src="core.js"></script>
+<script src="map.js"></script>
 <script type="module">
 /* ==========================================================================
-   1. MODEL + CONSTANTS
+   1-5. SHARED CORE
+   The model, Store adapter, date helpers, rating glyphs and theme now live
+   in tracker/core.js, and the map in tracker/map.js, because tracker/map.html
+   runs on the same code. Both are classic scripts (see the note in core.js):
+   `type="module"` cannot be fetched over file://, and this app has to open by
+   double-click. Everything below is ledger-page-specific.
    ========================================================================== */
-const SCHEMA_VERSION = 1;
-const DB_KEY = 'artShowTracker.db';
-const THEME_KEY = 'artShowTracker.theme';
+const {
+  STATUSES, STATUS_LABEL, makeShow, clampRating, Store,
+  parseISO, daysUntil, fmtDay, fmtRange, fmtCountdown, esc, place,
+  starsSVG, ratingText, Theme
+} = window.AST;
 
-const STATUSES = [
-  { value:'interested',   label:'Interested' },
-  { value:'applied',      label:'Applied' },
-  { value:'accepted',     label:'Accepted' },
-  { value:'waitlist',     label:'Waitlist' },
-  { value:'declined',     label:'Declined' },
-  { value:'not_applying', label:'Not applying' }
-];
-const STATUS_LABEL = Object.fromEntries(STATUSES.map(s => [s.value, s.label]));
-
-function newId() {
-  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-  return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-}
-
-/** Every record that enters the app goes through here, so the shape is one thing. */
-function makeShow(input = {}) {
-  const now = new Date().toISOString();
-  return {
-    id: input.id || newId(),
-    name: input.name || '',
-    city: input.city || '',
-    state: input.state || '',
-    lat: numOrNull(input.lat),
-    lng: numOrNull(input.lng),
-    startDate: input.startDate || '',
-    endDate: input.endDate || '',
-    applyBy: input.applyBy || '',
-    status: STATUS_LABEL[input.status] ? input.status : 'interested',
-    rating: clampRating(input.rating),
-    juryFee: numOrNull(input.juryFee),
-    boothFee: numOrNull(input.boothFee),
-    routeNumber: input.routeNumber == null ? '' : String(input.routeNumber),
-    isAlternate: !!input.isAlternate,
-    notes: input.notes || '',
-    url: input.url || '',
-    source: ['manual','zapp_paste','csv'].includes(input.source) ? input.source : 'manual',
-    createdAt: input.createdAt || now,
-    updatedAt: input.updatedAt || now
-  };
-}
-function numOrNull(v) {
-  if (v === null || v === undefined || v === '') return null;
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
-function clampRating(v) {
-  const n = Math.round(Number(v));
-  if (!Number.isFinite(n) || n <= 0) return 0;
-  return Math.min(10, n);
-}
-
-/* ==========================================================================
-   2. SEED — Isaac's 2027 Florida season
-   Stops 1-7 as signed off in design/Main.dc.html. Later stops (8-12,
-   through Apr 18) are not in the repo docs yet; add them in the drawer.
-   ========================================================================== */
-const SEED = [
-  ['1',  "Naples New Year's Art Fair",        'Naples','FL',          26.1420,-81.7948,'2027-01-02','2027-01-03','',           'accepted',   false],
-  ['2a', 'Bonita Springs National — Show 1',  'Bonita Springs','FL',  26.3398,-81.7787,'2027-01-09','2027-01-10','2026-09-15','applied',    false],
-  ['2b', 'Las Olas Art Fair Part I',          'Fort Lauderdale','FL', 26.1224,-80.1373,'2027-01-09','2027-01-10','2026-10-01','not_applying',true],
-  ['3',  'Beaux Arts Festival of Art',        'Coral Gables','FL',    25.7215,-80.2684,'2027-01-16','2027-01-17','2026-09-30','applied',    false],
-  ['4',  'IMAGES: A Festival of the Arts',    'New Smyrna Beach','FL',29.0258,-80.9270,'2027-01-22','2027-01-24','2026-10-12','interested', false],
-  ['5',  'St. Armands Circle Art Festival',   'Sarasota','FL',        27.3206,-82.5760,'2027-01-30','2027-01-31','2026-11-03','interested', false],
-  ['6a', 'Boca Raton Museum Art Festival',    'Boca Raton','FL',      26.3683,-80.1289,'2027-02-06','2027-02-07','2026-09-23','waitlist',   false],
-  ['6b', 'ArtiGras Fine Arts Festival',       'Palm Beach Gardens','FL',26.8234,-80.1387,'2027-02-06','2027-02-07','2026-09-23','interested',true],
-  ['7',  'Coconut Grove Arts Festival',       'Coconut Grove, Miami','FL',25.7282,-80.2434,'2027-02-13','2027-02-15','2026-09-08','applied', false]
-].map(([routeNumber,name,city,state,lat,lng,startDate,endDate,applyBy,status,isAlternate]) =>
-  makeShow({ routeNumber,name,city,state,lat,lng,startDate,endDate,applyBy,status,isAlternate,source:'manual' })
-);
-
-/* ==========================================================================
-   3. STORE ADAPTER
-   Nothing outside this block touches storage. Phase 3 adds SupabaseStore
-   with the same async surface: list/get/upsert/remove/replaceAll.
-   ========================================================================== */
-function migrate(db) {
-  let d = db;
-  if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [] };
-  if (!Array.isArray(d.shows)) d.shows = [];
-  // v0 (pre-versioning: a bare array or no version) -> v1
-  if (!d.schemaVersion) d.schemaVersion = 1;
-  // Future: if (d.schemaVersion < 2) { ...; d.schemaVersion = 2; }
-  d.shows = d.shows.map(makeShow);
-  d.schemaVersion = SCHEMA_VERSION;
-  return d;
-}
-
-const LocalStore = (() => {
-  function read() {
-    let raw = null;
-    try { raw = localStorage.getItem(DB_KEY); } catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [] }; }
-    if (raw === null) return null;
-    let parsed;
-    try { parsed = JSON.parse(raw); } catch (_) { parsed = null; }
-    if (Array.isArray(parsed)) parsed = { shows: parsed };
-    return migrate(parsed);
-  }
-  function write(db) {
-    db.schemaVersion = SCHEMA_VERSION;
-    try { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-    catch (err) { toast('Could not save — storage is unavailable or full.'); throw err; }
-    return db;
-  }
-  function load() {
-    const db = read();
-    if (db) return db;
-    return write({ schemaVersion: SCHEMA_VERSION, shows: SEED });
-  }
-  return {
-    async list() { return load().shows.slice(); },
-    async get(id) { return load().shows.find(s => s.id === id) || null; },
-    async upsert(show) {
-      const db = load();
-      const rec = makeShow(show);
-      rec.updatedAt = new Date().toISOString();
-      const i = db.shows.findIndex(s => s.id === rec.id);
-      if (i === -1) db.shows.push(rec); else db.shows[i] = { ...db.shows[i], ...rec };
-      write(db);
-      return rec;
-    },
-    async remove(id) {
-      const db = load();
-      const i = db.shows.findIndex(s => s.id === id);
-      if (i === -1) return null;
-      const [gone] = db.shows.splice(i, 1);
-      write(db);
-      return gone;
-    },
-    async replaceAll(shows) {
-      const db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow) };
-      write(db);
-      return db.shows.slice();
-    }
-  };
-})();
-
-const Store = LocalStore;
-
-/* ==========================================================================
-   4. DATES + FORMATTING
-   ========================================================================== */
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
-
-function parseISO(s) {
-  if (!s || !ISO_RE.test(s)) return null;
-  const [y, m, d] = s.split('-').map(Number);
-  const dt = new Date(y, m - 1, d);
-  return (dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d) ? dt : null;
-}
-function today() { const t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
-function daysUntil(iso) {
-  const d = parseISO(iso);
-  if (!d) return null;
-  return Math.round((d - today()) / 86400000);
-}
-function fmtDay(iso) { const d = parseISO(iso); return d ? MONTHS[d.getMonth()] + ' ' + d.getDate() : ''; }
-function fmtRange(startISO, endISO) {
-  const a = parseISO(startISO), b = parseISO(endISO);
-  if (!a) return '—';
-  const year = a.getFullYear();
-  if (!b || +a === +b) return MONTHS[a.getMonth()] + ' ' + a.getDate() + ', ' + year;
-  if (a.getMonth() === b.getMonth()) {
-    return MONTHS[a.getMonth()] + ' ' + a.getDate() + '–' + b.getDate() + ', ' + year;
-  }
-  return MONTHS[a.getMonth()] + ' ' + a.getDate() + ' – ' + MONTHS[b.getMonth()] + ' ' + b.getDate() + ', ' + year;
-}
-function fmtCountdown(n) {
-  if (n === null) return '';
-  if (n < 0) return 'closed';
-  if (n === 0) return 'today';
-  if (n === 1) return '1 day';
-  return n + ' days';
-}
-function esc(s) {
-  return String(s === null || s === undefined ? '' : s)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-function place(show) {
-  const p = [show.city, show.state].filter(Boolean).join(', ');
-  return show.isAlternate ? (p ? p + ' — alternate' : 'alternate') : p;
-}
-
-/* ==========================================================================
-   5. RATING WIDGET
-   ========================================================================== */
-const STAR_PATH = 'M10 1.8l2.47 5.01 5.53.8-4 3.9.94 5.5L10 14.42l-4.94 2.6.94-5.5-4-3.9 5.53-.8z';
-let starUid = 0;
-
-/** rating is 0-10; each star is worth 2 (so 10 half-star steps). */
-function starsSVG(rating, size) {
-  const r = clampRating(rating);
-  let out = '';
-  for (let i = 0; i < 5; i++) {
-    const frac = Math.max(0, Math.min(2, r - i * 2)) / 2;
-    const id = 'star' + (++starUid);
-    out += '<svg width="' + size + '" height="' + size + '" viewBox="0 0 20 20" aria-hidden="true">' +
-      (frac > 0 ? '<defs><clipPath id="' + id + '"><rect x="0" y="0" width="' + (frac * 20) + '" height="20"/></clipPath></defs>' : '') +
-      '<path d="' + STAR_PATH + '" fill="none" stroke="currentColor" stroke-width="1.1" opacity="' + (frac > 0 ? '.85' : '.4') + '"/>' +
-      (frac > 0 ? '<path d="' + STAR_PATH + '" fill="currentColor" clip-path="url(#' + id + ')"/>' : '') +
-      '</svg>';
-  }
-  return '<span class="stars">' + out + '</span>';
-}
-function ratingText(r) { return r ? (r + ' / 10') : 'Unrated'; }
+window.AST.setNotifier(msg => toast(msg));
 
 /* ==========================================================================
    6. APP STATE
@@ -757,7 +366,7 @@ function renderStats() {
     '<div class="stat"><div class="n">' + esc(n) + '</div><div class="k">' + esc(k) + '</div></div>').join('');
 }
 
-function render() { renderFilters(); renderList(); renderDeadlines(); renderStats(); }
+function render() { renderFilters(); renderList(); renderDeadlines(); renderStats(); renderMap(); }
 
 /* ==========================================================================
    8. TOAST (with undo)
@@ -978,21 +587,115 @@ async function importJSON(file) {
   });
 }
 
+
 /* ==========================================================================
-   11. THEME
+   11. MAP — rail panel, two-way highlight, Google / Apple hand-off
+   All Leaflet work happens in tracker/map.js; this block only wires the
+   module to the ledger.
    ========================================================================== */
-function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
-  $('#iconSun').hidden = theme === 'dark';
-  $('#iconMoon').hidden = theme !== 'dark';
-  $('#btnTheme').setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+let routeMap = null;
+
+function ensureMap() {
+  if (routeMap) return routeMap;
+  if (!window.L || !window.ASTMap) return null;
+  routeMap = ASTMap.create({
+    el: $('#mapCanvas'),
+    onHover: id => highlightRow(id),
+    onSelect: id => {
+      const show = state.shows.find(s => s.id === id);
+      if (show) openDrawer(show);
+    }
+  });
+  return routeMap;
 }
-function initTheme() {
-  let saved = null;
-  try { saved = localStorage.getItem(THEME_KEY); } catch (_) {}
-  const system = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  applyTheme(saved === 'dark' || saved === 'light' ? saved : system);
+
+/** Marker hover/focus -> light the matching row. */
+function highlightRow(id) {
+  document.querySelectorAll('.show-row.is-hot').forEach(el => el.classList.remove('is-hot'));
+  if (!id) return;
+  const row = $('.show-row[data-id="' + CSS.escape(id) + '"]');
+  if (!row) return;                       // filtered out of the list right now
+  row.classList.add('is-hot');
+  row.scrollIntoView({ block: 'nearest' });
 }
+
+/** Row hover/focus -> light the matching marker and pan to it. */
+function hoverStop(id) {
+  if (!routeMap) return;
+  if (id) routeMap.highlight(id); else routeMap.clearHighlight();
+}
+
+/* The map always shows the whole season, not the filtered list — a route
+   line through a filtered subset would be a different, misleading route. */
+let mapFingerprint = '';
+
+function renderMap() {
+  const rm = ensureMap();
+  const info = ASTMap.routeStops(state.shows);
+  if (!rm) {
+    $('#mapCanvas').innerHTML =
+      '<div class="map-empty">Map unavailable — Leaflet could not be loaded from cdnjs. ' +
+      'The hand-off links below still work.</div>';
+  } else {
+    rm.setShows(state.shows);
+    // Only re-fit when the pins actually moved, so an edit or a filter change
+    // does not throw away the pan and zoom the user set.
+    const fp = info.mapped.map(s => s.id + ':' + s.lat + ',' + s.lng).join('|');
+    if (fp !== mapFingerprint) { mapFingerprint = fp; rm.fitAll(); }
+  }
+  ASTMap.renderHandoff(info, {
+    google: $('#btnGoogle'), apple: $('#btnApple'),
+    legList: $('#legList'), note: $('#mapNote')
+  });
+}
+
+/* Responsive chrome: >=1024 the map lives in the rail; 768-1023 it collapses;
+   <768 it opens as a full-screen sheet. The node is never reparented, so
+   Leaflet keeps its state either way — it just needs invalidateSize(). */
+const mqPhone = window.matchMedia('(max-width:767px)');
+const mqNarrow = window.matchMedia('(max-width:1023px)');
+let mapCollapsed = false;
+
+function resizeMap() {
+  if (!routeMap) return;
+  requestAnimationFrame(() => { routeMap.invalidateSize(); routeMap.fitAll(); });
+}
+function setSheet(open) {
+  $('#mapShell').classList.toggle('is-sheet', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+  $('#btnMapToggle').setAttribute('aria-expanded', String(open));
+  if (open) { ensureMap(); resizeMap(); }
+}
+function setCollapsed(collapsed) {
+  mapCollapsed = collapsed;
+  $('#mapShell').hidden = collapsed;
+  $('#btnMapToggle').textContent = collapsed ? 'Show' : 'Hide';
+  $('#btnMapToggle').setAttribute('aria-expanded', String(!collapsed));
+  if (!collapsed) resizeMap();
+}
+function syncMapChrome() {
+  const btn = $('#btnMapToggle');
+  btn.hidden = !mqNarrow.matches;
+  if (mqPhone.matches) {
+    $('#mapShell').hidden = false;            // CSS hides it until it is a sheet
+    btn.textContent = 'Open map';
+    btn.setAttribute('aria-expanded', String($('#mapShell').classList.contains('is-sheet')));
+  } else {
+    setSheet(false);
+    setCollapsed(mqNarrow.matches ? mapCollapsed : false);
+    if (!mqNarrow.matches) $('#mapShell').hidden = false;
+    resizeMap();
+  }
+}
+
+
+/* Theme lives in core.js so both pages share one preference; the page owns
+   only its own icons. */
+Theme.onChange(t => {
+  $('#iconSun').hidden = t === 'dark';
+  $('#iconMoon').hidden = t !== 'dark';
+  $('#btnTheme').setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+});
 
 /* ==========================================================================
    12. EVENTS
@@ -1049,19 +752,40 @@ $('#fileImport').addEventListener('change', e => {
   e.target.value = '';
 });
 
-$('#btnTheme').addEventListener('click', () => {
-  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  try { localStorage.setItem(THEME_KEY, next); } catch (_) {}
-});
+$('#btnTheme').addEventListener('click', () => Theme.toggle());
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
+  else if (e.key === 'Escape' && $('#mapShell').classList.contains('is-sheet')) setSheet(false);
   if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey &&
       $('#drawer').hidden && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
     e.preventDefault(); openDrawer(null);
   }
 });
+
+/* ---- Map <-> list, both directions -------------------------------------- */
+const list = $('#showList');
+const rowId = e => { const r = e.target.closest('.show-row'); return r ? r.dataset.id : null; };
+
+list.addEventListener('mouseover', e => { const id = rowId(e); if (id) hoverStop(id); });
+list.addEventListener('mouseout',  e => {
+  const row = e.target.closest('.show-row');
+  if (row && !row.contains(e.relatedTarget)) hoverStop(null);
+});
+list.addEventListener('focusin',  e => { const id = rowId(e); if (id) hoverStop(id); });
+list.addEventListener('focusout', e => {
+  const row = e.target.closest('.show-row');
+  if (row && !row.contains(e.relatedTarget)) hoverStop(null);
+});
+
+$('#btnMapToggle').addEventListener('click', () => {
+  if (mqPhone.matches) setSheet(!$('#mapShell').classList.contains('is-sheet'));
+  else setCollapsed(!mapCollapsed);
+});
+$('#btnMapClose').addEventListener('click', () => setSheet(false));
+mqPhone.addEventListener('change', syncMapChrome);
+mqNarrow.addEventListener('change', syncMapChrome);
+window.addEventListener('resize', () => { if (routeMap) routeMap.invalidateSize(); });
 
 /* Keep focus inside the drawer while it is open. */
 $('#drawer').addEventListener('keydown', e => {
@@ -1078,9 +802,10 @@ $('#drawer').addEventListener('keydown', e => {
 /* ==========================================================================
    13. BOOT
    ========================================================================== */
-initTheme();
+Theme.init();
 fillStatusSelect();
 setRating(0, { silent: true });
+syncMapChrome();
 refresh().catch(err => {
   console.error(err);
   toast('Could not load saved shows.');
