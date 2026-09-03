@@ -1,0 +1,1332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Show Ledger — Isaac Anderson</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+      referrerpolicy="no-referrer">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<!-- ==========================================================================
+     HEADER
+     ========================================================================== -->
+<header class="app-header">
+  <div class="brand">
+    <h1>Show Ledger</h1>
+    <span class="sub" id="brandSub">Isaac Anderson &middot; 2027 season</span>
+  </div>
+  <div class="header-actions">
+    <button class="sync-pill" id="syncPill" type="button" data-state="local"
+            title="Sync status — click for account settings">
+      <span class="sync-dot" aria-hidden="true"></span><span id="syncText">On this device</span>
+    </button>
+    <button class="btn btn-quiet" id="btnImportShows" type="button">Import shows</button>
+    <button class="btn btn-quiet" id="btnShare" type="button">Share</button>
+    <button class="btn btn-quiet" id="btnExport" type="button">Export JSON</button>
+    <button class="btn btn-quiet" id="btnImport" type="button">Import JSON</button>
+    <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    <button class="btn btn-icon" id="btnTheme" type="button" aria-label="Switch theme" title="Switch theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" id="iconSun">
+        <circle cx="10" cy="10" r="3.6"/>
+        <path d="M10 1.6v2.2M10 16.2v2.2M2.6 10H4.8M15.2 10h2.2M4.8 4.8l1.6 1.6M13.6 13.6l1.6 1.6M15.2 4.8l-1.6 1.6M6.4 13.6l-1.6 1.6"/>
+      </svg>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" stroke-linejoin="round" id="iconMoon" hidden>
+        <path d="M16.5 11.8A6.9 6.9 0 0 1 8.2 3.5a6.9 6.9 0 1 0 8.3 8.3z"/>
+      </svg>
+    </button>
+    <button class="btn btn-primary" id="btnAdd" type="button">+ Add show</button>
+  </div>
+</header>
+
+<!-- ==========================================================================
+     MAIN
+     ========================================================================== -->
+<div class="main">
+  <main class="ledger">
+    <div class="toolbar">
+      <div class="chips" id="statusFilters" role="group" aria-label="Filter by status"></div>
+      <span class="spacer"></span>
+      <div class="field-inline">
+        <label class="label" for="sortBy">Sort</label>
+        <select class="control" id="sortBy" style="width:auto; min-width:150px;">
+          <option value="date">Show date</option>
+          <option value="deadline">Apply-by date</option>
+          <option value="rating">Rating</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row-grid list-head" aria-hidden="true">
+      <div>Stop</div><div>Show</div><div>Dates</div><div>Deadline</div><div>Status</div><div>Rating</div>
+    </div>
+
+    <div id="showList"></div>
+    <p class="list-note" id="listNote"></p>
+  </main>
+
+  <!-- ==========================================================================
+       RIGHT RAIL
+       ========================================================================== -->
+  <aside class="rail">
+    <section class="panel">
+      <h2>Next deadlines</h2>
+      <div id="deadlinePanel"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Season at a glance</h2>
+      <div class="stat-grid" id="statPanel"></div>
+    </section>
+
+    <section class="panel map-panel">
+      <div class="panel-head">
+        <h2>Route map</h2>
+        <button class="btn-mini" id="btnMapToggle" type="button" hidden>Open map</button>
+      </div>
+      <div class="map-shell" id="mapShell">
+        <div class="map-sheet-head">
+          <span class="label">Route map</span>
+          <button class="btn-mini" id="btnMapClose" type="button">Close</button>
+        </div>
+        <div class="map-canvas" id="mapCanvas" role="application" aria-label="Route map"></div>
+      </div>
+      <div class="map-actions">
+        <a class="btn" id="btnGoogle" href="#" target="_blank" rel="noopener">Open route in Google Maps</a>
+        <a class="btn" id="btnApple" href="#" target="_blank" rel="noopener">Open in Apple Maps</a>
+      </div>
+      <ul class="leg-list" id="legList" hidden></ul>
+      <p class="map-note" id="mapNote"></p>
+      <div class="map-actions">
+        <a class="btn btn-quiet" href="map.html">Open full-page map</a>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<!-- ==========================================================================
+     DRAWER
+     ========================================================================== -->
+<div class="overlay" id="overlay" hidden></div>
+<section class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
+  <div class="drawer-head">
+    <h2 id="drawerTitle">Add show</h2>
+    <button class="btn btn-icon" id="btnCloseDrawer" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+
+  <form class="drawer-body" id="showForm" novalidate>
+    <div class="form-row">
+      <label class="label" for="f_name">Show name</label>
+      <input class="control" id="f_name" name="name" autocomplete="off">
+      <div class="err" id="e_name" hidden></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_city">City</label>
+        <input class="control" id="f_city" name="city" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_state">State</label>
+        <input class="control" id="f_state" name="state" maxlength="2" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_startDate">Start date</label>
+        <input class="control" id="f_startDate" name="startDate" type="date">
+        <div class="err" id="e_startDate" hidden></div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_endDate">End date</label>
+        <input class="control" id="f_endDate" name="endDate" type="date">
+        <div class="err" id="e_endDate" hidden></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_applyBy">Apply by</label>
+        <input class="control" id="f_applyBy" name="applyBy" type="date">
+        <div class="err" id="e_applyBy" hidden></div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_status">Status</label>
+        <select class="control" id="f_status" name="status"></select>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_routeNumber">Stop number</label>
+        <input class="control" id="f_routeNumber" name="routeNumber" placeholder="1, 2a, 6c" autocomplete="off">
+        <div class="hint">Sets route order on the map. Reorder the season by editing these.</div>
+      </div>
+      <div class="form-row">
+        <span class="label">Alternate</span>
+        <label class="check"><input type="checkbox" id="f_isAlternate" name="isAlternate">
+          <span style="font-size:13px;">Backup for an overlapping weekend</span></label>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <span class="label" id="ratingLabel">Rating</span>
+      <div class="rating-control">
+        <div class="rating-track" id="ratingTrack" role="slider" tabindex="0"
+             aria-labelledby="ratingLabel" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0"
+             aria-valuetext="Unrated"></div>
+        <span class="rating-value" id="ratingValue">Unrated</span>
+        <button class="btn btn-quiet" id="btnClearRating" type="button" style="min-height:36px;">Clear</button>
+      </div>
+      <div class="hint">Arrow keys adjust, Home/End for 0&ndash;10, Delete clears.</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_juryFee">Jury fee ($)</label>
+        <input class="control" id="f_juryFee" name="juryFee" inputmode="decimal" autocomplete="off">
+        <div class="err" id="e_juryFee" hidden></div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_boothFee">Booth fee ($)</label>
+        <input class="control" id="f_boothFee" name="boothFee" inputmode="decimal" autocomplete="off">
+        <div class="err" id="e_boothFee" hidden></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="f_lat">Latitude</label>
+        <input class="control" id="f_lat" name="lat" inputmode="decimal" autocomplete="off">
+        <div class="err" id="e_lat" hidden></div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="f_lng">Longitude</label>
+        <input class="control" id="f_lng" name="lng" inputmode="decimal" autocomplete="off">
+        <div class="err" id="e_lng" hidden></div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="f_url">Link</label>
+      <input class="control" id="f_url" name="url" inputmode="url" placeholder="https://" autocomplete="off">
+      <div class="err" id="e_url" hidden></div>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="f_notes">Notes</label>
+      <textarea class="control" id="f_notes" name="notes"></textarea>
+      <div class="hint" id="notesHint">Autosaved.</div>
+    </div>
+
+    <p class="hint" id="metaHint"></p>
+  </form>
+
+  <div class="drawer-foot">
+    <button class="btn btn-primary" id="btnSave" type="button">Save show</button>
+    <button class="btn btn-quiet" id="btnCancel" type="button">Cancel</button>
+    <span class="spacer"></span>
+    <button class="btn btn-quiet btn-danger" id="btnDelete" type="button" hidden>Delete</button>
+  </div>
+</section>
+
+<section class="drawer" id="settingsDrawer" role="dialog" aria-modal="true"
+         aria-labelledby="settingsTitle" hidden>
+  <div class="drawer-head">
+    <h2 id="settingsTitle">Account &amp; sync</h2>
+    <button class="btn btn-icon" id="btnCloseSettings" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="drawer-body">
+    <div class="sync-state" id="syncState">
+      <span class="sync-dot" aria-hidden="true"></span>
+      <span id="syncStateText"></span>
+    </div>
+
+    <div class="form-row">
+      <span class="label">Signed in as</span>
+      <p id="acctEmail" style="margin:6px 0 0; font-size:14px;">Not signed in</p>
+    </div>
+
+    <div class="form-row" id="signInRow">
+      <label class="label" for="f_email">Email for the sign-in link</label>
+      <input class="control" id="f_email" type="email" inputmode="email"
+             autocomplete="email" placeholder="you@example.com">
+      <div class="err" id="e_email" hidden></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnMagicLink" type="button">Email me a sign-in link</button>
+      </div>
+      <div class="hint">Supabase sends a one-time link. Opening it on your phone
+        signs that device in to the same season.</div>
+    </div>
+
+    <div class="btn-row" id="signedInActions" hidden>
+      <button class="btn" id="btnSyncNow" type="button">Sync now</button>
+      <button class="btn btn-quiet" id="btnSignOut" type="button">Sign out</button>
+    </div>
+
+    <hr style="border:none; border-top:1px solid var(--line); margin:26px 0;">
+
+    <h3 class="label" style="margin:0 0 12px;">Supabase project</h3>
+    <div class="form-row">
+      <label class="label" for="f_supaUrl">Project URL</label>
+      <input class="control" id="f_supaUrl" inputmode="url" autocomplete="off"
+             placeholder="https://xxxxxxxx.supabase.co">
+      <div class="err" id="e_supaUrl" hidden></div>
+    </div>
+    <div class="form-row">
+      <label class="label" for="f_supaKey">Anon key</label>
+      <textarea class="control" id="f_supaKey" style="min-height:88px;"
+                autocomplete="off" spellcheck="false"></textarea>
+      <div class="err" id="e_supaKey" hidden></div>
+      <div class="hint">Use the <strong>anon</strong> public key. It is meant to be
+        in the browser — row level security is what protects your rows. Never paste
+        a service key here; it bypasses RLS entirely.</div>
+    </div>
+    <p class="hint">Run <code>docs/supabase-schema.sql</code> in the Supabase SQL
+      editor once before signing in.</p>
+  </div>
+
+  <div class="drawer-foot">
+    <button class="btn btn-primary" id="btnSaveSettings" type="button">Save project</button>
+    <button class="btn btn-quiet" id="btnCloseSettings2" type="button">Close</button>
+    <span class="spacer"></span>
+    <button class="btn btn-quiet btn-danger" id="btnForgetProject" type="button">Forget</button>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     IMPORT MODAL (Phase 4) — paste from Zapplication, or a CSV.
+     Three steps: source, column mapping (delimited sources only), review.
+     Nothing is written until the Import button; every write goes through
+     AST.Store, so an import syncs like any other edit.
+     ========================================================================== -->
+<section class="modal" id="importModal" role="dialog" aria-modal="true" aria-labelledby="impTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="impTitle">Import shows</h2>
+      <div class="imp-steps" id="impSteps" aria-hidden="true"></div>
+      <span class="spacer"></span>
+      <button class="btn btn-icon" id="impClose" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+          <path d="M5 5l10 10M15 5L5 15"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- ---- Step 1: source ------------------------------------------- -->
+      <div id="impStep1">
+        <div class="tabs" role="tablist">
+          <button class="tab" id="impTabPaste" type="button" role="tab" aria-selected="true">Paste from Zapplication</button>
+          <button class="tab" id="impTabCsv" type="button" role="tab" aria-selected="false">CSV file</button>
+        </div>
+
+        <div id="impPanePaste" role="tabpanel">
+          <p class="hint" style="margin:0 0 10px;">
+            Open your Zapp <strong>search results</strong> or <strong>My Applications</strong> page,
+            select the list, copy it, and paste it here. Nothing is fetched from Zapplication —
+            this only reads what you paste.
+          </p>
+          <textarea class="control imp-paste" id="impPasteText" spellcheck="false"
+                    placeholder="Coconut Grove Arts Festival&#10;Miami, FL&#10;Event Dates: 2/13/2027 - 2/15/2027&#10;Application Deadline: 9/8/2026&#10;Application Fee: $50.00&#10;Booth Fee: $895.00"></textarea>
+          <p class="hint" id="impParseNote"></p>
+        </div>
+
+        <div id="impPaneCsv" role="tabpanel" hidden>
+          <p class="hint" style="margin:0 0 10px;">
+            Save the application-calendar spreadsheet as CSV and choose it here.
+            You pick which column is which on the next step — no layout is assumed.
+          </p>
+          <div class="btn-row">
+            <label class="btn" for="impFile">Choose CSV file</label>
+            <input type="file" id="impFile" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values" hidden>
+            <span class="hint" id="impFileName" style="margin:0;"></span>
+          </div>
+          <p class="hint" style="margin:14px 0 6px;">Or paste the CSV text:</p>
+          <textarea class="control imp-paste" id="impCsvText" spellcheck="false"
+                    placeholder="Show,City,State,Start,End,Deadline,Jury Fee,Booth Fee"></textarea>
+          <p class="hint" id="impCsvNote"></p>
+        </div>
+      </div>
+
+      <!-- ---- Step 2: column mapping ----------------------------------- -->
+      <div id="impStep2" hidden>
+        <p class="hint" style="margin:0 0 12px;">
+          Match each tracker field to a column in your file. The guesses come from
+          the header names — change any of them.
+        </p>
+        <div id="impMapTable"></div>
+        <p class="hint" id="impMapNote"></p>
+      </div>
+
+      <!-- ---- Step 3: review ------------------------------------------- -->
+      <div id="impStep3" hidden>
+        <div class="imp-toolbar">
+          <div class="btn-row">
+            <button class="btn-mini" id="impSelectAll" type="button">Tick all</button>
+            <button class="btn-mini" id="impSelectNew" type="button">Only new</button>
+            <button class="btn-mini" id="impSelectNone" type="button">Tick none</button>
+          </div>
+          <span class="spacer"></span>
+          <div class="btn-row">
+            <button class="btn-mini" id="impGeocode" type="button">Find coordinates</button>
+            <button class="btn-mini" id="impGeoCancel" type="button" hidden>Stop</button>
+          </div>
+        </div>
+        <p class="hint" id="impReviewNote" style="margin:0 0 4px;"></p>
+        <p class="hint" id="impSummary" style="margin:0 0 4px;"></p>
+        <p class="hint" id="impGeoProgress" style="margin:0 0 10px;"></p>
+        <div class="rev-scroll" id="impReviewHost"></div>
+        <p class="hint imp-legend">
+          <span class="key c-med"></span> recognised by shape
+          <span class="key c-low"></span> inferred — worth checking
+          <span class="key key-plain"></span> read from a label or typed by you.
+          Coordinates come from OpenStreetMap&rsquo;s Nominatim, one lookup a second and cached;
+          anything it cannot place can be typed into the Lat and Lng columns.
+        </p>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-quiet" id="impBack" type="button" hidden>Back</button>
+      <button class="btn btn-primary" id="impNext" type="button">Read the text</button>
+      <button class="btn btn-primary" id="impCommit" type="button" hidden>Import</button>
+      <span class="spacer"></span>
+      <button class="btn btn-quiet" id="impCancel" type="button">Cancel</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SHARE & EXPORT MODAL (Phase 5)
+     Wiring in tracker/share-ui.js, rendering in tracker/share.js.
+     ========================================================================== -->
+<section class="modal" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shrTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="shrTitle">Share &amp; export</h2>
+      <span class="spacer"></span>
+      <button class="btn btn-icon" id="shrClose" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+             stroke-width="1.4" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- What goes out. Shared by the card, the caption and the embed, so
+           the three can never disagree about which shows are public. -->
+      <div class="shr-controls">
+        <div class="form-row">
+          <label class="label" for="shrStatusMode">Which shows</label>
+          <select class="control" id="shrStatusMode">
+            <option value="accepted">Accepted only</option>
+            <option value="confirmed">Accepted + waitlist</option>
+            <option value="planned">Everything but declined</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="shrCount">How many</label>
+          <select class="control" id="shrCount">
+            <option value="3">Next 3</option>
+            <option value="4">Next 4</option>
+            <option value="5">Next 5</option>
+            <option value="6">Next 6</option>
+            <option value="8">Next 8</option>
+            <option value="12">Next 12</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="shrArtist">Name on the card</label>
+          <input class="control" id="shrArtist" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <label class="label" for="shrLink">Link</label>
+          <input class="control" id="shrLink" inputmode="url" autocomplete="off"
+                 placeholder="isaacandersonart.com">
+        </div>
+        <div class="form-row shr-wide">
+          <label class="check"><input type="checkbox" id="shrAlts">
+            <span>Include alternates — shows you have not committed to</span></label>
+        </div>
+      </div>
+      <p class="hint" id="shrSelNote"></p>
+
+      <div class="tabs" role="tablist" aria-label="What to share">
+        <button class="tab" id="shrTabCard" type="button" role="tab" aria-selected="true">Image</button>
+        <button class="tab" id="shrTabText" type="button" role="tab" aria-selected="false">Caption &amp; email</button>
+        <button class="tab" id="shrTabEmbed" type="button" role="tab" aria-selected="false">Website embed</button>
+      </div>
+
+      <!-- ---- Image ---- -->
+      <div id="shrPaneCard" role="tabpanel" aria-labelledby="shrTabCard">
+        <div class="shr-controls">
+          <div class="form-row">
+            <label class="label" for="shrSize">Size</label>
+            <select class="control" id="shrSize">
+              <option value="square">1080 × 1080 — feed post</option>
+              <option value="story">1080 × 1920 — story</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="label" for="shrCardTheme">Card theme</label>
+            <select class="control" id="shrCardTheme">
+              <option value="">Match the app</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+        <div class="shr-preview"><canvas id="shrCanvas" width="1080" height="1080"
+             role="img" aria-label="Share card preview"></canvas></div>
+        <p class="hint" id="shrCardNote"></p>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="shrDownload" type="button">Download PNG</button>
+          <button class="btn" id="shrCopyImage" type="button">Copy image</button>
+        </div>
+      </div>
+
+      <!-- ---- Caption & email ---- -->
+      <div id="shrPaneText" role="tabpanel" aria-labelledby="shrTabText" hidden>
+        <div class="shr-controls">
+          <div class="form-row">
+            <label class="label" for="shrTextStyle">Format</label>
+            <select class="control" id="shrTextStyle">
+              <option value="caption">Caption — one line per show</option>
+              <option value="email">Email — a block per show</option>
+            </select>
+          </div>
+        </div>
+        <label class="sr" for="shrText">Copyable show list</label>
+        <textarea class="control shr-text" id="shrText" readonly spellcheck="false"></textarea>
+        <p class="hint" id="shrTextNote"></p>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="shrCopyText" type="button">Copy text</button>
+        </div>
+      </div>
+
+      <!-- ---- Website embed ---- -->
+      <div id="shrPaneEmbed" role="tabpanel" aria-labelledby="shrTabEmbed" hidden>
+        <div class="shr-controls">
+          <div class="form-row">
+            <label class="label" for="shrEmbedMode">Kind</label>
+            <select class="control" id="shrEmbedMode">
+              <option value="script">Script — self-contained, no hosting</option>
+              <option value="iframe">iframe — hosted, updates itself</option>
+            </select>
+          </div>
+          <div class="form-row" id="shrEmbedSrcRow" hidden>
+            <label class="label" for="shrEmbedSrc">Address of embed.html</label>
+            <input class="control" id="shrEmbedSrc" inputmode="url" autocomplete="off">
+          </div>
+        </div>
+        <label class="sr" for="shrSnippet">Embed snippet</label>
+        <textarea class="control shr-text" id="shrSnippet" readonly spellcheck="false"></textarea>
+        <p class="hint" id="shrEmbedNote"></p>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="shrCopySnippet" type="button">Copy snippet</button>
+          <button class="btn" id="shrDownloadJSON" type="button" hidden>Download shows.json</button>
+        </div>
+        <h3 class="label shr-sub">Preview</h3>
+        <div class="shr-embed-preview" id="shrEmbedPreview"></div>
+      </div>
+
+      <!-- ---- Post it ---- -->
+      <div class="shr-share">
+        <h3 class="label shr-sub">Post it</h3>
+        <div class="btn-row">
+          <a class="btn" id="shrFacebook" href="#" target="_blank" rel="noopener">Share on Facebook</a>
+          <a class="btn" id="shrX" href="#" target="_blank" rel="noopener">Post on X</a>
+          <button class="btn" id="shrCopyLink" type="button">Copy link</button>
+          <button class="btn" id="shrInsta" type="button">Instagram: save image + caption</button>
+        </div>
+        <p class="hint" id="shrShareNote"></p>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <span class="hint shr-status" id="shrStatus" role="status" aria-live="polite"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-quiet" id="shrDone" type="button">Done</button>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast" hidden>
+  <span class="t-msg" id="toastMsg"></span>
+  <button class="t-act" id="toastAct" type="button" hidden></button>
+</div>
+<!-- Leaflet 1.9.4 from cdnjs, no API key. Pinned to an exact version; no
+     Subresource Integrity hash because cdnjs is unreachable from the build
+     sandbox and an unverified hash would break the map outright. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
+        referrerpolicy="no-referrer"></script>
+<script src="core.js"></script>
+<script src="map.js"></script>
+<script src="store-supabase.js"></script>
+<script src="import.js"></script>
+<script src="import-ui.js"></script>
+<script src="share.js"></script>
+<script src="share-ui.js"></script>
+<script type="module">
+/* ==========================================================================
+   1-5. SHARED CORE
+   The model, Store adapter, date helpers, rating glyphs and theme now live
+   in tracker/core.js, and the map in tracker/map.js, because tracker/map.html
+   runs on the same code. Both are classic scripts (see the note in core.js):
+   `type="module"` cannot be fetched over file://, and this app has to open by
+   double-click. Everything below is ledger-page-specific.
+   ========================================================================== */
+const {
+  SCHEMA_VERSION, STATUSES, STATUS_LABEL, makeShow, clampRating, Store,
+  parseISO, daysUntil, fmtDay, fmtRange, fmtCountdown, esc, place,
+  starsSVG, ratingText, Theme
+} = window.AST;
+
+window.AST.setNotifier(msg => toast(msg));
+
+/* ==========================================================================
+   6. APP STATE
+   ========================================================================== */
+const state = { shows: [], filter: 'all', sort: 'date', editingId: null, lastDeleted: null };
+const $ = sel => document.querySelector(sel);
+
+function sortedShows() {
+  const list = state.filter === 'all'
+    ? state.shows.slice()
+    : state.shows.filter(s => s.status === state.filter);
+  const far = '9999-12-31';
+  if (state.sort === 'rating') {
+    list.sort((a, b) => (b.rating - a.rating) || (a.startDate || far).localeCompare(b.startDate || far));
+  } else if (state.sort === 'deadline') {
+    list.sort((a, b) => (a.applyBy || far).localeCompare(b.applyBy || far) ||
+                        (a.startDate || far).localeCompare(b.startDate || far));
+  } else {
+    list.sort((a, b) => (a.startDate || far).localeCompare(b.startDate || far) ||
+                        a.routeNumber.localeCompare(b.routeNumber, undefined, { numeric: true }));
+  }
+  return list;
+}
+
+/* ==========================================================================
+   7. RENDER
+   ========================================================================== */
+function renderFilters() {
+  const counts = { all: state.shows.length };
+  STATUSES.forEach(s => { counts[s.value] = state.shows.filter(x => x.status === s.value).length; });
+  const items = [{ value:'all', label:'All' }].concat(STATUSES);
+  $('#statusFilters').innerHTML = items.map(it =>
+    '<button type="button" class="chip" data-filter="' + it.value + '" aria-pressed="' +
+    (state.filter === it.value) + '">' + esc(it.label) + ' ' + (counts[it.value] || 0) + '</button>'
+  ).join('');
+}
+
+function renderList() {
+  const list = sortedShows();
+  const host = $('#showList');
+  if (!list.length) {
+    host.innerHTML = '<p class="empty">' + (state.shows.length
+      ? 'No shows with that status.'
+      : 'No shows yet. Add your first one, or import a JSON backup.') + '</p>';
+    $('#listNote').textContent = '';
+    return;
+  }
+  host.innerHTML = list.map(s => {
+    const dl = daysUntil(s.applyBy);
+    let dlClass = 'meta', dlText = '—';
+    if (s.applyBy) {
+      dlText = fmtDay(s.applyBy);
+      if (dl < 0) { dlClass = 'meta due-past'; dlText = 'closed'; }
+      else if (dl <= 14) { dlClass = 'meta due-soon'; dlText = fmtDay(s.applyBy) + ' · ' + fmtCountdown(dl); }
+    }
+    return '<button type="button" class="show-row row-grid" data-id="' + esc(s.id) + '">' +
+      '<span class="num' + (s.isAlternate ? ' alt' : '') + '">' + esc(s.routeNumber || '–') + '</span>' +
+      '<span><span class="name">' + esc(s.name || 'Untitled show') + '</span>' +
+        '<span class="place" style="display:block;">' + esc(place(s)) + '</span></span>' +
+      '<span class="meta r-dates">' + esc(fmtRange(s.startDate, s.endDate)) + '</span>' +
+      '<span class="' + dlClass + ' r-deadline">' + esc(dlText) + '</span>' +
+      '<span class="r-status"><span class="pill" data-status="' + esc(s.status) + '">' +
+        esc(STATUS_LABEL[s.status]) + '</span></span>' +
+      '<span class="r-rating" style="color:' + (s.rating ? 'var(--ink)' : 'var(--muted)') + '" ' +
+        'title="' + ratingText(s.rating) + '">' + starsSVG(s.rating, 13) +
+        '<span class="sr">' + ratingText(s.rating) + '</span></span>' +
+      '</button>';
+  }).join('');
+  $('#listNote').textContent = list.length + ' of ' + state.shows.length +
+    ' shows · click a row to edit · stop numbers set the route order';
+}
+
+function renderDeadlines() {
+  const upcoming = state.shows
+    .filter(s => s.applyBy && daysUntil(s.applyBy) >= 0)
+    .sort((a, b) => a.applyBy.localeCompare(b.applyBy))
+    .slice(0, 5);
+  const host = $('#deadlinePanel');
+  if (!upcoming.length) { host.innerHTML = '<p class="hint" style="margin:0;">No open deadlines.</p>'; return; }
+  host.innerHTML = upcoming.map(s => {
+    const n = daysUntil(s.applyBy);
+    const cls = n <= 3 ? 'd-critical' : n <= 14 ? 'd-soon' : 'd-ok';
+    return '<div class="deadline-row"><span class="d-name">' + esc(s.name) +
+      (s.status === 'applied' || s.status === 'accepted'
+        ? ' <span class="hint" style="margin:0;">· ' + esc(STATUS_LABEL[s.status]) + '</span>' : '') +
+      '</span><span class="d-when ' + cls + '">' + esc(fmtDay(s.applyBy)) + ' · ' +
+      esc(fmtCountdown(n)) + '</span></div>';
+  }).join('');
+}
+
+function renderStats() {
+  const rated = state.shows.filter(s => s.rating > 0);
+  const avg = rated.length ? (rated.reduce((t, s) => t + s.rating, 0) / rated.length).toFixed(1) : '—';
+  const fees = state.shows.reduce((t, s) => t + (s.juryFee || 0) + (s.boothFee || 0), 0);
+  const cells = [
+    ['Shows', state.shows.length],
+    ['Accepted', state.shows.filter(s => s.status === 'accepted').length],
+    ['Avg rating', avg],
+    ['Fees', '$' + fees.toLocaleString()]
+  ];
+  $('#statPanel').innerHTML = cells.map(([k, n]) =>
+    '<div class="stat"><div class="n">' + esc(n) + '</div><div class="k">' + esc(k) + '</div></div>').join('');
+}
+
+function render() { renderFilters(); renderList(); renderDeadlines(); renderStats(); renderMap(); }
+
+/* ==========================================================================
+   8. TOAST (with undo)
+   ========================================================================== */
+let toastTimer = null;
+function toast(msg, actionLabel, onAction, ms = 8000) {
+  clearTimeout(toastTimer);
+  $('#toastMsg').textContent = msg;
+  const act = $('#toastAct');
+  act.hidden = !actionLabel;
+  act.textContent = actionLabel || '';
+  act.onclick = () => { hideToast(); if (onAction) onAction(); };
+  $('#toast').hidden = false;
+  toastTimer = setTimeout(hideToast, ms);
+}
+function hideToast() { clearTimeout(toastTimer); $('#toast').hidden = true; }
+
+/* ==========================================================================
+   9. DRAWER — add / edit
+   ========================================================================== */
+const FIELDS = ['name','city','state','startDate','endDate','applyBy','status','routeNumber',
+                'juryFee','boothFee','lat','lng','url','notes'];
+let draftRating = 0;
+let notesTimer = null;
+let lastFocus = null;
+
+function fillStatusSelect() {
+  $('#f_status').innerHTML = STATUSES.map(s =>
+    '<option value="' + s.value + '">' + esc(s.label) + '</option>').join('');
+}
+
+function setRating(r, { silent = false } = {}) {
+  draftRating = clampRating(r);
+  const track = $('#ratingTrack');
+  track.innerHTML = starsSVG(draftRating, 26);
+  track.style.color = draftRating ? 'var(--ink)' : 'var(--muted)';
+  track.setAttribute('aria-valuenow', String(draftRating));
+  track.setAttribute('aria-valuetext', ratingText(draftRating));
+  $('#ratingValue').textContent = ratingText(draftRating);
+  if (!silent) queueAutosave();
+}
+
+function clearErrors() {
+  FIELDS.forEach(f => {
+    const e = document.getElementById('e_' + f);
+    if (e) { e.hidden = true; e.textContent = ''; }
+    const i = document.getElementById('f_' + f);
+    if (i) i.removeAttribute('aria-invalid');
+  });
+}
+function showError(field, msg) {
+  const e = document.getElementById('e_' + field);
+  if (e) { e.textContent = msg; e.hidden = false; }
+  const i = document.getElementById('f_' + field);
+  if (i) i.setAttribute('aria-invalid', 'true');
+}
+
+function openDrawer(show) {
+  lastFocus = document.activeElement;
+  state.editingId = show ? show.id : null;
+  const s = show || makeShow({});
+  clearErrors();
+  $('#drawerTitle').textContent = show ? 'Edit show' : 'Add show';
+  $('#f_name').value = s.name;
+  $('#f_city').value = s.city;
+  $('#f_state').value = s.state;
+  $('#f_startDate').value = s.startDate;
+  $('#f_endDate').value = s.endDate;
+  $('#f_applyBy').value = s.applyBy;
+  $('#f_status').value = s.status;
+  $('#f_routeNumber').value = s.routeNumber;
+  $('#f_isAlternate').checked = s.isAlternate;
+  $('#f_juryFee').value = s.juryFee === null ? '' : s.juryFee;
+  $('#f_boothFee').value = s.boothFee === null ? '' : s.boothFee;
+  $('#f_lat').value = s.lat === null ? '' : s.lat;
+  $('#f_lng').value = s.lng === null ? '' : s.lng;
+  $('#f_url').value = s.url;
+  $('#f_notes').value = s.notes;
+  setRating(s.rating, { silent: true });
+  $('#btnDelete').hidden = !show;
+  $('#notesHint').textContent = show ? 'Autosaved.' : 'Saved when you save the show.';
+  $('#metaHint').textContent = show
+    ? 'Source: ' + s.source + ' · updated ' + new Date(s.updatedAt).toLocaleString()
+    : '';
+  $('#overlay').hidden = false;
+  $('#drawer').hidden = false;
+  $('#f_name').focus();
+}
+
+function closeDrawer() {
+  clearTimeout(notesTimer);
+  state.editingId = null;
+  $('#drawer').hidden = true;
+  $('#overlay').hidden = true;
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+
+/** Reads the form into a Show, or returns null and paints the errors. */
+function collect() {
+  clearErrors();
+  const v = id => document.getElementById('f_' + id).value.trim();
+  let ok = true;
+  const name = v('name');
+  if (!name) { showError('name', 'A show needs a name.'); ok = false; }
+
+  const startDate = v('startDate'), endDate = v('endDate'), applyBy = v('applyBy');
+  if (!startDate) { showError('startDate', 'A start date is required.'); ok = false; }
+  else if (!parseISO(startDate)) { showError('startDate', 'Use a real date.'); ok = false; }
+  if (endDate && !parseISO(endDate)) { showError('endDate', 'Use a real date.'); ok = false; }
+  else if (endDate && startDate && endDate < startDate) {
+    showError('endDate', 'End date is before the start date.'); ok = false;
+  }
+  if (applyBy && !parseISO(applyBy)) { showError('applyBy', 'Use a real date.'); ok = false; }
+  else if (applyBy && startDate && applyBy > startDate) {
+    showError('applyBy', 'Apply-by falls after the show starts.'); ok = false;
+  }
+
+  const nums = { juryFee: v('juryFee'), boothFee: v('boothFee'), lat: v('lat'), lng: v('lng') };
+  for (const [k, raw] of Object.entries(nums)) {
+    if (raw === '') continue;
+    const n = Number(raw);
+    if (!Number.isFinite(n)) { showError(k, 'Numbers only.'); ok = false; continue; }
+    if ((k === 'juryFee' || k === 'boothFee') && n < 0) { showError(k, 'Cannot be negative.'); ok = false; }
+    if (k === 'lat' && Math.abs(n) > 90) { showError('lat', 'Latitude runs −90 to 90.'); ok = false; }
+    if (k === 'lng' && Math.abs(n) > 180) { showError('lng', 'Longitude runs −180 to 180.'); ok = false; }
+  }
+  const url = v('url');
+  if (url && !/^https?:\/\/\S+$/i.test(url)) { showError('url', 'Start with http:// or https://'); ok = false; }
+  if (!ok) return null;
+
+  const existing = state.shows.find(s => s.id === state.editingId);
+  return makeShow({
+    ...(existing || {}),
+    id: state.editingId || undefined,
+    name, city: v('city'), state: v('state').toUpperCase(),
+    lat: nums.lat, lng: nums.lng,
+    startDate, endDate, applyBy,
+    status: $('#f_status').value,
+    rating: draftRating,
+    juryFee: nums.juryFee, boothFee: nums.boothFee,
+    routeNumber: v('routeNumber'),
+    isAlternate: $('#f_isAlternate').checked,
+    notes: $('#f_notes').value,
+    url,
+    source: existing ? existing.source : 'manual'
+  });
+}
+
+async function refresh() { state.shows = await Store.list(); render(); }
+
+async function saveShow() {
+  const rec = collect();
+  if (!rec) return;
+  const isNew = !state.editingId;
+  await Store.upsert(rec);
+  await refresh();
+  closeDrawer();
+  toast(isNew ? 'Show added.' : 'Changes saved.', null, null, 2600);
+}
+
+/** Autosave for the fields that should not need a Save click on an existing show. */
+function queueAutosave() {
+  if (!state.editingId) return;
+  clearTimeout(notesTimer);
+  notesTimer = setTimeout(async () => {
+    const existing = state.shows.find(s => s.id === state.editingId);
+    if (!existing) return;
+    await Store.upsert({ ...existing, notes: $('#f_notes').value, rating: draftRating });
+    await refresh();
+    $('#notesHint').textContent = 'Autosaved ' + new Date().toLocaleTimeString() + '.';
+  }, 600);
+}
+
+async function deleteShow() {
+  const id = state.editingId;
+  if (!id) return;
+  const gone = await Store.remove(id);
+  if (!gone) return;
+  state.lastDeleted = gone;
+  await refresh();
+  closeDrawer();
+  toast('Deleted "' + gone.name + '".', 'Undo', async () => {
+    await Store.upsert(state.lastDeleted);
+    state.lastDeleted = null;
+    await refresh();
+    toast('Restored.', null, null, 2200);
+  });
+}
+
+/* ==========================================================================
+   10. EXPORT / IMPORT
+   ========================================================================== */
+function exportJSON() {
+  const payload = { schemaVersion: SCHEMA_VERSION, exportedAt: new Date().toISOString(), shows: state.shows };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'show-ledger-' + new Date().toISOString().slice(0, 10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function importJSON(file) {
+  let parsed;
+  try { parsed = JSON.parse(await file.text()); }
+  catch (_) { toast('That file is not valid JSON.'); return; }
+  const rows = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.shows) ? parsed.shows : null);
+  if (!rows) { toast('No shows found in that file.'); return; }
+  if (!confirm('Replace all ' + state.shows.length + ' shows with the ' + rows.length + ' in this file?')) return;
+  const previous = state.shows.slice();
+  await Store.replaceAll(rows);
+  await refresh();
+  toast('Imported ' + rows.length + ' shows.', 'Undo', async () => {
+    await Store.replaceAll(previous);
+    await refresh();
+  });
+}
+
+
+/* ==========================================================================
+   11. MAP — rail panel, two-way highlight, Google / Apple hand-off
+   All Leaflet work happens in tracker/map.js; this block only wires the
+   module to the ledger.
+   ========================================================================== */
+let routeMap = null;
+
+function ensureMap() {
+  if (routeMap) return routeMap;
+  if (!window.L || !window.ASTMap) return null;
+  routeMap = ASTMap.create({
+    el: $('#mapCanvas'),
+    onHover: id => highlightRow(id),
+    onSelect: id => {
+      const show = state.shows.find(s => s.id === id);
+      if (show) openDrawer(show);
+    }
+  });
+  return routeMap;
+}
+
+/** Marker hover/focus -> light the matching row. */
+function highlightRow(id) {
+  document.querySelectorAll('.show-row.is-hot').forEach(el => el.classList.remove('is-hot'));
+  if (!id) return;
+  const row = $('.show-row[data-id="' + CSS.escape(id) + '"]');
+  if (!row) return;                       // filtered out of the list right now
+  row.classList.add('is-hot');
+  row.scrollIntoView({ block: 'nearest' });
+}
+
+/** Row hover/focus -> light the matching marker and pan to it. */
+function hoverStop(id) {
+  if (!routeMap) return;
+  if (id) routeMap.highlight(id); else routeMap.clearHighlight();
+}
+
+/* The map always shows the whole season, not the filtered list — a route
+   line through a filtered subset would be a different, misleading route. */
+let mapFingerprint = '';
+
+function renderMap() {
+  const rm = ensureMap();
+  const info = ASTMap.routeStops(state.shows);
+  if (!rm) {
+    $('#mapCanvas').innerHTML =
+      '<div class="map-empty">Map unavailable — Leaflet could not be loaded from cdnjs. ' +
+      'The hand-off links below still work.</div>';
+  } else {
+    rm.setShows(state.shows);
+    // Only re-fit when the pins actually moved, so an edit or a filter change
+    // does not throw away the pan and zoom the user set.
+    const fp = info.mapped.map(s => s.id + ':' + s.lat + ',' + s.lng).join('|');
+    if (fp !== mapFingerprint) { mapFingerprint = fp; rm.fitAll(); }
+  }
+  ASTMap.renderHandoff(info, {
+    google: $('#btnGoogle'), apple: $('#btnApple'),
+    legList: $('#legList'), note: $('#mapNote')
+  });
+}
+
+/* Responsive chrome: >=1024 the map lives in the rail; 768-1023 it collapses;
+   <768 it opens as a full-screen sheet. The node is never reparented, so
+   Leaflet keeps its state either way — it just needs invalidateSize(). */
+const mqPhone = window.matchMedia('(max-width:767px)');
+const mqNarrow = window.matchMedia('(max-width:1023px)');
+let mapCollapsed = false;
+
+function resizeMap() {
+  if (!routeMap) return;
+  requestAnimationFrame(() => { routeMap.invalidateSize(); routeMap.fitAll(); });
+}
+function setSheet(open) {
+  $('#mapShell').classList.toggle('is-sheet', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+  $('#btnMapToggle').setAttribute('aria-expanded', String(open));
+  if (open) { ensureMap(); resizeMap(); }
+}
+function setCollapsed(collapsed) {
+  mapCollapsed = collapsed;
+  $('#mapShell').hidden = collapsed;
+  $('#btnMapToggle').textContent = collapsed ? 'Show' : 'Hide';
+  $('#btnMapToggle').setAttribute('aria-expanded', String(!collapsed));
+  if (!collapsed) resizeMap();
+}
+function syncMapChrome() {
+  const btn = $('#btnMapToggle');
+  btn.hidden = !mqNarrow.matches;
+  if (mqPhone.matches) {
+    $('#mapShell').hidden = false;            // CSS hides it until it is a sheet
+    btn.textContent = 'Open map';
+    btn.setAttribute('aria-expanded', String($('#mapShell').classList.contains('is-sheet')));
+  } else {
+    setSheet(false);
+    setCollapsed(mqNarrow.matches ? mapCollapsed : false);
+    if (!mqNarrow.matches) $('#mapShell').hidden = false;
+    resizeMap();
+  }
+}
+
+
+/* Theme lives in core.js so both pages share one preference; the page owns
+   only its own icons. */
+Theme.onChange(t => {
+  $('#iconSun').hidden = t === 'dark';
+  $('#iconMoon').hidden = t !== 'dark';
+  $('#btnTheme').setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+});
+
+/* ==========================================================================
+   14. SYNC + ACCOUNT (Phase 3)
+   The Store swap happens in core.js (`AST.useStore`), so nothing here — and
+   nothing in the render code — knows whether it is talking to localStorage or
+   to Supabase. Writes always land locally first, so the app keeps working
+   with no network and syncs when it comes back.
+   ========================================================================== */
+const { Settings } = window.AST;
+let syncStore = null;
+
+const SYNC_COPY = {
+  local:      ['local',      'On this device',   'Saved on this device only. Add a Supabase project below to sync to your phone.'],
+  signed_out: ['local',      'Not signed in',    'Project saved. Sign in with a magic link to sync this season across devices.'],
+  syncing:    ['syncing',    'Syncing…',         'Syncing with Supabase…'],
+  synced:     ['synced',     'Synced',           'Synced with Supabase.'],
+  offline:    ['offline',    'Offline',          'Offline — changes are saved locally and will sync when the connection is back.'],
+  error:      ['error',      'Sync problem',     'Sync failed.']
+};
+
+function paintSync(state, detail) {
+  const [tone, short, long] = SYNC_COPY[state] || SYNC_COPY.local;
+  const pill = $('#syncPill');
+  pill.dataset.state = tone;
+  $('#syncText').textContent = short;
+  pill.title = long;
+  $('#syncState').dataset.state = tone;
+  $('#syncStateText').textContent = detail ? long + ' ' + detail : long;
+}
+
+function paintAccount() {
+  const cfg = Settings.getConfig();
+  const sess = Settings.getSession();
+  $('#f_supaUrl').value = cfg ? cfg.url : '';
+  $('#f_supaKey').value = cfg ? cfg.anonKey : '';
+  $('#acctEmail').textContent = (sess && sess.user && sess.user.email) || 'Not signed in';
+  $('#signInRow').hidden = !!sess;
+  $('#signedInActions').hidden = !sess;
+  $('#btnForgetProject').hidden = !cfg;
+  if (!cfg) paintSync('local');
+  else if (!sess) paintSync('signed_out');
+}
+
+function openSettings() {
+  lastFocus = document.activeElement;
+  paintAccount();
+  $('#overlay').hidden = false;
+  $('#settingsDrawer').hidden = false;
+  $((Settings.getConfig() ? '#f_email' : '#f_supaUrl')).focus();
+}
+function closeSettings() {
+  $('#settingsDrawer').hidden = true;
+  $('#overlay').hidden = true;
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+
+function fieldError(field, msg) {
+  const e = document.getElementById('e_' + field);
+  const i = document.getElementById('f_' + field);
+  if (e) { e.textContent = msg || ''; e.hidden = !msg; }
+  if (i) { if (msg) i.setAttribute('aria-invalid', 'true'); else i.removeAttribute('aria-invalid'); }
+}
+
+function saveProject() {
+  const url = $('#f_supaUrl').value.trim().replace(/\/+$/, '');
+  const key = $('#f_supaKey').value.trim();
+  fieldError('supaUrl', ''); fieldError('supaKey', '');
+  let ok = true;
+  if (!/^https:\/\/\S+$/i.test(url)) { fieldError('supaUrl', 'Use the https:// project URL from Supabase.'); ok = false; }
+  if (!key) { fieldError('supaKey', 'Paste the anon public key.'); ok = false; }
+  else if (/service_role/.test(key)) {
+    fieldError('supaKey', 'That looks like a service key — it bypasses row level security. Use the anon key.');
+    ok = false;
+  }
+  if (!ok) return;
+  Settings.setConfig({ url, anonKey: key });
+  startSync();
+  paintAccount();
+  toast('Supabase project saved.', null, null, 2600);
+}
+
+function forgetProject() {
+  if (!confirm('Forget this Supabase project and sign out on this device? Your shows stay saved locally.')) return;
+  const cfg = Settings.getConfig(), sess = Settings.getSession();
+  if (cfg && sess) ASTSupabase.Auth.signOut(cfg, sess);
+  Settings.clearSession();
+  Settings.clearConfig();
+  syncStore = null;
+  window.AST.useStore(null);
+  paintAccount();
+  toast('Back to this device only.', null, null, 2600);
+}
+
+async function sendMagicLink() {
+  const cfg = Settings.getConfig();
+  if (!cfg) { fieldError('email', 'Save a Supabase project first.'); return; }
+  const email = $('#f_email').value.trim();
+  fieldError('email', '');
+  if (!/^\S+@\S+\.\S+$/.test(email)) { fieldError('email', 'Enter a valid email address.'); return; }
+  const btn = $('#btnMagicLink');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  try {
+    await ASTSupabase.Auth.sendMagicLink(cfg, email, location.origin + location.pathname);
+    toast('Sign-in link sent to ' + email + '. Open it on any device.', null, null, 9000);
+    closeSettings();
+  } catch (err) {
+    fieldError('email', err.message || 'Could not send the link.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Email me a sign-in link';
+  }
+}
+
+async function signOut() {
+  const cfg = Settings.getConfig(), sess = Settings.getSession();
+  if (cfg && sess) await ASTSupabase.Auth.signOut(cfg, sess);
+  Settings.clearSession();
+  if (syncStore) syncStore.setStatus('signed_out');
+  paintAccount();
+  toast('Signed out on this device. Your shows are still here.', null, null, 3200);
+}
+
+/** Connects (or reconnects) the Supabase-backed store. Safe to call repeatedly. */
+function startSync() {
+  syncStore = ASTSupabase.connect({
+    onStatus: (state, detail) => paintSync(state, detail),
+    onShows: () => refresh(),
+    onSession: () => paintAccount()
+  });
+  if (!syncStore) paintSync('local');
+  return syncStore;
+}
+
+/* ==========================================================================
+   12. EVENTS
+   ========================================================================== */
+$('#btnAdd').addEventListener('click', () => openDrawer(null));
+$('#btnCloseDrawer').addEventListener('click', closeDrawer);
+$('#btnCancel').addEventListener('click', closeDrawer);
+$('#overlay').addEventListener('click', () => { closeDrawer(); closeSettings(); ASTImportUI.close(); ASTShareUI.close(); });
+$('#btnSave').addEventListener('click', saveShow);
+$('#btnDelete').addEventListener('click', deleteShow);
+$('#showForm').addEventListener('submit', e => { e.preventDefault(); saveShow(); });
+
+$('#showList').addEventListener('click', e => {
+  const row = e.target.closest('.show-row');
+  if (!row) return;
+  const show = state.shows.find(s => s.id === row.dataset.id);
+  if (show) openDrawer(show);
+});
+
+$('#statusFilters').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  state.filter = chip.dataset.filter;
+  render();
+});
+
+$('#sortBy').addEventListener('change', e => { state.sort = e.target.value; renderList(); });
+$('#f_notes').addEventListener('input', queueAutosave);
+
+/* Rating: pointer over the track picks a half-star; arrows work without a mouse. */
+const track = $('#ratingTrack');
+function ratingFromEvent(e) {
+  const box = track.getBoundingClientRect();
+  const pct = (e.clientX - box.left) / box.width;
+  return Math.max(1, Math.min(10, Math.ceil(pct * 10)));
+}
+track.addEventListener('click', e => setRating(ratingFromEvent(e)));
+track.addEventListener('keydown', e => {
+  const k = e.key;
+  if (k === 'ArrowRight' || k === 'ArrowUp') { setRating(draftRating + 1); e.preventDefault(); }
+  else if (k === 'ArrowLeft' || k === 'ArrowDown') { setRating(Math.max(0, draftRating - 1)); e.preventDefault(); }
+  else if (k === 'Home') { setRating(0); e.preventDefault(); }
+  else if (k === 'End') { setRating(10); e.preventDefault(); }
+  else if (k === 'Delete' || k === 'Backspace') { setRating(0); e.preventDefault(); }
+  else if (/^[0-9]$/.test(k)) { setRating(k === '0' ? 10 : Number(k)); e.preventDefault(); }
+});
+$('#btnClearRating').addEventListener('click', () => { setRating(0); track.focus(); });
+
+$('#syncPill').addEventListener('click', openSettings);
+$('#btnCloseSettings').addEventListener('click', closeSettings);
+$('#btnCloseSettings2').addEventListener('click', closeSettings);
+$('#btnSaveSettings').addEventListener('click', saveProject);
+$('#btnForgetProject').addEventListener('click', forgetProject);
+$('#btnMagicLink').addEventListener('click', sendMagicLink);
+$('#btnSignOut').addEventListener('click', signOut);
+$('#btnSyncNow').addEventListener('click', () => { if (syncStore) syncStore.sync(); });
+
+/* Come back from a dead connection without the user having to do anything. */
+window.addEventListener('online', () => { if (syncStore) syncStore.sync(); });
+window.addEventListener('offline', () => { if (syncStore) syncStore.setStatus('offline'); });
+
+/* Phase 4: the import modal. It only ever writes through AST.Store, so a
+   Zapp paste or a CSV lands in whichever backend is live and syncs like any
+   hand edit. All parsing lives in import.js, all modal wiring in
+   import-ui.js — this page owns only the markup and these three callbacks. */
+ASTImportUI.init({
+  getShows: () => state.shows,
+  onDone: () => refresh(),
+  toast: (msg, label, fn, ms) => toast(msg, label, fn, ms)
+});
+$('#btnImportShows').addEventListener('click', () => ASTImportUI.open());
+
+/* Phase 5: share and export. The panel reads the same shows the ledger is
+   showing (so whichever Store is live) and writes nothing but its own
+   preferences. All rendering — card, caption, snippet — is in share.js. */
+ASTShareUI.init({
+  getShows: () => state.shows,
+  toast: (msg, label, fn, ms) => toast(msg, label, fn, ms)
+});
+$('#btnShare').addEventListener('click', () => ASTShareUI.open());
+
+$('#btnExport').addEventListener('click', exportJSON);
+$('#btnImport').addEventListener('click', () => $('#fileImport').click());
+$('#fileImport').addEventListener('change', e => {
+  const f = e.target.files && e.target.files[0];
+  if (f) importJSON(f);
+  e.target.value = '';
+});
+
+$('#btnTheme').addEventListener('click', () => Theme.toggle());
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('#drawer').hidden) closeDrawer();
+  else if (e.key === 'Escape' && !$('#settingsDrawer').hidden) closeSettings();
+  else if (e.key === 'Escape' && $('#mapShell').classList.contains('is-sheet')) setSheet(false);
+  if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey &&
+      $('#drawer').hidden && $('#importModal').hidden && $('#shareModal').hidden &&
+      !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
+    e.preventDefault(); openDrawer(null);
+  }
+});
+
+/* ---- Map <-> list, both directions -------------------------------------- */
+const list = $('#showList');
+const rowId = e => { const r = e.target.closest('.show-row'); return r ? r.dataset.id : null; };
+
+list.addEventListener('mouseover', e => { const id = rowId(e); if (id) hoverStop(id); });
+list.addEventListener('mouseout',  e => {
+  const row = e.target.closest('.show-row');
+  if (row && !row.contains(e.relatedTarget)) hoverStop(null);
+});
+list.addEventListener('focusin',  e => { const id = rowId(e); if (id) hoverStop(id); });
+list.addEventListener('focusout', e => {
+  const row = e.target.closest('.show-row');
+  if (row && !row.contains(e.relatedTarget)) hoverStop(null);
+});
+
+$('#btnMapToggle').addEventListener('click', () => {
+  if (mqPhone.matches) setSheet(!$('#mapShell').classList.contains('is-sheet'));
+  else setCollapsed(!mapCollapsed);
+});
+$('#btnMapClose').addEventListener('click', () => setSheet(false));
+mqPhone.addEventListener('change', syncMapChrome);
+mqNarrow.addEventListener('change', syncMapChrome);
+window.addEventListener('resize', () => { if (routeMap) routeMap.invalidateSize(); });
+
+/* Keep focus inside whichever drawer is open. */
+function trapFocus(root) {
+  root.addEventListener('keydown', e => {
+    if (e.key !== 'Tab') return;
+    const items = root.querySelectorAll(
+      'button:not([hidden]), input:not([hidden]), select, textarea, [tabindex="0"]');
+    const list = Array.from(items).filter(el => el.offsetParent !== null);
+    if (!list.length) return;
+    const first = list[0], last = list[list.length - 1];
+    if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
+    else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+  });
+}
+trapFocus($('#drawer'));
+trapFocus($('#settingsDrawer'));
+trapFocus($('#importModal'));
+trapFocus($('#shareModal'));
+
+/* ==========================================================================
+   13. BOOT
+   ========================================================================== */
+Theme.init();
+fillStatusSelect();
+setRating(0, { silent: true });
+syncMapChrome();
+
+/* A failed magic link comes back with the reason in the fragment. */
+const linkError = ASTSupabase.Auth.errorFromHash();
+startSync();
+paintAccount();
+if (linkError) toast('Sign-in link failed: ' + linkError, null, null, 9000);
+refresh().catch(err => {
+  console.error(err);
+  toast('Could not load saved shows.');
+});
+</script>
+</body>
+</html>

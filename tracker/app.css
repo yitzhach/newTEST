@@ -1,0 +1,539 @@
+/* ==========================================================================
+   TOKENS
+   ========================================================================== */
+:root {
+  --bg:#ffffff; --surface:#fafaf9; --ink:#171717; --muted:#737373;
+  --line:#e5e5e5; --accent:#2f5d4f; --accent-ink:#ffffff;
+  --s-applied:#6366f1; --s-accepted:#2f5d4f; --s-waitlist:#b45309;
+  --s-declined:#737373; --s-interested:#0f766e; --s-not_applying:#a3a3a3;
+  --danger:#b42318; --warn:#b45309;
+  --font:"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --shadow:0 10px 40px rgba(0,0,0,.12);
+}
+html[data-theme="dark"] {
+  --bg:#0f0f0f; --surface:#171717; --ink:#f5f5f4; --muted:#a3a3a3;
+  --line:#262626; --accent:#7fb09c; --accent-ink:#0f0f0f;
+  --s-applied:#818cf8; --s-accepted:#7fb09c; --s-waitlist:#d97706;
+  --s-declined:#a3a3a3; --s-interested:#2dd4bf; --s-not_applying:#525252;
+  --danger:#f87171; --warn:#fbbf24;
+  --shadow:0 10px 40px rgba(0,0,0,.6);
+}
+* { box-sizing:border-box; }
+html, body { height:100%; }
+body {
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--font);
+  font-weight:300; font-size:15px; line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button, input, select, textarea { font:inherit; color:inherit; }
+button { background:none; border:none; cursor:pointer; }
+a { color:var(--accent); }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.label {
+  font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--muted);
+}
+.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+.app-header {
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:22px 32px; border-bottom:1px solid var(--line); flex-wrap:wrap;
+}
+.brand { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; }
+.brand h1 {
+  margin:0; font-size:15px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+}
+.brand .sub { font-size:11px; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
+.header-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.btn {
+  display:inline-flex; align-items:center; gap:8px; justify-content:center;
+  min-height:44px; padding:0 16px; border:1px solid var(--line); background:var(--bg);
+  font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+}
+.btn:hover { border-color:var(--ink); }
+.btn-primary { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+.btn-primary:hover { filter:brightness(1.08); border-color:var(--accent); }
+.btn-quiet { border-color:transparent; color:var(--muted); }
+.btn-quiet:hover { color:var(--ink); border-color:var(--line); }
+.btn-danger { color:var(--danger); }
+.btn-icon { width:44px; min-height:44px; padding:0; border-color:transparent; }
+.btn-icon:hover { border-color:var(--line); }
+svg { display:block; }
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+.main { display:grid; grid-template-columns:minmax(0,1fr) 392px; align-items:start; }
+.ledger { padding:18px 8px 64px 32px; min-width:0; }
+.rail {
+  border-left:1px solid var(--line); background:var(--surface);
+  padding:18px 32px 64px 26px; min-height:calc(100vh - 88px);
+}
+@media (max-width:1023px) {
+  .main { grid-template-columns:minmax(0,1fr); }
+  .ledger { padding:18px 24px 32px; }
+  .rail { border-left:none; border-top:1px solid var(--line); padding:24px; min-height:0; }
+}
+@media (max-width:767px) {
+  .app-header { padding:16px; }
+  .ledger { padding:12px 16px 32px; }
+  .rail { padding:20px 16px 48px; }
+}
+
+/* ==========================================================================
+   TOOLBAR
+   ========================================================================== */
+.toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:8px 0 14px; }
+.chips { display:flex; gap:6px; flex-wrap:wrap; }
+.chip {
+  min-height:36px; padding:0 12px; border:1px solid var(--line); background:var(--bg);
+  font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+}
+.chip[aria-pressed="true"] { border-color:var(--ink); color:var(--ink); font-weight:600; }
+.spacer { flex:1 1 auto; }
+.field-inline { display:flex; align-items:center; gap:8px; }
+select.control, input.control, textarea.control {
+  background:var(--bg); border:1px solid var(--line); color:var(--ink);
+  padding:10px 12px; min-height:44px; width:100%; border-radius:0;
+}
+textarea.control { min-height:110px; resize:vertical; line-height:1.6; }
+.control:hover { border-color:var(--muted); }
+
+/* ==========================================================================
+   SHOW LIST
+   ========================================================================== */
+.row-grid {
+  display:grid; grid-template-columns:52px minmax(0,1fr) 148px 116px 104px 116px;
+  gap:0 14px; align-items:baseline;
+}
+.list-head { padding:10px 0 8px; border-bottom:1px solid var(--line); }
+.list-head > div { font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.show-row {
+  width:100%; text-align:left; padding:14px 0; border-bottom:1px solid var(--line);
+  background:none; cursor:pointer;
+}
+.show-row:hover { background:var(--surface); }
+.show-row .num { font-size:12px; font-weight:600; letter-spacing:.08em; color:var(--accent); }
+.show-row .num.alt { color:var(--warn); }
+.show-row .name { font-size:15px; font-weight:400; }
+.show-row .place { font-size:12px; color:var(--muted); margin-top:2px; }
+.show-row .meta { font-size:12px; color:var(--muted); letter-spacing:.04em; }
+.show-row .meta.due-soon { color:var(--warn); font-weight:600; }
+.show-row .meta.due-past { color:var(--muted); opacity:.6; }
+.pill {
+  display:inline-block; font-size:10px; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; padding:4px 9px; border:1px solid currentColor; white-space:nowrap;
+}
+.pill[data-status="applied"] { color:var(--s-applied); }
+.pill[data-status="accepted"] { color:var(--s-accepted); }
+.pill[data-status="waitlist"] { color:var(--s-waitlist); }
+.pill[data-status="declined"] { color:var(--s-declined); }
+.pill[data-status="interested"] { color:var(--s-interested); }
+.pill[data-status="not_applying"] { color:var(--s-not_applying); }
+.empty { padding:48px 0; color:var(--muted); font-size:14px; }
+.list-note { padding:14px 0 0; font-size:12px; color:var(--muted); }
+@media (max-width:767px) {
+  .list-head { display:none; }
+  .row-grid { grid-template-columns:44px minmax(0,1fr); gap:2px 12px; }
+  .show-row .r-dates { grid-column:2; }
+  .show-row .r-deadline { grid-column:2; }
+  .show-row .r-status { grid-column:2; margin-top:6px; }
+  .show-row .r-rating { grid-column:2; margin-top:4px; }
+}
+
+/* ==========================================================================
+   RATING
+   ========================================================================== */
+.stars { display:inline-flex; align-items:center; gap:2px; }
+.rating-control { display:inline-flex; align-items:center; gap:10px; min-height:44px; }
+.rating-track { display:inline-flex; gap:2px; cursor:pointer; padding:4px 0; }
+.rating-value { font-size:11px; letter-spacing:.12em; color:var(--muted); min-width:56px; }
+
+/* ==========================================================================
+   RAIL PANELS
+   ========================================================================== */
+.panel + .panel { margin-top:32px; }
+.panel h2 { margin:0 0 10px; font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.deadline-row {
+  display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+  padding:11px 0; border-bottom:1px solid var(--line);
+}
+.deadline-row .d-name { font-size:13px; }
+.deadline-row .d-when { font-size:11px; letter-spacing:.08em; text-align:right; white-space:nowrap; }
+.d-critical { color:var(--danger); font-weight:600; }
+.d-soon { color:var(--warn); font-weight:600; }
+.d-ok { color:var(--muted); }
+.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px 12px; }
+.stat .n { font-size:22px; font-weight:300; }
+.stat .k { font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted); }
+
+/* ==========================================================================
+   DRAWER
+   ========================================================================== */
+.overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,.35); border:none; padding:0; margin:0;
+  z-index:40;
+}
+html[data-theme="dark"] .overlay { background:rgba(0,0,0,.6); }
+.drawer {
+  position:fixed; top:0; right:0; bottom:0; width:min(460px,100vw); z-index:50;
+  background:var(--bg); border-left:1px solid var(--line); box-shadow:var(--shadow);
+  display:flex; flex-direction:column;
+}
+.drawer-head {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:18px 20px; border-bottom:1px solid var(--line);
+}
+.drawer-head h2 { margin:0; font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; }
+.drawer-body { flex:1; overflow-y:auto; padding:20px; }
+.drawer-foot {
+  display:flex; gap:8px; align-items:center; padding:16px 20px; border-top:1px solid var(--line);
+}
+.form-row { margin-bottom:18px; }
+.form-row > .label { display:block; margin-bottom:6px; }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:0 12px; }
+.check { display:flex; align-items:center; gap:10px; min-height:44px; }
+.check input { width:18px; height:18px; accent-color:var(--accent); }
+.err { color:var(--danger); font-size:12px; margin-top:6px; }
+.hint { color:var(--muted); font-size:12px; margin-top:6px; }
+.control[aria-invalid="true"] { border-color:var(--danger); }
+@media (max-width:767px) { .drawer { width:100vw; border-left:none; } .grid-2 { grid-template-columns:1fr; } }
+
+/* ==========================================================================
+   TOAST
+   ========================================================================== */
+.toast {
+  position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:60;
+  display:flex; align-items:center; gap:14px; padding:12px 12px 12px 18px;
+  background:var(--ink); color:var(--bg); box-shadow:var(--shadow); max-width:calc(100vw - 32px);
+}
+.toast .t-msg { font-size:13px; }
+.toast .t-act {
+  min-height:36px; padding:0 12px; border:1px solid currentColor;
+  font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+}
+[hidden] { display:none !important; }
+
+/* ==========================================================================
+   MAP — shared by tracker/index.html (rail) and tracker/map.html (full page)
+   ========================================================================== */
+.leaflet-container { font-family:var(--font); background:var(--surface); }
+.leaflet-container a { color:var(--accent); }
+
+/* OSM tiles are a light raster; in dark mode invert them so the page keeps
+   one ground colour. Markers and route lines sit above the tile pane and are
+   unaffected. */
+html[data-theme="dark"] .leaflet-tile-pane {
+  filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7);
+}
+.leaflet-control-attribution {
+  background:var(--bg) !important; color:var(--muted) !important;
+  font-size:10px !important; font-family:var(--font);
+}
+.leaflet-bar a, .leaflet-bar a:hover {
+  background:var(--bg); color:var(--ink); border-bottom-color:var(--line);
+}
+.leaflet-bar { border:1px solid var(--line); box-shadow:none; }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background:var(--bg); color:var(--ink); border:1px solid var(--line);
+  border-radius:0; box-shadow:var(--shadow);
+}
+.leaflet-popup-content { margin:14px 16px; font-size:13px; line-height:1.55; }
+.leaflet-popup-close-button { color:var(--muted) !important; }
+
+/* Numbered markers. Leaflet owns the transform on the icon root, so all
+   visual state lives on the inner .pin-dot. */
+.stop-pin { background:none; border:none; }
+.stop-pin .pin-dot {
+  display:flex; align-items:center; justify-content:center;
+  width:28px; height:28px; border-radius:50%;
+  background:var(--accent); color:var(--accent-ink);
+  border:2px solid var(--bg);
+  font-size:11px; font-weight:600; letter-spacing:.02em;
+  box-shadow:0 1px 6px rgba(0,0,0,.3);
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.stop-pin.is-alt .pin-dot {
+  background:var(--bg); color:var(--warn); border:2px dashed var(--warn);
+}
+.stop-pin.is-hot .pin-dot { transform:scale(1.32); box-shadow:0 3px 14px rgba(0,0,0,.45); }
+.stop-pin.is-selected .pin-dot { outline:2px solid var(--ink); outline-offset:2px; }
+.stop-pin:focus { outline:none; }
+.stop-pin:focus-visible .pin-dot { outline:2px solid var(--ink); outline-offset:3px; }
+
+.pop-name { font-size:13px; font-weight:600; }
+.pop-meta { font-size:11px; color:var(--muted); letter-spacing:.06em; text-transform:uppercase; margin-top:4px; }
+.pop-alt { color:var(--warn); }
+
+/* Row highlight driven by the map (mirror of .show-row:hover). */
+.show-row.is-hot, .itin-row.is-hot { background:var(--surface); }
+.show-row.is-hot .num, .itin-row.is-hot .num { text-decoration:underline; }
+
+/* ---- Rail panel shell ---------------------------------------------------- */
+.map-shell { position:relative; }
+/* z-index:0 on a positioned element makes the map its own stacking context, so
+   Leaflet's controls (z-index 800) stay inside it. Without this they float
+   above the drawer and the overlay and swallow clicks on them. */
+.map-canvas {
+  position:relative; z-index:0;
+  height:320px; border:1px solid var(--line); background:var(--surface);
+}
+.map-sheet-head { display:none; }
+.map-empty {
+  display:flex; align-items:center; justify-content:center; height:100%;
+  padding:24px; text-align:center; font-size:12px; color:var(--muted);
+}
+.map-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.map-actions .btn { flex:1 1 100%; }   /* the hand-off labels are long; give each its own row */
+.map-note { font-size:11px; color:var(--muted); margin:10px 0 0; line-height:1.6; }
+.leg-list { margin:10px 0 0; padding:0; list-style:none; border-top:1px solid var(--line); }
+.leg-list li {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  min-height:44px; padding:4px 0; border-bottom:1px solid var(--line);
+}
+.leg-list .leg-k {
+  font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+}
+.leg-links { display:flex; gap:4px; flex:0 0 auto; }
+.leg-links a {
+  display:inline-flex; align-items:center; min-height:36px; padding:0 10px;
+  border:1px solid var(--line); text-decoration:none; color:var(--ink);
+  font-size:10px; font-weight:600; letter-spacing:.12em; text-transform:uppercase;
+}
+.leg-links a:hover { border-color:var(--ink); color:var(--accent); }
+.panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.panel-head h2 { margin:0 0 10px; }
+.btn-mini {
+  min-height:36px; padding:0 10px; border:1px solid var(--line); background:var(--bg);
+  font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);
+}
+.btn-mini:hover { color:var(--ink); border-color:var(--ink); }
+
+/* 768–1023: the map collapses so the ledger stays reachable. */
+@media (max-width:1023px) { .map-canvas { height:380px; } }
+
+/* <768: the map opens as a full-screen sheet. The same node is promoted with
+   a class — it is never reparented, so Leaflet keeps its state. */
+@media (max-width:767px) {
+  /* The inline map is gone on phones; the sheet is the only map surface. */
+  .map-shell:not(.is-sheet) { display:none; }
+  .map-shell.is-sheet {
+    position:fixed; inset:0; z-index:70; background:var(--bg);
+    display:flex; flex-direction:column; border:none;
+  }
+  .map-shell.is-sheet .map-sheet-head {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 16px; border-bottom:1px solid var(--line); flex:0 0 auto;
+  }
+  .map-shell.is-sheet .map-canvas { flex:1 1 auto; height:auto; border:none; }
+}
+
+/* ==========================================================================
+   FULL-PAGE MAP (tracker/map.html)
+   ========================================================================== */
+.map-page { display:grid; grid-template-columns:minmax(0,1fr) 392px; align-items:stretch; }
+.map-page .map-stage { position:relative; min-width:0; }
+.map-page .map-canvas { height:calc(100vh - 88px); border:none; border-right:1px solid var(--line); }
+.map-page .rail { min-height:calc(100vh - 88px); border-left:none; overflow-y:auto; }
+.itin-row {
+  display:grid; grid-template-columns:44px minmax(0,1fr); gap:0 12px; align-items:baseline;
+  width:100%; text-align:left; padding:12px 0; border-bottom:1px solid var(--line);
+  background:none; cursor:pointer;
+}
+.itin-row:hover { background:var(--bg); }
+.itin-row .num { font-size:12px; font-weight:600; letter-spacing:.08em; color:var(--accent); }
+.itin-row .num.alt { color:var(--warn); }
+.itin-row .name { font-size:14px; }
+.itin-row .meta { font-size:11px; color:var(--muted); letter-spacing:.04em; margin-top:2px; }
+.itin-row[aria-current="true"] { background:var(--bg); box-shadow:inset 3px 0 0 var(--accent); padding-left:10px; }
+@media (max-width:1023px) {
+  .map-page { grid-template-columns:minmax(0,1fr); }
+  .map-page .map-canvas { height:56vh; border-right:none; border-bottom:1px solid var(--line); }
+  .map-page .rail { min-height:0; }
+}
+
+/* Route geometry is styled in CSS, not via Leaflet's `color` option: Leaflet
+   writes that as an SVG presentation attribute, where var() does not resolve.
+   As a class it also re-colours itself on a theme switch for free. */
+.route-line { stroke:var(--accent); fill:none; }
+.route-spur { stroke:var(--warn); fill:none; }
+
+/* ==========================================================================
+   SYNC + ACCOUNT (Phase 3)
+   ========================================================================== */
+.sync-pill {
+  display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 14px;
+  border:1px solid var(--line); background:var(--bg);
+  font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--muted);
+}
+.sync-pill:hover { border-color:var(--ink); color:var(--ink); }
+.sync-dot { width:7px; height:7px; border-radius:50%; background:var(--muted); flex:0 0 auto; }
+[data-state="synced"]  .sync-dot { background:var(--s-accepted); }
+[data-state="syncing"] .sync-dot { background:var(--s-applied); }
+[data-state="offline"] .sync-dot { background:var(--warn); }
+[data-state="error"]   .sync-dot { background:var(--danger); }
+[data-state="synced"]  { color:var(--ink); }
+[data-state="error"]   { color:var(--danger); }
+
+.sync-state {
+  display:flex; align-items:center; gap:10px; padding:12px 14px; margin-bottom:22px;
+  border:1px solid var(--line); background:var(--surface); font-size:13px;
+}
+@media (max-width:767px) {
+  .sync-pill { padding:0 10px; }
+  .sync-pill #syncText { display:none; }
+}
+
+.btn-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.btn-row .btn { flex:1 1 auto; }
+
+/* ==========================================================================
+   IMPORT (Phase 4) — Zapplication paste, CSV, review table
+
+   A drawer is the wrong shape here: the review table carries fourteen
+   editable columns, so this is a wide centred modal that scrolls its table
+   sideways inside itself. The page body never scrolls horizontally.
+   ========================================================================== */
+.modal {
+  position:fixed; inset:0; z-index:55; display:flex; align-items:center; justify-content:center;
+  padding:24px; pointer-events:none;
+}
+.modal-card {
+  pointer-events:auto;
+  display:flex; flex-direction:column;
+  width:min(1180px, 100%); max-height:min(92vh, 900px);
+  background:var(--bg); border:1px solid var(--line); box-shadow:var(--shadow);
+}
+.modal-head {
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  padding:16px 20px; border-bottom:1px solid var(--line);
+}
+.modal-head h2 { margin:0; font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; }
+.modal-body { flex:1 1 auto; overflow-y:auto; padding:20px; min-height:0; }
+.modal-foot {
+  display:flex; gap:8px; align-items:center; padding:14px 20px; border-top:1px solid var(--line);
+}
+
+.imp-steps { display:flex; gap:14px; flex-wrap:wrap; }
+.imp-step {
+  font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);
+}
+.imp-step.is-now { color:var(--accent); }
+.imp-step.is-done { color:var(--ink); }
+
+.tabs { display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid var(--line); }
+.tab {
+  min-height:44px; padding:0 4px; margin-bottom:-1px; background:none; border:none;
+  border-bottom:2px solid transparent; color:var(--muted);
+  font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+}
+.tab:hover { color:var(--ink); }
+.tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--accent); }
+
+.imp-paste { min-height:220px; width:100%; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; }
+
+/* ---- Column mapping ---------------------------------------------------- */
+.map-table { width:100%; border-collapse:collapse; }
+.map-table th, .map-table td { text-align:left; padding:6px 10px 6px 0; vertical-align:middle; }
+.map-table thead th {
+  font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+  border-bottom:1px solid var(--line); padding-bottom:10px;
+}
+.map-table tbody th { font-size:13px; font-weight:400; white-space:nowrap; }
+.map-table tbody tr + tr th, .map-table tbody tr + tr td { border-top:1px solid var(--line); }
+.map-table select.control { min-width:220px; }
+.map-sample { font-size:12px; color:var(--muted); max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* ---- Review table ------------------------------------------------------ */
+.imp-toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.imp-toolbar .btn-row { margin-top:0; }
+
+.rev-scroll { overflow-x:auto; border:1px solid var(--line); }
+.rev-table { border-collapse:collapse; width:max-content; min-width:100%; }
+.rev-table th, .rev-table td { padding:6px 8px; white-space:nowrap; vertical-align:middle; }
+.rev-table thead th {
+  position:sticky; top:0; z-index:1; background:var(--bg); text-align:left;
+  font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);
+  border-bottom:1px solid var(--line);
+}
+.rev-table tbody tr + tr td { border-top:1px solid var(--line); }
+.rev-table tbody tr.is-off { opacity:.45; }
+.rev-table .col-tick { width:34px; }
+.rev-table .col-tick input { width:18px; height:18px; accent-color:var(--accent); }
+.rev-table .col-flag { min-width:150px; white-space:normal; }
+
+.rev-input {
+  min-height:36px; padding:5px 8px; border:1px solid var(--line); background:var(--bg); color:var(--ink);
+  font:inherit; font-size:13px; max-width:34ch;
+}
+.rev-input:focus { outline:none; border-color:var(--ink); }
+/* Confidence, as the phase asks — one flag per field, visible per cell.
+   Colour is never the only cue: every cell's title says why it is flagged. */
+.rev-input.c-med { border-bottom:2px solid var(--s-applied); }
+.rev-input.c-low { border-bottom:2px solid var(--warn); background:color-mix(in srgb, var(--warn) 7%, var(--bg)); }
+.rev-input.is-bad { border-color:var(--danger); }
+
+.dupe-new { font-size:10px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--s-accepted); }
+.dupe-flag {
+  display:inline-block; margin-right:6px;
+  font-size:10px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--warn);
+}
+.dupe-flag.is-bad-flag { color:var(--danger); }
+.rev-action { min-height:32px; font:inherit; font-size:11px; border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+.geo-flag { display:inline-block; margin-right:6px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.geo-flag.geo-miss, .geo-flag.geo-error { color:var(--danger); }
+
+.imp-legend { line-height:1.8; }
+.imp-legend .key {
+  display:inline-block; width:22px; height:0; margin:0 4px 0 10px; vertical-align:middle;
+  border-bottom:2px solid var(--line);
+}
+.imp-legend .key.c-med { border-bottom-color:var(--s-applied); }
+.imp-legend .key.c-low { border-bottom-color:var(--warn); }
+.is-bad-note { color:var(--danger); }
+
+/* ==========================================================================
+   SHARE & EXPORT (Phase 5)
+   ========================================================================== */
+.shr-controls {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:0 16px; align-items:end;
+}
+.shr-controls .form-row { margin-bottom:14px; }
+.shr-controls .shr-wide { grid-column:1 / -1; }
+.shr-controls .check { min-height:38px; font-size:13px; color:var(--muted); }
+.shr-sub { display:block; margin:22px 0 10px; }
+.shr-preview {
+  display:flex; justify-content:center; padding:18px 0 6px;
+}
+.shr-preview canvas {
+  width:100%; max-width:340px; height:auto; border:1px solid var(--line);
+  box-shadow:var(--shadow); background:var(--surface);
+}
+.shr-preview canvas.is-story { max-width:220px; }
+.shr-text {
+  width:100%; min-height:230px; resize:vertical;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px;
+  line-height:1.6; white-space:pre; overflow-wrap:normal; overflow-x:auto;
+}
+.shr-embed-preview {
+  border:1px solid var(--line); background:var(--surface); padding:18px 20px;
+}
+.shr-share { border-top:1px solid var(--line); margin-top:26px; }
+#shareModal .btn-row .btn { flex:0 1 auto; }
+.btn.is-off { opacity:.5; }
+.shr-status { margin:0; }
+
+@media (max-width:767px) {
+  .modal { padding:0; }
+  .modal-card { width:100vw; max-height:100vh; height:100vh; border:none; }
+  .map-table select.control { min-width:150px; }
+  .map-sample { max-width:120px; }
+  .shr-controls { grid-template-columns:1fr; }
+  .shr-preview canvas { max-width:260px; }
+  .shr-preview canvas.is-story { max-width:170px; }
+}

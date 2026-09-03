@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Route map — Show Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+      referrerpolicy="no-referrer">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<!-- ==========================================================================
+     HEADER
+     ========================================================================== -->
+<header class="app-header">
+  <div class="brand">
+    <h1>Route map</h1>
+    <span class="sub">Isaac Anderson &middot; 2027 season</span>
+  </div>
+  <div class="header-actions">
+    <a class="btn btn-quiet" href="index.html">&larr; Back to ledger</a>
+    <button class="btn btn-icon" id="btnTheme" type="button" aria-label="Switch theme" title="Switch theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" id="iconSun">
+        <circle cx="10" cy="10" r="3.6"/>
+        <path d="M10 1.6v2.2M10 16.2v2.2M2.6 10H4.8M15.2 10h2.2M4.8 4.8l1.6 1.6M13.6 13.6l1.6 1.6M15.2 4.8l-1.6 1.6M6.4 13.6l-1.6 1.6"/>
+      </svg>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" stroke-linejoin="round" id="iconMoon" hidden>
+        <path d="M16.5 11.8A6.9 6.9 0 0 1 8.2 3.5a6.9 6.9 0 1 0 8.3 8.3z"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ==========================================================================
+     MAP + ITINERARY
+     ========================================================================== -->
+<div class="map-page">
+  <div class="map-stage">
+    <div class="map-canvas" id="mapCanvas" role="application" aria-label="Route map"></div>
+  </div>
+
+  <aside class="rail">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Itinerary</h2>
+        <button class="btn-mini" id="btnFit" type="button">Fit route</button>
+      </div>
+      <div id="itinerary"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Hand off the route</h2>
+      <div class="map-actions">
+        <a class="btn" id="btnGoogle" href="#" target="_blank" rel="noopener">Open route in Google Maps</a>
+        <a class="btn" id="btnApple" href="#" target="_blank" rel="noopener">Open in Apple Maps</a>
+      </div>
+      <ul class="leg-list" id="legList" hidden></ul>
+      <p class="map-note" id="mapNote"></p>
+    </section>
+  </aside>
+</div>
+
+<div class="toast" id="toast" hidden>
+  <span class="t-msg" id="toastMsg"></span>
+  <button class="t-act" id="toastAct" type="button" hidden></button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
+        referrerpolicy="no-referrer"></script>
+<script src="core.js"></script>
+<script src="map.js"></script>
+<script src="store-supabase.js"></script>
+<script type="module">
+/* ==========================================================================
+   FULL-PAGE MAP
+   Same Store, same map module as the ledger — this page only adds the
+   itinerary rail and the #stop= deep link. No map code lives here.
+   ========================================================================== */
+const { Store, byDate, hasCoords, esc, place, fmtRange, STATUS_LABEL, Theme } = window.AST;
+const $ = sel => document.querySelector(sel);
+
+const state = { shows: [], selectedId: null };
+let routeMap = null;
+
+/* ---- Deep link: #stop=6a (a stop number, or an id) ----------------------- */
+function readHash() {
+  const m = /(?:^|[#&])stop=([^&]+)/.exec(location.hash || '');
+  return m ? decodeURIComponent(m[1]) : null;
+}
+/** Resolves a hash token to a show: stop number first, then id. */
+function showFromToken(token) {
+  if (!token) return null;
+  const t = String(token).trim().toLowerCase();
+  return state.shows.find(s => (s.routeNumber || '').toLowerCase() === t)
+      || state.shows.find(s => s.id.toLowerCase() === t)
+      || null;
+}
+function writeHash(show) {
+  const token = show ? (show.routeNumber || show.id) : '';
+  const next = token ? '#stop=' + encodeURIComponent(token) : '#';
+  if (location.hash !== next) history.replaceState(null, '', next);
+}
+
+/* ---- Itinerary ----------------------------------------------------------- */
+function renderItinerary() {
+  const rows = byDate(state.shows);
+  const host = $('#itinerary');
+  if (!rows.length) {
+    host.innerHTML = '<p class="empty">No shows yet. Add them in the ledger.</p>';
+    return;
+  }
+  host.innerHTML = rows.map(s =>
+    '<button type="button" class="itin-row" data-id="' + esc(s.id) + '"' +
+      (s.id === state.selectedId ? ' aria-current="true"' : '') + '>' +
+      '<span class="num' + (s.isAlternate ? ' alt' : '') + '">' + esc(s.routeNumber || '–') + '</span>' +
+      '<span><span class="name">' + esc(s.name || 'Untitled show') + '</span>' +
+        '<span class="meta" style="display:block;">' + esc(place(s)) + '</span>' +
+        '<span class="meta" style="display:block;">' + esc(fmtRange(s.startDate, s.endDate)) +
+          ' · ' + esc(STATUS_LABEL[s.status]) +
+          (hasCoords(s) ? '' : ' · not on the map') + '</span></span>' +
+    '</button>'
+  ).join('');
+}
+
+function highlightRow(id) {
+  document.querySelectorAll('.itin-row.is-hot').forEach(el => el.classList.remove('is-hot'));
+  if (!id) return;
+  const row = $('.itin-row[data-id="' + CSS.escape(id) + '"]');
+  if (!row) return;
+  row.classList.add('is-hot');
+  row.scrollIntoView({ block: 'nearest' });
+}
+
+/** Selects a stop everywhere at once: map, rail and URL. */
+function selectStop(id, { pan = true } = {}) {
+  state.selectedId = id;
+  renderItinerary();
+  const show = state.shows.find(s => s.id === id) || null;
+  writeHash(show);
+  if (routeMap && pan && show && hasCoords(show)) routeMap.focusStop(id);
+  else if (routeMap) routeMap.select(id);
+}
+
+/* ---- Boot ---------------------------------------------------------------- */
+function renderMap() {
+  const info = ASTMap.routeStops(state.shows);
+  if (routeMap) { routeMap.setShows(state.shows); routeMap.fitAll(); }
+  ASTMap.renderHandoff(info, {
+    google: $('#btnGoogle'), apple: $('#btnApple'),
+    legList: $('#legList'), note: $('#mapNote')
+  });
+}
+
+Theme.onChange(t => {
+  $('#iconSun').hidden = t === 'dark';
+  $('#iconMoon').hidden = t !== 'dark';
+  $('#btnTheme').setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+});
+$('#btnTheme').addEventListener('click', () => Theme.toggle());
+$('#btnFit').addEventListener('click', () => { if (routeMap) routeMap.fitAll(); });
+
+const itin = $('#itinerary');
+const rowId = e => { const r = e.target.closest('.itin-row'); return r ? r.dataset.id : null; };
+itin.addEventListener('click', e => { const id = rowId(e); if (id) selectStop(id); });
+itin.addEventListener('mouseover', e => { const id = rowId(e); if (id && routeMap) routeMap.highlight(id); });
+itin.addEventListener('mouseout', e => {
+  const row = e.target.closest('.itin-row');
+  if (row && !row.contains(e.relatedTarget) && routeMap) routeMap.clearHighlight();
+});
+itin.addEventListener('focusin', e => { const id = rowId(e); if (id && routeMap) routeMap.highlight(id); });
+itin.addEventListener('focusout', e => {
+  const row = e.target.closest('.itin-row');
+  if (row && !row.contains(e.relatedTarget) && routeMap) routeMap.clearHighlight();
+});
+window.addEventListener('hashchange', () => {
+  const show = showFromToken(readHash());
+  if (show && show.id !== state.selectedId) selectStop(show.id);
+});
+
+Theme.init();
+
+/* Same Store swap as the ledger: if a Supabase project is configured this
+   page reads the synced season, otherwise it reads localStorage. Either way
+   the code below is unchanged. */
+let syncStore = null;
+function reloadShows() {
+  return Store.list().then(shows => {
+    state.shows = shows;
+    renderItinerary();
+    renderMap();
+    if (state.selectedId) selectStop(state.selectedId, { pan: false });
+  });
+}
+if (window.ASTSupabase) {
+  syncStore = ASTSupabase.connect({ onShows: () => reloadShows() });
+}
+
+Store.list().then(shows => {
+  state.shows = shows;
+  renderItinerary();
+
+  if (window.L && window.ASTMap) {
+    routeMap = ASTMap.create({
+      el: $('#mapCanvas'),
+      onHover: id => highlightRow(id),
+      onSelect: id => selectStop(id, { pan: false })
+    });
+  } else {
+    $('#mapCanvas').innerHTML =
+      '<div class="map-empty">Map unavailable — Leaflet could not be loaded from cdnjs. ' +
+      'The itinerary and hand-off links still work.</div>';
+  }
+  renderMap();
+
+  const deepLinked = showFromToken(readHash());
+  if (deepLinked) selectStop(deepLinked.id);
+}).catch(err => {
+  console.error(err);
+  $('#itinerary').innerHTML = '<p class="empty">Could not load saved shows.</p>';
+});
+</script>
+</body>
+</html>
