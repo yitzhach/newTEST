@@ -34,6 +34,24 @@ half-built in the code. Add to the top of each section as it comes up.
 - Other platforms once Zapp works: EntryThingy, JurorPro, ShowClix, direct
   show sites.
 
+## Share and export
+- **A public read path in Supabase** so the iframe embed follows the tracker
+  by itself. Phase 3's RLS is owner-only, which is correct for the ledger but
+  means an anonymous embed cannot read the table — hence `shows.json`, which
+  has to be re-uploaded when the season changes. Wants a `public_shows` view
+  (or a per-artist share token) plus a policy allowing anon select on it.
+- **A carousel of cards** — one slide per show instead of one card for the
+  season, which is what most artists actually post.
+- **A poster per show** (venue, booth number, hours) for the week of a show.
+- **The route map on the card.** Leaflet tiles cannot be drawn into a canvas
+  without a tile-side CORS header, so this needs a static map image service,
+  which needs an API key — the first paid dependency in the project.
+- **A QR code** on the story card pointing at the schedule page.
+- **.ics export** — already parked under Tracker features; the share panel is
+  where it belongs when it happens.
+- **Remember more than one share preset** (a caption voice for Instagram, a
+  drier one for email), rather than one set of preferences.
+
 ## Travel and money (the monetizable layer)
 - Per-leg lodging, van/truck rental, and flight lookups with affiliate links.
 - Cost model per show: booth + jury + travel + lodging + estimated hours,

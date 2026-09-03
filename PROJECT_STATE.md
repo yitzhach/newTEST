@@ -160,6 +160,68 @@ deadline tracking, and travel (lodging/rentals/flights) tie-ins.
   - Also fixed while in the file: `exportJSON` referenced `SCHEMA_VERSION`
     without binding it from `window.AST`, so Export JSON threw.
 
+- **Phase 5 built and working** — share and export. Two new modules,
+  `tracker/share.js` (selection, card, text, snippet — no DOM) and
+  `tracker/share-ui.js` (the panel), plus `tracker/embed.html` and the modal
+  markup in `tracker/index.html`. A **Share** button sits in the header.
+  - **One selection feeds all three outputs**, so the card, the caption and
+    the embed can never disagree about what is public: which statuses go out
+    (accepted only / accepted + waitlist / everything but declined), how many
+    shows, and whether alternates are included. **Declined and not-applying
+    shows are never publishable at all**, and alternates are off by default —
+    they are shows you have not committed to. A show that has started but not
+    finished still counts as upcoming; a finished one drops out.
+  - **Canvas share card at 1080×1080 and 1080×1920**, drawn in the site's own
+    type: Montserrat via the page's webfont, uppercase wide-tracked kicker and
+    meta lines, light display weight for the name, one hairline, one accent.
+    Light or dark, following the app or forced. Tracking is drawn glyph by
+    glyph rather than relying on `ctx.letterSpacing`, which not every browser
+    has. Long festival names are ellipsised inside the margin — checked by
+    reading the pixels in the right-hand margin, not by eye.
+  - The card **waits for the webfont** before drawing (canvas silently falls
+    back to Helvetica if you draw too early) and says so on the rare occasion
+    Montserrat did not load. Rows shrink to fit before any row is dropped, the
+    list block is centred in the space left, and **a row that still will not
+    fit is counted into the "+ N more shows" line and reported in the UI**
+    rather than vanishing.
+  - **Download PNG** (a real 1080×1080 PNG, verified by reading the file
+    header) and **Copy image** where the browser has `ClipboardItem`.
+  - **Copyable text block** in two shapes: a caption (one line per show —
+    `Jan 2–3 — Naples New Year's Art Fair, Naples, FL`) and an email block (a
+    block per show, with the year). Both name the artist, count what is not
+    listed, and carry the link. The character count is shown against
+    Instagram's 2,200 and X's 280, counting a link as X counts it.
+  - **Embed for isaacandersonart.com, two ways.** *Script* is self-contained:
+    the list is baked into the snippet, so it needs no hosting and makes no
+    requests — paste it again when the season changes. *iframe* points at a
+    hosted `tracker/embed.html` and stays current, at the cost of hosting that
+    file (with `core.js` and `share.js`) plus a `shows.json` you re-upload.
+    The iframe posts its height to the host page and the snippet resizes it.
+  - **One renderer, three homes.** The pasted snippet is `ASTShare.mountEmbed`
+    serialised — literally the same function the panel previews with and
+    `embed.html` calls — so the two embeds cannot drift. It builds DOM with
+    `textContent`, so a show name containing `</script><img onerror=…>`
+    renders as text and cannot break out of the snippet (checked by pasting
+    exactly that into a foreign page).
+  - **`shows.json` carries only what is public** — name, city, state, dates,
+    status, alternate flag, url. Never notes, fees, ratings, apply-by dates or
+    coordinates. `embed.html` reads the tracker's own storage **only over
+    `file://`** (the local double-click preview); on a real host a missing
+    `shows.json` says so rather than seeding a visitor's browser with the demo
+    season.
+  - **Share buttons, honestly labelled.** Facebook takes a URL and nothing
+    else — its prefill parameter has been gone for years — so clicking it
+    copies the caption to the clipboard and says so. X uses the intent URL
+    with the caption and link. Copy link. And **Instagram: there is no web API
+    to post**, so the button saves the PNG and copies the caption in one
+    click, and the panel says to post it from the phone app. Nothing in the UI
+    claims otherwise.
+  - The panel **writes nothing but its own preferences** (`AST.Settings`, key
+    `artShowTracker.share` — name, link, counts, sizes, never show data);
+    verified by comparing the stored season before and after. It reads shows
+    through the ledger's own state, so it works the same on LocalStore or the
+    Supabase SyncStore.
+
 ## Why the file split
 Phase 1's "one file" rule ran into Phase 2's "`map.html` reuses the same
 module, do not fork the code". Two pages cannot share inline script, so:
@@ -174,10 +236,19 @@ module, do not fork the code". Two pages cannot share inline script, so:
   column mapper, duplicate detection, and the Nominatim geocoder. **No DOM.**
 - `tracker/import-ui.js` — Phase 4: the import modal's wiring, the review
   table, and the commit. Writes only through `AST.Store`.
+- `tracker/share.js` — Phase 5: which shows are public, the canvas card, the
+  caption/email blocks, the embed snippet and the share URLs. **No DOM
+  reads.** Its `mountEmbed` is the function the pasted snippet carries.
+- `tracker/share-ui.js` — Phase 5: the share panel's wiring. Writes nothing
+  but the panel's own preferences.
+- `tracker/embed.html` — Phase 5: the read-only upcoming list, for an
+  `<iframe>` on isaacandersonart.com. Standalone but not forked — it draws
+  with `ASTShare.mountEmbed`.
 - `tracker/index.html` — the ledger; `tracker/map.html` — the full-page map.
 
-The geocode cache is the one new piece of stored state (`AST.Settings`,
-key `artShowTracker.geocache`) and it lives in `core.js` for the same reason
+The geocode cache and the share panel's preferences are the two new pieces of
+stored state (`AST.Settings`, keys `artShowTracker.geocache` and
+`artShowTracker.share`) and they live in `core.js` for the same reason
 everything else does: one file touches localStorage.
 
 These are **classic scripts on purpose, not ES modules**: `type="module"`
@@ -213,7 +284,15 @@ double-click. Verified that it still does. `core.js` publishes `window.AST`,
   carries fourteen editable columns; a 460px drawer cannot show them. It
   scrolls sideways inside its own box, so the page body never does.
 - **Sharing: canvas-rendered PNG card** (IG has no web post API) plus a
-  copyable caption and an embed snippet.
+  copyable caption and an embed snippet. Built in Phase 5. The embed ships in
+  two shapes because Phase 3's RLS is owner-only: a self-contained snippet
+  with the list baked in (no hosting, does not update itself) and an iframe
+  onto a hosted `embed.html` reading a `shows.json` you re-upload. A public
+  read path in Supabase would remove that re-upload; it is parked in
+  `docs/FUTURE_BUILD.md`.
+- **Nothing private is publishable.** The share panel's outputs carry name,
+  city, state, dates, status and url — never notes, fees, ratings, apply-by
+  dates or coordinates — and declined / not-applying shows never go out.
 
 ## Verified
 **Phase 1:** seed loads, add / edit / rate / note / delete + undo all work,
@@ -277,6 +356,32 @@ in via `AST.useStore` and confirms both the import and its undo write
 through the adapter rather than around it. A ten-record paste parses and
 commits in about **0.3s**, well inside the phase's "under a minute".
 
+**Phase 5:** 99 checks in headless Chromium driving the real panel over
+`file://`, all passing. They cover the selection rules (declined and
+not-applying never published, alternates off by default and still excluded
+when a not-applying show is one, a show mid-run still upcoming, the count cap
+and the "+ N more" remainder, the default status mode), the card (1080×1080
+and 1080×1920 canvases, the light and dark grounds sampled as pixels, that
+type was actually drawn, a long name ellipsised with the right-hand margin
+provably empty, rows dropped rather than overprinted and the drop reported,
+the story size fitting at least as many rows as the square), the caption and
+email blocks (line shapes, the year, the link, the remainder line, a declined
+show absent, the character count), copy through a stubbed clipboard, the
+script snippet (mount point, baked data, exactly one closing tag, rendering to
+five rows when pasted into a foreign page, read-only, and an injected
+`</script><img onerror>` neither escaping nor firing), the iframe snippet
+(src, count, height listener), `shows.json` holding no private fields, the
+Facebook and X URLs, the Instagram button downloading the PNG *and* copying
+the caption and saying to post from the app, a real 1080×1080 PNG download
+read back from disk, sharing never touching the stored season, preferences
+surviving a reload, the empty-season state, Escape and focus return, and no
+horizontal overflow at 1280 / 900 / 390px on every tab. A further five checks
+serve `tracker/embed.html` over real HTTP: a missing `shows.json` says so and
+leaves the visitor's storage untouched, a served `shows.json` renders, and the
+iframe reports its height to the host page. A nine-check regression pass
+confirms Phases 1-4 still work with the panel in place (ledger, import modal,
+drawer, JSON export, the map page).
+
 **Not verified from here:** the cdnjs and OpenStreetMap tile requests
 themselves — both hosts are blocked from the build sandbox, so the map was
 tested with a locally vendored Leaflet and no tiles. Open `tracker/index.html`
@@ -291,6 +396,12 @@ failure handling are all verified; what is not is that
 `nominatim.openstreetmap.org` returns what is expected for these particular
 city names. Run one import on a real connection to confirm.
 
+**Montserrat has never loaded here** — Google Fonts is blocked from the build
+sandbox — so every card in these checks was drawn in the fallback stack. The
+wait-for-the-webfont path and its fallback message are verified; what is not
+is how the card looks in the real typeface. Open the panel on a real
+connection and download one card.
+
 Phase 3 has never touched a **real** Supabase project — only a mock
 implementing the same endpoints. Before trusting it: create a project, run
 `docs/supabase-schema.sql`, paste the URL and anon key into the account panel,
@@ -300,19 +411,27 @@ that the magic-link redirect URL is allow-listed in Supabase's auth settings
 written.
 
 ## Next step
-Start a fresh chat and run `docs/BUILD_PROMPT.md`, **Phase 5 — Share and
-export** (canvas share card at 1080×1080 and 1080×1920, copyable caption and
-email block, an embed snippet for isaacandersonart.com, and share buttons —
-with Instagram honestly presented as download-the-image-and-copy-the-caption,
-because there is no web API to post to it).
+All five phases in `docs/BUILD_PROMPT.md` are built. What is left is real-data
+and real-service work, not new phases:
 
-Still outstanding, independent of Phase 5:
-- **Backfill stops 8-12** (through Apr 18). The CSV import now exists: save
-  the xlsx's Application Calendar tab as CSV, open **Import shows → CSV
-  file**, map the columns, and commit. This is the first thing to do with
-  Phase 4 on real data.
+- **Backfill stops 8-12** (through Apr 18). The CSV import exists: save the
+  xlsx's Application Calendar tab as CSV, open **Import shows → CSV file**,
+  map the columns, and commit. This is the first thing to do with Phase 4 on
+  real data, and the share card is thin until it is done.
 - **Point Phase 3 at a real Supabase project** and sign in on two devices —
-  see the caveat under Verified.
+  see the caveat under Verified. Two things only a real project can confirm:
+  the magic-link redirect URL is allow-listed (Authentication → URL
+  Configuration), and the RLS policies behave as written.
 - **Run one import on a real connection** to confirm Nominatim answers as
-  expected — see the caveat under Verified.
-- Add verified Subresource Integrity hashes to the two Leaflet tags.
+  expected for these city names — see the caveat under Verified.
+- **Open the map on a real connection** to confirm OpenStreetMap tiles paint;
+  neither cdnjs nor the tile host is reachable from the build sandbox.
+- **Add verified Subresource Integrity hashes** to the two Leaflet tags.
+- **Look at one share card with Montserrat actually loaded** — every card
+  drawn here used the fallback typeface.
+- **Publish the embed**: paste the self-contained snippet into
+  isaacandersonart.com, or upload `embed.html`, `core.js`, `share.js` and
+  `shows.json` and use the iframe snippet.
+- The 331 Phase 4 + Phase 5 checks still live in the build sandbox rather than
+  the repo — committing a runner is parked in `docs/FUTURE_BUILD.md` under
+  Technical.

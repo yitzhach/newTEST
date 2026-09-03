@@ -496,9 +496,44 @@ html[data-theme="dark"] .leaflet-tile-pane {
 .imp-legend .key.c-low { border-bottom-color:var(--warn); }
 .is-bad-note { color:var(--danger); }
 
+/* ==========================================================================
+   SHARE & EXPORT (Phase 5)
+   ========================================================================== */
+.shr-controls {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:0 16px; align-items:end;
+}
+.shr-controls .form-row { margin-bottom:14px; }
+.shr-controls .shr-wide { grid-column:1 / -1; }
+.shr-controls .check { min-height:38px; font-size:13px; color:var(--muted); }
+.shr-sub { display:block; margin:22px 0 10px; }
+.shr-preview {
+  display:flex; justify-content:center; padding:18px 0 6px;
+}
+.shr-preview canvas {
+  width:100%; max-width:340px; height:auto; border:1px solid var(--line);
+  box-shadow:var(--shadow); background:var(--surface);
+}
+.shr-preview canvas.is-story { max-width:220px; }
+.shr-text {
+  width:100%; min-height:230px; resize:vertical;
+  font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px;
+  line-height:1.6; white-space:pre; overflow-wrap:normal; overflow-x:auto;
+}
+.shr-embed-preview {
+  border:1px solid var(--line); background:var(--surface); padding:18px 20px;
+}
+.shr-share { border-top:1px solid var(--line); margin-top:26px; }
+#shareModal .btn-row .btn { flex:0 1 auto; }
+.btn.is-off { opacity:.5; }
+.shr-status { margin:0; }
+
 @media (max-width:767px) {
   .modal { padding:0; }
   .modal-card { width:100vw; max-height:100vh; height:100vh; border:none; }
   .map-table select.control { min-width:150px; }
   .map-sample { max-width:120px; }
+  .shr-controls { grid-template-columns:1fr; }
+  .shr-preview canvas { max-width:260px; }
+  .shr-preview canvas.is-story { max-width:170px; }
 }

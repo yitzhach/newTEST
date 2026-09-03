@@ -26,6 +26,7 @@
       <span class="sync-dot" aria-hidden="true"></span><span id="syncText">On this device</span>
     </button>
     <button class="btn btn-quiet" id="btnImportShows" type="button">Import shows</button>
+    <button class="btn btn-quiet" id="btnShare" type="button">Share</button>
     <button class="btn btn-quiet" id="btnExport" type="button">Export JSON</button>
     <button class="btn btn-quiet" id="btnImport" type="button">Import JSON</button>
     <input type="file" id="fileImport" accept="application/json,.json" hidden>
@@ -412,6 +413,160 @@
   </div>
 </section>
 
+<!-- ==========================================================================
+     SHARE & EXPORT MODAL (Phase 5)
+     Wiring in tracker/share-ui.js, rendering in tracker/share.js.
+     ========================================================================== -->
+<section class="modal" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shrTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="shrTitle">Share &amp; export</h2>
+      <span class="spacer"></span>
+      <button class="btn btn-icon" id="shrClose" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+             stroke-width="1.4" stroke-linecap="round"><path d="M5 5l10 10M15 5L5 15"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- What goes out. Shared by the card, the caption and the embed, so
+           the three can never disagree about which shows are public. -->
+      <div class="shr-controls">
+        <div class="form-row">
+          <label class="label" for="shrStatusMode">Which shows</label>
+          <select class="control" id="shrStatusMode">
+            <option value="accepted">Accepted only</option>
+            <option value="confirmed">Accepted + waitlist</option>
+            <option value="planned">Everything but declined</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="shrCount">How many</label>
+          <select class="control" id="shrCount">
+            <option value="3">Next 3</option>
+            <option value="4">Next 4</option>
+            <option value="5">Next 5</option>
+            <option value="6">Next 6</option>
+            <option value="8">Next 8</option>
+            <option value="12">Next 12</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="shrArtist">Name on the card</label>
+          <input class="control" id="shrArtist" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <label class="label" for="shrLink">Link</label>
+          <input class="control" id="shrLink" inputmode="url" autocomplete="off"
+                 placeholder="isaacandersonart.com">
+        </div>
+        <div class="form-row shr-wide">
+          <label class="check"><input type="checkbox" id="shrAlts">
+            <span>Include alternates — shows you have not committed to</span></label>
+        </div>
+      </div>
+      <p class="hint" id="shrSelNote"></p>
+
+      <div class="tabs" role="tablist" aria-label="What to share">
+        <button class="tab" id="shrTabCard" type="button" role="tab" aria-selected="true">Image</button>
+        <button class="tab" id="shrTabText" type="button" role="tab" aria-selected="false">Caption &amp; email</button>
+        <button class="tab" id="shrTabEmbed" type="button" role="tab" aria-selected="false">Website embed</button>
+      </div>
+
+      <!-- ---- Image ---- -->
+      <div id="shrPaneCard" role="tabpanel" aria-labelledby="shrTabCard">
+        <div class="shr-controls">
+          <div class="form-row">
+            <label class="label" for="shrSize">Size</label>
+            <select class="control" id="shrSize">
+              <option value="square">1080 × 1080 — feed post</option>
+              <option value="story">1080 × 1920 — story</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="label" for="shrCardTheme">Card theme</label>
+            <select class="control" id="shrCardTheme">
+              <option value="">Match the app</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+        <div class="shr-preview"><canvas id="shrCanvas" width="1080" height="1080"
+             role="img" aria-label="Share card preview"></canvas></div>
+        <p class="hint" id="shrCardNote"></p>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="shrDownload" type="button">Download PNG</button>
+          <button class="btn" id="shrCopyImage" type="button">Copy image</button>
+        </div>
+      </div>
+
+      <!-- ---- Caption & email ---- -->
+      <div id="shrPaneText" role="tabpanel" aria-labelledby="shrTabText" hidden>
+        <div class="shr-controls">
+          <div class="form-row">
+            <label class="label" for="shrTextStyle">Format</label>
+            <select class="control" id="shrTextStyle">
+              <option value="caption">Caption — one line per show</option>
+              <option value="email">Email — a block per show</option>
+            </select>
+          </div>
+        </div>
+        <label class="sr" for="shrText">Copyable show list</label>
+        <textarea class="control shr-text" id="shrText" readonly spellcheck="false"></textarea>
+        <p class="hint" id="shrTextNote"></p>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="shrCopyText" type="button">Copy text</button>
+        </div>
+      </div>
+
+      <!-- ---- Website embed ---- -->
+      <div id="shrPaneEmbed" role="tabpanel" aria-labelledby="shrTabEmbed" hidden>
+        <div class="shr-controls">
+          <div class="form-row">
+            <label class="label" for="shrEmbedMode">Kind</label>
+            <select class="control" id="shrEmbedMode">
+              <option value="script">Script — self-contained, no hosting</option>
+              <option value="iframe">iframe — hosted, updates itself</option>
+            </select>
+          </div>
+          <div class="form-row" id="shrEmbedSrcRow" hidden>
+            <label class="label" for="shrEmbedSrc">Address of embed.html</label>
+            <input class="control" id="shrEmbedSrc" inputmode="url" autocomplete="off">
+          </div>
+        </div>
+        <label class="sr" for="shrSnippet">Embed snippet</label>
+        <textarea class="control shr-text" id="shrSnippet" readonly spellcheck="false"></textarea>
+        <p class="hint" id="shrEmbedNote"></p>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="shrCopySnippet" type="button">Copy snippet</button>
+          <button class="btn" id="shrDownloadJSON" type="button" hidden>Download shows.json</button>
+        </div>
+        <h3 class="label shr-sub">Preview</h3>
+        <div class="shr-embed-preview" id="shrEmbedPreview"></div>
+      </div>
+
+      <!-- ---- Post it ---- -->
+      <div class="shr-share">
+        <h3 class="label shr-sub">Post it</h3>
+        <div class="btn-row">
+          <a class="btn" id="shrFacebook" href="#" target="_blank" rel="noopener">Share on Facebook</a>
+          <a class="btn" id="shrX" href="#" target="_blank" rel="noopener">Post on X</a>
+          <button class="btn" id="shrCopyLink" type="button">Copy link</button>
+          <button class="btn" id="shrInsta" type="button">Instagram: save image + caption</button>
+        </div>
+        <p class="hint" id="shrShareNote"></p>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <span class="hint shr-status" id="shrStatus" role="status" aria-live="polite"></span>
+      <span class="spacer"></span>
+      <button class="btn btn-quiet" id="shrDone" type="button">Done</button>
+    </div>
+  </div>
+</section>
+
 <div class="toast" id="toast" hidden>
   <span class="t-msg" id="toastMsg"></span>
   <button class="t-act" id="toastAct" type="button" hidden></button>
@@ -426,6 +581,8 @@
 <script src="store-supabase.js"></script>
 <script src="import.js"></script>
 <script src="import-ui.js"></script>
+<script src="share.js"></script>
+<script src="share-ui.js"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE
@@ -1016,7 +1173,7 @@ function startSync() {
 $('#btnAdd').addEventListener('click', () => openDrawer(null));
 $('#btnCloseDrawer').addEventListener('click', closeDrawer);
 $('#btnCancel').addEventListener('click', closeDrawer);
-$('#overlay').addEventListener('click', () => { closeDrawer(); closeSettings(); ASTImportUI.close(); });
+$('#overlay').addEventListener('click', () => { closeDrawer(); closeSettings(); ASTImportUI.close(); ASTShareUI.close(); });
 $('#btnSave').addEventListener('click', saveShow);
 $('#btnDelete').addEventListener('click', deleteShow);
 $('#showForm').addEventListener('submit', e => { e.preventDefault(); saveShow(); });
@@ -1081,6 +1238,15 @@ ASTImportUI.init({
 });
 $('#btnImportShows').addEventListener('click', () => ASTImportUI.open());
 
+/* Phase 5: share and export. The panel reads the same shows the ledger is
+   showing (so whichever Store is live) and writes nothing but its own
+   preferences. All rendering — card, caption, snippet — is in share.js. */
+ASTShareUI.init({
+  getShows: () => state.shows,
+  toast: (msg, label, fn, ms) => toast(msg, label, fn, ms)
+});
+$('#btnShare').addEventListener('click', () => ASTShareUI.open());
+
 $('#btnExport').addEventListener('click', exportJSON);
 $('#btnImport').addEventListener('click', () => $('#fileImport').click());
 $('#fileImport').addEventListener('change', e => {
@@ -1096,7 +1262,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Escape' && !$('#settingsDrawer').hidden) closeSettings();
   else if (e.key === 'Escape' && $('#mapShell').classList.contains('is-sheet')) setSheet(false);
   if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey &&
-      $('#drawer').hidden && $('#importModal').hidden &&
+      $('#drawer').hidden && $('#importModal').hidden && $('#shareModal').hidden &&
       !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
     e.preventDefault(); openDrawer(null);
   }
@@ -1142,6 +1308,7 @@ function trapFocus(root) {
 trapFocus($('#drawer'));
 trapFocus($('#settingsDrawer'));
 trapFocus($('#importModal'));
+trapFocus($('#shareModal'));
 
 /* ==========================================================================
    13. BOOT

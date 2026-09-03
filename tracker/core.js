@@ -18,6 +18,7 @@ window.AST = (function () {
   var CONFIG_KEY = 'artShowTracker.supabase';
   var SESSION_KEY = 'artShowTracker.session';
   var GEOCACHE_KEY = 'artShowTracker.geocache';
+  var SHARE_KEY = 'artShowTracker.share';
 
   var STATUSES = [
     { value:'interested',   label:'Interested' },
@@ -247,7 +248,12 @@ window.AST = (function () {
        results be cached rather than looked up again, and a miss is cached as
        null so a place with no match is asked about once, not once per import. */
     getGeoCache: function () { return readJSON(GEOCACHE_KEY) || {}; },
-    setGeoCache: function (cache) { return writeJSON(GEOCACHE_KEY, cache); }
+    setGeoCache: function (cache) { return writeJSON(GEOCACHE_KEY, cache); },
+    /* Phase 5: the share panel's remembered choices (artist name, link, card
+       size, how many shows, which statuses are public). Prefs only — never
+       show data. */
+    getShare: function () { return readJSON(SHARE_KEY) || {}; },
+    setShare: function (prefs) { return writeJSON(SHARE_KEY, prefs); }
   };
 
   var backend = LocalStore;
