@@ -17,6 +17,25 @@ divergence — consolidating on 2026-09-03 was a fast-forward, not a merge:
 no merge commits, and every phase commit kept intact. The two phase branches
 are now redundant and can be deleted whenever you like.
 
+## Live demo
+Deployed to GitHub Pages on 2026-09-03 — **https://yitzhach.github.io/newTEST/tracker/**
+(route map at `tracker/map.html`). The existing Pages workflow
+(`.github/workflows/static.yml`) uploads the repository root from `main`, so
+publishing was one additive commit putting `tracker/` on `main`; nothing
+outside `tracker/` was touched and the site at the root is unchanged. No
+Cloudflare or other host is involved — the tracker has no build step, so being
+uploaded is all it needs. Re-deploy by pushing `tracker/` changes to `main`.
+
+Note the root site is a Vite/React source tree that the workflow uploads
+**unbuilt** — `index.html` there loads `/index.tsx` and an `/index.css` that is
+not in the repo — so the portfolio at the root will not run as deployed. That
+predates this work and is untouched by it; it needs a build step in the
+workflow if it is ever meant to work.
+
+A single-file preview of the ledger (no map — the artifact sandbox blocks
+OpenStreetMap tiles and Leaflet's stylesheet) is also published at
+https://claude.ai/code/artifact/a1fcd724-d87d-4c62-83fc-66ddf1f2494a
+
 ## Where things stand
 - **Design concepts (done).** Three homepage directions on a canvas:
   https://claude.ai/code/artifact/f9a1a8a5-ba14-4dcd-a1f7-ff06b18f0121
