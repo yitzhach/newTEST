@@ -13,6 +13,19 @@ half-built in the code. Add to the top of each section as it comes up.
   drive distance from home, and prior acceptance rate.
 
 ## Zapplication
+- **Read .xlsx directly** instead of asking for a CSV export. Needs SheetJS
+  or similar from a CDN, which is a dependency whose build path can't be
+  verified from the sandbox — and the CSV path already covers the case. Park
+  it until the app has a build step.
+- **Remember a column mapping** per file shape, so re-importing next year's
+  calendar skips the mapping step. Trivial once there's somewhere sensible to
+  keep named profiles.
+- **Geocode the venue, not the city.** Right now Nominatim is asked for
+  "city, state, USA", which puts the pin in the middle of town rather than at
+  the park the show is in. Wants a street-address field on the model first.
+- **Auto-assign stop numbers on import.** Deliberately not done: imported
+  shows land with a blank stop number because the route order is a decision,
+  not a derivation, and guessing it would quietly reorder the season.
 - Bookmarklet that grabs a show off the Zapp page you're viewing, using your
   own logged-in session. Lower risk than a crawler, much faster than pasting.
 - Watch for a real Zapp/WESTAF API or data partnership before ever building
@@ -43,4 +56,6 @@ half-built in the code. Add to the top of each section as it comes up.
 - Offline-first with a service worker; the app is used in fields with bad
   signal.
 - Tests: the Zapp parser and the date/deadline logic are the two places bugs
-  will actually hurt.
+  will actually hurt. Phase 4 has 232 checks (Node + headless Chromium) but
+  they live in the build sandbox, not the repo — commit a runner once there
+  is a build step to hang it off.

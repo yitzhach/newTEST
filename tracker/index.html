@@ -25,6 +25,7 @@
             title="Sync status — click for account settings">
       <span class="sync-dot" aria-hidden="true"></span><span id="syncText">On this device</span>
     </button>
+    <button class="btn btn-quiet" id="btnImportShows" type="button">Import shows</button>
     <button class="btn btn-quiet" id="btnExport" type="button">Export JSON</button>
     <button class="btn btn-quiet" id="btnImport" type="button">Import JSON</button>
     <input type="file" id="fileImport" accept="application/json,.json" hidden>
@@ -308,6 +309,109 @@
   </div>
 </section>
 
+<!-- ==========================================================================
+     IMPORT MODAL (Phase 4) — paste from Zapplication, or a CSV.
+     Three steps: source, column mapping (delimited sources only), review.
+     Nothing is written until the Import button; every write goes through
+     AST.Store, so an import syncs like any other edit.
+     ========================================================================== -->
+<section class="modal" id="importModal" role="dialog" aria-modal="true" aria-labelledby="impTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="impTitle">Import shows</h2>
+      <div class="imp-steps" id="impSteps" aria-hidden="true"></div>
+      <span class="spacer"></span>
+      <button class="btn btn-icon" id="impClose" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+          <path d="M5 5l10 10M15 5L5 15"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- ---- Step 1: source ------------------------------------------- -->
+      <div id="impStep1">
+        <div class="tabs" role="tablist">
+          <button class="tab" id="impTabPaste" type="button" role="tab" aria-selected="true">Paste from Zapplication</button>
+          <button class="tab" id="impTabCsv" type="button" role="tab" aria-selected="false">CSV file</button>
+        </div>
+
+        <div id="impPanePaste" role="tabpanel">
+          <p class="hint" style="margin:0 0 10px;">
+            Open your Zapp <strong>search results</strong> or <strong>My Applications</strong> page,
+            select the list, copy it, and paste it here. Nothing is fetched from Zapplication —
+            this only reads what you paste.
+          </p>
+          <textarea class="control imp-paste" id="impPasteText" spellcheck="false"
+                    placeholder="Coconut Grove Arts Festival&#10;Miami, FL&#10;Event Dates: 2/13/2027 - 2/15/2027&#10;Application Deadline: 9/8/2026&#10;Application Fee: $50.00&#10;Booth Fee: $895.00"></textarea>
+          <p class="hint" id="impParseNote"></p>
+        </div>
+
+        <div id="impPaneCsv" role="tabpanel" hidden>
+          <p class="hint" style="margin:0 0 10px;">
+            Save the application-calendar spreadsheet as CSV and choose it here.
+            You pick which column is which on the next step — no layout is assumed.
+          </p>
+          <div class="btn-row">
+            <label class="btn" for="impFile">Choose CSV file</label>
+            <input type="file" id="impFile" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values" hidden>
+            <span class="hint" id="impFileName" style="margin:0;"></span>
+          </div>
+          <p class="hint" style="margin:14px 0 6px;">Or paste the CSV text:</p>
+          <textarea class="control imp-paste" id="impCsvText" spellcheck="false"
+                    placeholder="Show,City,State,Start,End,Deadline,Jury Fee,Booth Fee"></textarea>
+          <p class="hint" id="impCsvNote"></p>
+        </div>
+      </div>
+
+      <!-- ---- Step 2: column mapping ----------------------------------- -->
+      <div id="impStep2" hidden>
+        <p class="hint" style="margin:0 0 12px;">
+          Match each tracker field to a column in your file. The guesses come from
+          the header names — change any of them.
+        </p>
+        <div id="impMapTable"></div>
+        <p class="hint" id="impMapNote"></p>
+      </div>
+
+      <!-- ---- Step 3: review ------------------------------------------- -->
+      <div id="impStep3" hidden>
+        <div class="imp-toolbar">
+          <div class="btn-row">
+            <button class="btn-mini" id="impSelectAll" type="button">Tick all</button>
+            <button class="btn-mini" id="impSelectNew" type="button">Only new</button>
+            <button class="btn-mini" id="impSelectNone" type="button">Tick none</button>
+          </div>
+          <span class="spacer"></span>
+          <div class="btn-row">
+            <button class="btn-mini" id="impGeocode" type="button">Find coordinates</button>
+            <button class="btn-mini" id="impGeoCancel" type="button" hidden>Stop</button>
+          </div>
+        </div>
+        <p class="hint" id="impReviewNote" style="margin:0 0 4px;"></p>
+        <p class="hint" id="impSummary" style="margin:0 0 4px;"></p>
+        <p class="hint" id="impGeoProgress" style="margin:0 0 10px;"></p>
+        <div class="rev-scroll" id="impReviewHost"></div>
+        <p class="hint imp-legend">
+          <span class="key c-med"></span> recognised by shape
+          <span class="key c-low"></span> inferred — worth checking
+          <span class="key key-plain"></span> read from a label or typed by you.
+          Coordinates come from OpenStreetMap&rsquo;s Nominatim, one lookup a second and cached;
+          anything it cannot place can be typed into the Lat and Lng columns.
+        </p>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-quiet" id="impBack" type="button" hidden>Back</button>
+      <button class="btn btn-primary" id="impNext" type="button">Read the text</button>
+      <button class="btn btn-primary" id="impCommit" type="button" hidden>Import</button>
+      <span class="spacer"></span>
+      <button class="btn btn-quiet" id="impCancel" type="button">Cancel</button>
+    </div>
+  </div>
+</section>
+
 <div class="toast" id="toast" hidden>
   <span class="t-msg" id="toastMsg"></span>
   <button class="t-act" id="toastAct" type="button" hidden></button>
@@ -320,6 +424,8 @@
 <script src="core.js"></script>
 <script src="map.js"></script>
 <script src="store-supabase.js"></script>
+<script src="import.js"></script>
+<script src="import-ui.js"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE
@@ -330,7 +436,7 @@
    double-click. Everything below is ledger-page-specific.
    ========================================================================== */
 const {
-  STATUSES, STATUS_LABEL, makeShow, clampRating, Store,
+  SCHEMA_VERSION, STATUSES, STATUS_LABEL, makeShow, clampRating, Store,
   parseISO, daysUntil, fmtDay, fmtRange, fmtCountdown, esc, place,
   starsSVG, ratingText, Theme
 } = window.AST;
@@ -910,7 +1016,7 @@ function startSync() {
 $('#btnAdd').addEventListener('click', () => openDrawer(null));
 $('#btnCloseDrawer').addEventListener('click', closeDrawer);
 $('#btnCancel').addEventListener('click', closeDrawer);
-$('#overlay').addEventListener('click', () => { closeDrawer(); closeSettings(); });
+$('#overlay').addEventListener('click', () => { closeDrawer(); closeSettings(); ASTImportUI.close(); });
 $('#btnSave').addEventListener('click', saveShow);
 $('#btnDelete').addEventListener('click', deleteShow);
 $('#showForm').addEventListener('submit', e => { e.preventDefault(); saveShow(); });
@@ -964,6 +1070,17 @@ $('#btnSyncNow').addEventListener('click', () => { if (syncStore) syncStore.sync
 window.addEventListener('online', () => { if (syncStore) syncStore.sync(); });
 window.addEventListener('offline', () => { if (syncStore) syncStore.setStatus('offline'); });
 
+/* Phase 4: the import modal. It only ever writes through AST.Store, so a
+   Zapp paste or a CSV lands in whichever backend is live and syncs like any
+   hand edit. All parsing lives in import.js, all modal wiring in
+   import-ui.js — this page owns only the markup and these three callbacks. */
+ASTImportUI.init({
+  getShows: () => state.shows,
+  onDone: () => refresh(),
+  toast: (msg, label, fn, ms) => toast(msg, label, fn, ms)
+});
+$('#btnImportShows').addEventListener('click', () => ASTImportUI.open());
+
 $('#btnExport').addEventListener('click', exportJSON);
 $('#btnImport').addEventListener('click', () => $('#fileImport').click());
 $('#fileImport').addEventListener('change', e => {
@@ -979,7 +1096,8 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Escape' && !$('#settingsDrawer').hidden) closeSettings();
   else if (e.key === 'Escape' && $('#mapShell').classList.contains('is-sheet')) setSheet(false);
   if ((e.key === 'n' || e.key === 'N') && !e.metaKey && !e.ctrlKey && !e.altKey &&
-      $('#drawer').hidden && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
+      $('#drawer').hidden && $('#importModal').hidden &&
+      !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
     e.preventDefault(); openDrawer(null);
   }
 });
@@ -1023,6 +1141,7 @@ function trapFocus(root) {
 }
 trapFocus($('#drawer'));
 trapFocus($('#settingsDrawer'));
+trapFocus($('#importModal'));
 
 /* ==========================================================================
    13. BOOT

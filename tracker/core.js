@@ -17,6 +17,7 @@ window.AST = (function () {
   var THEME_KEY = 'artShowTracker.theme';
   var CONFIG_KEY = 'artShowTracker.supabase';
   var SESSION_KEY = 'artShowTracker.session';
+  var GEOCACHE_KEY = 'artShowTracker.geocache';
 
   var STATUSES = [
     { value:'interested',   label:'Interested' },
@@ -241,7 +242,12 @@ window.AST = (function () {
     clearConfig: function () { return writeJSON(CONFIG_KEY, null); },
     getSession: function () { return readJSON(SESSION_KEY); },
     setSession: function (sess) { return writeJSON(SESSION_KEY, sess); },
-    clearSession: function () { return writeJSON(SESSION_KEY, null); }
+    clearSession: function () { return writeJSON(SESSION_KEY, null); },
+    /* Phase 4: geocoded places, keyed 'city|state'. Nominatim asks that
+       results be cached rather than looked up again, and a miss is cached as
+       null so a place with no match is asked about once, not once per import. */
+    getGeoCache: function () { return readJSON(GEOCACHE_KEY) || {}; },
+    setGeoCache: function (cache) { return writeJSON(GEOCACHE_KEY, cache); }
   };
 
   var backend = LocalStore;

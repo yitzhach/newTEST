@@ -98,6 +98,68 @@ deadline tracking, and travel (lodging/rentals/flights) tie-ins.
     could not be verified from here, and this needs five REST endpoints, not a
     library. Plain `fetch` against GoTrue and PostgREST, so still no build step.
 
+- **Phase 4 built and working** — Zapplication import. Two new files,
+  `tracker/import.js` (all the logic, no DOM) and `tracker/import-ui.js` (the
+  modal), plus the modal markup in `tracker/index.html`. **No scraping** —
+  nothing fetches a Zapp page; the text arrives from the clipboard.
+  - **Paste box** takes a copied Zapp **search-results** or **My-Applications**
+    page. Two shapes are handled: a copied HTML table (tab-separated, usually
+    with a header row) is routed through the same column mapper the CSV import
+    uses, so you get to fix its columns; a stack of text blocks is split on
+    blank lines, or segmented by heuristic when the paste runs together with
+    no blank lines at all.
+  - **Parser** reads name, city/state, show dates, deadline and both fees, and
+    maps Zapp's own application states ("Invited to Participate", "Wait List",
+    "Not Invited") onto the tracker's statuses. It copes with `1/2/2027 -
+    1/3/2027`, `January 2 - 3, 2027`, `Jan 22 – Jan 24, 2027`, `2027-02-13 to
+    2027-02-15` and `1/2 - 1/3/2027`.
+  - **Confidence flag per field**, which is the phase's real requirement:
+    `high` (read from an explicit label, or a column you mapped), `med`
+    (recognised by shape — a "City, ST" line, a bare date range), `low`
+    (inferred — a year that was not in the text, a fee assigned by position,
+    an end date assumed equal to the start). Med and low get a coloured
+    underline in the review table, and **every flagged cell's tooltip says
+    why**, so colour is never the only cue. A deadline with no year is put in
+    the season *before* the show, which is what Zapp means, and flagged low.
+  - **Review table before anything is written.** Fourteen editable columns, a
+    tick per row, per-row validation (end before start, deadline after the
+    show, unparseable dates) that unticks a broken row rather than importing
+    it, and Tick all / Only new / Tick none. Typing in a cell re-reads it — a
+    typed `7/4/2027` normalises to ISO — and clears its guess flag.
+  - **Dedupe by name + year**, as specified. Names normalise past case,
+    punctuation, `&`, a leading "The" and "44th Annual", so an exact match in
+    the same season is flagged **Already have** and unticked, with a per-row
+    choice of **Update it** (writes onto the existing record, keeping its id,
+    rating, status and createdAt) or **Add as new**. A name that merely
+    *contains* the other is only flagged **Similar to** and stays ticked —
+    "Las Olas Art Fair Part I" and "Part II" must not collapse into one row.
+    Repeats inside a single paste are caught too.
+  - **CSV import with the mapping done in the UI.** Delimiter is sniffed
+    across the first dozen lines (not just the first, which is often a title
+    row above the real header); quoted fields, embedded commas and doubled
+    quotes are handled; a title row above the header is skipped and reported.
+    Every tracker field gets a dropdown of the file's actual columns,
+    pre-selected from header synonyms and freely overridable, with the first
+    real value shown beside it. A column can only feed one field — picking a
+    taken column releases it from the other. Synonyms are tried
+    most-specific-first, so a sheet with both "Apply By" and "Closes" does not
+    hand the deadline to whichever happens to come first. One "Dates" column
+    holding a range fills both start and end.
+  - **Geocoding via Nominatim**, one request every 1.1s enforced at module
+    level (so two callers cannot each think they are alone), results cached in
+    localStorage through `AST.Settings` — **misses cached too**, so a place
+    with no match is asked about once, not once per import. Progress is shown,
+    Stop actually stops between requests, and anything it cannot place keeps
+    empty Lat/Lng columns that are editable right there, plus the drawer's
+    existing manual fields. Coordinates that came from Nominatim are flagged
+    `med`, not `high` — an ambiguous city name deserves a look.
+  - **Every write goes through `AST.Store`**, so an import lands in whichever
+    backend is live (LocalStore or the Supabase SyncStore) and syncs like a
+    hand edit. Undo removes what was added and restores what was updated,
+    also through the adapter.
+  - Also fixed while in the file: `exportJSON` referenced `SCHEMA_VERSION`
+    without binding it from `window.AST`, so Export JSON threw.
+
 ## Why the file split
 Phase 1's "one file" rule ran into Phase 2's "`map.html` reuses the same
 module, do not fork the code". Two pages cannot share inline script, so:
@@ -108,7 +170,15 @@ module, do not fork the code". Two pages cannot share inline script, so:
 - `tracker/app.css` — all styling for both pages.
 - `tracker/store-supabase.js` — Phase 3: auth, the remote table, the sync
   store. Also only reaches storage through `core.js`.
+- `tracker/import.js` — Phase 4: the Zapp paste parser, the CSV reader and
+  column mapper, duplicate detection, and the Nominatim geocoder. **No DOM.**
+- `tracker/import-ui.js` — Phase 4: the import modal's wiring, the review
+  table, and the commit. Writes only through `AST.Store`.
 - `tracker/index.html` — the ledger; `tracker/map.html` — the full-page map.
+
+The geocode cache is the one new piece of stored state (`AST.Settings`,
+key `artShowTracker.geocache`) and it lives in `core.js` for the same reason
+everything else does: one file touches localStorage.
 
 These are **classic scripts on purpose, not ES modules**: `type="module"`
 cannot be fetched over `file://`, and the app has to keep opening by
@@ -136,7 +206,12 @@ double-click. Verified that it still does. `core.js` publishes `window.AST`,
 - **Map: Leaflet + OpenStreetMap tiles**, no API key. Numbered markers, hover
   sync with the list, hand-off to Google/Apple Maps, plus a full-page
   `tracker/map.html`.
-- **Zapplication: paste-and-parse + CSV import.** No scraping.
+- **Zapplication: paste-and-parse + CSV import.** No scraping. Built in
+  Phase 4; a copied Zapp *table* is routed through the CSV column mapper
+  rather than guessed at separately.
+- **Import is a wide modal, not the right-hand drawer.** The review table
+  carries fourteen editable columns; a 460px drawer cannot show them. It
+  scrolls sideways inside its own box, so the page body never does.
 - **Sharing: canvas-rendered PNG card** (IG has no web post API) plus a
   copyable caption and an embed snippet.
 
@@ -169,12 +244,52 @@ session. A further 9 checks cover the v1 to v2 migration (existing data
 preserved, `deletedAt` backfilled, the upgrade persisted) and delete/undo
 clearing the tombstone.
 
+**Phase 4:** 139 checks in Node against the parsing/geocoding module plus 93
+in headless Chromium driving the real modal over `file://`, all passing.
+Node covers the date shapes (slash, ISO, "January 2 - 3, 2027", "Jan 22 – Jan
+24, 2027", "1/2 - 1/3/2027"), a word that is not a month not being read as a
+date, Feb 31 rejected, the labelled and unlabelled paste paths, the run-on
+paste with no blank lines, the deadline-year inference, positional fee
+assignment, every Zapp status mapping, the tabbed-paste-to-column-mapper
+route, CSV quoting and delimiter sniffing, a title row above the header, one
+column feeding only one field, "Apply By" beating "Closes" for the deadline,
+a range in a single "Dates" column, dedupe (exact, case/punctuation, "44th
+Annual", different year, Part I vs Part II, repeats inside one paste),
+validation, and `toShow` preserving an updated record's id, rating and
+createdAt. The geocoder is driven against a stub: requests measured ≥1s
+apart, a second pass served entirely from the cache with no request at all,
+a cached miss staying a miss, a failed lookup flagged per row without
+stopping the run, Stop actually stopping, and rows that already have
+coordinates or are unticked never being looked up.
+
+Chromium covers the whole flow end to end: the modal opening, a three-record
+Zapp paste parsed into the review table with the right values, the
+confidence classes and their explanatory tooltips, the duplicate flagged and
+unticked against the seeded season, editing a cell clearing its flag and
+re-running validation, geocoding filling coordinates with the manual columns
+still editable, commit writing through `AST.Store` and the ledger growing,
+the undo, the cache serving a second import, the CSV path including
+hand-mapping a column the guesser missed and the release-on-reuse rule,
+update-an-existing instead of adding a second copy, unparseable text
+refusing to invent rows, and no horizontal page overflow at 1280 / 900 /
+390px with the review table open. One further check swaps a recording store
+in via `AST.useStore` and confirms both the import and its undo write
+through the adapter rather than around it. A ten-record paste parses and
+commits in about **0.3s**, well inside the phase's "under a minute".
+
 **Not verified from here:** the cdnjs and OpenStreetMap tile requests
 themselves — both hosts are blocked from the build sandbox, so the map was
 tested with a locally vendored Leaflet and no tiles. Open `tracker/index.html`
 on a real connection to confirm tiles paint. For the same reason Leaflet
 carries no Subresource Integrity hash; adding verified hashes is a small
 follow-up.
+
+The **real Nominatim service** has also never been called from here — the
+host is blocked from the build sandbox, so the geocoder was driven against a
+stub implementing the same response shape. The rate limit, the cache and the
+failure handling are all verified; what is not is that
+`nominatim.openstreetmap.org` returns what is expected for these particular
+city names. Run one import on a real connection to confirm.
 
 Phase 3 has never touched a **real** Supabase project — only a mock
 implementing the same endpoints. Before trusting it: create a project, run
@@ -185,14 +300,19 @@ that the magic-link redirect URL is allow-listed in Supabase's auth settings
 written.
 
 ## Next step
-Start a fresh chat and run `docs/BUILD_PROMPT.md`, **Phase 4 — Zapplication
-import** (paste box, parser with per-field confidence, review table with
-dedupe, CSV import with column mapping in the UI, Nominatim geocoding at 1
-req/sec with a cache and a manual lat/lng fallback).
+Start a fresh chat and run `docs/BUILD_PROMPT.md`, **Phase 5 — Share and
+export** (canvas share card at 1080×1080 and 1080×1920, copyable caption and
+email block, an embed snippet for isaacandersonart.com, and share buttons —
+with Instagram honestly presented as download-the-image-and-copy-the-caption,
+because there is no web API to post to it).
 
-Still outstanding, independent of Phase 4:
+Still outstanding, independent of Phase 5:
+- **Backfill stops 8-12** (through Apr 18). The CSV import now exists: save
+  the xlsx's Application Calendar tab as CSV, open **Import shows → CSV
+  file**, map the columns, and commit. This is the first thing to do with
+  Phase 4 on real data.
 - **Point Phase 3 at a real Supabase project** and sign in on two devices —
   see the caveat under Verified.
-- **Backfill stops 8-12** (through Apr 18) when the xlsx is at hand — or wait
-  for the Phase 4 CSV import.
+- **Run one import on a real connection** to confirm Nominatim answers as
+  expected — see the caveat under Verified.
 - Add verified Subresource Integrity hashes to the two Leaflet tags.

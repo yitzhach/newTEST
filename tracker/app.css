@@ -390,3 +390,115 @@ html[data-theme="dark"] .leaflet-tile-pane {
 
 .btn-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
 .btn-row .btn { flex:1 1 auto; }
+
+/* ==========================================================================
+   IMPORT (Phase 4) — Zapplication paste, CSV, review table
+
+   A drawer is the wrong shape here: the review table carries fourteen
+   editable columns, so this is a wide centred modal that scrolls its table
+   sideways inside itself. The page body never scrolls horizontally.
+   ========================================================================== */
+.modal {
+  position:fixed; inset:0; z-index:55; display:flex; align-items:center; justify-content:center;
+  padding:24px; pointer-events:none;
+}
+.modal-card {
+  pointer-events:auto;
+  display:flex; flex-direction:column;
+  width:min(1180px, 100%); max-height:min(92vh, 900px);
+  background:var(--bg); border:1px solid var(--line); box-shadow:var(--shadow);
+}
+.modal-head {
+  display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  padding:16px 20px; border-bottom:1px solid var(--line);
+}
+.modal-head h2 { margin:0; font-size:12px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; }
+.modal-body { flex:1 1 auto; overflow-y:auto; padding:20px; min-height:0; }
+.modal-foot {
+  display:flex; gap:8px; align-items:center; padding:14px 20px; border-top:1px solid var(--line);
+}
+
+.imp-steps { display:flex; gap:14px; flex-wrap:wrap; }
+.imp-step {
+  font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);
+}
+.imp-step.is-now { color:var(--accent); }
+.imp-step.is-done { color:var(--ink); }
+
+.tabs { display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid var(--line); }
+.tab {
+  min-height:44px; padding:0 4px; margin-bottom:-1px; background:none; border:none;
+  border-bottom:2px solid transparent; color:var(--muted);
+  font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase;
+}
+.tab:hover { color:var(--ink); }
+.tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--accent); }
+
+.imp-paste { min-height:220px; width:100%; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:12px; }
+
+/* ---- Column mapping ---------------------------------------------------- */
+.map-table { width:100%; border-collapse:collapse; }
+.map-table th, .map-table td { text-align:left; padding:6px 10px 6px 0; vertical-align:middle; }
+.map-table thead th {
+  font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted);
+  border-bottom:1px solid var(--line); padding-bottom:10px;
+}
+.map-table tbody th { font-size:13px; font-weight:400; white-space:nowrap; }
+.map-table tbody tr + tr th, .map-table tbody tr + tr td { border-top:1px solid var(--line); }
+.map-table select.control { min-width:220px; }
+.map-sample { font-size:12px; color:var(--muted); max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+/* ---- Review table ------------------------------------------------------ */
+.imp-toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.imp-toolbar .btn-row { margin-top:0; }
+
+.rev-scroll { overflow-x:auto; border:1px solid var(--line); }
+.rev-table { border-collapse:collapse; width:max-content; min-width:100%; }
+.rev-table th, .rev-table td { padding:6px 8px; white-space:nowrap; vertical-align:middle; }
+.rev-table thead th {
+  position:sticky; top:0; z-index:1; background:var(--bg); text-align:left;
+  font-size:10px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; color:var(--muted);
+  border-bottom:1px solid var(--line);
+}
+.rev-table tbody tr + tr td { border-top:1px solid var(--line); }
+.rev-table tbody tr.is-off { opacity:.45; }
+.rev-table .col-tick { width:34px; }
+.rev-table .col-tick input { width:18px; height:18px; accent-color:var(--accent); }
+.rev-table .col-flag { min-width:150px; white-space:normal; }
+
+.rev-input {
+  min-height:36px; padding:5px 8px; border:1px solid var(--line); background:var(--bg); color:var(--ink);
+  font:inherit; font-size:13px; max-width:34ch;
+}
+.rev-input:focus { outline:none; border-color:var(--ink); }
+/* Confidence, as the phase asks — one flag per field, visible per cell.
+   Colour is never the only cue: every cell's title says why it is flagged. */
+.rev-input.c-med { border-bottom:2px solid var(--s-applied); }
+.rev-input.c-low { border-bottom:2px solid var(--warn); background:color-mix(in srgb, var(--warn) 7%, var(--bg)); }
+.rev-input.is-bad { border-color:var(--danger); }
+
+.dupe-new { font-size:10px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--s-accepted); }
+.dupe-flag {
+  display:inline-block; margin-right:6px;
+  font-size:10px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--warn);
+}
+.dupe-flag.is-bad-flag { color:var(--danger); }
+.rev-action { min-height:32px; font:inherit; font-size:11px; border:1px solid var(--line); background:var(--bg); color:var(--ink); }
+.geo-flag { display:inline-block; margin-right:6px; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+.geo-flag.geo-miss, .geo-flag.geo-error { color:var(--danger); }
+
+.imp-legend { line-height:1.8; }
+.imp-legend .key {
+  display:inline-block; width:22px; height:0; margin:0 4px 0 10px; vertical-align:middle;
+  border-bottom:2px solid var(--line);
+}
+.imp-legend .key.c-med { border-bottom-color:var(--s-applied); }
+.imp-legend .key.c-low { border-bottom-color:var(--warn); }
+.is-bad-note { color:var(--danger); }
+
+@media (max-width:767px) {
+  .modal { padding:0; }
+  .modal-card { width:100vw; max-height:100vh; height:100vh; border:none; }
+  .map-table select.control { min-width:150px; }
+  .map-sample { max-width:120px; }
+}
