@@ -70,6 +70,33 @@ deadline tracking, and travel (lodging/rentals/flights) tie-ins.
   CSV import.
 - `/` still holds an unrelated Vite/React art portfolio (Isaac Anderson Art);
   the tracker is self-contained under `tracker/`.
+- **Phase 3 built and working** — Supabase sync behind the same adapter.
+  - `docs/supabase-schema.sql` — `shows` table mirroring the model, RLS on,
+    owner-only policies, plus a trigger that stamps `owner_id` from the JWT so
+    a forged `owner_id` in a request body cannot land on someone else's row.
+    Run it once in the Supabase SQL editor.
+  - Magic-link sign-in. The session is stored locally and the tokens are
+    scrubbed out of the URL on return. A refresh token the server rejects
+    signs out cleanly rather than looking like an outage.
+  - `SyncStore` (`tracker/store-supabase.js`) implements the same
+    `list/get/upsert/remove/replaceAll` surface, and `AST.useStore()` swaps it
+    in. **No render or UI code knows which backend is live.**
+  - Writes land locally first and push after, so the app works with no
+    network, says "offline — changes are saved locally", and catches up by
+    itself on the `online` event.
+  - Last-write-wins on `updatedAt`. **Deletes are tombstones** (`deletedAt`,
+    schemaVersion 2) — a hard delete would just be pushed back by the other
+    device on its next sync. Tombstones never reach the UI.
+  - A device holding nothing but the untouched demo seed **adopts** the
+    account's season instead of pushing the seed up; otherwise signing in on a
+    second device duplicates all nine shows. Genuine local data still migrates
+    up on first sign-in, which is the case the phase asks for.
+  - Account panel behind the sync pill in the header: project URL, anon key,
+    magic link, sync now, sign out, forget project. A pasted **service key is
+    refused** with a reason — only the anon key belongs in a browser.
+  - No `supabase-js`: it would be another CDN script whose exact build path
+    could not be verified from here, and this needs five REST endpoints, not a
+    library. Plain `fetch` against GoTrue and PostgREST, so still no build step.
 
 ## Why the file split
 Phase 1's "one file" rule ran into Phase 2's "`map.html` reuses the same
@@ -79,6 +106,8 @@ module, do not fork the code". Two pages cannot share inline script, so:
 - `tracker/map.js` — every line of Leaflet work, plus the Google/Apple
   hand-off builder. Neither page contains map code.
 - `tracker/app.css` — all styling for both pages.
+- `tracker/store-supabase.js` — Phase 3: auth, the remote table, the sync
+  store. Also only reaches storage through `core.js`.
 - `tracker/index.html` — the ledger; `tracker/map.html` — the full-page map.
 
 These are **classic scripts on purpose, not ES modules**: `type="module"`
@@ -101,7 +130,8 @@ double-click. Verified that it still does. `core.js` publishes `window.AST`,
   `map.js` + `app.css` so the two pages share one map module, as Phase 2
   requires. Still no bundler, still opens by double-click.
 - **Storage behind a `Store` adapter.** localStorage in Phase 1, Supabase in
-  Phase 3, same interface.
+  Phase 3, same interface. `AST.Store` is a stable façade; `AST.useStore()`
+  swaps the backend under it so no page re-binds its reference.
 - **Responsive single file** — no separate mobile file. Light + dark mode.
 - **Map: Leaflet + OpenStreetMap tiles**, no API key. Numbered markers, hover
   sync with the list, hand-off to Google/Apple Maps, plus a full-page
@@ -127,6 +157,18 @@ missing-coordinate reporting, and no horizontal overflow at 1280 / 900 /
 390px. Also loaded both pages over `file://` to confirm double-click still
 works.
 
+**Phase 3:** driven in headless Chromium against a mock GoTrue/PostgREST,
+using separate browser contexts as separate devices — 42 checks, all passing:
+first-sign-in migration up, a second device pulling the same season without
+duplicating it, edits crossing devices, last-write-wins against a stale local
+edit, deletes propagating instead of resurrecting, one user not seeing
+another's rows, offline editing plus automatic catch-up when the connection
+returns, sign-out leaving the data on the device, service-key and bad-URL
+rejection, magic-link dispatch and redirect, and recovery from an expired
+session. A further 9 checks cover the v1 to v2 migration (existing data
+preserved, `deletedAt` backfilled, the upgrade persisted) and delete/undo
+clearing the tombstone.
+
 **Not verified from here:** the cdnjs and OpenStreetMap tile requests
 themselves — both hosts are blocked from the build sandbox, so the map was
 tested with a locally vendored Leaflet and no tiles. Open `tracker/index.html`
@@ -134,13 +176,23 @@ on a real connection to confirm tiles paint. For the same reason Leaflet
 carries no Subresource Integrity hash; adding verified hashes is a small
 follow-up.
 
-## Next step
-Start a fresh chat and run `docs/BUILD_PROMPT.md`, **Phase 3 — Supabase**
-(`shows` table with RLS, magic-link auth, `SupabaseStore` behind the existing
-adapter, settings panel for project URL + anon key, last-write-wins sync with
-a visible offline state).
+Phase 3 has never touched a **real** Supabase project — only a mock
+implementing the same endpoints. Before trusting it: create a project, run
+`docs/supabase-schema.sql`, paste the URL and anon key into the account panel,
+and sign in on two devices. Two things only a real project can confirm are
+that the magic-link redirect URL is allow-listed in Supabase's auth settings
+(Authentication → URL Configuration), and that the RLS policies behave as
+written.
 
-Still outstanding, independent of Phase 3:
+## Next step
+Start a fresh chat and run `docs/BUILD_PROMPT.md`, **Phase 4 — Zapplication
+import** (paste box, parser with per-field confidence, review table with
+dedupe, CSV import with column mapping in the UI, Nominatim geocoding at 1
+req/sec with a cache and a manual lat/lng fallback).
+
+Still outstanding, independent of Phase 4:
+- **Point Phase 3 at a real Supabase project** and sign in on two devices —
+  see the caveat under Verified.
 - **Backfill stops 8-12** (through Apr 18) when the xlsx is at hand — or wait
   for the Phase 4 CSV import.
 - Add verified Subresource Integrity hashes to the two Leaflet tags.
