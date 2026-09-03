@@ -29,11 +29,18 @@ deadline tracking, and travel (lodging/rentals/flights) tie-ins.
 - 2027 Florida season: 12 stops, Jan 2 – Apr 18, with lettered alternates
   (2a/2b, 6a–6c, 7/7b, 9a/9b, 10a/10b) for overlapping weekends.
 
-## Open decisions
-- Which of A / B / C to build (or a mix).
-- Data store: a JSON file to start, or a real DB.
-- Zapplication has no public API — likely scrape or manual import first.
+## Decisions made
+- **Direction A — Show Ledger** is the one being built.
+- **One file: `tracker/index.html`.** No build step, vanilla JS.
+- **Storage behind a `Store` adapter.** localStorage in Phase 1, Supabase in
+  Phase 3, same interface.
+- **Responsive single file** — no separate mobile file. Light + dark mode.
+- **Map: Leaflet + OpenStreetMap tiles**, no API key. Numbered markers, hover
+  sync with the list, hand-off to Google/Apple Maps, plus a full-page
+  `tracker/map.html`.
+- **Zapplication: paste-and-parse + CSV import.** No scraping.
+- **Sharing: canvas-rendered PNG card** (IG has no web post API) plus a
+  copyable caption and an embed snippet.
 
 ## Next step
-Pick a direction, then build the simple version: local JSON of shows +
-list + map + add/edit form.
+Start a fresh chat and run `docs/BUILD_PROMPT.md`, Phase 1.
