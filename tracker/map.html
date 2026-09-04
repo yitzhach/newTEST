@@ -44,6 +44,9 @@
     <div class="map-canvas" id="mapCanvas" role="application" aria-label="Route map"></div>
   </div>
 
+  <!-- Draggable divider: trade map width for itinerary width. -->
+  <div class="splitter" id="splitter"></div>
+
   <aside class="rail">
     <section class="panel">
       <div class="panel-head">
@@ -81,7 +84,7 @@
    Same Store, same map module as the ledger — this page only adds the
    itinerary rail and the #stop= deep link. No map code lives here.
    ========================================================================== */
-const { Store, byDate, hasCoords, esc, place, fmtRange, STATUS_LABEL, Theme } = window.AST;
+const { Store, byDate, hasCoords, esc, place, fmtRange, STATUS_LABEL, Theme, Splitter } = window.AST;
 const $ = sel => document.querySelector(sel);
 
 const state = { shows: [], selectedId: null };
@@ -183,6 +186,14 @@ window.addEventListener('hashchange', () => {
 });
 
 Theme.init();
+
+/* Draggable divider. invalidateSize() but not fitAll(), so resizing gives you
+   more of the view you had rather than re-framing the whole season. */
+Splitter.attach(document.querySelector('#splitter'), {
+  container: document.querySelector('.map-page'),
+  key: 'mapPageRail',
+  onResize: () => { if (routeMap) routeMap.invalidateSize(); }
+});
 
 /* Same Store swap as the ledger: if a Supabase project is configured this
    page reads the synced season, otherwise it reads localStorage. Either way

@@ -21,6 +21,12 @@
     <span class="sub" id="brandSub">Isaac Anderson &middot; 2027 season</span>
   </div>
   <div class="header-actions">
+    <div class="viewtoggle" id="viewToggle" role="group" aria-label="Main view">
+      <button id="btnViewList" type="button" aria-pressed="true">List</button>
+      <button id="btnViewMap"  type="button" aria-pressed="false">Map</button>
+    </div>
+    <a class="btn btn-quiet" href="map.html" id="btnFullMap"
+       title="Open the standalone full-page route map">Full map</a>
     <button class="sync-pill" id="syncPill" type="button" data-state="local"
             title="Sync status — click for account settings">
       <span class="sync-dot" aria-hidden="true"></span><span id="syncText">On this device</span>
@@ -70,6 +76,9 @@
     <div id="showList"></div>
     <p class="list-note" id="listNote"></p>
   </main>
+
+  <!-- Draggable divider: grab it to trade list width for map width. -->
+  <div class="splitter" id="splitter"></div>
 
   <!-- ==========================================================================
        RIGHT RAIL
@@ -595,7 +604,7 @@
 const {
   SCHEMA_VERSION, STATUSES, STATUS_LABEL, makeShow, clampRating, Store,
   parseISO, daysUntil, fmtDay, fmtRange, fmtCountdown, esc, place,
-  starsSVG, ratingText, Theme
+  starsSVG, ratingText, Theme, Splitter
 } = window.AST;
 
 window.AST.setNotifier(msg => toast(msg));
@@ -1292,6 +1301,37 @@ mqPhone.addEventListener('change', syncMapChrome);
 mqNarrow.addEventListener('change', syncMapChrome);
 window.addEventListener('resize', () => { if (routeMap) routeMap.invalidateSize(); });
 
+/* ---- Draggable divider ---------------------------------------------------
+   Note this calls invalidateSize() but deliberately NOT fitAll(): resizing
+   the map should give you more of the map you were looking at, not silently
+   re-frame the whole season and throw away the pan and zoom you set. */
+Splitter.attach($('#splitter'), {
+  container: $('.main'),
+  key: 'ledgerRail',
+  onResize: () => { if (routeMap) routeMap.invalidateSize(); }
+});
+
+/* ---- List / Map view -----------------------------------------------------
+   CSS-only: the ledger is hidden and the rail takes the width. The map node
+   is never reparented, so Leaflet keeps everything and just needs telling
+   that its box changed. */
+function setView(mode, opts) {
+  const map = mode === 'map';
+  $('.main').classList.toggle('is-mapview', map);
+  $('#btnViewMap').setAttribute('aria-pressed', String(map));
+  $('#btnViewList').setAttribute('aria-pressed', String(!map));
+  if (map) ensureMap();
+  /* Unlike a splitter drag, switching view changes the shape of the viewport
+     completely, so re-fit here — otherwise the season sits squashed in one
+     corner of a very differently proportioned map. */
+  if (routeMap) requestAnimationFrame(() => { routeMap.invalidateSize(); routeMap.fitAll(); });
+  if (!opts || opts.persist !== false) {
+    const l = AST.Settings.getLayout(); l.ledgerView = mode; AST.Settings.setLayout(l);
+  }
+}
+$('#btnViewList').addEventListener('click', () => setView('list'));
+$('#btnViewMap').addEventListener('click', () => setView('map'));
+
 /* Keep focus inside whichever drawer is open. */
 function trapFocus(root) {
   root.addEventListener('keydown', e => {
@@ -1317,6 +1357,7 @@ Theme.init();
 fillStatusSelect();
 setRating(0, { silent: true });
 syncMapChrome();
+setView(AST.Settings.getLayout().ledgerView === 'map' ? 'map' : 'list', { persist: false });
 
 /* A failed magic link comes back with the reason in the fragment. */
 const linkError = ASTSupabase.Auth.errorFromHash();
