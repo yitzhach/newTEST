@@ -10,4 +10,7 @@
    next phase in a fresh chat.
 4. **Read `PROJECT_STATE.md`** at the start of every session — it's the
    handoff doc.
-5. Branch for this work: `claude/artist-show-tracker-5pavpl`.
+5. Branch for this work: `claude/art-show-tracker-smoke-18dbj6`.
+   It is `claude/artist-show-tracker-5pavpl` plus the Phase 6 and smoke-harness
+   commits — a strict fast-forward, so 5pavpl is redundant and can be deleted.
+   The tracker itself ships from `main` (GitHub Pages).

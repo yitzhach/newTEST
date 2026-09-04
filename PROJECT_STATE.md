@@ -8,14 +8,20 @@ in date order, and easy add/edit. Later: pull shows from Zapplication,
 deadline tracking, and travel (lodging/rentals/flights) tie-ins.
 
 ## Branches
-One line of history again, on **`claude/artist-show-tracker-5pavpl`**.
-Phases 4 and 5 were built on branches stacked off it
-(`claude/art-show-tracker-phase-4-38h09w`, then
-`claude/art-show-tracker-phase-5-u99p8m`). Because the stack was strictly
+One line of history, now on **`claude/art-show-tracker-smoke-18dbj6`** — which
+is `claude/artist-show-tracker-5pavpl` plus the Phase 6 and smoke-harness
+commits, a strict fast-forward with no divergence. `CLAUDE.md` was updated to
+name it, and 5pavpl is redundant and can be deleted. The deployed tracker
+ships from **`main`**, whose `tracker/` is byte-identical to this branch's, so
+Phase 6 is live and there is nothing waiting to be published.
+
+Everything before it was consolidated the same way. Phases 4 and 5 were built
+on branches stacked off 5pavpl (`claude/art-show-tracker-phase-4-38h09w`, then
+`claude/art-show-tracker-phase-5-u99p8m`); because the stack was strictly
 linear — each branch was the one below it plus its own commit, with no
-divergence — consolidating on 2026-09-03 was a fast-forward, not a merge:
-no merge commits, and every phase commit kept intact. The two phase branches
-are now redundant and can be deleted whenever you like.
+divergence — folding them in on 2026-09-03 was a fast-forward, not a merge: no
+merge commits, and every phase commit kept intact. Those two, and now 5pavpl,
+are redundant and can be deleted whenever you like.
 
 ## Live demo
 Deployed to GitHub Pages on 2026-09-03 — **https://yitzhach.github.io/newTEST/tracker/**
@@ -541,6 +547,19 @@ markers and overlays. It was dead code of exactly the kind the
 CSS went rather than reaching into Leaflet's private `_path` for a cosmetic
 opacity change.
 
+**Re-run 2026-09-04 (later session).** `tools/smoke/run.sh` still passes
+**97/97** (15 + 19 + 7 + 56) on this branch with no code changes, and
+`git diff origin/main HEAD -- tracker/` is empty, so what the harness drove is
+what is deployed. The five external hosts were re-checked once more and the
+proxy still answers **403 to CONNECT** for `yitzhach.github.io`,
+`cdnjs.cloudflare.com`, `tile.openstreetmap.org`, `nominatim.openstreetmap.org`
+and — newly confirmed, it had not been probed directly before —
+`router.project-osrm.org`. `fonts.googleapis.com` and `fonts.gstatic.com`
+remain reachable. So the real-browser checks below are still open and nothing
+was changed on speculation: the legacy `{s}.` tile URL in `tracker/map.js` is
+deliberately left alone until a browser says tiles are missing, and the
+straight-line route fallback stays as designed.
+
 **Not verified from here:** the cdnjs, OpenStreetMap tile and Nominatim
 requests themselves, and the live Pages URL. Re-checked 2026-09-04 and all
 four hosts are still refused by the sandbox's egress policy — the proxy
@@ -585,8 +604,10 @@ that the magic-link redirect URL is allow-listed in Supabase's auth settings
 written.
 
 ## Next step
-All five phases in `docs/BUILD_PROMPT.md` are built. What is left is real-data
-and real-service work, not new phases:
+All five phases in `docs/BUILD_PROMPT.md` are built, and Phase 6 is live. What
+is left is real-data and real-service work, not new phases. **Both of the top
+two items are blocked on something only you can supply** — the xlsx, and one
+pass in a real browser — and neither was unblocked on 2026-09-04:
 
 - **Backfill stops 8-12** (through Apr 18) — *still the first thing to do, and
   still blocked on the source file.* The CSV import exists: save the xlsx's
