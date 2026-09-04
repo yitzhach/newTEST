@@ -9,7 +9,7 @@ now served from GitHub Pages at a **subpath** (`/newTEST/tracker/`) over
 **https**, which is a shape it had never run in. These harnesses serve the
 repo at that exact path over real HTTP and drive it in headless Chromium.
 
-## What they cover (97 checks)
+## What they cover (158 checks)
 - `01-pages-and-map.cjs` (15) — `index.html` and `map.html` load with no
   uncaught errors at the subpath, Leaflet initialises, tile URLs are
   well-formed and paint, 9 markers render, the `#stop=6a` deep link selects
@@ -26,6 +26,11 @@ repo at that exact path over real HTTP and drive it in headless Chromium.
   and the road-following route (request shape, cached geometry, cache hit on
   reload, and a provably different line from the straight fallback) plus its
   failure and timeout paths.
+- `05-hide-vsplit-catalogue.cjs` (53) — Phase 7: the vertical map resize,
+  hiding a show from the route (greys out, leaves the map, stays in the ledger
+  and the exports, survives a reload), and the All shows catalogue (202 cards,
+  Zapp links, filters, like, rate, Add to ledger through the Store, automatic
+  geocoding, and two checks that the catalogue never leaks into the ledger).
 - `03-degradation.cjs` (7) — the failure modes a visitor can actually hit:
   cdnjs blocked by an adblocker (ledger and drawer still work, no uncaught
   errors) and tiles refused while Leaflet loads (markers still drawn).

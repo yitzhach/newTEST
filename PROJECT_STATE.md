@@ -1,6 +1,6 @@
 # Art Show Tracker — project state
 
-_Last updated: 2026-09-04_
+_Last updated: 2026-09-04 (Phase 7)_
 
 ## What this is
 A tracker for Isaac Anderson's art show season: upcoming shows, a route map
@@ -320,6 +320,69 @@ https://claude.ai/code/artifact/a1fcd724-d87d-4c62-83fc-66ddf1f2494a
   neighbourly use, but it carries no uptime promise — which is precisely why
   the fallback is silent and the straight line always draws first.
 
+- **Phase 7 built and working** — the catalogue, hiding, and the view rework.
+  One new module and one new page (`tracker/catalogue.js`,
+  `tracker/browse.html`), plus `tracker/catalogue.json`.
+  - **The map stretches vertically too.** `AST.SplitterV` drags the bottom
+    edge of the map in ledger view, writing `--map-h`. Same throttling and
+    keyboard support as the horizontal one, clamped so it cannot be collapsed
+    to nothing (min 180px) or grow past 78% of the window. Remembered under
+    `ledgerMapH`.
+  - **Map view was backwards and is now the right way round.** *Map* keeps the
+    show list as a narrow companion on the **left** with the map taking most
+    of the width; **Full screen** is the browser Fullscreen API on the map
+    shell, with Escape to come back. The grid is unchanged between the two
+    views — only the remembered proportion differs (`ledgerRail` vs
+    `ledgerRailMap`, one divider serving both via `setKey`), so the divider
+    keeps working and each view remembers its own split.
+    - The narrow list re-uses the phone layout's stacking, but keyed to **the
+      width of its own column** via an `@container` query rather than the
+      window. This bit twice: the rule did nothing at first because it sat
+      *above* the base `.row-grid` rule, and at equal specificity the later
+      rule wins. There is now a check asserting the row really collapses.
+  - **Hide a show from the plan.** An eye on each row. Hidden shows grey out
+    and strike through, and drop out of the map, the route line and the
+    Google/Apple hand-off — the filtering happens once, inside
+    `routeStops()`, so those three can never disagree. It is a **lens, not a
+    delete**: exports, the share card and the season stats all still count a
+    hidden show. `hidden` is a real field on the model (schemaVersion **3**,
+    with a migration backfilling `false`) so it survives a reload and syncs
+    like any other edit. Clicking the eye is caught before the row handler,
+    so it does not also open the drawer, and every toggle offers an undo.
+  - **All shows — the catalogue** (`tracker/browse.html`). 202 shows read out
+    of `Art_Show_Tracker.xlsx`, **kept firmly out of the ledger**: it is the
+    pool you draw a season from, not part of one.
+    - Filter by text, state (built from the data, with counts), fee, and
+      whether the deadline is still open — **on by default**, since 63 of the
+      202 are 2026 shows whose deadlines have largely passed. Sort by event
+      date, deadline, name, fee or your own rating.
+    - **Like first, then rate**, as asked: a one-click heart to shortlist
+      while skimming, then the ledger's own 0–10 half-star rating on the
+      shortlist. Ratings work by click and by keyboard.
+    - **Add to ledger**, one show or every liked show at once, through
+      `AST.Store` like any other write, carrying the name, city, state,
+      dates, deadline, fee and **the Zapplication link**. Undo removes them
+      again.
+    - Added shows are **geocoded automatically** through the import module's
+      existing `Geocoder` — same 1.1s rate limit, same shared cache — because
+      a catalogue record has a city but no coordinates, and without this a
+      show added here would never appear on the map. It runs in the
+      background with progress, and an undo cancels it.
+    - **Your picks live apart from the data.** `catalogue.json` is replaceable
+      wholesale; likes, ratings, which records you have pulled across, and any
+      show you add yourself live in `AST.Settings.getCatalogue()`, keyed by
+      catalogue id. So a fresher export can be dropped in without losing
+      anything. Ids come from the Zapp event id in the link where there is
+      one, which is what makes that stable.
+    - A record whose ledger show has since been deleted stops claiming to be
+      "In ledger", or the Add button would never come back.
+
+  **On the data.** The 202 rows converted cleanly: every one has a
+  Zapplication link, 25 states (99 of them Florida), events across 2026–27,
+  fees $25–135. One row — a statewide South Carolina residency — had a blank
+  State with the state name sitting in the City column; that was read across
+  rather than invented. Nothing else was inferred.
+
 ## Why the file split
 Phase 1's "one file" rule ran into Phase 2's "`map.html` reuses the same
 module, do not fork the code". Two pages cannot share inline script, so:
@@ -348,6 +411,18 @@ Phase 6 added no files. `AST.Splitter` (the draggable divider) went into
 `core.js` beside `Theme`, and `ASTMap.Road` (the road-following route) into
 `map.js` beside the rest of the Leaflet work, because both pages use both and
 neither is a new concern.
+
+Phase 7 added:
+- `tracker/catalogue.js` — the shows catalogue: loading, your likes and
+  ratings, filtering and sorting, and turning a record into a ledger show.
+  **No DOM.**
+- `tracker/browse.html` — the All shows page. Wiring only; every decision it
+  makes lives in `catalogue.js`, and every write to the season goes through
+  `AST.Store`.
+- `tracker/catalogue.json` — the 202-show reference list, generated from the
+  xlsx. Replaceable wholesale without touching your picks.
+`AST.SplitterV` (the vertical divider) sits beside `AST.Splitter` in
+`core.js`, for the same reason.
 
 `tools/smoke/` sits outside `tracker/` and is **not part of the app** —
 nothing in `tracker/` references it and deleting it costs nothing. It is the
@@ -559,6 +634,32 @@ remain reachable. So the real-browser checks below are still open and nothing
 was changed on speculation: the legacy `{s}.` tile URL in `tracker/map.js` is
 deliberately left alone until a browser says tiles are missing, and the
 straight-line route fallback stays as designed.
+
+**Phase 7 (2026-09-04).** 53 checks in
+`tools/smoke/05-hide-vsplit-catalogue.cjs` plus 3 added to the Phase 6 file,
+taking the harness to **158**, all passing. The vertical divider: dragging
+makes the map taller, the height is remembered and returns on reload, arrow
+keys work, and it cannot be collapsed to nothing. Hiding: the row greys, the
+pin leaves the map, the show stays in the ledger and in the season stats,
+Export data still carries it (`hidden:true`), the state survives a reload, the
+eye does not open the drawer, and unhiding puts the pin back. The catalogue:
+202 cards render, each carries its Zapplication link opening in a new tab with
+`rel="noopener noreferrer"`, search and the deadline and state filters narrow
+it, a like is saved, a keyboard rating is saved, Add to ledger writes through
+`AST.Store` keeping the link and the catalogue id, **the added show is
+geocoded and appears as a tenth pin on the ledger's map**, "hide what's
+already in the ledger" works, and a show you add yourself is stored apart from
+the shipped file. Two checks confirm the catalogue does **not** leak into the
+ledger: a fresh ledger still has exactly the 9 seeded shows, and liking adds
+nothing. Plus no horizontal overflow at 1280 / 900 / 390px on the new page.
+
+Two bugs were found this way and fixed. The `@container` rule that collapses
+the show row in a narrow column **did nothing**, because it sat above the base
+`.row-grid` rule and at equal specificity the later rule wins — map view
+rendered the six columns squeezed to one word per line. There is now a check
+asserting the row really collapses to two columns. And `.card-acts` was
+`flex:none`, so the Zapp link and Add button together overflowed a narrow
+card by 5px; they now wrap.
 
 **Not verified from here:** the cdnjs, OpenStreetMap tile and Nominatim
 requests themselves, and the live Pages URL. Re-checked 2026-09-04 and all

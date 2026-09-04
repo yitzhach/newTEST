@@ -27,6 +27,10 @@ create table if not exists public.shows (
 
   route_number  text not null default '',
   is_alternate  boolean not null default false,
+  -- Phase 7: hidden is a planning lens (out of the route, still in the season);
+  -- catalogue_id ties a row back to the catalogue record it was added from.
+  hidden        boolean not null default false,
+  catalogue_id  text not null default '',
   notes         text not null default '',
   url           text not null default '',
   source        text not null default 'manual'
@@ -89,3 +93,10 @@ drop trigger if exists shows_set_owner_trg on public.shows;
 create trigger shows_set_owner_trg
   before insert or update on public.shows
   for each row execute function public.shows_set_owner();
+
+-- ---------------------------------------------------------------------------
+-- Phase 7 upgrade, for a project created before these columns existed.
+-- Safe to run more than once.
+-- ---------------------------------------------------------------------------
+alter table public.shows add column if not exists hidden       boolean not null default false;
+alter table public.shows add column if not exists catalogue_id text    not null default '';

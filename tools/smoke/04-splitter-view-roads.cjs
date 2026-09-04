@@ -93,15 +93,39 @@ console.log('\n--- List / Map view toggle ---');
 {const ctx=await mk(browser);const p=await ctx.newPage();const pe=[];p.on('pageerror',e=>pe.push(e.message));
  await p.goto(BASE,{waitUntil:'networkidle'});await p.waitForTimeout(900);
  ok('header has a List/Map toggle',await p.locator('#viewToggle').isVisible());
- ok('header also has a link to the full-page map',await p.locator('#btnFullMap').isVisible()
-    &&(await p.locator('#btnFullMap').getAttribute('href'))==='map.html');
+ ok('header has a Full screen button',await p.locator('#btnFullScreen').isVisible());
+ ok('header has an All shows link',await p.locator('#btnBrowse').isVisible()
+    &&(await p.locator('#btnBrowse').getAttribute('href'))==='browse.html');
  ok('List is the pressed state at rest',await p.locator('#btnViewList').getAttribute('aria-pressed')==='true');
  const idBefore=await p.evaluate(()=>{window.__m=document.querySelector('#mapCanvas');return !!window.__m;});
- await p.locator('#btnViewMap').click(); await p.waitForTimeout(600);
- ok('Map view hides the list',!(await p.locator('.ledger').isVisible()));
+ const listW0=await p.evaluate(()=>document.querySelector('.ledger').getBoundingClientRect().width);
+ await p.locator('#btnViewMap').click(); await p.waitForTimeout(700);
+ ok('Map view KEEPS the show list (now on the left)',await p.locator('.ledger').isVisible());
+ ok('Map view still lists the shows',await p.locator('.show-row').count()===9);
  ok('Map view marks Map as pressed',await p.locator('#btnViewMap').getAttribute('aria-pressed')==='true');
  const mw=await p.evaluate(()=>document.querySelector('#mapCanvas').getBoundingClientRect().width);
- ok('map takes the full width in map view',mw>1000,'mapCanvas='+Math.round(mw));
+ const listW1=await p.evaluate(()=>document.querySelector('.ledger').getBoundingClientRect().width);
+ ok('the map takes most of the width in map view',mw>700,'mapCanvas='+Math.round(mw));
+ ok('the list narrows to a companion column',listW1<listW0*0.6,
+    Math.round(listW0)+' -> '+Math.round(listW1));
+ ok('the map is wider than the list in map view',mw>listW1,Math.round(mw)+' vs '+Math.round(listW1));
+ /* Regression guard: the narrow-column stacking is a @container rule, and it
+    silently did nothing when it sat above the base .row-grid rule — the six
+    columns stayed, squeezed to one word per line. Assert the collapse. */
+ const collapsed=await p.evaluate(()=>{
+   const row=document.querySelector('.row-main');
+   const cols=getComputedStyle(row).gridTemplateColumns.trim().split(/\s+/).length;
+   const dates=document.querySelector('.show-row .r-dates');
+   return {cols, dateCol:getComputedStyle(dates).gridColumnStart,
+           headHidden:document.querySelector('.list-head').offsetParent===null};});
+ ok('the row collapses to 2 columns in the narrow list',collapsed.cols===2,'cols='+collapsed.cols);
+ ok('the dates stack under the name rather than in their own column',
+    collapsed.dateCol==='2',"gridColumnStart="+collapsed.dateCol);
+ ok('the column headings are hidden when the row is stacked',collapsed.headHidden);
+ ok('the deadline/stats panels stand down in map view',
+    await p.evaluate(()=>{const ps=[...document.querySelectorAll('.rail > .panel')]
+      .filter(e=>!e.classList.contains('map-panel'));
+      return ps.every(e=>e.offsetParent===null);}));
  ok('the map node was NOT reparented (Leaflet keeps its state)',
     await p.evaluate(()=>window.__m===document.querySelector('#mapCanvas')));
  ok('markers survived the switch',await p.locator('.leaflet-marker-icon').count()===9);

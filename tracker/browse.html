@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>All shows — Show Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="app-header">
+  <div class="brand">
+    <h1>All shows</h1>
+    <span class="sub" id="brandSub">the catalogue you build a season from</span>
+  </div>
+  <div class="header-actions">
+    <span class="cat-count" id="catCount"></span>
+    <button class="btn btn-quiet" id="btnAddRecord" type="button">Add a show</button>
+    <button class="btn btn-icon" id="btnTheme" type="button" aria-label="Switch theme" title="Switch theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" id="iconSun">
+        <circle cx="10" cy="10" r="3.6"/>
+        <path d="M10 1.6v2.2M10 16.2v2.2M2.6 10H4.8M15.2 10h2.2M4.8 4.8l1.6 1.6M13.6 13.6l1.6 1.6M15.2 4.8l-1.6 1.6M6.4 13.6l-1.6 1.6"/>
+      </svg>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" stroke-linejoin="round" id="iconMoon" hidden>
+        <path d="M16.5 11.8A6.9 6.9 0 0 1 8.2 3.5a6.9 6.9 0 1 0 8.3 8.3z"/>
+      </svg>
+    </button>
+    <a class="btn btn-primary" href="index.html">&larr; Show Ledger</a>
+  </div>
+</header>
+
+<div class="browse">
+  <!-- ==========================================================================
+       FILTERS
+       ========================================================================== -->
+  <aside class="filters" id="filters">
+    <div class="f-block">
+      <label class="label" for="fText">Search</label>
+      <input class="control" id="fText" type="search" placeholder="Show or city">
+    </div>
+
+    <div class="f-block">
+      <div class="chips" id="fQuick" role="group" aria-label="Quick filters">
+        <button class="chip" type="button" data-quick="all" aria-pressed="true">All</button>
+        <button class="chip" type="button" data-quick="liked" aria-pressed="false">Liked</button>
+        <button class="chip" type="button" data-quick="added" aria-pressed="false">In ledger</button>
+      </div>
+    </div>
+
+    <div class="f-block">
+      <label class="cbx"><input type="checkbox" id="fOpen" checked>
+        <span>Deadline still open</span></label>
+      <label class="cbx"><input type="checkbox" id="fHideAdded">
+        <span>Hide what's already in the ledger</span></label>
+    </div>
+
+    <div class="f-block">
+      <label class="label" for="fSort">Sort</label>
+      <select class="control" id="fSort">
+        <option value="date">Event date</option>
+        <option value="deadline">Apply-by date</option>
+        <option value="name">Name</option>
+        <option value="fee">Fee</option>
+        <option value="rating">My rating</option>
+      </select>
+    </div>
+
+    <div class="f-block">
+      <div class="f-head">
+        <span class="label">State</span>
+        <button class="btn-mini" id="fStatesClear" type="button">Clear</button>
+      </div>
+      <div class="state-list" id="fStates"></div>
+    </div>
+
+    <div class="f-block">
+      <label class="label" for="fMaxFee">Max fee <span id="fMaxFeeVal" class="muted-inline">any</span></label>
+      <input id="fMaxFee" type="range" min="0" max="150" step="5" value="150">
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       RESULTS
+       ========================================================================== -->
+  <main class="results">
+    <div class="res-head">
+      <p class="res-count" id="resCount">Loading the catalogue…</p>
+      <div class="res-actions">
+        <button class="btn btn-quiet" id="btnAddLiked" type="button" hidden></button>
+      </div>
+    </div>
+    <div id="cards" class="cards"></div>
+    <p class="list-note" id="catNote"></p>
+  </main>
+</div>
+
+<!-- ==========================================================================
+     ADD-A-SHOW DIALOG
+     ========================================================================== -->
+<div class="overlay" id="overlay" hidden></div>
+<section class="drawer" id="recDrawer" role="dialog" aria-modal="true" aria-labelledby="recTitle" hidden>
+  <div class="drawer-head">
+    <h2 id="recTitle">Add a show to the catalogue</h2>
+    <button class="btn btn-icon" id="btnCloseRec" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+  <div class="drawer-body">
+    <p class="hint">This goes in the catalogue, not the ledger — pull it across
+      when you decide to apply.</p>
+    <div class="field"><label class="label" for="rName">Show name</label>
+      <input class="control" id="rName" type="text"></div>
+    <div class="grid-2">
+      <div class="field"><label class="label" for="rCity">City</label>
+        <input class="control" id="rCity" type="text"></div>
+      <div class="field"><label class="label" for="rState">State</label>
+        <input class="control" id="rState" type="text" maxlength="2" placeholder="FL"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label class="label" for="rStart">Starts</label>
+        <input class="control" id="rStart" type="date"></div>
+      <div class="field"><label class="label" for="rEnd">Ends</label>
+        <input class="control" id="rEnd" type="date"></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label class="label" for="rApply">Apply by</label>
+        <input class="control" id="rApply" type="date"></div>
+      <div class="field"><label class="label" for="rFee">Fee</label>
+        <input class="control" id="rFee" type="number" min="0" step="1"></div>
+    </div>
+    <div class="field"><label class="label" for="rUrl">Link</label>
+      <input class="control" id="rUrl" type="url" placeholder="https://"></div>
+    <p class="err" id="recErr" hidden></p>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-quiet" id="btnRecCancel" type="button">Cancel</button>
+    <button class="btn btn-primary" id="btnRecSave" type="button">Add to catalogue</button>
+  </div>
+</section>
+
+<div class="toast" id="toast" hidden>
+  <span class="t-msg" id="toastMsg"></span>
+  <button class="t-act" id="toastAct" type="button" hidden></button>
+</div>
+
+<script src="core.js"></script>
+<script src="catalogue.js"></script>
+<script src="store-supabase.js"></script>
+<script src="import.js"></script>
+<script type="module">
+/* ==========================================================================
+   ALL SHOWS
+   The catalogue browser. It reads catalogue.json through ASTCatalogue and
+   writes to the ledger only through AST.Store, so a show added here lands in
+   whichever backend is live and syncs like a hand edit.
+   ========================================================================== */
+const { Store, Settings, Theme, esc, fmtRange, fmtDay, daysUntil, fmtCountdown,
+        starsSVG, ratingText, clampRating } = window.AST;
+const C = window.ASTCatalogue;
+const $ = sel => document.querySelector(sel);
+
+const state = {
+  rows: [],
+  ledger: [],
+  q: { text:'', states:[], liked:false, added:null, deadline:'open', maxFee:null, sort:'date' },
+  quick: 'all'
+};
+
+/* ---- Toast --------------------------------------------------------------- */
+let toastTimer = null;
+function toast(msg, actionLabel, onAction, ms = 7000) {
+  clearTimeout(toastTimer);
+  $('#toastMsg').textContent = msg;
+  const act = $('#toastAct');
+  act.hidden = !actionLabel;
+  act.textContent = actionLabel || '';
+  act.onclick = () => { hideToast(); if (onAction) onAction(); };
+  $('#toast').hidden = false;
+  toastTimer = setTimeout(hideToast, ms);
+}
+function hideToast() { $('#toast').hidden = true; }
+window.AST.setNotifier(msg => toast(msg));
+
+/* ---- Rendering ----------------------------------------------------------- */
+
+const HEART =
+  '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">' +
+  '<path d="M10 16.4S3.3 12.2 3.3 7.8a3.4 3.4 0 0 1 6.7-1 3.4 3.4 0 0 1 6.7 1c0 4.4-6.7 8.6-6.7 8.6z" ' +
+  'fill="var(--fill,none)" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+
+function deadlineBits(r) {
+  if (!r.applyBy) return { cls:'meta', text:'no deadline' };
+  const d = daysUntil(r.applyBy);
+  if (d < 0) return { cls:'meta due-past', text:'closed ' + fmtDay(r.applyBy) };
+  if (d <= 21) return { cls:'meta due-soon', text:fmtDay(r.applyBy) + ' · ' + fmtCountdown(d) };
+  return { cls:'meta', text:'apply by ' + fmtDay(r.applyBy) };
+}
+
+function cardHtml(r) {
+  const dl = deadlineBits(r);
+  const fee = r.fee == null ? '' : '$' + (Number.isInteger(r.fee) ? r.fee : r.fee.toFixed(2));
+  return '<article class="card' + (r.addedShowId ? ' is-added' : '') + '" data-id="' + esc(r.id) + '">' +
+    '<div class="card-top">' +
+      '<h3 class="card-name">' + esc(r.name) + '</h3>' +
+      '<button type="button" class="card-like" data-like="' + esc(r.id) + '" ' +
+        'aria-pressed="' + (r.liked ? 'true' : 'false') + '" ' +
+        'style="--fill:' + (r.liked ? 'currentColor' : 'none') + '" ' +
+        'title="' + (r.liked ? 'Remove from your shortlist' : 'Add to your shortlist') + '" ' +
+        'aria-label="' + (r.liked ? 'Unlike ' : 'Like ') + esc(r.name) + '">' + HEART + '</button>' +
+    '</div>' +
+    '<p class="card-place">' + esc([r.city, r.state].filter(Boolean).join(', ')) + '</p>' +
+    '<p class="meta card-dates">' + esc(fmtRange(r.startDate, r.endDate)) + '</p>' +
+    '<p class="' + dl.cls + '">' + esc(dl.text) +
+      (r.deadlineNote ? ' <span class="muted-inline">' + esc(r.deadlineNote) + '</span>' : '') + '</p>' +
+    (fee ? '<p class="meta">' + esc(fee + (r.feeLabel ? ' · ' + r.feeLabel : '')) + '</p>' : '') +
+    '<div class="card-foot">' +
+      '<span class="card-stars" data-rate="' + esc(r.id) + '" role="slider" tabindex="0" ' +
+        'aria-label="Rating for ' + esc(r.name) + '" aria-valuemin="0" aria-valuemax="10" ' +
+        'aria-valuenow="' + (r.rating || 0) + '" aria-valuetext="' + ratingText(r.rating) + '" ' +
+        'title="' + ratingText(r.rating) + '" ' +
+        'style="color:' + (r.rating ? 'var(--ink)' : 'var(--muted)') + '">' +
+        starsSVG(r.rating, 14) + '</span>' +
+      '<span class="card-acts">' +
+        (r.url ? '<a class="btn-mini" href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer" ' +
+          'title="Open the Zapplication page in a new tab">Zapp &#8599;</a>' : '') +
+        (r.addedShowId
+          ? '<span class="added-tag" title="Already in your ledger">In ledger</span>'
+          : '<button type="button" class="btn-mini add" data-add="' + esc(r.id) + '">Add to ledger</button>') +
+      '</span>' +
+    '</div>' +
+  '</article>';
+}
+
+function visible() {
+  const q = Object.assign({}, state.q);
+  if (state.quick === 'liked') q.liked = true;
+  if (state.quick === 'added') q.added = 'only';
+  else if ($('#fHideAdded').checked) q.added = 'hide';
+  return C.query(state.rows, q);
+}
+
+function render() {
+  const rows = visible();
+  $('#cards').innerHTML = rows.length
+    ? rows.map(cardHtml).join('')
+    : '<p class="empty">Nothing matches those filters.</p>';
+  const liked = state.rows.filter(r => r.liked && !r.addedShowId).length;
+  $('#resCount').textContent =
+    rows.length + ' of ' + state.rows.length + ' shows' +
+    (liked ? ' · ' + liked + ' liked and not yet in the ledger' : '');
+  const btn = $('#btnAddLiked');
+  btn.hidden = !liked;
+  btn.textContent = 'Add ' + liked + ' liked ' + (liked === 1 ? 'show' : 'shows') + ' to the ledger';
+}
+
+function renderStates() {
+  const st = C.states(state.rows);
+  $('#fStates').innerHTML = st.map(s =>
+    '<label class="cbx"><input type="checkbox" value="' + esc(s.state) + '"' +
+    (state.q.states.includes(s.state) ? ' checked' : '') + '>' +
+    '<span>' + esc(s.name) + ' <span class="muted-inline">' + s.n + '</span></span></label>'
+  ).join('');
+}
+
+/* ---- Reload both sides --------------------------------------------------- */
+async function refresh() {
+  state.ledger = await Store.list();
+  /* Reconcile: a record marked as added whose ledger show has since been
+     deleted should stop claiming to be in the ledger, or the "Add" button
+     never comes back. */
+  const ids = new Set(state.ledger.map(s => s.id));
+  C.all().forEach(r => {
+    if (r.addedShowId && !ids.has(r.addedShowId)) C.markAdded(r.id, '');
+  });
+  state.rows = C.all();
+  render();
+}
+
+/* ---- Adding to the ledger ------------------------------------------------ */
+
+async function addToLedger(ids) {
+  const recs = ids.map(id => C.get(id)).filter(Boolean).filter(r => !r.addedShowId);
+  if (!recs.length) return;
+  const made = recs.map(r => C.toShow(r));
+  for (const show of made) await Store.upsert(show);
+  made.forEach((show, i) => C.markAdded(recs[i].id, show.id));
+  await refresh();
+
+  const n = made.length;
+  toast(n + (n === 1 ? ' show' : ' shows') + ' added to the ledger', 'Undo', async () => {
+      geocodeRun++;                       // cancel any lookup still running for these
+      for (const show of made) await Store.remove(show.id);
+      recs.forEach(r => C.markAdded(r.id, ''));
+      await refresh();
+      toast('Removed again');
+    });
+
+  geocodePins(made);
+}
+
+/* A catalogue record carries a city and a state but no coordinates, so a show
+   added from here would sit off the map until it is geocoded. Reuse the
+   import module's geocoder rather than opening a second path to Nominatim:
+   it holds the 1.1s rate limit and the shared cache, so a city already looked
+   up costs nothing. Runs in the background — the show is already in the
+   ledger, this only decides whether it has a pin yet. */
+let geocodeRun = 0;
+async function geocodePins(shows) {
+  const G = window.ASTImport && window.ASTImport.Geocoder;
+  if (!G) return;
+  const todo = shows.filter(s => s.city && s.lat == null);
+  if (!todo.length) return;
+
+  const run = ++geocodeRun;
+  let done = 0, found = 0;
+  for (const show of todo) {
+    if (run !== geocodeRun) return;               // undone, or a newer batch started
+    $('#catNote').textContent =
+      'Finding coordinates… ' + (done + 1) + ' of ' + todo.length + ' (' + show.city + ')';
+    let hit = null;
+    try { hit = await G.lookup(show.city, show.state); } catch (_) { hit = null; }
+    if (run !== geocodeRun) return;
+    if (hit && hit.lat != null) {
+      await Store.upsert({ ...show, lat: hit.lat, lng: hit.lng,
+                           updatedAt: new Date().toISOString() });
+      found++;
+    }
+    done++;
+  }
+  $('#catNote').textContent = found === todo.length
+    ? 'All ' + found + ' placed on the map.'
+    : found + ' of ' + todo.length + ' placed on the map — the rest need coordinates ' +
+      'adding by hand in the ledger drawer.';
+  await refresh();
+}
+
+/* ---- Events -------------------------------------------------------------- */
+
+$('#fText').addEventListener('input', e => { state.q.text = e.target.value; render(); });
+$('#fSort').addEventListener('change', e => { state.q.sort = e.target.value; render(); });
+$('#fOpen').addEventListener('change', e => {
+  state.q.deadline = e.target.checked ? 'open' : null; render();
+});
+$('#fHideAdded').addEventListener('change', render);
+$('#fMaxFee').addEventListener('input', e => {
+  const v = Number(e.target.value);
+  state.q.maxFee = v >= 150 ? null : v;
+  $('#fMaxFeeVal').textContent = state.q.maxFee == null ? 'any' : '$' + v;
+  render();
+});
+$('#fStates').addEventListener('change', () => {
+  state.q.states = Array.from($('#fStates').querySelectorAll('input:checked')).map(i => i.value);
+  render();
+});
+$('#fStatesClear').addEventListener('click', () => {
+  state.q.states = []; renderStates(); render();
+});
+$('#fQuick').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  state.quick = chip.dataset.quick;
+  $('#fQuick').querySelectorAll('.chip').forEach(c =>
+    c.setAttribute('aria-pressed', String(c === chip)));
+  render();
+});
+
+$('#cards').addEventListener('click', async e => {
+  const like = e.target.closest('[data-like]');
+  if (like) {
+    const id = like.dataset.like;
+    C.like(id, !C.pick(id).liked);
+    state.rows = C.all();
+    render();
+    return;
+  }
+  const add = e.target.closest('[data-add]');
+  if (add) { await addToLedger([add.dataset.add]); return; }
+});
+
+/* Rating: click the stars, or focus them and use the arrow keys. */
+function rateFromEvent(el, e) {
+  const box = el.getBoundingClientRect();
+  const frac = Math.min(1, Math.max(0, (e.clientX - box.left) / box.width));
+  return clampRating(Math.ceil(frac * 10));
+}
+$('#cards').addEventListener('click', e => {
+  const stars = e.target.closest('[data-rate]');
+  if (!stars) return;
+  C.rate(stars.dataset.rate, rateFromEvent(stars, e));
+  state.rows = C.all();
+  render();
+});
+$('#cards').addEventListener('keydown', e => {
+  const stars = e.target.closest('[data-rate]');
+  if (!stars) return;
+  const id = stars.dataset.rate;
+  const cur = C.pick(id).rating;
+  let next = null;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = cur + 1;
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = cur - 1;
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = 10;
+  else if (/^[0-9]$/.test(e.key)) next = Number(e.key) * (e.shiftKey ? 1 : 1);
+  else if (e.key === 'Delete' || e.key === 'Backspace') next = 0;
+  else return;
+  e.preventDefault();
+  C.rate(id, next);
+  state.rows = C.all();
+  render();
+  const again = $('[data-rate="' + CSS.escape(id) + '"]');
+  if (again) again.focus();
+});
+
+$('#btnAddLiked').addEventListener('click', async () => {
+  await addToLedger(state.rows.filter(r => r.liked && !r.addedShowId).map(r => r.id));
+});
+
+/* ---- Add a record of your own -------------------------------------------- */
+function openRec() {
+  ['rName','rCity','rState','rStart','rEnd','rApply','rFee','rUrl']
+    .forEach(id => { $('#' + id).value = ''; });
+  $('#recErr').hidden = true;
+  $('#overlay').hidden = false;
+  $('#recDrawer').hidden = false;
+  $('#rName').focus();
+}
+function closeRec() { $('#overlay').hidden = true; $('#recDrawer').hidden = true; }
+$('#btnAddRecord').addEventListener('click', openRec);
+$('#btnCloseRec').addEventListener('click', closeRec);
+$('#btnRecCancel').addEventListener('click', closeRec);
+$('#overlay').addEventListener('click', closeRec);
+$('#btnRecSave').addEventListener('click', () => {
+  const name = $('#rName').value.trim();
+  if (!name) { $('#recErr').textContent = 'A show needs a name.'; $('#recErr').hidden = false; return; }
+  C.addRecord({
+    name,
+    city: $('#rCity').value, state: $('#rState').value,
+    startDate: $('#rStart').value, endDate: $('#rEnd').value,
+    applyBy: $('#rApply').value, fee: $('#rFee').value, url: $('#rUrl').value
+  });
+  closeRec();
+  state.rows = C.all();
+  renderStates(); render();
+  toast('"' + name + '" added to the catalogue');
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('#recDrawer').hidden) closeRec();
+});
+
+/* ==========================================================================
+   BOOT
+   ========================================================================== */
+Theme.init();
+$('#btnTheme').addEventListener('click', () => {
+  Theme.toggle();
+  const dark = Theme.current() === 'dark';
+  $('#iconSun').hidden = dark; $('#iconMoon').hidden = !dark;
+});
+(() => { const dark = Theme.current() === 'dark';
+  $('#iconSun').hidden = dark; $('#iconMoon').hidden = !dark; })();
+
+/* Same Store swap as the ledger: a configured Supabase project means shows
+   added here sync, otherwise they land in localStorage. */
+(async () => {
+  if (window.ASTSupabase) {
+    try { window.ASTSupabase.connect({ onShows: () => refresh() }); } catch (_) {}
+  }
+
+  const res = await C.load();
+  if (!res.ok) {
+    $('#resCount').textContent = 'The catalogue could not be loaded.';
+    $('#catNote').textContent =
+      'catalogue.json did not load (' + res.error + '). Over file:// the browser ' +
+      'blocks it; open the tracker over http, or on the live site. Shows you added ' +
+      'yourself are still listed.';
+  } else {
+    const m = C.meta();
+    $('#catCount').textContent = m.count + ' shows';
+    $('#catNote').textContent =
+      'Catalogue of ' + m.count + ' shows' + (m.importedAt ? ', imported ' + m.importedAt : '') +
+      '. Liking and rating here changes nothing in your ledger until you add a show across.';
+  }
+  await refresh();
+  renderStates();
+  render();
+})();
+</script>
+</body>
+</html>

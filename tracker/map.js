@@ -39,12 +39,18 @@ window.ASTMap = (function () {
 
   /* ---- Route maths ------------------------------------------------------- */
 
-  /** Splits the season into the pieces the map and the hand-off buttons need. */
+  /** Splits the season into the pieces the map and the hand-off buttons need.
+      Hidden shows are dropped here rather than at each call site, so the map,
+      the route line and the Google/Apple hand-off can never disagree about
+      what is in the plan. Hiding does not touch the ledger, the stats or
+      anything shareable — see the note on `hidden` in core.js. */
   function routeStops(shows) {
-    var ordered = A.byDate(shows);
+    var visible = (shows || []).filter(function (s) { return !s.hidden; });
+    var ordered = A.byDate(visible);
     var mapped = ordered.filter(A.hasCoords);
     return {
       ordered: ordered,
+      hidden: (shows || []).filter(function (s) { return !!s.hidden; }),
       mapped: mapped,
       main: mapped.filter(function (s) { return !s.isAlternate; }),
       alternates: mapped.filter(function (s) { return s.isAlternate; }),
