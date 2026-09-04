@@ -1,6 +1,6 @@
 # Art Show Tracker — project state
 
-_Last updated: 2026-09-03_
+_Last updated: 2026-09-04_
 
 ## What this is
 A tracker for Isaac Anderson's art show season: upcoming shows, a route map
@@ -275,6 +275,10 @@ module, do not fork the code". Two pages cannot share inline script, so:
   with `ASTShare.mountEmbed`.
 - `tracker/index.html` — the ledger; `tracker/map.html` — the full-page map.
 
+`tools/smoke/` sits outside `tracker/` and is **not part of the app** —
+nothing in `tracker/` references it and deleting it costs nothing. It is the
+headless harness that serves the repo at the deployed subpath; see its README.
+
 The geocode cache and the share panel's preferences are the two new pieces of
 stored state (`AST.Settings`, keys `artShowTracker.geocache` and
 `artShowTracker.share`) and they live in `core.js` for the same reason
@@ -411,19 +415,43 @@ iframe reports its height to the host page. A nine-check regression pass
 confirms Phases 1-4 still work with the panel in place (ledger, import modal,
 drawer, JSON export, the map page).
 
-**Not verified from here:** the cdnjs and OpenStreetMap tile requests
-themselves — both hosts are blocked from the build sandbox, so the map was
-tested with a locally vendored Leaflet and no tiles. Open `tracker/index.html`
-on a real connection to confirm tiles paint. For the same reason Leaflet
-carries no Subresource Integrity hash; adding verified hashes is a small
-follow-up.
+**Served over real HTTP at the live path shape (2026-09-04).** Every earlier
+phase was driven over `file://` against local stubs. The deployed site is a
+**subpath over https** (`/newTEST/tracker/`), a shape the app had never run in,
+so `tools/smoke/` now serves the repo at exactly that path in headless Chromium
+— **41 checks, all passing** (`tools/smoke/run.sh`):
+- *Pages and map (15).* `index.html` and `map.html` both load at the subpath
+  with no uncaught errors, Leaflet initialises, the tile URLs it builds are
+  well-formed `z/x/y.png`, tiles paint, all 9 seeded markers render, and
+  `#stop=6a` selects stop 6a and round-trips through the hash.
+- *Geocode / export / PNG (19).* The real `Geocoder` against a stub serving
+  Nominatim's actual `jsonv2` shape: the request is
+  `…/search?format=jsonv2&limit=1&addressdetails=0&q=Naples%2C%20FL%2C%20USA`,
+  the ≥1s gate holds (1107ms measured), and six lookups cost three network
+  calls because hits *and* misses cache. Export JSON downloads valid JSON with
+  all 9 shows; Download PNG downloads a real 1080×1080 PNG (signature and
+  dimensions read back off disk).
+- *Degradation (7).* The two failure modes a visitor can actually hit. With
+  cdnjs blocked as an adblocker would block it, `window.L` is absent and the
+  ledger, its rows and the add-show drawer all still work with no uncaught
+  errors; with Leaflet loaded but tiles refused, the markers still draw. **A
+  CDN or tile failure cannot take the ledger down** — which also means a
+  fault on the live site will be visibly local to the map.
 
-The **real Nominatim service** has also never been called from here — the
-host is blocked from the build sandbox, so the geocoder was driven against a
-stub implementing the same response shape. The rate limit, the cache and the
-failure handling are all verified; what is not is that
-`nominatim.openstreetmap.org` returns what is expected for these particular
-city names. Run one import on a real connection to confirm.
+What this does *not* prove is the other half of each contract: the harness
+intercepts the blocked hosts and answers for them, so it verifies what the app
+asks for and does with the answer, not that cdnjs, OpenStreetMap or Nominatim
+answer that way. That still needs one pass in a real browser.
+
+**Not verified from here:** the cdnjs, OpenStreetMap tile and Nominatim
+requests themselves, and the live Pages URL. Re-checked 2026-09-04 and all
+four hosts are still refused by the sandbox's egress policy — the proxy
+answers 403 to CONNECT for `yitzhach.github.io`, `cdnjs.cloudflare.com`,
+`tile.openstreetmap.org` and `nominatim.openstreetmap.org`. That is an
+organization policy denial, not a transient failure, so it cannot be retried
+or routed around from here. `fonts.googleapis.com` remains reachable (it
+opened up on 2026-09-03, which is how Montserrat got verified). For the same
+reason Leaflet still carries no Subresource Integrity hash.
 
 **Montserrat now verified (2026-09-03).** Google Fonts had been blocked from
 the build sandbox; `fonts.googleapis.com` and `fonts.gstatic.com` are now
@@ -477,17 +505,36 @@ and real-service work, not new phases:
   see the caveat under Verified. Two things only a real project can confirm:
   the magic-link redirect URL is allow-listed (Authentication → URL
   Configuration), and the RLS policies behave as written.
-- **Smoke-test the live deploy** (https://yitzhach.github.io/newTEST/tracker/).
-  These three were unverifiable from the build sandbox and are now just a
-  browser away — nobody has looked yet:
-  - **The route map.** Does Leaflet load from cdnjs and do OpenStreetMap tiles
-    actually paint? Try `tracker/map.html` and the `#stop=6a` deep link too.
-  - **Import geocoding.** Import shows → paste or CSV → Geocode, and confirm
-    Nominatim answers sensibly for these Florida city names.
-  - **Download PNG / Export JSON**, which the artifact preview could not do.
-  Anything that fails here is real and worth fixing before the backfill.
+- **Smoke-test the live deploy** (https://yitzhach.github.io/newTEST/tracker/)
+  — *the app's side is now verified; what is left needs a real browser.*
+  Attempted 2026-09-04 and the live URL could not be opened from the session:
+  `yitzhach.github.io` is refused by the egress policy along with cdnjs, the
+  OSM tiles and Nominatim (see Verified). What was done instead was to serve
+  the repo locally at the same subpath over https and drive it — 41 checks,
+  all passing, so the page wiring, the tile URL construction, the Nominatim
+  request, Export JSON and Download PNG are all known good on the app's side.
+  Three things still need one pass in a real browser, and only these:
+  - **Do OSM tiles actually paint?** If they do not, suspect number one is
+    the tile URL: `map.js` uses the legacy subdomain form
+    `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`, while OSM's current
+    tile usage policy documents `https://tile.openstreetmap.org/{z}/{x}/{y}.png`
+    with no subdomain. The `a`/`b`/`c` subdomains are believed to still
+    resolve, so this was **deliberately not changed blind** — it is a
+    one-line fix in `tracker/map.js` the moment a real browser says tiles are
+    missing. Check `map.html` and `#stop=6a` while there.
+  - **Does Nominatim answer for these Florida city names?** The request shape
+    is verified; what is not is the service's replies. Nominatim sends
+    permissive CORS, so a browser call should work.
+  - **Download PNG / Export JSON in a real browser.** Both verified headless;
+    this is confirming the browser's own download path.
+  A failure in any of these is local to that feature — the degradation checks
+  show a dead CDN or dead tiles cannot take the ledger down with them.
 - **Add verified Subresource Integrity hashes** to the two Leaflet tags. Still
-  blocked as of 2026-09-03: `cdnjs.cloudflare.com`, `api.cdnjs.com` (which
+  blocked, re-checked 2026-09-04 — `cdnjs.cloudflare.com`, `api.cdnjs.com`,
+  jsDelivr and unpkg are all still refused. `registry.npmjs.org` *is* reachable
+  now, but the npm tarball is not evidence of the bytes cdnjs serves, so
+  hashing it would be the same guess by another route. Original note
+  (2026-09-03): `cdnjs.cloudflare.com`, `api.cdnjs.com` (which
   serves the official hashes), jsDelivr and unpkg are all refused by the
   sandbox gateway, so no hash can be computed against the bytes cdnjs will
   actually serve. Deliberately not guessed from the npm tarball — a wrong SRI
