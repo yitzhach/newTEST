@@ -477,10 +477,15 @@ and real-service work, not new phases:
   see the caveat under Verified. Two things only a real project can confirm:
   the magic-link redirect URL is allow-listed (Authentication → URL
   Configuration), and the RLS policies behave as written.
-- **Run one import on a real connection** to confirm Nominatim answers as
-  expected for these city names — see the caveat under Verified.
-- **Open the map on a real connection** to confirm OpenStreetMap tiles paint;
-  neither cdnjs nor the tile host is reachable from the build sandbox.
+- **Smoke-test the live deploy** (https://yitzhach.github.io/newTEST/tracker/).
+  These three were unverifiable from the build sandbox and are now just a
+  browser away — nobody has looked yet:
+  - **The route map.** Does Leaflet load from cdnjs and do OpenStreetMap tiles
+    actually paint? Try `tracker/map.html` and the `#stop=6a` deep link too.
+  - **Import geocoding.** Import shows → paste or CSV → Geocode, and confirm
+    Nominatim answers sensibly for these Florida city names.
+  - **Download PNG / Export JSON**, which the artifact preview could not do.
+  Anything that fails here is real and worth fixing before the backfill.
 - **Add verified Subresource Integrity hashes** to the two Leaflet tags. Still
   blocked as of 2026-09-03: `cdnjs.cloudflare.com`, `api.cdnjs.com` (which
   serves the official hashes), jsDelivr and unpkg are all refused by the
@@ -497,3 +502,10 @@ and real-service work, not new phases:
 - The 331 Phase 4 + Phase 5 checks still live in the build sandbox rather than
   the repo — committing a runner is parked in `docs/FUTURE_BUILD.md` under
   Technical.
+- **The root site does not run as deployed**, and never did — the Pages
+  workflow uploads the repo unbuilt, so `index.html` at the root asks the
+  browser for `/index.tsx` (raw TypeScript) and an `/index.css` that is not in
+  the repo. Untouched by the tracker work and out of its scope, but it is the
+  first thing anyone opening the bare Pages URL will hit. Fixing it means
+  giving the workflow a real Vite build step, or leaving the root to the
+  portfolio's own hosting.
