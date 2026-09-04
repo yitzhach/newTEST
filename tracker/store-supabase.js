@@ -33,6 +33,7 @@ window.ASTSupabase = (function () {
     ['status','status'], ['rating','rating'],
     ['juryFee','jury_fee'], ['boothFee','booth_fee'],
     ['routeNumber','route_number'], ['isAlternate','is_alternate'],
+    ['hidden','hidden'], ['catalogueId','catalogue_id'],
     ['notes','notes'], ['url','url'], ['source','source'],
     ['deletedAt','deleted_at'], ['createdAt','created_at'], ['updatedAt','updated_at']
   ];

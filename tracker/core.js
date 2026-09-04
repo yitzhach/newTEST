@@ -12,7 +12,7 @@ window.AST = (function () {
   'use strict';
 
   /* ---- 1. MODEL + CONSTANTS --------------------------------------------- */
-  var SCHEMA_VERSION = 2;
+  var SCHEMA_VERSION = 3;
   var DB_KEY = 'artShowTracker.db';
   var THEME_KEY = 'artShowTracker.theme';
   var CONFIG_KEY = 'artShowTracker.supabase';
@@ -20,6 +20,7 @@ window.AST = (function () {
   var GEOCACHE_KEY = 'artShowTracker.geocache';
   var SHARE_KEY = 'artShowTracker.share';
   var LAYOUT_KEY = 'artShowTracker.layout';
+  var CATALOGUE_KEY = 'artShowTracker.catalogue';
   var ROUTECACHE_KEY = 'artShowTracker.routecache';
 
   var STATUSES = [
@@ -57,9 +58,17 @@ window.AST = (function () {
       boothFee: numOrNull(input.boothFee),
       routeNumber: input.routeNumber == null ? '' : String(input.routeNumber),
       isAlternate: !!input.isAlternate,
+      /* Phase 7: temporarily out of the plan. A hidden show greys out in the
+         list and drops out of the map and the route, so a route can be tried
+         without it — but it is still yours: exports, the share card and the
+         season stats all still count it. Hiding is a lens, not a delete. */
+      hidden: !!input.hidden,
       notes: input.notes || '',
       url: input.url || '',
-      source: ['manual','zapp_paste','csv'].indexOf(input.source) !== -1 ? input.source : 'manual',
+      source: ['manual','zapp_paste','csv','catalogue'].indexOf(input.source) !== -1 ? input.source : 'manual',
+      /* Which catalogue record this came from, so All shows can tell you it
+         is already in the ledger without matching on name. */
+      catalogueId: input.catalogueId || '',
       // Tombstone. Sync is last-write-wins on updatedAt, so a delete has to
       // stay as a row or the other device simply pushes the show back.
       deletedAt: input.deletedAt || null,
@@ -115,6 +124,14 @@ window.AST = (function () {
         return row;
       });
       d.schemaVersion = 2;
+    }
+    // v2 -> v3: the hide-from-plan flag. Everything existing starts visible.
+    if (d.schemaVersion < 3) {
+      d.shows = d.shows.map(function (row) {
+        if (row && row.hidden === undefined) row.hidden = false;
+        return row;
+      });
+      d.schemaVersion = 3;
     }
     d.shows = d.shows.map(makeShow);
     d.schemaVersion = SCHEMA_VERSION;
@@ -266,7 +283,13 @@ window.AST = (function () {
        no network at all. A failure is NOT cached — unlike a geocode miss it
        is usually the network, not the answer. */
     getRouteCache: function () { return readJSON(ROUTECACHE_KEY) || {}; },
-    setRouteCache: function (cache) { return writeJSON(ROUTECACHE_KEY, cache); }
+    setRouteCache: function (cache) { return writeJSON(ROUTECACHE_KEY, cache); },
+    /* Phase 7: what you have done to the shows catalogue — likes, ratings,
+       which ones you have already pulled into the ledger, and any rows you
+       added yourself. Keyed by catalogue id, kept apart from catalogue.json
+       so re-importing a fresher export never costs you your picks. */
+    getCatalogue: function () { return readJSON(CATALOGUE_KEY) || {}; },
+    setCatalogue: function (state) { return writeJSON(CATALOGUE_KEY, state); }
   };
 
   var backend = LocalStore;
@@ -399,10 +422,11 @@ window.AST = (function () {
       l[key] = Math.round(w);
       return Settings.setLayout(l);
     },
-    /** The width the rail should open at. */
-    stored: function (key) {
+    /** The width the rail should open at, falling back to a per-key default. */
+    stored: function (key, fallback) {
       var w = Splitter.get(key);
-      return typeof w === 'number' ? w : Splitter.DEFAULT;
+      if (typeof w === 'number') return w;
+      return typeof fallback === 'number' ? fallback : Splitter.DEFAULT;
     },
     /** Clamps a desired rail width against the space actually available. */
     clamp: function (w, containerWidth) {
@@ -492,10 +516,103 @@ window.AST = (function () {
         e.preventDefault();
       });
 
+      function openAt(k) {
+        key = k;
+        var fb = o.defaultFor ? o.defaultFor(k, box.getBoundingClientRect().width) : undefined;
+        apply(Splitter.stored(k, fb), false);
+      }
+
       // Opening width, and keep it legal when the window is resized.
-      apply(Splitter.stored(key), false);
+      openAt(key);
       window.addEventListener('resize', function () { apply(width(), false); });
-      return { apply: apply, width: width };
+      /* setKey lets one divider serve two layouts — the ledger's list view and
+         its map view remember different proportions under different keys,
+         without a second element or a second set of listeners. */
+      return { apply: apply, width: width, setKey: openAt };
+    }
+  };
+
+  /* Same idea, one axis over: drags the bottom edge of the map to make it
+     taller or shorter. Writes --map-h on the element you give it. */
+  var SplitterV = {
+    MIN: 180,
+    DEFAULT: 320,
+    max: function () { return Math.max(SplitterV.MIN, Math.round(window.innerHeight * 0.78)); },
+    clamp: function (h) { return Math.max(SplitterV.MIN, Math.min(h, SplitterV.max())); },
+
+    attach: function (el, o) {
+      if (!el || !o || !o.target) return null;
+      var box = o.target, key = o.key || 'mapH';
+      var onResize = o.onResize || function () {};
+      var raf = 0, pending = null, dragging = false;
+
+      function height() {
+        var v = parseFloat(getComputedStyle(box).getPropertyValue('--map-h'));
+        return isFinite(v) ? v : SplitterV.DEFAULT;
+      }
+      function paint(h) {
+        box.style.setProperty('--map-h', h + 'px');
+        el.setAttribute('aria-valuenow', String(Math.round(h)));
+      }
+      function schedule(h) {
+        pending = h;
+        if (raf) return;
+        raf = requestAnimationFrame(function () {
+          raf = 0;
+          if (pending == null) return;
+          paint(pending); pending = null;
+          onResize();
+        });
+      }
+      function apply(h, persist) {
+        var c = SplitterV.clamp(h);
+        schedule(c);
+        if (persist) Splitter.set(key, c);
+        return c;
+      }
+
+      el.setAttribute('role', 'separator');
+      el.setAttribute('aria-orientation', 'horizontal');
+      el.setAttribute('aria-label', 'Resize the map height');
+      el.setAttribute('aria-valuemin', String(SplitterV.MIN));
+      el.setAttribute('tabindex', '0');
+
+      el.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        dragging = true;
+        el.classList.add('is-dragging');
+        document.body.classList.add('is-splitting-v');
+        try { el.setPointerCapture(e.pointerId); } catch (_) {}
+        e.preventDefault();
+      });
+      el.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        // Height is the pointer's distance from the top of the map box.
+        apply(e.clientY - box.getBoundingClientRect().top, false);
+        e.preventDefault();
+      });
+      function end(e) {
+        if (!dragging) return;
+        dragging = false;
+        el.classList.remove('is-dragging');
+        document.body.classList.remove('is-splitting-v');
+        try { el.releasePointerCapture(e.pointerId); } catch (_) {}
+        Splitter.set(key, height());
+        onResize();
+      }
+      el.addEventListener('pointerup', end);
+      el.addEventListener('pointercancel', end);
+      el.addEventListener('keydown', function (e) {
+        var step = e.shiftKey ? 48 : 16, h = height();
+        if (e.key === 'ArrowUp')        apply(h - step, true);
+        else if (e.key === 'ArrowDown') apply(h + step, true);
+        else return;
+        e.preventDefault();
+      });
+
+      apply(Splitter.stored(key, SplitterV.DEFAULT), false);
+      window.addEventListener('resize', function () { apply(height(), false); });
+      return { apply: apply, height: height };
     }
   };
 
@@ -510,6 +627,6 @@ window.AST = (function () {
     fmtDay: fmtDay, fmtRange: fmtRange, fmtCountdown: fmtCountdown,
     esc: esc, place: place, byDate: byDate, hasCoords: hasCoords, FAR: FAR,
     starsSVG: starsSVG, ratingText: ratingText,
-    Theme: Theme, Splitter: Splitter
+    Theme: Theme, Splitter: Splitter, SplitterV: SplitterV
   };
 })();
