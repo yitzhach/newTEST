@@ -6,4 +6,4 @@ cd "$(dirname "$0")"
 export NODE_PATH="${NODE_PATH:-$(npm root -g)}"
 [ -d package/dist ] || { npm pack leaflet@1.9.4 >/dev/null && tar xzf leaflet-1.9.4.tgz; }
 [ -f tile.png ] || node make-tile.cjs tile.png
-for f in 01-*.cjs 02-*.cjs 03-*.cjs; do echo; echo "######## $f ########"; node "$f"; done
+for f in 0*.cjs; do echo; echo "######## $f ########"; node "$f"; done

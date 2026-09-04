@@ -9,7 +9,7 @@ now served from GitHub Pages at a **subpath** (`/newTEST/tracker/`) over
 **https**, which is a shape it had never run in. These harnesses serve the
 repo at that exact path over real HTTP and drive it in headless Chromium.
 
-## What they cover (41 checks)
+## What they cover (97 checks)
 - `01-pages-and-map.cjs` (15) — `index.html` and `map.html` load with no
   uncaught errors at the subpath, Leaflet initialises, tile URLs are
   well-formed and paint, 9 markers render, the `#stop=6a` deep link selects
@@ -19,6 +19,13 @@ repo at that exact path over real HTTP and drive it in headless Chromium.
   gate, cache hits, cached misses (3 network calls for 6 lookups). Then
   Export JSON (valid JSON, 9 shows) and Download PNG (real PNG signature,
   1080×1080).
+- `04-splitter-view-roads.cjs` (56) — Phase 6: the draggable divider
+  (drag, clamp, persist, keyboard, hidden when stacked, separate width per
+  page), the List/Map view (same DOM node before and after, so Leaflet keeps
+  its state), the hover pan (`.85s`, and one `panTo` for an eight-row sweep),
+  and the road-following route (request shape, cached geometry, cache hit on
+  reload, and a provably different line from the straight fallback) plus its
+  failure and timeout paths.
 - `03-degradation.cjs` (7) — the failure modes a visitor can actually hit:
   cdnjs blocked by an adblocker (ledger and drawer still work, no uncaught
   errors) and tiles refused while Leaflet loads (markers still drawn).

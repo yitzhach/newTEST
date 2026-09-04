@@ -251,6 +251,69 @@ https://claude.ai/code/artifact/a1fcd724-d87d-4c62-83fc-66ddf1f2494a
     through the ledger's own state, so it works the same on LocalStore or the
     Supabase SyncStore.
 
+- **Phase 6 built and working** — the four layout/map asks from 2026-09-04.
+  No new files; `core.js`, `map.js`, `app.css`, `index.html` and `map.html`.
+  - **A draggable divider between the list and the map.** The rail's width is
+    a CSS custom property (`--rail-w`) on the grid, so a drag is one variable
+    write rather than a layout rewrite. `AST.Splitter` lives in `core.js` for
+    the same reason `Theme` does — both pages need it and one file owns the
+    localStorage write. It knows nothing about maps: the page passes an
+    `onResize`, which is where `invalidateSize()` goes. Writes are throttled
+    to one per animation frame, because calling `invalidateSize()` on every
+    `pointermove` is exactly what makes a resizable map feel like treacle.
+    Clamped so neither pane can be squeezed out (rail ≥280px, list ≥420px),
+    re-clamped on window resize, and keyboard-operable with the arrow keys
+    (`role="separator"`, labelled) — a divider you can only drag is a divider
+    some people cannot move. The width is remembered per page
+    (`artShowTracker.layout`, keys `ledgerRail` and `mapPageRail`) — **no
+    double-click reset, as asked.** It deliberately does **not** re-fit the
+    map: resizing should give you more of the view you had, not silently
+    re-frame the season and throw away your pan and zoom.
+  - **Slower, smoother hover pan.** The map used to snap to the next city in
+    `.35s`, which reads as a jump. Now `.85s` with a gentler `easeLinearity`.
+    The real fix was the second half: a 90ms settle delay before the pan
+    starts, so running the pointer down eight rows animates **once**, to
+    where you stopped, instead of queueing eight interrupted pans. The pin
+    still lights up instantly — only the pan waits.
+  - **List / Map view in the header**, plus a **Full map** link to the
+    standalone page (both, as asked). Map view is CSS only: the ledger and
+    the divider stand down, and so do the deadline and stats panels, so the
+    map gets the whole page rather than being pushed below the fold by them.
+    **The map node is never reparented**, so Leaflet keeps its zoom, pan and
+    layers — it just gets `invalidateSize()`. This one *does* re-fit, unlike
+    the divider: switching view changes the viewport's shape completely, and
+    without a fit the season sits squashed in one corner. The chosen view is
+    remembered.
+  - **The route follows roads.** The straight line between two stops was
+    never the drive. `ASTMap.Road` asks OSRM's public demo server for the
+    real geometry and swaps it into the existing polyline. Everything about
+    it is best-effort and nothing is load-bearing: the straight line is drawn
+    **first** and only then upgraded, so the route is never missing while a
+    request is in flight and never lost if one fails; there is a hard 9s
+    abort so a hung router cannot leave it pending; a stale reply landing
+    after the season changed is discarded by token; and a failure is silent,
+    because a missing road route is a cosmetic difference, not an error worth
+    putting in front of anyone. Geometry is cached
+    (`artShowTracker.routecache`, keyed by the ordered coordinates) so a
+    reload redraws the roads with no request at all. **A failure is not
+    cached** — unlike a geocode miss it is usually the network, not the
+    answer.
+
+  **Why not an embedded Google map.** The URL the hand-off buttons build
+  cannot be framed: Google serves `google.com/maps/dir/...` with
+  `X-Frame-Options: SAMEORIGIN` and the browser refuses. The supported route
+  is the **Maps Embed API**, which is built for iframes and free of charge,
+  but needs a key from a billing-enabled Google Cloud project, and on a
+  static public site that key ships in the page source and must be
+  referrer-locked. That would be the project's first API key, so the no-key
+  road route was built first and the Embed API is parked in
+  `docs/FUTURE_BUILD.md` for when a key exists.
+
+  **The one thing to watch:** `router.project-osrm.org` is a *demo* server,
+  not a production service. One cached request per season is well within
+  neighbourly use, but it carries no uptime promise — which is precisely why
+  the fallback is silent and the straight line always draws first.
+
 ## Why the file split
 Phase 1's "one file" rule ran into Phase 2's "`map.html` reuses the same
 module, do not fork the code". Two pages cannot share inline script, so:
@@ -274,6 +337,11 @@ module, do not fork the code". Two pages cannot share inline script, so:
   `<iframe>` on isaacandersonart.com. Standalone but not forked — it draws
   with `ASTShare.mountEmbed`.
 - `tracker/index.html` — the ledger; `tracker/map.html` — the full-page map.
+
+Phase 6 added no files. `AST.Splitter` (the draggable divider) went into
+`core.js` beside `Theme`, and `ASTMap.Road` (the road-following route) into
+`map.js` beside the rest of the Leaflet work, because both pages use both and
+neither is a new concern.
 
 `tools/smoke/` sits outside `tracker/` and is **not part of the app** —
 nothing in `tracker/` references it and deleting it costs nothing. It is the
@@ -442,6 +510,36 @@ What this does *not* prove is the other half of each contract: the harness
 intercepts the blocked hosts and answers for them, so it verifies what the app
 asks for and does with the answer, not that cdnjs, OpenStreetMap or Nominatim
 answer that way. That still needs one pass in a real browser.
+
+**Phase 6 (2026-09-04).** 56 checks in `tools/smoke/04-splitter-view-roads.cjs`,
+all passing, bringing the harness to **97**. The divider: dragging widens the
+map and the canvas with it, the width is written to the layout setting and
+comes back on reload, dragging past either edge still leaves a usable list and
+a usable map, the arrow keys move it, it is a labelled `separator`, it
+disappears when the layout stacks below 1024px, and the map page remembers its
+own width separately from the ledger. The view toggle: Map hides the list and
+gives the map the full width, **the map node is the same DOM node before and
+after** (so Leaflet keeps its state), the markers survive, the choice is
+remembered, and the full-map link is in the header. The hover pan: the
+duration really is `.85s`, and sweeping eight rows quickly calls `panTo`
+**once**, verified by instrumenting `L.Map.prototype.panTo`. The road route:
+the request is lon,lat pairs asking for geojson, the cached geometry is the
+router's 40-point line rather than the 6 stops, the points are `[lat,lng]`
+pairs in Florida, a reload serves it from cache with **no second request**,
+and the drawn path is provably different from the straight one — the same
+season and viewport drawn with the router failing gives a different `d`, which
+is what proves the reply reached the screen. Failure modes: a refused router
+leaves the straight line, the markers and the ledger untouched with no
+uncaught error and nothing cached; a router that hangs for 4s does not stop
+the route appearing. Plus no horizontal overflow at 1280 / 900 / 390px, and in
+map view.
+
+Removed while in there: `upgradeToRoads()` briefly set an `is-road` class via
+`mainLine.getElement()`, which **Leaflet does not define on paths** — only on
+markers and overlays. It was dead code of exactly the kind the
+`document.fonts.check()` bug had already cost this project once, so it and its
+CSS went rather than reaching into Leaflet's private `_path` for a cosmetic
+opacity change.
 
 **Not verified from here:** the cdnjs, OpenStreetMap tile and Nominatim
 requests themselves, and the live Pages URL. Re-checked 2026-09-04 and all

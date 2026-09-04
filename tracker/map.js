@@ -17,6 +17,23 @@ window.ASTMap = (function () {
   var GOOGLE_MAX_WAYPOINTS = 9;
   var MAX_STOPS_PER_LEG = GOOGLE_MAX_WAYPOINTS + 2;
 
+  /* Hover pan. The map used to snap in .35s, which reads as a jump when you
+     run down the list. .85s with a gentler easeLinearity glides instead.
+     HOVER_SETTLE_MS is why a sweep does not thrash: panning starts only once
+     the pointer has rested, so passing over eight rows animates once, to
+     where you stopped, rather than queueing eight interrupted pans. */
+  var HOVER_PAN_SEC = .85;
+  var HOVER_PAN_EASE = .18;
+  var HOVER_SETTLE_MS = 90;
+
+  /* Road-following route geometry from OSRM's public demo server. No API key
+     and no account, which is the whole reason it was chosen: the alternative
+     that draws a Google route on the page needs a billing-enabled key.
+     Everything about it is best-effort — if it is blocked, down, or slow, the
+     straight point-to-point line stays exactly as it was. */
+  var OSRM_URL = 'https://router.project-osrm.org/route/v1/driving/';
+  var OSRM_TIMEOUT_MS = 9000;
+
   var TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
   var TILE_ATTR = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
@@ -47,6 +64,71 @@ window.ASTMap = (function () {
     });
     return best;
   }
+
+  /* ---- Road-following route geometry ------------------------------------
+     The straight line between two stops is not the drive; this asks a routing
+     service for the roads. Kept deliberately defensive: one request, a hard
+     timeout, a cache, and a caller that carries on with the straight line if
+     any of it fails. Nothing here is load-bearing. */
+
+  /** Cache key: the ordered stop coordinates, rounded to ~11m. */
+  function routeKey(stops) {
+    return stops.map(function (s) {
+      return s.lat.toFixed(4) + ',' + s.lng.toFixed(4);
+    }).join(';');
+  }
+
+  /**
+   * Ordered stops -> [[lat,lng], ...] following roads, or null if the service
+   * cannot be reached. Cached in localStorage through AST.Settings.
+   * Overridable endpoint so the harness can point at a stub.
+   * @returns Promise<{ line, cached } | null>
+   */
+  function fetchRoadRoute(stops, opts) {
+    opts = opts || {};
+    if (!stops || stops.length < 2) return Promise.resolve(null);
+
+    var key = routeKey(stops);
+    var cache = A.Settings.getRouteCache();
+    if (!opts.force && cache[key]) {
+      return Promise.resolve({ line: cache[key], cached: true });
+    }
+
+    var coords = stops.map(function (s) { return s.lng + ',' + s.lat; }).join(';');
+    var url = (opts.endpoint || Road.endpoint) + coords + '?overview=full&geometries=geojson';
+
+    /* AbortController so a hung request cannot leave the route pending
+       forever; the straight line is already on screen either way. */
+    var ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctl) ctl.abort(); }, opts.timeoutMs || OSRM_TIMEOUT_MS);
+
+    return fetch(url, ctl ? { signal: ctl.signal } : undefined)
+      .then(function (res) {
+        if (!res.ok) throw new Error('router answered ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var r = data && data.routes && data.routes[0];
+        var cs = r && r.geometry && r.geometry.coordinates;
+        if (!cs || !cs.length) throw new Error('no route geometry');
+        // GeoJSON is [lng,lat]; Leaflet wants [lat,lng].
+        var line = cs.map(function (c) { return [c[1], c[0]]; });
+        var c2 = A.Settings.getRouteCache();
+        c2[key] = line;
+        A.Settings.setRouteCache(c2);
+        return { line: line, cached: false };
+      })
+      .catch(function () { return null; })   // blocked, offline, slow, malformed — all the same to the caller
+      .then(function (out) { clearTimeout(timer); return out; });
+  }
+
+  var Road = {
+    endpoint: OSRM_URL,
+    routeKey: routeKey,
+    fetch: fetchRoadRoute,
+    clearCache: function () { A.Settings.setRouteCache({}); },
+    cacheSize: function () { return Object.keys(A.Settings.getRouteCache()).length; }
+  };
 
   /** Legs of at most MAX_STOPS_PER_LEG, overlapping by one stop. */
   function buildLegs(stops) {
@@ -163,6 +245,10 @@ window.ASTMap = (function () {
     var route = null;        // last routeStops() result
     var hotId = null;
     var selectedId = null;
+    var mainLine = null;     // the through-route polyline, straight or road-following
+    var roadToken = 0;       // guards against a slow reply landing on a newer season
+    var hoverTimer = null;   // HOVER_SETTLE_MS debounce, so a sweep animates once
+    var useRoads = opts.roads !== false;
 
     function pinHtml(s) {
       return '<span class="pin-dot">' + A.esc(s.routeNumber || '•') + '</span>';
@@ -186,17 +272,25 @@ window.ASTMap = (function () {
       markers = {};
       lines.forEach(function (l) { map.removeLayer(l); });
       lines = [];
+      mainLine = null;
+      roadToken++;          // any road reply still in flight is now stale
     }
 
     function setShows(shows) {
       clear();
       route = routeStops(shows);
 
-      // Solid line through the main route, in date order.
+      // Solid line through the main route, in date order. This is drawn
+      // straight away, straight point-to-point, and only then upgraded to the
+      // real roads if the router answers — so the route is never missing
+      // while a request is in flight, and never lost if one fails.
+      mainLine = null;
       if (route.main.length > 1) {
-        lines.push(L.polyline(route.main.map(function (s) { return [s.lat, s.lng]; }), {
+        mainLine = L.polyline(route.main.map(function (s) { return [s.lat, s.lng]; }), {
           className: 'route-line', weight: 2.5, opacity: .85, interactive: false
-        }).addTo(map));
+        }).addTo(map);
+        lines.push(mainLine);
+        if (useRoads) upgradeToRoads(route.main);
       }
       // Dashed spur from each alternate to the stop it stands in for.
       route.alternates.forEach(function (alt) {
@@ -235,6 +329,18 @@ window.ASTMap = (function () {
       return route;
     }
 
+    /* Swaps the straight line's points for road geometry once the router
+       answers. Silent on failure by design: a missing road route is a
+       cosmetic difference, not an error worth putting in front of anyone. */
+    function upgradeToRoads(stops) {
+      var token = ++roadToken;
+      Road.fetch(stops).then(function (out) {
+        if (!out || token !== roadToken || !mainLine) return;   // stale or failed
+        mainLine.setLatLngs(out.line);
+        if (opts.onRoute) opts.onRoute({ roads: true, cached: out.cached });
+      });
+    }
+
     function applyMarkerState() {
       Object.keys(markers).forEach(function (id) {
         var node = markers[id].getElement();
@@ -258,13 +364,27 @@ window.ASTMap = (function () {
       /** Called when a list row is hovered or focused. */
       highlight: function (id, opts2) {
         hotId = id;
-        applyMarkerState();
+        applyMarkerState();               // the pin lights up at once; only the pan waits
+        if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
         var m = id && markers[id];
-        if (m && (!opts2 || opts2.pan !== false)) {
-          map.panTo(m.getLatLng(), { animate: true, duration: .35 });
-        }
+        if (!m || (opts2 && opts2.pan === false)) return;
+        var go = function () {
+          hoverTimer = null;
+          if (hotId !== id) return;       // pointer moved on while we waited
+          map.panTo(m.getLatLng(), {
+            animate: true,
+            duration: HOVER_PAN_SEC,
+            easeLinearity: HOVER_PAN_EASE
+          });
+        };
+        if (opts2 && opts2.immediate) go();
+        else hoverTimer = setTimeout(go, HOVER_SETTLE_MS);
       },
-      clearHighlight: function () { hotId = null; applyMarkerState(); },
+      clearHighlight: function () {
+        hotId = null;
+        if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+        applyMarkerState();
+      },
 
       /** Selects a stop: pans, opens its popup, keeps it marked. */
       focusStop: function (id, opts2) {
@@ -280,6 +400,7 @@ window.ASTMap = (function () {
       select: function (id) { selectedId = id; applyMarkerState(); },
       hasMarker: function (id) { return !!markers[id]; },
       fitAll: fitAll,
+      refreshRoads: function () { if (route && route.main.length > 1) upgradeToRoads(route.main); },
       invalidateSize: function () { map.invalidateSize(); }
     };
   }
@@ -293,6 +414,9 @@ window.ASTMap = (function () {
     appleUrl: appleUrl,
     legLabel: legLabel,
     renderHandoff: renderHandoff,
+    Road: Road,
+    HOVER_PAN_SEC: HOVER_PAN_SEC,
+    HOVER_SETTLE_MS: HOVER_SETTLE_MS,
     create: create
   };
 })();

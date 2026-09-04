@@ -9,6 +9,7 @@
   --danger:#b42318; --warn:#b45309;
   --font:"Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --shadow:0 10px 40px rgba(0,0,0,.12);
+  --split-w:11px;              /* hit area of the list/map divider */
 }
 html[data-theme="dark"] {
   --bg:#0f0f0f; --surface:#171717; --ink:#f5f5f4; --muted:#a3a3a3;
@@ -66,14 +67,80 @@ svg { display:block; }
 /* ==========================================================================
    LAYOUT
    ========================================================================== */
-.main { display:grid; grid-template-columns:minmax(0,1fr) 392px; align-items:start; }
+.main {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) var(--split-w) var(--rail-w, 392px);
+  align-items:start;
+}
 .ledger { padding:18px 8px 64px 32px; min-width:0; }
+
+/* ---- Draggable divider between the list and the map --------------------
+   The rail's width is a custom property so dragging is one variable write
+   rather than a layout rewrite. The hit area is deliberately wider than the
+   1px line it draws, because a 1px grab target is unusable with a mouse. */
+.splitter {
+  position:relative; align-self:stretch; min-height:calc(100vh - 88px);
+  cursor:col-resize; background:none; border:none; padding:0;
+  touch-action:none;                 /* let the pointer drag, not scroll the page */
+  -webkit-user-select:none; user-select:none;
+}
+.splitter::before {                  /* the visible hairline */
+  content:''; position:absolute; inset:0 5px; background:var(--line);
+  transition:background .15s ease, box-shadow .15s ease;
+}
+.splitter::after {                   /* the grip, only on hover/drag */
+  content:''; position:absolute; top:50%; left:50%; width:3px; height:34px;
+  transform:translate(-50%,-50%); border-radius:2px; background:var(--line);
+  opacity:0; transition:opacity .15s ease;
+}
+.splitter:hover::before, .splitter:focus-visible::before, .splitter.is-dragging::before {
+  background:var(--accent);
+}
+.splitter:hover::after, .splitter:focus-visible::after, .splitter.is-dragging::after {
+  opacity:.9; background:var(--accent);
+}
+.splitter:focus-visible { outline:none; }
+.splitter:focus-visible::before { box-shadow:0 0 0 2px var(--accent); }
+/* While dragging, kill text selection and pointer noise across the whole page. */
+body.is-splitting { cursor:col-resize; -webkit-user-select:none; user-select:none; }
+body.is-splitting .leaflet-container { pointer-events:none; }
+
+/* ---- Map view: the ledger steps aside and the map takes the width -------
+   CSS only, on purpose. The map node is never reparented, so Leaflet keeps
+   its zoom, pan and layers; it just gets invalidateSize(). */
+.main.is-mapview { grid-template-columns:minmax(0,1fr); }
+.main.is-mapview > .ledger,
+.main.is-mapview > .splitter { display:none; }
+/* Map view means the map, not the rail stretched wide: the deadline and
+   stats panels stand down so the map gets the whole page rather than being
+   pushed below the fold by them. */
+.main.is-mapview .rail > .panel:not(.map-panel) { display:none; }
+.main.is-mapview .rail {
+  border-left:none; padding:18px 32px 32px; min-height:0;
+  display:flex; flex-direction:column;
+}
+.main.is-mapview .map-panel { display:flex; flex-direction:column; flex:1 1 auto; min-height:0; }
+.main.is-mapview .map-shell { flex:1 1 auto; min-height:0; }
+.main.is-mapview .map-canvas { height:calc(100vh - 230px); min-height:420px; }
+
+/* ---- Header List/Map toggle -------------------------------------------- */
+.viewtoggle { display:inline-flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+.viewtoggle button {
+  appearance:none; border:none; background:none; cursor:pointer;
+  font:inherit; font-size:13px; color:var(--muted);
+  padding:7px 13px; line-height:1;
+}
+.viewtoggle button + button { border-left:1px solid var(--line); }
+.viewtoggle button[aria-pressed="true"] { background:var(--accent); color:var(--accent-ink); }
+.viewtoggle button:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; }
 .rail {
   border-left:1px solid var(--line); background:var(--surface);
   padding:18px 32px 64px 26px; min-height:calc(100vh - 88px);
 }
 @media (max-width:1023px) {
-  .main { grid-template-columns:minmax(0,1fr); }
+  .main, .main.is-mapview { grid-template-columns:minmax(0,1fr); }
+  .splitter { display:none; }
+  .main.is-mapview .map-canvas { height:60vh; }
   .ledger { padding:18px 24px 32px; }
   .rail { border-left:none; border-top:1px solid var(--line); padding:24px; min-height:0; }
 }
@@ -334,7 +401,8 @@ html[data-theme="dark"] .leaflet-tile-pane {
 /* ==========================================================================
    FULL-PAGE MAP (tracker/map.html)
    ========================================================================== */
-.map-page { display:grid; grid-template-columns:minmax(0,1fr) 392px; align-items:stretch; }
+.map-page { display:grid; grid-template-columns:minmax(0,1fr) var(--split-w) var(--rail-w, 392px); align-items:stretch; }
+.map-page .splitter { min-height:calc(100vh - 88px); }
 .map-page .map-stage { position:relative; min-width:0; }
 .map-page .map-canvas { height:calc(100vh - 88px); border:none; border-right:1px solid var(--line); }
 .map-page .rail { min-height:calc(100vh - 88px); border-left:none; overflow-y:auto; }
@@ -351,6 +419,7 @@ html[data-theme="dark"] .leaflet-tile-pane {
 .itin-row[aria-current="true"] { background:var(--bg); box-shadow:inset 3px 0 0 var(--accent); padding-left:10px; }
 @media (max-width:1023px) {
   .map-page { grid-template-columns:minmax(0,1fr); }
+  .map-page .splitter { display:none; }
   .map-page .map-canvas { height:56vh; border-right:none; border-bottom:1px solid var(--line); }
   .map-page .rail { min-height:0; }
 }

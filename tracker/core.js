@@ -19,6 +19,8 @@ window.AST = (function () {
   var SESSION_KEY = 'artShowTracker.session';
   var GEOCACHE_KEY = 'artShowTracker.geocache';
   var SHARE_KEY = 'artShowTracker.share';
+  var LAYOUT_KEY = 'artShowTracker.layout';
+  var ROUTECACHE_KEY = 'artShowTracker.routecache';
 
   var STATUSES = [
     { value:'interested',   label:'Interested' },
@@ -253,7 +255,18 @@ window.AST = (function () {
        size, how many shows, which statuses are public). Prefs only — never
        show data. */
     getShare: function () { return readJSON(SHARE_KEY) || {}; },
-    setShare: function (prefs) { return writeJSON(SHARE_KEY, prefs); }
+    setShare: function (prefs) { return writeJSON(SHARE_KEY, prefs); },
+    /* Phase 6: the width you dragged the list/map divider to, per page, plus
+       whether the ledger was left in map view. Layout only — never show data. */
+    getLayout: function () { return readJSON(LAYOUT_KEY) || {}; },
+    setLayout: function (prefs) { return writeJSON(LAYOUT_KEY, prefs); },
+    /* Phase 6: road-following route geometry, keyed by the ordered stop
+       coordinates. The routing service asks that results be reused rather
+       than re-requested, and this lets the drawn route survive a reload with
+       no network at all. A failure is NOT cached — unlike a geocode miss it
+       is usually the network, not the answer. */
+    getRouteCache: function () { return readJSON(ROUTECACHE_KEY) || {}; },
+    setRouteCache: function (cache) { return writeJSON(ROUTECACHE_KEY, cache); }
   };
 
   var backend = LocalStore;
@@ -365,6 +378,127 @@ window.AST = (function () {
     toggle: function () { Theme.set(Theme.current() === 'dark' ? 'light' : 'dark'); }
   };
 
+  /* ==========================================================================
+     SPLITTER — the draggable divider between the list and the map
+     Lives here for the same reason Theme does: both pages need it, and one
+     file owns the localStorage write. It knows nothing about maps; the host
+     page passes an onResize callback, which is where invalidateSize() goes.
+     ========================================================================== */
+  var Splitter = {
+    MIN_RAIL: 280,      // below this the map is too small to read
+    MIN_LIST: 420,      // and above it the list stops being a list
+    DEFAULT: 392,
+
+    get: function (key) {
+      var l = Settings.getLayout();
+      var w = l && l[key];
+      return (typeof w === 'number' && isFinite(w)) ? w : null;
+    },
+    set: function (key, w) {
+      var l = Settings.getLayout();
+      l[key] = Math.round(w);
+      return Settings.setLayout(l);
+    },
+    /** The width the rail should open at. */
+    stored: function (key) {
+      var w = Splitter.get(key);
+      return typeof w === 'number' ? w : Splitter.DEFAULT;
+    },
+    /** Clamps a desired rail width against the space actually available. */
+    clamp: function (w, containerWidth) {
+      var max = Math.max(Splitter.MIN_RAIL, containerWidth - Splitter.MIN_LIST);
+      return Math.max(Splitter.MIN_RAIL, Math.min(w, max));
+    },
+
+    /**
+     * Wires a divider element up to a grid container.
+     * @param el          the .splitter element
+     * @param o.container the grid whose --rail-w is written
+     * @param o.key       Settings.layout key to remember the width under
+     * @param o.onResize  called (throttled) while dragging and once after
+     */
+    attach: function (el, o) {
+      if (!el || !o || !o.container) return null;
+      var box = o.container, key = o.key || 'rail';
+      var onResize = o.onResize || function () {};
+      var raf = 0, pending = null, dragging = false;
+
+      function width() {
+        var v = parseFloat(getComputedStyle(box).getPropertyValue('--rail-w'));
+        return isFinite(v) ? v : Splitter.DEFAULT;
+      }
+      function paint(w) {
+        box.style.setProperty('--rail-w', w + 'px');
+        el.setAttribute('aria-valuenow', String(Math.round(w)));
+      }
+      /* One write per frame. Dragging fires pointermove far faster than the
+         map can redraw, and calling invalidateSize() on every event is what
+         makes a resizable map feel like treacle. */
+      function schedule(w) {
+        pending = w;
+        if (raf) return;
+        raf = requestAnimationFrame(function () {
+          raf = 0;
+          if (pending == null) return;
+          paint(pending); pending = null;
+          onResize();
+        });
+      }
+      function apply(w, persist) {
+        var c = Splitter.clamp(w, box.getBoundingClientRect().width);
+        schedule(c);
+        if (persist) Splitter.set(key, c);
+        return c;
+      }
+
+      el.setAttribute('role', 'separator');
+      el.setAttribute('aria-orientation', 'vertical');
+      el.setAttribute('aria-label', 'Resize the map');
+      el.setAttribute('aria-valuemin', String(Splitter.MIN_RAIL));
+      el.setAttribute('tabindex', '0');
+
+      el.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        dragging = true;
+        el.classList.add('is-dragging');
+        document.body.classList.add('is-splitting');
+        try { el.setPointerCapture(e.pointerId); } catch (_) {}
+        e.preventDefault();
+      });
+      el.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        // The rail is whatever is left between the pointer and the right edge.
+        apply(box.getBoundingClientRect().right - e.clientX, false);
+        e.preventDefault();
+      });
+      function end(e) {
+        if (!dragging) return;
+        dragging = false;
+        el.classList.remove('is-dragging');
+        document.body.classList.remove('is-splitting');
+        try { el.releasePointerCapture(e.pointerId); } catch (_) {}
+        Splitter.set(key, width());
+        onResize();
+      }
+      el.addEventListener('pointerup', end);
+      el.addEventListener('pointercancel', end);
+
+      // A divider you can only drag is a divider some people cannot move.
+      el.addEventListener('keydown', function (e) {
+        var step = e.shiftKey ? 48 : 16, w = width();
+        if (e.key === 'ArrowLeft')       apply(w + step, true);
+        else if (e.key === 'ArrowRight') apply(w - step, true);
+        else return;
+        e.preventDefault();
+      });
+
+      // Opening width, and keep it legal when the window is resized.
+      apply(Splitter.stored(key), false);
+      window.addEventListener('resize', function () { apply(width(), false); });
+      return { apply: apply, width: width };
+    }
+  };
+
   return {
     SCHEMA_VERSION: SCHEMA_VERSION,
     STATUSES: STATUSES, STATUS_LABEL: STATUS_LABEL,
@@ -376,6 +510,6 @@ window.AST = (function () {
     fmtDay: fmtDay, fmtRange: fmtRange, fmtCountdown: fmtCountdown,
     esc: esc, place: place, byDate: byDate, hasCoords: hasCoords, FAR: FAR,
     starsSVG: starsSVG, ratingText: ratingText,
-    Theme: Theme
+    Theme: Theme, Splitter: Splitter
   };
 })();
