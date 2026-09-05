@@ -60,13 +60,17 @@
 
     <div class="f-block">
       <label class="label" for="fSort">Sort</label>
-      <select class="control" id="fSort">
-        <option value="date">Event date</option>
-        <option value="deadline">Apply-by date</option>
-        <option value="name">Name</option>
-        <option value="fee">Fee</option>
-        <option value="rating">My rating</option>
-      </select>
+      <div class="sort-row">
+        <select class="control" id="fSort">
+          <option value="date">Event date</option>
+          <option value="deadline">Application deadline</option>
+          <option value="name">Name (A&ndash;Z)</option>
+          <option value="rating">My rating</option>
+          <option value="fee">Fee</option>
+        </select>
+        <button class="btn-mini sort-dir" id="fSortDir" type="button"
+                aria-pressed="false" title="Reverse the order"></button>
+      </div>
     </div>
 
     <div class="f-block">
@@ -91,7 +95,15 @@
       <p class="res-count" id="resCount">Loading the catalogue…</p>
       <div class="res-actions">
         <button class="btn btn-quiet" id="btnAddLiked" type="button" hidden></button>
+        <div class="viewtoggle" id="catView" role="group" aria-label="Layout">
+          <button id="btnViewCards" type="button" aria-pressed="true">Cards</button>
+          <button id="btnViewRows"  type="button" aria-pressed="false">List</button>
+        </div>
       </div>
+    </div>
+    <div class="rowhead" id="rowHead" hidden aria-hidden="true">
+      <span>Show</span><span>Where</span><span>Dates</span>
+      <span>Deadline</span><span>Fee</span><span>Rating</span><span></span>
     </div>
     <div id="cards" class="cards"></div>
     <p class="list-note" id="catNote"></p>
@@ -168,8 +180,10 @@ const $ = sel => document.querySelector(sel);
 const state = {
   rows: [],
   ledger: [],
-  q: { text:'', states:[], liked:false, added:null, deadline:'open', maxFee:null, sort:'date' },
-  quick: 'all'
+  q: { text:'', states:[], liked:false, added:null, deadline:'open', maxFee:null,
+       sort:'date', dir:'asc' },
+  quick: 'all',
+  view: 'cards'
 };
 
 /* ---- Toast --------------------------------------------------------------- */
@@ -237,6 +251,40 @@ function cardHtml(r) {
   '</article>';
 }
 
+/* The same record as one line. Cards are for browsing; this is for comparing
+   202 of them, which is what the list view is actually for. */
+function rowHtml(r) {
+  const dl = deadlineBits(r);
+  const fee = r.fee == null ? '—' : '$' + (Number.isInteger(r.fee) ? r.fee : r.fee.toFixed(2));
+  return '<div class="crow' + (r.addedShowId ? ' is-added' : '') + '" data-id="' + esc(r.id) + '">' +
+    '<span class="c-name">' +
+      '<button type="button" class="card-like" data-like="' + esc(r.id) + '" ' +
+        'aria-pressed="' + (r.liked ? 'true' : 'false') + '" ' +
+        'style="--fill:' + (r.liked ? 'currentColor' : 'none') + '" ' +
+        'title="' + (r.liked ? 'Remove from your shortlist' : 'Add to your shortlist') + '" ' +
+        'aria-label="' + (r.liked ? 'Unlike ' : 'Like ') + esc(r.name) + '">' + HEART + '</button>' +
+      (r.url
+        ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer" ' +
+          'title="Open the Zapplication page in a new tab">' + esc(r.name) + '</a>'
+        : '<span>' + esc(r.name) + '</span>') +
+    '</span>' +
+    '<span class="meta">' + esc([r.city, r.state].filter(Boolean).join(', ')) + '</span>' +
+    '<span class="meta">' + esc(fmtRange(r.startDate, r.endDate)) + '</span>' +
+    '<span class="' + dl.cls + '">' + esc(dl.text) + '</span>' +
+    '<span class="meta">' + esc(fee) + '</span>' +
+    '<span class="card-stars" data-rate="' + esc(r.id) + '" role="slider" tabindex="0" ' +
+      'aria-label="Rating for ' + esc(r.name) + '" aria-valuemin="0" aria-valuemax="10" ' +
+      'aria-valuenow="' + (r.rating || 0) + '" aria-valuetext="' + ratingText(r.rating) + '" ' +
+      'title="' + ratingText(r.rating) + '" ' +
+      'style="color:' + (r.rating ? 'var(--ink)' : 'var(--muted)') + '">' +
+      starsSVG(r.rating, 13) + '</span>' +
+    '<span class="c-act">' + (r.addedShowId
+      ? '<span class="added-tag" title="Already in your ledger">In ledger</span>'
+      : '<button type="button" class="btn-mini add" data-add="' + esc(r.id) + '">Add</button>') +
+    '</span>' +
+  '</div>';
+}
+
 function visible() {
   const q = Object.assign({}, state.q);
   if (state.quick === 'liked') q.liked = true;
@@ -247,8 +295,15 @@ function visible() {
 
 function render() {
   const rows = visible();
-  $('#cards').innerHTML = rows.length
-    ? rows.map(cardHtml).join('')
+  const list = state.view === 'rows';
+  const host = $('#cards');
+  host.classList.toggle('cards', !list);
+  host.classList.toggle('rows', list);
+  /* The column headings only make sense above the list layout, and they must
+     go when there is nothing under them. */
+  $('#rowHead').hidden = !list || !rows.length;
+  host.innerHTML = rows.length
+    ? rows.map(list ? rowHtml : cardHtml).join('')
     : '<p class="empty">Nothing matches those filters.</p>';
   const liked = state.rows.filter(r => r.liked && !r.addedShowId).length;
   $('#resCount').textContent =
@@ -343,7 +398,51 @@ async function geocodePins(shows) {
 /* ---- Events -------------------------------------------------------------- */
 
 $('#fText').addEventListener('input', e => { state.q.text = e.target.value; render(); });
-$('#fSort').addEventListener('change', e => { state.q.sort = e.target.value; render(); });
+/* Picking a sort key snaps the direction to whatever is most useful for it —
+   earliest date first, but highest rating first — and the arrow then flips
+   whichever key is chosen. That is what "newest to oldest" is: date, reversed. */
+function paintSortDir() {
+  const desc = state.q.dir === 'desc';
+  const b = $('#fSortDir');
+  b.textContent = desc ? '\u2193' : '\u2191';
+  b.setAttribute('aria-pressed', String(desc));
+  const key = state.q.sort;
+  const label = desc
+    ? { date:'Newest first', deadline:'Latest deadline first', name:'Z to A',
+        rating:'Highest rated first', fee:'Most expensive first' }[key]
+    : { date:'Oldest first', deadline:'Soonest deadline first', name:'A to Z',
+        rating:'Lowest rated first', fee:'Cheapest first' }[key];
+  b.setAttribute('aria-label', label);
+  b.title = label + ' — click to reverse';
+}
+$('#fSort').addEventListener('change', e => {
+  state.q.sort = e.target.value;
+  state.q.dir = C.SORT_DEFAULT_DIR[state.q.sort] || 'asc';
+  paintSortDir(); saveLayout(); render();
+});
+$('#fSortDir').addEventListener('click', () => {
+  state.q.dir = state.q.dir === 'desc' ? 'asc' : 'desc';
+  paintSortDir(); saveLayout(); render();
+});
+
+/* Cards or list. Remembered, like the ledger's own view choice. */
+function setView(view) {
+  state.view = view === 'rows' ? 'rows' : 'cards';
+  $('#btnViewRows').setAttribute('aria-pressed', String(state.view === 'rows'));
+  $('#btnViewCards').setAttribute('aria-pressed', String(state.view === 'cards'));
+  saveLayout(); render();
+}
+$('#btnViewCards').addEventListener('click', () => setView('cards'));
+$('#btnViewRows').addEventListener('click', () => setView('rows'));
+
+/* Layout only — never show data. */
+function saveLayout() {
+  const l = Settings.getLayout();
+  l.catalogueView = state.view;
+  l.catalogueSort = state.q.sort;
+  l.catalogueDir = state.q.dir;
+  Settings.setLayout(l);
+}
 $('#fOpen').addEventListener('change', e => {
   state.q.deadline = e.target.checked ? 'open' : null; render();
 });
@@ -487,6 +586,15 @@ $('#btnTheme').addEventListener('click', () => {
       'Catalogue of ' + m.count + ' shows' + (m.importedAt ? ', imported ' + m.importedAt : '') +
       '. Liking and rating here changes nothing in your ledger until you add a show across.';
   }
+  const l = Settings.getLayout();
+  if (C.SORTS[l.catalogueSort]) state.q.sort = l.catalogueSort;
+  state.q.dir = (l.catalogueDir === 'desc' || l.catalogueDir === 'asc')
+    ? l.catalogueDir
+    : (C.SORT_DEFAULT_DIR[state.q.sort] || 'asc');
+  $('#fSort').value = state.q.sort;
+  paintSortDir();
+  setView(l.catalogueView === 'rows' ? 'rows' : 'cards');
+
   await refresh();
   renderStates();
   render();

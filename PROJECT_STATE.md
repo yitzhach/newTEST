@@ -1,6 +1,6 @@
 # Art Show Tracker — project state
 
-_Last updated: 2026-09-04 (Phase 7)_
+_Last updated: 2026-09-05 (Phase 8)_
 
 ## What this is
 A tracker for Isaac Anderson's art show season: upcoming shows, a route map
@@ -383,6 +383,32 @@ https://claude.ai/code/artifact/a1fcd724-d87d-4c62-83fc-66ddf1f2494a
   State with the state name sitting in the City column; that was read across
   rather than invented. Nothing else was inferred.
 
+- **Phase 8 built and working** — a list view and real sorting for All shows.
+  No new files; `catalogue.js`, `browse.html`, `app.css`.
+  - **Cards or List**, toggled top-right of the results and remembered. Cards
+    are for browsing; the list is for comparing 202 of them at once — one row
+    per show with Show / Where / Dates / Deadline / Fee / Rating columns, and
+    the like, the rating and Add all still live in the row. The Zapplication
+    link is the show name itself, still opening in a new tab. Below 900px the
+    row folds to a name plus a stacked summary rather than scrolling sideways.
+  - **One sort control, both directions.** Every comparator is written
+    *ascending in its own natural sense* — earliest date, A to Z, cheapest,
+    lowest rating — and an arrow button reverses it. That is the whole reason
+    "newest to oldest" is not a separate menu entry: it is Event date,
+    reversed. Keys are Event date, Application deadline, Name (A–Z), My
+    rating and Fee. Picking a key snaps the arrow to whatever is most useful
+    for it (soonest deadline first, but *highest* rating first), and the arrow
+    then flips whichever is chosen. Both the key and the direction are
+    remembered, and the arrow carries a written label ("Z to A", "Newest
+    first") so the direction is never conveyed by a glyph alone.
+  - **Empty values sink.** A show with no date or no fee sorts to the bottom
+    of an ascending order rather than masquerading as the earliest or the
+    cheapest, and **name breaks every tie**, so equal rows keep a stable order
+    instead of shuffling between renders.
+  - **Keyword search now takes several words and matches the state.** Every
+    word has to appear somewhere in the name, city or state, so "art naples"
+    behaves the way people expect, and both "florida" and "FL" work.
+
 ## Why the file split
 Phase 1's "one file" rule ran into Phase 2's "`map.html` reuses the same
 module, do not fork the code". Two pages cannot share inline script, so:
@@ -671,6 +697,22 @@ It now pins a fixed record (West End Arts Festival, La Grange IL) by search
 with the deadline filter off, and asserts it found exactly that one card, so
 the run no longer depends on the date. **No app code changed.** That is the
 54th check.
+
+**Phase 8 (2026-09-05).** 46 checks in `tools/smoke/06-list-view-sorts.cjs`,
+taking the harness to **205**, all passing. The list view: 202 rows and no
+cards, the column headings appear and go again when the list is empty, the
+row keeps its Zapp link (new tab, `rel="noopener noreferrer"`), its like, its
+rating and its Add button, liking and rating both work *from a row*, and the
+choice is remembered across a reload. The sorting: A–Z and its exact reverse,
+event date oldest-first with **every adjacent pair checked against the ISO
+dates in the model** rather than the rendered text, "newest to oldest" proved
+to be the same list reversed end for end, deadline soonest-first, rating
+defaulting to highest-first with the unrated sinking when reversed, the arrow
+carrying a written label, picking a key resetting the direction to its natural
+one, and the key and direction both surviving a reload. Search: a city, a full
+state name, the two-letter code, two words that must both match, and a miss
+saying so rather than silently showing everything. Plus no horizontal overflow
+at 1400 / 1280 / 900 / 390px in list view.
 
 **Not verified from here:** the cdnjs, OpenStreetMap tile and Nominatim
 requests themselves, and the live Pages URL. Re-checked 2026-09-04 and all
