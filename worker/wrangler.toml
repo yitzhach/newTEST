@@ -1,0 +1,44 @@
+name = "show-ledger-intel"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+# The origins allowed to call this Worker from a browser. Anything else is
+# refused before it reaches a handler. Add your custom domain here when the
+# site moves off github.io.
+[vars]
+ALLOWED_ORIGINS = "https://yitzhach.github.io,http://127.0.0.1:8765,http://localhost:8765"
+
+# ---------------------------------------------------------------------------
+# Bindings. The ids below are placeholders — `wrangler d1 create` and
+# `wrangler kv namespace create` print the real ones. See README.md.
+# ---------------------------------------------------------------------------
+
+[[d1_databases]]
+binding = "DB"
+database_name = "show-ledger-intel"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+# Fixed-window rate limiting. Optional: without it the Worker still runs, it
+# just stops rate limiting (rateLimit() fails open on purpose).
+[[kv_namespaces]]
+binding = "RATE"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Images attached to reports. Not yet written to by the API — the binding is
+# here so the bucket exists before the feature lands.
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "show-ledger-intel-images"
+
+# ---------------------------------------------------------------------------
+# Secrets — set with `wrangler secret put`, NEVER in this file:
+#   SESSION_SECRET   signs session tokens. 32+ random bytes.
+#   IP_SALT          salts hashed addresses in the audit log and rate limiter.
+# ---------------------------------------------------------------------------
+
+[observability]
+enabled = true
+
+[placement]
+mode = "smart"
