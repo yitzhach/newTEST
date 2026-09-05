@@ -97,6 +97,10 @@ published acceptance rates where they exist. Three shows publish one:
 | Saint Louis Art Fair | 145 | ~1,000+ | ~14% |
 | Plaza Art Fair | 240 | 1,400+ | ~17% |
 | Des Moines Arts Festival | 195 | 953 | ~20% |
+| Gasparilla Festival of the Arts | 233 | 1,000+ | ~23% |
+
+Laumeier publishes its jury *method* rather than a rate: two rounds, top third
+advance. The effective acceptance is well under a third.
 
 ### Ten disciplines. Fine art only.
 
@@ -155,11 +159,11 @@ The provenance vocabulary reflects that honestly:
 A future session with open egress should re-run the research pass and upgrade
 `search` to `verified` where the source page confirms it.
 
-**29 of the top 50 shows** have been through the deep pass. The rest keep their
-original data, flagged. **33 shows** still sit on estimated rather than
+**37 of the top 50 shows** have been through the deep pass. The rest keep their
+original data, flagged. **32 shows** still sit on estimated rather than
 published dates.
 
-Two findings worth acting on before anyone plans a season:
+Three findings worth acting on before anyone plans a season:
 
 - **Sausalito Art Festival** has been suspended over problems at its Marinship
   Park site. Its Labor Day slot competes with Long's Park and Kings Mountain.
@@ -167,9 +171,26 @@ Two findings worth acting on before anyone plans a season:
   car park and now runs as **SoMi Art Fair**. Its scores still describe the old
   site and are stale until members report from the new one.
 
+- **Northern Virginia Fine Arts Festival is now the Tephra ICA Arts Festival.**
+  Same show, same Reston Town Center site; searching the old name will not find
+  the current application.
+
 Also: **"Ann Arbor Art Fair" is not one show.** It is several independently
 juried fairs running concurrently across 30 blocks, each with its own jury,
 deadline and fee.
+
+### Commission is not in the fit score, on purpose
+
+Kings Mountain charges $20 to jury, $100 for the weekend, and **15% of
+everything you sell**. On an $8,000 piece that is $1,200 — against $600 for a
+booth at Art in the High Desert, which takes no commission and sits in a state
+with no sales tax.
+
+The price band tilts cost efficiency *down* as work gets dearer, which is
+correct for a fixed booth fee and exactly backwards for a percentage. Rather
+than bend the weighting into something wrong half the time, `gates()` states
+the commission plainly with the arithmetic already done for your price band: a
+hint at $45 for cheap work, a warning at $2,250 for expensive.
 
 ---
 
@@ -235,7 +256,7 @@ build/
   record_research.py    merges a research batch, REJECTS anything missing provenance
   research-overrides.json  the research pass output, 29 shows deep
   catalogue-source.json    pristine ZAPP export. Read-only input, never written
-  browser-tests.js      35 Playwright checks against the live page
+  browser-tests.cjs     37 Playwright checks against the live page
 
 worker/               Cloudflare Worker + D1. Complete, NOT deployed. See its README
 docs/
@@ -257,7 +278,7 @@ map and the ledger all read one list.
 
 ```bash
 python3 -m http.server 8765          # from the repo root
-node build/browser-tests.js          # 35 checks — needs the server running
+node build/browser-tests.cjs        # 37 checks — needs the server running
 
 cd worker && npm test                # 45 API checks, manages its own worker
 ```
@@ -281,7 +302,7 @@ Membership is invite-only. The first steward gets in via a one-time
 
 ## 10. Open threads
 
-- **Finish the research.** 21 of the top 50 remain, then the fast sweep of the
+- **Finish the research.** 13 of the top 50 remain, then the fast sweep of the
   other 186. A session with open egress should also re-verify the 29 already
   done and upgrade `search` to `verified`.
 - **Confirm the 33 estimated dates** on ZAPP, EntryThingy and show sites.

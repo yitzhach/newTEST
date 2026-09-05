@@ -49,6 +49,17 @@ def main():
                 continue  # explicitly "not known" needs no source
             if field not in prov:
                 problems.append("%s: fact %r has no provenance entry" % (show_id, field))
+        # A factor score is a claim too, and an unattributed one is exactly the
+        # kind of number this whole file exists to prevent. Even an editorial
+        # estimate has to say it is one.
+        for field in (ov.get("factors") or {}):
+            if field not in prov:
+                problems.append("%s: factor %r has no provenance entry" % (show_id, field))
+        for disc, vals in (ov.get("byDiscipline") or {}).items():
+            for field in vals:
+                if field not in prov:
+                    problems.append("%s: byDiscipline[%s].%s has no provenance entry"
+                                    % (show_id, disc, field))
         for field, entry in prov.items():
             status = entry.get("status")
             if status not in VALID_STATUS:

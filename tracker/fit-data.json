@@ -31,8 +31,8 @@
     "qualifiedTraffic": 7,
     "costEfficiency": 6,
     "lowCompetition": 6,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -57,22 +57,22 @@
     "applyBy": "2026-10-31",
     "deadlineNote": null,
     "notifyDate": "2026-11-20",
-    "juryFee": 45.0,
+    "juryFee": 40,
     "juryFeeLabel": "2027 4 Bridges Arts Festival Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14594",
-    "officialUrl": null,
-    "boothFee": null,
-    "boothFeeNote": null,
+    "officialUrl": "https://www.avarts.org/about-4baf1",
+    "boothFee": 500,
+    "boothFeeNote": "$500-$1,100 by space and placement; free application for emerging artists",
     "commissionPct": null,
-    "boothCount": null,
+    "boothCount": 143,
     "attendance": null,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Chattanooga riverfront",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -126,15 +126,55 @@
      "basis": "ZAPPlication export"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.avarts.org/about-4baf1",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "sources give 140, 145 and 146 in different years; recorded as a mid figure",
+     "checked": "2026-09-05",
+     "source": "https://www.avarts.org/about-4baf1",
+     "status": "search"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://www.avarts.org/about-4baf1",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://www.avarts.org/about-4baf1",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.avarts.org/about-4baf1",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "~143 places, strong southeastern draw",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "riverfront site with established load-in",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.avarts.org/about-4baf1",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.visitchattanooga.com/listing/4-bridges-arts-festival/1264/",
+     "status": "search"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Chattanooga. Indoor, well curated, art-focused audience. Reliable mid-to-upper sales.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Run by the Association for Visual Arts; no membership needed to apply and the application is free for emerging artists. 2027 dates not yet posted \u2014 the 2026 edition ran 17-19 April.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14106",
@@ -945,8 +985,8 @@
     "qualifiedTraffic": 6,
     "costEfficiency": 6,
     "lowCompetition": 7,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 8,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -974,19 +1014,19 @@
     "juryFee": 45,
     "juryFeeLabel": "Application Fee (estimated)",
     "applicationUrl": null,
-    "officialUrl": null,
-    "boothFee": null,
+    "officialUrl": "https://www.artinthehighdesert.com/ForArtists.html",
+    "boothFee": 600,
     "boothFeeNote": null,
-    "commissionPct": null,
-    "boothCount": null,
+    "commissionPct": 0,
+    "boothCount": 150,
     "attendance": null,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Riverbend Park, on the Deschutes",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -1038,13 +1078,54 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "boothCount": {
+     "basis": "around 150 all-corner booths",
+     "checked": "2026-09-05",
+     "source": "https://www.artinthehighdesert.com/ForArtists.html",
+     "status": "search"
+    },
+    "boothFee": {
+     "basis": "$600 per booth in the most recent published year",
+     "checked": "2026-09-05",
+     "source": "https://www.artinthehighdesert.com/ForArtists.html",
+     "status": "corroborated"
+    },
+    "commissionPct": {
+     "basis": "no commission taken, and no Oregon sales tax",
+     "checked": "2026-09-05",
+     "source": "https://www.artinthehighdesert.com/ForArtists.html",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.artinthehighdesert.com/ForArtists.html",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "~150 places, blind jury on images alone",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "riverside park with all-corner booths \u2014 every booth gets two open sides, which few shows offer",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.artinthehighdesert.com/ForArtists.html",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://visitcentraloregon.com/event/art-in-the-high-desert/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": true,
-   "editorialNote": "Run by working show artists, roughly 150 all-corner booths, no commission, and Oregon has no sales tax. It was ranked 12th nationally for sales before its pandemic hiatus and has rebuilt since. Booth fee ran $600 with a $45 jury fee and an early-bird discount in December.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "No commission and no Oregon sales tax, against all-corner booths. On a $10,000 weekend that is worth more than the entire booth fee. The jury is blind \u2014 images only, including a booth shot \u2014 so presentation carries real weight. Runs the last weekend of August; 2027 dates not yet published.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14759",
@@ -1183,6 +1264,10 @@
      "checked": "2026-09-05",
      "source": "http://www.artinthesquare.com/",
      "status": "search"
+    },
+    "juryOdds": {
+     "basis": "150+ places against a mainly regional Texas pool",
+     "status": "editorial"
     },
     "logistics": {
      "basis": "free 300W per booth, 24-hour security, free parking, booth sitting, meals delivered. Unusually well run for artists, and the amenities are published rather than implied.",
@@ -1708,8 +1793,8 @@
     "qualifiedTraffic": 7,
     "costEfficiency": 6,
     "lowCompetition": 6,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -1734,22 +1819,22 @@
     "applyBy": "2026-09-18",
     "deadlineNote": null,
     "notifyDate": "2026-10-09",
-    "juryFee": 35.0,
+    "juryFee": 35,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14585",
-    "officialUrl": null,
-    "boothFee": null,
-    "boothFeeNote": null,
+    "officialUrl": "https://www.artfestfortmyers.com/",
+    "boothFee": 517,
+    "boothFeeNote": "from $517",
     "commissionPct": null,
-    "boothCount": null,
-    "attendance": null,
+    "boothCount": 170,
+    "attendance": 95000,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Historic Fort Myers River District",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -1791,27 +1876,76 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14585"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.lehighacrescitizen.com/2026/05/06/artfest-fort-myers-2027-now-accepting-artist-applications/",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.lehighacrescitizen.com/2026/05/06/artfest-fort-myers-2027-now-accepting-artist-applications/",
+     "status": "corroborated"
     },
     "applyBy": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.lehighacrescitizen.com/2026/05/06/artfest-fort-myers-2027-now-accepting-artist-applications/",
+     "status": "corroborated"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.artfestfortmyers.com/",
+     "status": "search"
+    },
+    "attendance": {
+     "basis": "over 95,000 across the weekend",
+     "checked": "2026-09-05",
+     "source": "https://www.northfortmyersneighbor.com/news/community-news/2026/05/artfest-fort-myers-2027-now-accepting-artist-applications/",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "sources give 170 and 200+; recorded at the lower figure",
+     "checked": "2026-09-05",
+     "source": "https://www.artfestfortmyers.com/",
+     "status": "search"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://www.artfestfortmyers.com/",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://www.artfestfortmyers.com/",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.artfestfortmyers.com/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "170 places against a strong Florida winter pool",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "flat riverfront district with established load-in",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.artfestfortmyers.com/",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.artfestfortmyers.com/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Solid SW Florida fine art show; good but a step below Naples/Bonita for the top of your price range.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Applications close 18 September 2026 \u2014 the nearest live deadline of any show in the top fifty. $35 to apply against a 95,000 gate is one of the cheaper shots on the winter calendar.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14555",
@@ -11790,8 +11924,8 @@
     "qualifiedTraffic": 8,
     "costEfficiency": 6,
     "lowCompetition": 5,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 3
    },
    "byDiscipline": {
     "painting": {
@@ -11816,22 +11950,22 @@
     "applyBy": "2026-09-07",
     "deadlineNote": "at Midnight EST",
     "notifyDate": "2026-09-30",
-    "juryFee": 50.0,
+    "juryFee": 50,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14737",
-    "officialUrl": null,
+    "officialUrl": "https://gasparillaarts.com/application-rules/",
     "boothFee": null,
-    "boothFeeNote": null,
+    "boothFeeNote": "10x10 standard, 10x20 double; booth requests open Jan-early Feb 2027, first come first served",
     "commissionPct": null,
-    "boothCount": null,
+    "boothCount": 233,
     "attendance": null,
-    "acceptanceRatePct": null,
+    "acceptanceRatePct": 23,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Julian B. Lane Riverfront Park",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -11873,27 +12007,72 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14737"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://gasparillaarts.com/",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://gasparillaarts.com/",
+     "status": "corroborated"
     },
     "applyBy": {
      "status": "verified",
      "basis": "ZAPPlication export"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://gasparillaarts.com/application-rules/",
+     "status": "search"
+    },
+    "acceptanceRatePct": {
+     "basis": "233 places against over 1,000 applicants a year \u2014 about 23%",
+     "checked": "2026-09-05",
+     "source": "https://gasparillaarts.com/application-rules/",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "233 artist spots",
+     "checked": "2026-09-05",
+     "source": "https://gasparillaarts.com/application-rules/",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://gasparillaarts.com/application-rules/",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://gasparillaarts.com/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "derived from a ~23% acceptance rate",
+     "checked": "2026-09-05",
+     "source": "https://gasparillaarts.com/application-rules/",
+     "status": "search"
+    },
+    "logistics": {
+     "basis": "flat riverfront park with vehicle access",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://gasparillaarts.com/application-rules/",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.tampa.gov/special-events-coordination/news-and-events/featured-events/gasparilla-festival-of-the-arts",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Prestigious and well juried; Tampa crowd buys, but more often in the mid hundreds to low thousands.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "$92,000 in prize money across 35 artists, with $15,000 for Best in Show \u2014 among the largest award pools on the circuit, and worth weighing separately from sales. Booth placement is first come, first served once you are in, so watch for the January window.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14514",
@@ -13342,8 +13521,8 @@
     "qualifiedTraffic": 5,
     "costEfficiency": 7,
     "lowCompetition": 7,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 4,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -13365,25 +13544,25 @@
    "facts": {
     "startDate": "2027-09-04",
     "endDate": "2027-09-06",
-    "applyBy": "2027-03-01",
+    "applyBy": "2027-01-30",
     "deadlineNote": null,
     "notifyDate": null,
-    "juryFee": 40,
+    "juryFee": 20,
     "juryFeeLabel": "Application Fee (estimated)",
     "applicationUrl": null,
-    "officialUrl": null,
-    "boothFee": null,
-    "boothFeeNote": null,
-    "commissionPct": null,
-    "boothCount": null,
+    "officialUrl": "https://kingsmountainartfair.org/call-for-entry/",
+    "boothFee": 100,
+    "boothFeeNote": "$100 non-refundable for the three-day weekend; all booths 10x10",
+    "commissionPct": 15,
+    "boothCount": 125,
     "attendance": null,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
-    "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "vehicleAccessToBooth": false,
+    "venue": "Kings Mountain Community Center and Firehouse, in the redwoods above Woodside",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -13429,19 +13608,71 @@
      "basis": "inferred from the show's usual calendar slot"
     },
     "applyBy": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "basis": "applications open 15 November and close 31 January; deadline given as 30 January",
+     "checked": "2026-09-05",
+     "source": "https://kingsmountainartfair.org/call-for-entry/",
+     "status": "search"
     },
     "juryFee": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "checked": "2026-09-05",
+     "source": "https://kingsmountainartfair.org/call-for-entry/",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "around 125 juried exhibitors",
+     "checked": "2026-09-05",
+     "source": "https://kingsmountainartfair.org/",
+     "status": "search"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://kingsmountainartfair.org/frequently-asked-question/",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://kingsmountainartfair.org/frequently-asked-question/",
+     "status": "search"
+    },
+    "commissionPct": {
+     "basis": "15% on all sales, on top of the $100 entry",
+     "checked": "2026-09-05",
+     "source": "https://kingsmountainartfair.org/frequently-asked-question/",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://kingsmountainartfair.org/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "around 125 places with a long-standing returning field; a $20 jury fee also means a wider applicant pool than the standing alone would suggest",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "redwood forest floor, uneven ground, no vehicle access to booths, single booth size only",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://kingsmountainartfair.org/call-for-entry/",
+     "status": "search"
+    },
+    "vehicleAccessToBooth": {
+     "basis": "forested site on uneven ground under redwoods; booths are not drive-up",
+     "status": "editorial"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://kingsmountainartfair.org/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": true,
-   "editorialNote": "In the redwoods above Silicon Valley. Small, curated, volunteer-run, with wealthy repeat buyers and unusually low costs for a California show.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "The cheapest-looking entry on the circuit and, for expensive work, one of the dearest. $20 jury and $100 for the weekend, then 15% of everything you sell \u2014 $1,200 on a single $8,000 piece, against $600 for a booth at Art in the High Desert with no commission at all. For prints and small work the arithmetic reverses completely. Labor Day weekend, competing with Long's Park and (when it runs) Sausalito.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "fit-krasl-art-fair-on-the-bluff",
@@ -15098,8 +15329,8 @@
     "qualifiedTraffic": 7,
     "costEfficiency": 7,
     "lowCompetition": 6,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 3
    },
    "byDiscipline": {
     "painting": {
@@ -15124,12 +15355,12 @@
     "applyBy": "2027-01-04",
     "deadlineNote": null,
     "notifyDate": "2027-02-01",
-    "juryFee": 35.0,
-    "juryFeeLabel": "Early Bird Laumeier Application Fee",
+    "juryFee": 35,
+    "juryFeeLabel": "$35 early to 30 Sep 2026, $45 regular, $55 late after 1 Jan 2027",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14782",
-    "officialUrl": null,
-    "boothFee": null,
-    "boothFeeNote": null,
+    "officialUrl": "https://www.laumeiersculpturepark.org/artists",
+    "boothFee": 400,
+    "boothFeeNote": "$400 open booth or $600 with a tent provided; all spaces 10x10",
     "commissionPct": null,
     "boothCount": null,
     "attendance": null,
@@ -15138,8 +15369,8 @@
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Laumeier Sculpture Park",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -15193,15 +15424,58 @@
      "basis": "ZAPPlication export"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.laumeiersculpturepark.org/artists",
+     "status": "search"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://www.laumeiersculpturepark.org/artists",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://www.laumeiersculpturepark.org/artists",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.laumeiersculpturepark.org/artists",
+     "status": "search"
+    },
+    "juryFeeLabel": {
+     "checked": "2026-09-05",
+     "source": "https://www.laumeiersculpturepark.org/artists",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "published two-round jury: the top 33% of applications advance to round two, and the field is chosen from those \u2014 so the effective acceptance rate is well under a third",
+     "checked": "2026-09-05",
+     "source": "https://www.laumeiersculpturepark.org/artists",
+     "status": "search"
+    },
+    "logistics": {
+     "basis": "a tent can be rented with the space for $200 more, which is rare and useful if you are flying in",
+     "checked": "2026-09-05",
+     "source": "https://www.laumeiersculpturepark.org/artists",
+     "status": "search"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.laumeiersculpturepark.org/artists",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.laumeiersculpturepark.org/artists",
+     "status": "corroborated"
     }
    },
-   "confidence": "Medium",
+   "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Sculpture-park setting draws a contemporary-leaning St. Louis audience \u2014 a good context for mixed media.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "One of the few shows that publishes how its jury works: two rounds, with the top third advancing. It also rents you a tent with the booth for $200 more, which is worth knowing if you are flying to it rather than driving. A sculpture park setting puts three-dimensional work in front of an audience already there for it.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14714",
@@ -16470,8 +16744,8 @@
     "qualifiedTraffic": 8,
     "costEfficiency": 6,
     "lowCompetition": 5,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -16499,19 +16773,19 @@
     "juryFee": 45,
     "juryFeeLabel": "Application Fee (estimated)",
     "applicationUrl": null,
-    "officialUrl": null,
+    "officialUrl": "https://mam.org/lfoa",
     "boothFee": null,
     "boothFeeNote": null,
     "commissionPct": null,
-    "boothCount": null,
+    "boothCount": 145,
     "attendance": null,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Milwaukee Art Museum lakeside campus",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -16563,13 +16837,42 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "boothCount": {
+     "basis": "145 jury-selected artists",
+     "checked": "2026-09-05",
+     "source": "https://mam.org/lfoa",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://mam.org/lfoa",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "145 places, museum-run, national pool",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "museum campus with proper service access; lakefront wind is the variable",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://mam.org/lfoa",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://mam.org/lfoa",
+     "status": "corroborated"
     }
    },
-   "confidence": "High",
+   "confidence": "Medium",
    "datesEstimated": true,
-   "editorialNote": "Run by the Milwaukee Art Museum, on the lakefront, ticketed. A museum audience rather than a street-festival one.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Museum-run with a ticketed gate, which is the useful signal \u2014 the crowd paid to be there. Booth fee not published in the sources found. Runs the third weekend of June.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14570",
@@ -18435,8 +18738,8 @@
     "qualifiedTraffic": 7,
     "costEfficiency": 6,
     "lowCompetition": 6,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -18456,27 +18759,27 @@
     }
    },
    "facts": {
-    "startDate": "2027-05-14",
+    "startDate": "2027-05-15",
     "endDate": "2027-05-16",
     "applyBy": "2026-12-31",
     "deadlineNote": null,
     "notifyDate": null,
-    "juryFee": 45,
+    "juryFee": 55,
     "juryFeeLabel": "Application Fee (estimated)",
     "applicationUrl": null,
-    "officialUrl": null,
-    "boothFee": null,
-    "boothFeeNote": null,
+    "officialUrl": "https://www.tephraica.org/festival",
+    "boothFee": 525,
+    "boothFeeNote": "$525 standard 10x10; $787.50 endcap with five extra feet of display on one side",
     "commissionPct": null,
-    "boothCount": null,
+    "boothCount": 200,
     "attendance": null,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Reston Town Center",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -18514,27 +18817,69 @@
      "basis": "authored as a 2D/mixed-media field estimate; approximate for three-dimensional media until member data replaces it"
     },
     "startDate": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "checked": "2026-09-05",
+     "source": "https://www.tephraica.org/events/tephra-ica-arts-festival",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "checked": "2026-09-05",
+     "source": "https://www.tephraica.org/events/tephra-ica-arts-festival",
+     "status": "corroborated"
     },
     "applyBy": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
     },
     "juryFee": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "checked": "2026-09-05",
+     "source": "https://www.tephraica.org/artist-faq/artist-faq",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "over 200 contemporary artists",
+     "checked": "2026-09-05",
+     "source": "https://www.tephraica.org/festival",
+     "status": "search"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://www.tephraica.org/artist-faq/artist-faq",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://www.tephraica.org/artist-faq/artist-faq",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.tephraica.org/festival",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "200+ places against a strong mid-Atlantic and national pool",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "purpose-built town centre plaza with service access",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.tephraica.org/festival",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.tephraica.org/festival",
+     "status": "corroborated"
     }
    },
-   "confidence": "Medium",
-   "datesEstimated": true,
-   "editorialNote": "DC-area professional incomes in a walkable town centre. A good May date when the Florida season has ended.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "confidence": "High",
+   "datesEstimated": false,
+   "editorialNote": "RENAMED. This is now the Tephra ICA Arts Festival \u2014 same show, same Reston Town Center site, new name and a more explicitly contemporary framing. Searching for the old Northern Virginia Fine Arts Festival name will not find the current application.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14687",

@@ -374,6 +374,28 @@ window.ASTFit = (function () {
       out.push({ level:'warning', code:'no_vehicle_access',
         text:'No vehicle access to the booth. Heavy or fragile work means a long hand-carry both ways.' });
     }
+
+    /* Commission is the one cost the fit score genuinely cannot carry. The
+       price band tilts cost efficiency DOWN as work gets dearer, which is right
+       for a fixed booth fee — $900 is noise against a $40,000 weekend — and
+       exactly backwards for a percentage. A 15% commission is a rounding error
+       at $300 a piece and $1,200 on a single $8,000 sale.
+
+       Rather than bend the weighting into something that is wrong half the
+       time, the commission is stated plainly with the arithmetic done. */
+    var pct = show.facts && show.facts.commissionPct;
+    if (pct != null && pct > 0) {
+      var midpoint = { under_500: 300, '500_2000': 1200, '2000_10000': 6000, over_10000: 15000 }[p.priceBand];
+      var perSale = Math.round(midpoint * pct / 100);
+      out.push({
+        level: (p.priceBand === 'over_10000' || p.priceBand === '2000_10000') && pct >= 10
+          ? 'warning' : 'hint',
+        code: 'commission',
+        text: pct + '% commission on sales — about $' + perSale.toLocaleString('en-US') +
+              ' on a typical sale at your price point, on top of any booth fee. ' +
+              'A low booth fee here is not the whole cost.'
+      });
+    }
     return out;
   }
 

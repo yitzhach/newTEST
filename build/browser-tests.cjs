@@ -149,6 +149,39 @@ function check(name, pass, detail) {
   await page.click('.crow .btn-detail');
   await page.waitForTimeout(400);
 
+  // ---- 10b. the commission gate scales with the price band ----------------
+  // Kings Mountain is $100 to enter and takes 15% of everything you sell. A
+  // model that only looks at booth fee calls that the cheapest show on the
+  // circuit; for expensive work it is one of the dearest.
+  await page.click('#idrClose');
+  await page.fill('#fText', 'Kings Mountain');
+  await page.waitForTimeout(300);
+  await page.selectOption('#pfBand', 'under_500');
+  await page.waitForTimeout(300);
+  await page.click('.crow .btn-detail');
+  await page.waitForTimeout(400);
+  const cheapGate = await page.textContent('.gates');
+  check('commission reads as a hint for cheap work',
+        /15% commission/.test(cheapGate) && !!(await page.$('.gate-hint')),
+        (cheapGate || '').trim().slice(0, 90));
+
+  await page.click('#idrClose');
+  await page.selectOption('#pfBand', 'over_10000');
+  await page.waitForTimeout(300);
+  await page.click('.crow .btn-detail');
+  await page.waitForTimeout(400);
+  const richGate = await page.textContent('.gates');
+  check('commission escalates to a warning for expensive work',
+        !!(await page.$('.gate-warning')) && /\$2,250/.test(richGate),
+        (richGate || '').trim().slice(0, 90));
+
+  await page.click('#idrClose');
+  await page.selectOption('#pfBand', '2000_10000');
+  await page.fill('#fText', 'Bar Harbor');
+  await page.waitForTimeout(300);
+  await page.click('.crow .btn-detail');
+  await page.waitForTimeout(400);
+
   // ---- 11. report form ---------------------------------------------------
   await page.click('#btnAddIntel');
   await page.waitForTimeout(400);
