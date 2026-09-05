@@ -105,6 +105,15 @@ window.ASTIntelUI = (function () {
             }).join('') +
           '</select>' +
         '</div>' +
+        '<div class="pf-field">' +
+          '<label class="label" for="pfLens">Score shows by</label>' +
+          '<select class="control" id="pfLens">' +
+            I.LENSES.map(function (l) {
+              return '<option value="' + esc(l.key) + '"' + (l.key === p.lens ? ' selected' : '') +
+                     '>' + esc(l.label) + '</option>';
+            }).join('') +
+          '</select>' +
+        '</div>' +
         '<button class="btn-mini pf-why" id="pfWhy" type="button" ' +
           'title="What these settings do to the ranking">Why this order?</button>' +
       '</div>' +
@@ -114,12 +123,13 @@ window.ASTIntelUI = (function () {
       var next = I.setProfile({
         discipline: mount.querySelector('#pfDiscipline').value,
         priceBand: mount.querySelector('#pfBand').value,
-        strategy: mount.querySelector('#pfStrategy').value
+        strategy: mount.querySelector('#pfStrategy').value,
+        lens: mount.querySelector('#pfLens').value
       });
       renderNote(mount, next);
       if (onProfileChange) onProfileChange(next);
     }
-    ['#pfDiscipline', '#pfBand', '#pfStrategy'].forEach(function (sel) {
+    ['#pfDiscipline', '#pfBand', '#pfStrategy', '#pfLens'].forEach(function (sel) {
       mount.querySelector(sel).addEventListener('change', pushProfile);
     });
     mount.querySelector('#pfWhy').addEventListener('click', function () { openWeights(); });
@@ -130,8 +140,12 @@ window.ASTIntelUI = (function () {
   function renderNote(mount, p) {
     var d = F.DISCIPLINE_BY_KEY[p.discipline];
     var b = F.PRICE_BANDS.filter(function (x) { return x.key === p.priceBand; })[0];
+    var l = I.LENSES.filter(function (x) { return x.key === p.lens; })[0];
     mount.querySelector('#pfNote').innerHTML =
-      esc(d.blurb) + ' <span class="pf-sep">·</span> ' + esc(b.note);
+      esc(d.blurb) + ' <span class="pf-sep">·</span> ' + esc(b.note) +
+      (l && l.key !== 'model'
+        ? ' <span class="pf-sep">·</span> <strong>' + esc(l.note) + '</strong>'
+        : '');
   }
 
   /* The weights panel. An artist who cannot see why a show ranks where it
@@ -163,26 +177,57 @@ window.ASTIntelUI = (function () {
     I.store.list(show.id).then(function (reports) {
       reportsCache[show.id] = reports;
       var cons = I.consensus(reports, p.discipline);
-      var scored = F.scoreShow(show, p, {
-        memberConsensus: cons.ready ? cons.factors : null
-      });
+      var active = I.lens(reports, p.lens, p.discipline);
+
+      /* Under a reported lens the score comes only from reports. Under the
+         model lens it comes from the estimate, corrected by consensus. */
+      var scored = p.lens === 'model'
+        ? F.scoreShow(show, p, { memberConsensus: cons.ready ? cons.factors : null })
+        : F.scoreShow(show, p, { factorsOnly: active.ready ? active.factors : {} });
+
       var gates = F.gates(show, p);
 
-      drawer(show.name, showBody(show, p, scored, gates, cons, reports), function (root) {
-        var add = root.querySelector('#btnAddIntel');
-        if (add) add.addEventListener('click', function () { openReport(show); });
-        root.querySelectorAll('[data-edit-report]').forEach(function (b) {
-          b.addEventListener('click', function () {
-            var id = b.getAttribute('data-edit-report');
-            var rec = (reportsCache[show.id] || []).filter(function (r) { return r.id === id; })[0];
-            if (rec) openReport(show, rec);
-          });
-        });
+      drawer(show.name,
+             showBody(show, p, scored, gates, cons, reports, active),
+             function (root) { wireShow(root, show, p); });
+    });
+  }
+
+  /* Which report tab the drawer opens on. Sticky within a session, because an
+     artist comparing their own results across shows should not have to click
+     the same tab on every one. */
+  var reportTab = 'mine';
+
+  function wireShow(root, show, p) {
+    var add = root.querySelector('#btnAddIntel');
+    if (add) add.addEventListener('click', function () { openReport(show); });
+
+    root.querySelectorAll('[data-edit-report]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var id = b.getAttribute('data-edit-report');
+        var rec = (reportsCache[show.id] || []).filter(function (r) { return r.id === id; })[0];
+        if (rec) openReport(show, rec);
+      });
+    });
+
+    /* Jump from the header straight to the reports, which is where an artist
+       who has worked a show actually wants to land. */
+    var jump = root.querySelector('#btnReadReport');
+    if (jump) jump.addEventListener('click', function (e) {
+      e.preventDefault();
+      var target = root.querySelector('#reportSection');
+      if (target) target.scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+
+    root.querySelectorAll('[data-report-tab]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        reportTab = b.getAttribute('data-report-tab');
+        openShow(show);
       });
     });
   }
 
-  function showBody(show, p, scored, gates, cons, reports) {
+  function showBody(show, p, scored, gates, cons, reports, active) {
     var f = show.facts || {};
     var place = [show.city, show.state].filter(Boolean).join(', ');
 
@@ -203,6 +248,7 @@ window.ASTIntelUI = (function () {
             ' · scored on ' + Math.round(scored.coverage * 100) + '% of your weighting' +
             ' · ' + esc(evidenceLabel(scored.evidence)) +
           '</p>' +
+          readReportLink(reports, p) +
         '</div>' +
       '</div>';
 
@@ -217,10 +263,25 @@ window.ASTIntelUI = (function () {
     var maxW = Math.max.apply(null, scored.weights);
     var bars = F.FACTORS.map(function (fac, i) {
       var v = scored.scores[fac.key];
-      var fromMember = cons.ready && cons.factors[fac.key] != null;
-      var prov = fromMember
-        ? { status:'member', basis:'Median of ' + cons.count + ' member report' + (cons.count === 1 ? '' : 's') }
-        : (show.provenance || {})[fac.key];
+
+      /* Where the number on this row actually came from. Under a reported
+         lens it is a report and must say so — an estimate chip over an
+         artist's own figure is exactly the mislabelling this whole layer
+         exists to prevent. */
+      var prov;
+      if (p.lens === 'mine' && active && active.ready && active.factors[fac.key] != null) {
+        prov = { status:'member',
+                 basis:'Your own rating' + (active.count > 1 ? ', median of ' + active.count + ' reports' : '') };
+      } else if (p.lens === 'network' && active && active.ready && active.factors[fac.key] != null) {
+        prov = { status:'member',
+                 basis:'Median of ' + active.count + ' member report' + (active.count === 1 ? '' : 's') };
+      } else if (p.lens === 'model' && cons.ready && cons.factors[fac.key] != null) {
+        prov = { status:'member',
+                 basis:'Median of ' + cons.count + ' member report' + (cons.count === 1 ? '' : 's') +
+                       ', replacing the estimate' };
+      } else {
+        prov = (show.provenance || {})[fac.key];
+      }
       return '<tr class="' + (v == null ? 'is-unscored' : '') + '">' +
         '<th scope="row"><span class="fac-name">' + esc(fac.label) + '</span>' +
           '<span class="fac-help" title="' + esc(fac.help) + '">?</span></th>' +
@@ -281,17 +342,101 @@ window.ASTIntelUI = (function () {
       intel;
   }
 
+  /* The top-of-drawer shortcut. Only appears when there is something to read,
+     and says whose report it is rather than a generic label. */
+  function readReportLink(reports, p) {
+    var mine = I.mineOf(reports).length;
+    var shared = reports.filter(function (r) {
+      return r.visibility !== 'private' && !r.deletedAt;
+    }).length;
+    if (!mine && !shared) return '';
+    var bits = [];
+    if (mine) bits.push('your report' + (mine === 1 ? '' : 's'));
+    if (shared) bits.push(shared + ' from the network');
+    return '<p class="sd-read"><a href="#reportSection" id="btnReadReport">' +
+           'Read ' + esc(bits.join(' · ')) + ' &darr;</a></p>';
+  }
+
   function evidenceLabel(e) {
     return { reported:'backed by member reports', verified:'high-confidence estimate',
              estimated:'medium-confidence estimate',
              placeholder:'placeholder — treat as a starting point' }[e] || 'estimate';
   }
 
+  /* Two tabs over the same show: what YOU found, and what the network found.
+     They are different claims and the page never merges them — your own
+     weekend is not evidence about the show in general, and the network median
+     is not what happened to you. */
   function intelSection(show, cons, reports, p) {
-    var shared = reports.filter(function (r) { return r.visibility !== 'private'; });
-    var mine = reports.filter(function (r) { return r.visibility === 'private'; });
-    var out = '<h3 class="sd-h">What the network reports</h3>';
+    var mine = I.mineOf(reports);
+    var shared = reports.filter(function (r) {
+      return r.visibility !== 'private' && !r.deletedAt;
+    });
+    var tab = reportTab === 'network' ? 'network' : 'mine';
 
+    var out = '<h3 class="sd-h" id="reportSection">Reports</h3>' +
+      '<div class="rtabs" role="tablist">' +
+        '<button type="button" class="rtab' + (tab === 'mine' ? ' on' : '') + '" ' +
+          'data-report-tab="mine" role="tab" aria-selected="' + (tab === 'mine') + '">' +
+          'Yours <span class="rtab-n">' + mine.length + '</span></button>' +
+        '<button type="button" class="rtab' + (tab === 'network' ? ' on' : '') + '" ' +
+          'data-report-tab="network" role="tab" aria-selected="' + (tab === 'network') + '">' +
+          'The network <span class="rtab-n">' + shared.length + '</span></button>' +
+      '</div>';
+
+    out += tab === 'mine' ? minePanel(mine, p) : networkPanel(cons, shared, p);
+
+    out += '<p class="sd-cta"><button class="btn btn-primary" id="btnAddIntel" type="button">' +
+      (mine.length ? 'Add another report' : 'Add a report') + '</button></p>';
+    return out;
+  }
+
+  function minePanel(mine, p) {
+    if (!mine.length) {
+      return '<p class="intel-empty">You have not reported on this show. ' +
+        'Your own numbers are the only ones that tell you whether it works for ' +
+        'your work specifically — the network median is a different question.</p>';
+    }
+    var money = mineMoney(mine);
+    var out = '';
+    if (money) {
+      out += '<div class="intel-stats">' +
+        statTile('Gross', money.gross == null ? '—' : money.gross, '') +
+        statTile('Net', money.net == null ? '—' : money.net, '') +
+        statTile('Avg sale', money.avg == null ? '—' : money.avg, '') +
+        statTile('Pieces', money.pieces == null ? '—' : money.pieces, '') +
+        '</div>';
+    }
+    out += '<ul class="reports">' + mine.map(reportCard).join('') + '</ul>';
+    return out;
+  }
+
+  function mineMoney(mine) {
+    var g = [], n = [], pc = [], av = [];
+    mine.forEach(function (r) {
+      if (r.results.grossSales != null) g.push(r.results.grossSales);
+      var net = I.netOf(r);
+      if (net != null) n.push(net);
+      if (r.results.piecesSold != null) pc.push(r.results.piecesSold);
+      if (r.results.grossSales != null && r.results.piecesSold) {
+        av.push(r.results.grossSales / r.results.piecesSold);
+      }
+    });
+    if (!g.length && !n.length) return null;
+    var avgOf = function (a) {
+      if (!a.length) return null;
+      return a.reduce(function (x, y) { return x + y; }, 0) / a.length;
+    };
+    return {
+      gross: g.length ? money(avgOf(g)) : null,
+      net: n.length ? money(avgOf(n)) : null,
+      avg: av.length ? money(avgOf(av)) : null,
+      pieces: pc.length ? Math.round(avgOf(pc)) : null
+    };
+  }
+
+  function networkPanel(cons, shared, p) {
+    var out = '';
     if (!cons.ready) {
       out += '<p class="intel-empty">' +
         (shared.length
@@ -319,17 +464,7 @@ window.ASTIntelUI = (function () {
       out += '<p class="intel-return">Would go back: <strong>' + wr.yes + '</strong> yes · ' +
         wr.maybe + ' depends · <strong>' + wr.no + '</strong> no</p>';
     }
-
-    if (shared.length) {
-      out += '<ul class="reports">' + shared.map(reportCard).join('') + '</ul>';
-    }
-    if (mine.length) {
-      out += '<h3 class="sd-h">Your private notes</h3>' +
-        '<ul class="reports">' + mine.map(reportCard).join('') + '</ul>';
-    }
-
-    out += '<p class="sd-cta"><button class="btn btn-primary" id="btnAddIntel" type="button">' +
-      'Add a report</button></p>';
+    if (shared.length) out += '<ul class="reports">' + shared.map(reportCard).join('') + '</ul>';
     return out;
   }
 
