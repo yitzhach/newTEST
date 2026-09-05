@@ -163,7 +163,15 @@ console.log('\n--- All shows catalogue ---');
  const rated=await p.evaluate(()=>{const s=JSON.parse(localStorage.getItem('artShowTracker.catalogue')||'{}');
    const k=Object.keys(s.picks||{})[0];return s.picks[k];});
  ok('rating with the keyboard saves a rating',rated&&rated.rating>0,JSON.stringify(rated));
- // add to ledger
+ // add to ledger.  Pin the record rather than taking whichever card happens to
+ // be first: the default "deadline still open" filter is relative to today, so
+ // the first card changes as deadlines pass and the stub would be asked about a
+ // different city every week.  West End Arts Festival (La Grange, IL) is a fixed
+ // target the geocode stub knows; its deadline has passed, hence #fOpen off.
+ await p.uncheck('#fOpen');await p.waitForTimeout(300);
+ await p.fill('#fText','West End Arts Festival');await p.waitForTimeout(400);
+ ok('the pinned catalogue record is there to add',await p.locator('.card').count()===1,
+    'cards='+await p.locator('.card').count());
  const name=await p.locator('.card-name').first().textContent();
  await p.locator('.card [data-add]').first().click();
  await p.waitForTimeout(1200);
@@ -190,6 +198,7 @@ console.log('\n--- All shows catalogue ---');
  await p.check('#fHideAdded');await p.waitForTimeout(400);
  ok('"hide what is already in the ledger" removes it',await p.locator('.card.is-added').count()===0);
  await p.uncheck('#fHideAdded');await p.waitForTimeout(300);
+ await p.fill('#fText','');await p.waitForTimeout(400);
  // add your own record
  await p.click('#btnAddRecord');await p.waitForTimeout(300);
  await p.fill('#rName','A Show I Heard About');await p.fill('#rCity','Sarasota');await p.fill('#rState','FL');

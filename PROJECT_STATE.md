@@ -635,9 +635,9 @@ was changed on speculation: the legacy `{s}.` tile URL in `tracker/map.js` is
 deliberately left alone until a browser says tiles are missing, and the
 straight-line route fallback stays as designed.
 
-**Phase 7 (2026-09-04).** 53 checks in
+**Phase 7 (2026-09-04, re-run green 2026-09-05).** 54 checks in
 `tools/smoke/05-hide-vsplit-catalogue.cjs` plus 3 added to the Phase 6 file,
-taking the harness to **158**, all passing. The vertical divider: dragging
+taking the harness to **159**, all passing. The vertical divider: dragging
 makes the map taller, the height is remembered and returns on reload, arrow
 keys work, and it cannot be collapsed to nothing. Hiding: the row greys, the
 pin leaves the map, the show stays in the ledger and in the season stats,
@@ -660,6 +660,17 @@ rendered the six columns squeezed to one word per line. There is now a check
 asserting the row really collapses to two columns. And `.card-acts` was
 `flex:none`, so the Zapp link and Add button together overflowed a narrow
 card by 5px; they now wrap.
+
+**A date-dependent flake in the harness, fixed 2026-09-05.** The catalogue
+test added *whichever card was first*, but the "deadline still open" filter is
+relative to today, so the first card changes as deadlines pass: on 2026-09-04
+it was Bar Harbor, a city the Nominatim stub knows, and by 2026-09-05 it was
+Algonquin, which the stub correctly answers with no match — so the two
+geocoding checks failed on a test that had aged, not on anything the app does.
+It now pins a fixed record (West End Arts Festival, La Grange IL) by search
+with the deadline filter off, and asserts it found exactly that one card, so
+the run no longer depends on the date. **No app code changed.** That is the
+54th check.
 
 **Not verified from here:** the cdnjs, OpenStreetMap tile and Nominatim
 requests themselves, and the live Pages URL. Re-checked 2026-09-04 and all
