@@ -169,13 +169,40 @@ window.ASTCatalogue = (function () {
 
   /* ---- Filtering and sorting --------------------------------------------- */
 
+  /* Every comparator is written ASCENDING in its own natural sense — earliest
+     date, A to Z, cheapest, lowest rating — and `dir:'desc'` flips it. That is
+     what makes "newest to oldest" the same control as "oldest to newest"
+     rather than a separate sort key. Rows with nothing to sort on sink to the
+     bottom of an ascending sort; they are not evidence of anything. */
   var SORTS = {
-    date:     function (a, b) { return (a.startDate || '9999').localeCompare(b.startDate || '9999'); },
-    deadline: function (a, b) { return (a.applyBy || '9999').localeCompare(b.applyBy || '9999'); },
+    date:     function (a, b) { return cmpStr(a.startDate, b.startDate); },
+    deadline: function (a, b) { return cmpStr(a.applyBy, b.applyBy); },
     name:     function (a, b) { return a.name.localeCompare(b.name); },
-    fee:      function (a, b) { return (a.fee == null ? 1e9 : a.fee) - (b.fee == null ? 1e9 : b.fee); },
-    rating:   function (a, b) { return (b.rating || 0) - (a.rating || 0); }
+    fee:      function (a, b) { return cmpNum(a.fee, b.fee); },
+    rating:   function (a, b) { return cmpNum(a.rating || 0, b.rating || 0); }
   };
+
+  /** Which way round each sort is most useful when you first pick it. */
+  var SORT_DEFAULT_DIR = {
+    date: 'asc', deadline: 'asc', name: 'asc', fee: 'asc', rating: 'desc'
+  };
+
+  /* Empty sorts last in an ascending order, so a missing date does not
+     masquerade as the earliest one. */
+  function cmpStr(a, b) {
+    a = a || ''; b = b || '';
+    if (!a && !b) return 0;
+    if (!a) return 1;
+    if (!b) return -1;
+    return a < b ? -1 : (a > b ? 1 : 0);
+  }
+  function cmpNum(a, b) {
+    var an = (a == null), bn = (b == null);
+    if (an && bn) return 0;
+    if (an) return 1;
+    if (bn) return -1;
+    return a - b;
+  }
 
   /**
    * @param q.text     name / city substring
@@ -186,16 +213,23 @@ window.ASTCatalogue = (function () {
    * @param q.from,q.to  event-date window (ISO)
    * @param q.maxFee   number
    * @param q.sort     key of SORTS
+   * @param q.dir      'asc' (default) or 'desc' — reverses whichever sort
    */
   function query(rows, q) {
     q = q || {};
     var text = String(q.text || '').trim().toLowerCase();
+    var words = text ? text.split(/\s+/) : [];
     var states = (q.states && q.states.length) ? q.states : null;
 
     var out = rows.filter(function (r) {
       if (text) {
-        var hay = (r.name + ' ' + r.city + ' ' + r.state).toLowerCase();
-        if (hay.indexOf(text) === -1) return false;
+        /* Keyword search across name, city and both forms of the state, so
+           "florida" and "FL" both work. Every word has to match somewhere,
+           which makes "naples art" behave the way people expect. */
+        var hay = (r.name + ' ' + r.city + ' ' + r.state + ' ' + r.stateName).toLowerCase();
+        for (var w = 0; w < words.length; w++) {
+          if (hay.indexOf(words[w]) === -1) return false;
+        }
       }
       if (states && states.indexOf(r.state) === -1) return false;
       if (q.liked && !r.liked) return false;
@@ -211,7 +245,12 @@ window.ASTCatalogue = (function () {
     });
 
     var cmp = SORTS[q.sort] || SORTS.date;
-    return out.sort(cmp);
+    var sign = q.dir === 'desc' ? -1 : 1;
+    /* Name breaks every tie, so equal rows keep a stable, readable order
+       instead of shuffling between renders. */
+    return out.sort(function (a, b) {
+      return sign * cmp(a, b) || a.name.localeCompare(b.name);
+    });
   }
 
   /** The states present, with counts, for the filter UI. */
@@ -255,6 +294,7 @@ window.ASTCatalogue = (function () {
   return {
     SOURCE_URL: SOURCE_URL,
     SORTS: SORTS,
+    SORT_DEFAULT_DIR: SORT_DEFAULT_DIR,
     load: load,
     isLoaded: function () { return loaded; },
     meta: function () { return Object.assign({}, meta); },
