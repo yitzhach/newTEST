@@ -238,14 +238,20 @@ function rescore() {
     if (!rec) { r.fit = null; r.fitDetail = null; r.gates = []; r.blocked = false; return; }
     const reports = state.reportsByShow[r.id] || [];
     const cons = INTEL.consensus(reports, profile.discipline);
-    const scored = FIT.scoreShow(rec, profile, {
-      memberConsensus: cons.ready ? cons.factors : null
-    });
+    /* Under a reported lens the score comes ONLY from reports, so a show
+       nobody has worked scores null and sinks — which is the honest answer to
+       "what has actually paid", rather than an estimate wearing a report's
+       clothes. */
+    const active = INTEL.lens(reports, profile.lens, profile.discipline);
+    const scored = profile.lens === 'model'
+      ? FIT.scoreShow(rec, profile, { memberConsensus: cons.ready ? cons.factors : null })
+      : FIT.scoreShow(rec, profile, { factorsOnly: active.ready ? active.factors : {} });
     r.fit = scored.fit;
     r.fitDetail = scored;
     r.gates = FIT.gates(rec, profile);
     r.blocked = r.gates.some(g => g.level === 'blocking');
-    r.reportCount = reports.filter(x => x.visibility !== 'private').length;
+    r.reportCount = reports.filter(x => x.visibility !== 'private' && !x.deletedAt).length;
+    r.myReportCount = INTEL.mineOf(reports).length;
   });
 }
 
@@ -261,8 +267,41 @@ C.SORTS.fit = (a, b) => {
 };
 C.SORT_DEFAULT_DIR.fit = 'desc';
 
+/* Reported-on marker. Two different facts, and they read differently: a
+   filled mark means YOU worked this show, an outline means the network did.
+   Both matter when scanning a list to decide where to apply. */
+function reportBadge(r) {
+  if (!r.myReportCount && !r.reportCount) return '';
+  const mine = r.myReportCount > 0;
+  const label = mine
+    ? 'You have ' + r.myReportCount + ' report' + (r.myReportCount === 1 ? '' : 's') + ' on this show'
+      + (r.reportCount ? ', plus ' + r.reportCount + ' from the network' : '')
+    : r.reportCount + ' member report' + (r.reportCount === 1 ? '' : 's');
+  return '<span class="rbadge' + (mine ? ' is-mine' : '') + '" title="' + esc(label) + '">' +
+    (mine ? '\u25CF' : '\u25CB') +
+    '<span class="rbadge-n">' + (mine ? r.myReportCount : r.reportCount) + '</span></span>';
+}
+
+/* The external link. Small, explicit, and never the thing you hit by accident
+   when you meant to open the show. */
+function siteLink(r) {
+  if (!r.url) return '';
+  return '<a class="extlink" href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer" ' +
+    'title="Open this show\'s own page in a new tab" ' +
+    'aria-label="Open the page for ' + esc(r.name) + ' in a new tab">\u2197</a>';
+}
+
 function fitChip(r) {
-  if (r.fit == null) return '<span class="fitchip sc-none" title="Not scored yet">—</span>';
+  if (r.fit == null) {
+    /* A dash under a reported lens is information, not an absence: it says
+       nobody has worked this show yet. Say which. */
+    const why = state.profile.lens === 'mine'
+      ? 'You have not reported on this show'
+      : (state.profile.lens === 'network'
+          ? 'The network has not reported on this show yet'
+          : 'Not scored yet');
+    return '<span class="fitchip sc-none" title="' + esc(why) + '">—</span>';
+  }
   const title = 'Fit for ' + FIT.DISCIPLINE_BY_KEY[state.profile.discipline].label.toLowerCase() +
     ' — scored on ' + Math.round(r.fitDetail.coverage * 100) + '% of your weighting' +
     (r.blocked ? '. This show does not jury your medium.' : '');
@@ -317,7 +356,10 @@ function cardHtml(r) {
   return '<article class="card' + (r.addedShowId ? ' is-added' : '') +
     (r.blocked ? ' is-blocked' : '') + '" data-id="' + esc(r.id) + '">' +
     '<div class="card-top">' +
-      '<h3 class="card-name">' + esc(r.name) + '</h3>' +
+      '<h3 class="card-name">' +
+        '<button type="button" class="namebtn" data-detail="' + esc(r.id) + '">' +
+          esc(r.name) + '</button>' + siteLink(r) +
+      '</h3>' +
       fitChip(r) +
       '<button type="button" class="card-like" data-like="' + esc(r.id) + '" ' +
         'aria-pressed="' + (r.liked ? 'true' : 'false') + '" ' +
@@ -331,10 +373,13 @@ function cardHtml(r) {
       (r.deadlineNote ? ' <span class="muted-inline">' + esc(r.deadlineNote) + '</span>' : '') + '</p>' +
     (fee ? '<p class="meta">' + esc(fee + (r.feeLabel ? ' · ' + r.feeLabel : '')) + '</p>' : '') +
     '<p class="card-intel">' +
-      (r.reportCount
-        ? '<span class="intel-dot"></span>' + r.reportCount + ' member report' + (r.reportCount === 1 ? '' : 's')
+      (r.myReportCount || r.reportCount
+        ? reportBadge(r) +
+          (r.myReportCount ? 'your report' + (r.myReportCount === 1 ? '' : 's') : '') +
+          (r.myReportCount && r.reportCount ? ' \u00b7 ' : '') +
+          (r.reportCount ? r.reportCount + ' from the network' : '')
         : '<span class="muted-inline">no reports yet</span>') +
-      '<button type="button" class="btn-mini btn-detail" data-detail="' + esc(r.id) + '">Detail</button>' +
+      '<button type="button" class="btn-mini btn-detail" data-detail="' + esc(r.id) + '">Details</button>' +
     '</p>' +
     '<div class="card-foot">' +
       '<span class="card-stars" data-rate="' + esc(r.id) + '" role="slider" tabindex="0" ' +
@@ -367,10 +412,9 @@ function rowHtml(r) {
         'style="--fill:' + (r.liked ? 'currentColor' : 'none') + '" ' +
         'title="' + (r.liked ? 'Remove from your shortlist' : 'Add to your shortlist') + '" ' +
         'aria-label="' + (r.liked ? 'Unlike ' : 'Like ') + esc(r.name) + '">' + HEART + '</button>' +
-      (r.url
-        ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener noreferrer" ' +
-          'title="Open the Zapplication page in a new tab">' + esc(r.name) + '</a>'
-        : '<span>' + esc(r.name) + '</span>') +
+      '<button type="button" class="namebtn" data-detail="' + esc(r.id) + '" ' +
+        'title="Open the full breakdown">' + esc(r.name) + '</button>' +
+      siteLink(r) + reportBadge(r) +
     '</span>' +
     '<span class="meta">' + esc([r.city, r.state].filter(Boolean).join(', ')) + '</span>' +
     '<span class="meta">' + esc(fmtRange(r.startDate, r.endDate)) + '</span>' +
@@ -384,7 +428,7 @@ function rowHtml(r) {
       starsSVG(r.rating, 13) + '</span>' +
     '<span class="c-fit">' + fitChip(r) +
       '<button type="button" class="btn-mini btn-detail" data-detail="' + esc(r.id) +
-      '" title="Open the full breakdown">&#8250;</button></span>' +
+      '" title="Open the full breakdown">Details</button></span>' +
     '<span class="c-act">' + (r.addedShowId
       ? '<span class="added-tag" title="Already in your ledger">In ledger</span>'
       : '<button type="button" class="btn-mini add" data-add="' + esc(r.id) + '">Add</button>') +

@@ -349,6 +349,84 @@ window.ASTIntel = (function () {
     return c.ready ? c.factors : null;
   }
 
+  /* ---- 3b. LENSES --------------------------------------------------------
+     Three ways to rank the same 236 shows:
+
+       model    the editorial estimate, with member consensus replacing it
+                wherever enough artists have reported. Every show has a score.
+       mine     only what YOU found. Shows you have never worked score null.
+       network  only what the network found, and only where the consensus
+                threshold is met.
+
+     The point of separating them is that they answer different questions.
+     "Which shows suit work like mine" is a different question from "which
+     shows have actually paid me", and a season is planned with both.
+
+     A lens never falls back to the layer beneath it. A reported lens that
+     quietly borrows an estimate is not a reported lens.                     */
+  var LENSES = [
+    { key:'model', label:'Model fit',
+      note:'The estimate, corrected by member reports wherever there are enough of them.' },
+    { key:'mine', label:'My results',
+      note:'Only shows you have reported on, scored from your own numbers.' },
+    { key:'network', label:'The network',
+      note:'Only shows the network has reported on, scored from members\' numbers.' }
+  ];
+
+  /** Reports this artist wrote. In solo mode that is all of them by
+      definition — they are on this device. Over the network the server
+      stamps `mine`, and a private report is always the reader's own. */
+  function mineOf(reports) {
+    return (reports || []).filter(function (r) {
+      if (r.deletedAt) return false;
+      if (r.visibility === 'private') return true;
+      if (r.mine === true) return true;
+      return store.kind === 'local';
+    });
+  }
+
+  /**
+   * Factors and money for one show under one lens.
+   * Returns { ready, factors, count, money, reason } — `reason` says why a
+   * lens has nothing to show, so the UI can be specific instead of blank.
+   */
+  function lens(reports, mode, disciplineKey) {
+    reports = (reports || []).filter(function (r) { return !r.deletedAt; });
+
+    if (mode === 'mine') {
+      var mine = mineOf(reports);
+      if (!mine.length) {
+        return { ready:false, factors:{}, count:0, money:null,
+                 reason:'You have not reported on this show.' };
+      }
+      var f = {};
+      F.FACTOR_KEYS.forEach(function (k) {
+        f[k] = median(compact(mine.map(function (r) { return r.factors && r.factors[k]; })));
+      });
+      return { ready:true, factors:f, count:mine.length, money:moneyStats(mine),
+               logistics:logisticsStats(mine), wouldReturn:returnSplit(mine) };
+    }
+
+    if (mode === 'network') {
+      var c = consensus(reports, disciplineKey);
+      if (!c.ready) {
+        var shared = reports.filter(function (r) { return r.visibility !== 'private'; }).length;
+        return { ready:false, factors:{}, count:shared, money:null,
+                 reason: shared
+                   ? shared + ' report' + (shared === 1 ? '' : 's') + ' so far — ' +
+                     MIN_REPORTS + ' are needed before the network publishes a number.'
+                   : 'Nobody has reported on this show yet.' };
+      }
+      return c;
+    }
+
+    /* model — always ready; the editorial layer covers every show. */
+    var cons = consensus(reports, disciplineKey);
+    return { ready:true, factors: cons.ready ? cons.factors : {},
+             count: cons.ready ? cons.count : 0,
+             money: cons.money || null, blended:true };
+  }
+
   /* ---- 4. STORE ----------------------------------------------------------
      Same shape as core.js's Store so the two behave alike: local is the
      immediate read/write path and stays authoritative offline, and a remote
@@ -457,13 +535,23 @@ window.ASTIntel = (function () {
   function useNetwork(client) { store = client ? SplitStore(NetworkStore(client)) : LocalStore; }
 
   /* ---- 5. ARTIST PROFILE -------------------------------------------------- */
+  /* The lens lives here rather than in fit.js: which data source you are
+     ranking by is a property of the intel layer, and the model has no reason
+     to know the concept exists. F.makeProfile drops keys it does not own, so
+     it is reattached after. */
+  function withLens(clean, raw) {
+    var keys = LENSES.map(function (l) { return l.key; });
+    clean.lens = keys.indexOf(raw && raw.lens) !== -1 ? raw.lens : 'model';
+    return clean;
+  }
   function getProfile() {
     var raw = null;
     try { raw = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); } catch (e) {}
-    return F.makeProfile(raw || {});
+    raw = raw || {};
+    return withLens(F.makeProfile(raw), raw);
   }
   function setProfile(p) {
-    var clean = F.makeProfile(p);
+    var clean = withLens(F.makeProfile(p), p);
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(clean)); } catch (e) {}
     return clean;
   }
@@ -479,6 +567,9 @@ window.ASTIntel = (function () {
     reviewTone: reviewTone,
     consensus: consensus,
     consensusForScoring: consensusForScoring,
+    LENSES: LENSES,
+    lens: lens,
+    mineOf: mineOf,
     getProfile: getProfile,
     setProfile: setProfile,
     useNetwork: useNetwork,

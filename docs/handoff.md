@@ -126,6 +126,21 @@ multiplicative tilt on the discipline's weights, then renormalised. Two oil
 painters selling at $600 and $12,000 want opposite calendars out of the same
 list.
 
+**Scoring lens** — the third axis, and the one that changes what the number
+*means* rather than how it is weighted:
+
+| Lens | Scored from | Shows with no data |
+|---|---|---|
+| **Model fit** | the editorial estimate, with member consensus replacing it wherever three or more artists have reported | every show scores |
+| **My results** | only your own reports | score null, sink to the bottom, render a dash |
+| **The network** | only member consensus, and only past the three-report threshold | same |
+
+A lens never falls back to the layer beneath it. A reported lens that quietly
+borrows an estimate is not a reported lens, and the whole point of asking
+"which shows have actually paid me" is that it is a different question from
+"which shows suit work like mine". The factor provenance chips follow the lens
+too — under a reported lens they read `reported`, not `estimate`.
+
 **Season strategy** — balanced, build the resume, maximise gross, budget & low
 risk, only what is proven. The last one is a discount rather than a weighting:
 it multiplies the fit by an evidence factor, so a 9.2 resting on estimate alone
@@ -256,7 +271,8 @@ build/
   record_research.py    merges a research batch, REJECTS anything missing provenance
   research-overrides.json  the research pass output, 29 shows deep
   catalogue-source.json    pristine ZAPP export. Read-only input, never written
-  browser-tests.cjs     37 Playwright checks against the live page
+  browser-tests.cjs     37 Playwright checks: the model, the drawer, provenance
+  ledger-view-tests.cjs 21 checks: details/link split, report badge, the lenses
 
 worker/               Cloudflare Worker + D1. Complete, NOT deployed. See its README
 docs/
@@ -279,6 +295,8 @@ map and the ledger all read one list.
 ```bash
 python3 -m http.server 8765          # from the repo root
 node build/browser-tests.cjs        # 37 checks — needs the server running
+node build/ledger-view-tests.cjs   # 21 checks — files a report, so it clears
+                                   # localStorage first and runs standalone
 
 cd worker && npm test                # 45 API checks, manages its own worker
 ```
@@ -316,6 +334,10 @@ Membership is invite-only. The first steward gets in via a one-time
   Aug 6–15 is a pick-one between Park City, Crested Butte and Sun Valley.
   Ranking has hit diminishing returns; scheduling has not.
 - **Images on reports.** The R2 binding exists, the API does not write to it yet.
+- **Money in the lenses.** "My results" and "The network" currently rank on the
+  ten factor ratings. Ranking directly on reported net — the number an artist
+  actually cares about — is the obvious next lens, and needs a decision about
+  how to compare a $900 booth weekend against a $2,400 one fairly.
 - **The community layer.** Specified in `community-build.md`. Not worth building
   below ~20 active members — a discussion layer on an empty database is a
   Facebook group with extra steps.

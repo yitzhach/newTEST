@@ -278,8 +278,12 @@ window.ASTFit = (function () {
        the same claim as 9.2 with a dozen member reports behind it, and the
        ranking should say so out loud rather than in a footnote. */
     var strategy = makeProfile(profile).strategy;
-    var evidence = evidenceLevel(show);
-    if (STRATEGY_BY_KEY[strategy].demandsEvidence) fit = fit * EVIDENCE_DISCOUNT[evidence];
+    /* Scoring from reports IS the evidence, so it never takes the discount —
+       the discount exists to mark estimates, and there is no estimate here. */
+    var evidence = opts.factorsOnly ? 'reported' : evidenceLevel(show);
+    if (!opts.factorsOnly && STRATEGY_BY_KEY[strategy].demandsEvidence) {
+      fit = fit * EVIDENCE_DISCOUNT[evidence];
+    }
 
     return {
       fit: Math.round(fit * 100) / 100,
@@ -313,6 +317,23 @@ window.ASTFit = (function () {
    */
   function resolveScores(show, disciplineKey, opts) {
     opts = opts || {};
+
+    /* `factorsOnly` switches the model from "best available estimate" to
+       "this source and nothing else". It is how the reported lenses work:
+       ranking by what artists actually found has to mean ONLY that, or an
+       editorial guess quietly fills the gaps and the lens stops being an
+       answer to the question it was asked. A show with no reports scores
+       null here, and null sinks to the bottom rather than inventing a
+       middle. */
+    if (opts.factorsOnly) {
+      var only = {};
+      FACTOR_KEYS.forEach(function (k) {
+        var v = opts.factorsOnly[k];
+        only[k] = v == null ? null : clamp10(v);
+      });
+      return only;
+    }
+
     var base = show.factors || {};
     var perDisc = (show.byDiscipline && show.byDiscipline[disciplineKey]) || {};
     var member = opts.memberConsensus || (show.intel && show.intel.byDiscipline

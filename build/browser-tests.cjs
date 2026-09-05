@@ -232,9 +232,13 @@ function check(name, pass, detail) {
   // ---- 15. the saved report shows on the show ---------------------------
   await page.click('.crow .btn-detail');
   await page.waitForTimeout(500);
+  /* Reports now live under a Yours / The network tab pair rather than a
+     separate "your private notes" heading. Same guarantee, different shape:
+     your own report is the default view and the network tab is empty. */
   const privSection = await page.textContent('.idr-body');
-  check('private report listed under "your private notes"',
-        /Your private notes/i.test(privSection) && /12,000/.test(privSection));
+  check('your own report shows on the Yours tab',
+        /Yours/.test(privSection) && /12,000/.test(privSection),
+        (privSection || '').slice(0, 60));
   check('a single report does not publish a consensus',
         /Nothing reported yet|report.? so far/i.test(privSection) || !/Median of/.test(privSection));
 
