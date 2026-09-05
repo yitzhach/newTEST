@@ -1,0 +1,299 @@
+/* ==========================================================================
+   Show Ledger — members' intel layer
+   Extends app.css. Uses the same tokens, adds only what the fit model and the
+   intel drawer need. Every colour resolves through a token so dark mode comes
+   for free.
+   ========================================================================== */
+:root {
+  --sc-top:#1d6b52; --sc-high:#3f8a63; --sc-mid:#8a7a2b;
+  --sc-low:#a4652a; --sc-poor:#9b4a34; --sc-none:#a3a3a3;
+  --prov-verified:#1d6b52; --prov-corroborated:#3f7f8a;
+  --prov-search:#8a6d2b; --prov-editorial:#737373; --prov-member:#5b53a6;
+}
+html[data-theme="dark"] {
+  --sc-top:#6fc39c; --sc-high:#7fb09c; --sc-mid:#d0b95e;
+  --sc-low:#e0a06a; --sc-poor:#f08d76; --sc-none:#737373;
+  --prov-verified:#6fc39c; --prov-corroborated:#7dc4d1;
+  --prov-search:#d8b45e; --prov-editorial:#a3a3a3; --prov-member:#a9a2e8;
+}
+
+/* ==========================================================================
+   PROFILE BAR
+   ========================================================================== */
+.profilebar {
+  padding:16px 32px; border-bottom:1px solid var(--line); background:var(--surface);
+}
+.pf-row { display:flex; gap:18px; align-items:flex-end; flex-wrap:wrap; }
+.pf-field { display:flex; flex-direction:column; gap:6px; min-width:190px; flex:1 1 190px; }
+.pf-field .control { min-height:40px; }
+.pf-why { white-space:nowrap; }
+.pf-note { margin:10px 0 0; font-size:13px; color:var(--muted); max-width:88ch; }
+.pf-sep { opacity:.5; padding:0 4px; }
+
+/* ==========================================================================
+   FIT SCORE CHIP — used in cards, rows and the drawer
+   ========================================================================== */
+.fitchip {
+  display:inline-flex; align-items:baseline; gap:5px; padding:3px 9px;
+  border:1px solid currentColor; border-radius:999px;
+  font-size:12px; font-weight:600; letter-spacing:.04em; white-space:nowrap;
+}
+.fitchip .fc-rank { font-weight:300; opacity:.7; font-size:11px; }
+.sc-top{color:var(--sc-top)} .sc-high{color:var(--sc-high)} .sc-mid{color:var(--sc-mid)}
+.sc-low{color:var(--sc-low)} .sc-poor{color:var(--sc-poor)} .sc-none{color:var(--sc-none)}
+.crow .fitchip, .card .fitchip { flex:none; }
+.card-top .fitchip { margin-left:auto; }
+/* A blocked show stays visible but reads as struck through. */
+.crow.is-blocked, .card.is-blocked { opacity:.55; }
+.crow.is-blocked .c-name a, .card.is-blocked .card-name { text-decoration:line-through; }
+
+/* ==========================================================================
+   PROVENANCE CHIPS
+   The visual argument of the whole tool: four states that cannot be mistaken
+   for one another at a glance.
+   ========================================================================== */
+.prov {
+  display:inline-block; padding:1px 6px; border-radius:3px;
+  font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+  text-decoration:none; white-space:nowrap; border:1px solid currentColor;
+}
+a.prov:hover { filter:brightness(1.15); text-decoration:underline; }
+.prov-verified{color:var(--prov-verified)}
+.prov-corroborated{color:var(--prov-corroborated)}
+.prov-search{color:var(--prov-search); border-style:dashed}
+.prov-editorial{color:var(--prov-editorial); border-style:dotted}
+.prov-member{color:var(--prov-member)}
+
+.tag {
+  display:inline-block; padding:1px 6px; border-radius:3px; font-size:10px;
+  font-weight:600; letter-spacing:.08em; text-transform:uppercase; border:1px solid currentColor;
+}
+.tag-warn { color:var(--warn); }
+.tag-priv { color:var(--prov-editorial); }
+
+/* ==========================================================================
+   DRAWER
+   ========================================================================== */
+.idr-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:60; }
+.idr {
+  position:fixed; top:0; right:0; bottom:0; width:min(680px, 100vw);
+  background:var(--bg); border-left:1px solid var(--line); box-shadow:var(--shadow);
+  z-index:61; display:flex; flex-direction:column;
+}
+.idr-wide { width:min(880px, 100vw); }
+body.idr-open { overflow:hidden; }
+.idr-head {
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:20px 26px; border-bottom:1px solid var(--line); flex:none;
+}
+.idr-head h2 { margin:0; font-size:16px; font-weight:600; line-height:1.3; }
+.idr-body { padding:24px 26px 64px; overflow:auto; flex:1 1 auto; }
+.idr-body .lede { margin:0 0 18px; font-size:14px; color:var(--muted); }
+.idr-body .fine { margin:20px 0 0; font-size:12px; color:var(--muted); line-height:1.6; }
+.sd-h {
+  margin:30px 0 12px; font-size:10px; font-weight:600; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--muted);
+  padding-bottom:7px; border-bottom:1px solid var(--line);
+}
+
+/* ---- Drawer header block ------------------------------------------------- */
+.sd-head { display:flex; gap:18px; align-items:flex-start; }
+.sd-score {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  min-width:88px; padding:12px 8px; border:1px solid currentColor; border-radius:10px;
+}
+.sd-num { font-size:28px; font-weight:600; line-height:1; }
+.sd-cap { font-size:9px; letter-spacing:.2em; text-transform:uppercase; opacity:.75; margin-top:5px; }
+.sd-headmeta { min-width:0; }
+.sd-headmeta p { margin:0 0 5px; }
+.sd-place { font-size:15px; }
+.sd-dates { font-size:13px; color:var(--muted); }
+.sd-conf { font-size:12px; color:var(--muted); }
+.sd-note {
+  margin:18px 0 0; padding:12px 14px; background:var(--surface);
+  border-left:2px solid var(--line); font-size:13px; line-height:1.6;
+}
+.sd-links { margin:14px 0 0; display:flex; gap:8px; flex-wrap:wrap; }
+.sd-cta { margin:22px 0 0; }
+
+/* ---- Gates --------------------------------------------------------------- */
+.gates { list-style:none; margin:18px 0 0; padding:0; display:grid; gap:8px; }
+.gate {
+  padding:10px 13px; font-size:13px; line-height:1.5; border-radius:4px;
+  border:1px solid currentColor;
+}
+.gate-blocking { color:var(--danger); }
+.gate-warning  { color:var(--warn); }
+.gate-hint     { color:var(--muted); }
+
+/* ---- Factor table -------------------------------------------------------- */
+.factable, .facttable, .wtable { width:100%; border-collapse:collapse; font-size:13px; }
+.factable th, .facttable th, .wtable th {
+  text-align:left; font-weight:400; padding:7px 10px 7px 0; vertical-align:middle;
+}
+.factable td, .facttable td, .wtable td { padding:7px 0 7px 10px; vertical-align:middle; }
+.factable tr + tr, .facttable tr + tr { border-top:1px solid var(--line); }
+.factable tr.is-unscored { opacity:.6; }
+.fac-name { }
+.fac-help {
+  display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px;
+  margin-left:6px; border:1px solid var(--line); border-radius:50%;
+  font-size:9px; color:var(--muted); cursor:help; vertical-align:middle;
+}
+.fac-bar { width:38%; }
+.fb { display:block; height:7px; background:var(--line); border-radius:4px; overflow:hidden; }
+.fb i { display:block; height:100%; background:var(--accent); }
+.fac-missing { font-size:11px; color:var(--muted); font-style:italic; }
+.fac-val { width:34px; text-align:right; font-variant-numeric:tabular-nums; font-weight:600; }
+.fac-w {
+  width:66px; text-align:right; font-size:11px; color:var(--muted);
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+.wdot {
+  display:inline-block; width:6px; height:6px; border-radius:50%;
+  background:var(--accent); margin-right:5px; vertical-align:middle;
+}
+.fac-prov { width:96px; text-align:right; }
+
+.facttable tr.is-unknown { opacity:.65; }
+.facttable td:last-child { text-align:right; width:96px; }
+.unknown { color:var(--muted); font-style:italic; }
+
+.wtable .w-bar { width:60%; }
+.wtable .w-bar span { display:block; height:8px; background:var(--accent); border-radius:4px; }
+.wtable .w-num { text-align:right; font-variant-numeric:tabular-nums; width:60px; }
+.drivers { margin:0 0 18px; padding-left:18px; font-size:13px; line-height:1.65; color:var(--muted); }
+.drivers li + li { margin-top:7px; }
+
+/* ---- Network intel ------------------------------------------------------- */
+.intel-empty, .intel-scope { font-size:13px; color:var(--muted); margin:0 0 14px; line-height:1.6; }
+.intel-stats { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 14px; }
+.stile {
+  flex:1 1 96px; padding:11px 12px; border:1px solid var(--line); border-radius:6px;
+  display:flex; flex-direction:column; gap:3px; background:var(--surface);
+}
+.stile-l { font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+.stile-v { font-size:17px; font-weight:600; font-variant-numeric:tabular-nums; }
+.stile-s { font-size:10px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.intel-return { font-size:13px; margin:0 0 16px; }
+
+.reports { list-style:none; margin:0; padding:0; display:grid; gap:12px; }
+.report { padding:13px 15px; border:1px solid var(--line); border-radius:6px; }
+.rep-head { margin:0 0 6px; font-size:13px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.rep-edit { margin-left:auto; }
+.rep-nums { margin:0 0 6px; font-size:13px; font-variant-numeric:tabular-nums; }
+.rep-notes { margin:0; font-size:13px; line-height:1.6; color:var(--muted); white-space:pre-wrap; }
+
+/* ==========================================================================
+   REPORT FORM
+   ========================================================================== */
+.conduct {
+  margin:0 0 24px; padding:16px 18px; border:1px solid var(--accent); border-radius:6px;
+  background:var(--surface);
+}
+.conduct h4 {
+  margin:0 0 10px; font-size:10px; font-weight:600; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--accent);
+}
+.conduct ul { margin:0; padding-left:17px; font-size:13px; line-height:1.65; }
+.conduct li + li { margin-top:7px; }
+.conduct li:last-child { font-weight:600; }
+
+.fgroup { margin:0 0 26px; }
+.fgroup h4 {
+  margin:0 0 6px; font-size:10px; font-weight:600; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--muted);
+  padding-bottom:7px; border-bottom:1px solid var(--line);
+}
+.fgroup .hint { margin:10px 0 14px; font-size:12px; color:var(--muted); line-height:1.6; }
+.hint-warn { color:var(--warn); }
+
+.grid-2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-bottom:14px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-bottom:14px; }
+@media (max-width:640px) {
+  .grid-2, .grid-3 { grid-template-columns:minmax(0,1fr); }
+  .idr { width:100vw; }
+}
+.field { display:flex; flex-direction:column; gap:6px; min-width:0; }
+.inwrap { position:relative; display:flex; }
+.inwrap .control { width:100%; }
+.inwrap.has-pre .control { padding-left:24px; }
+.inpre {
+  position:absolute; left:10px; top:50%; transform:translateY(-50%);
+  font-size:13px; color:var(--muted); pointer-events:none;
+}
+.net-preview { justify-content:flex-end; }
+.net-val {
+  min-height:40px; display:flex; align-items:center; font-size:17px; font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---- Visibility picker ---------------------------------------------------- */
+.vis-opts { display:grid; gap:9px; }
+.vis {
+  display:grid; grid-template-columns:auto 1fr; gap:4px 11px; align-items:center;
+  padding:11px 14px; border:1px solid var(--line); border-radius:6px; cursor:pointer;
+}
+.vis:hover { border-color:var(--muted); }
+.vis:has(input:checked) { border-color:var(--accent); background:var(--surface); }
+.vis input { grid-row:span 2; }
+.vis-l { font-size:13px; font-weight:600; }
+.vis-n { grid-column:2; font-size:12px; color:var(--muted); line-height:1.5; }
+.vis.is-disabled { opacity:.45; cursor:not-allowed; }
+
+/* ---- 1-5 rating rows ------------------------------------------------------ */
+.rfield { gap:7px; }
+.r5row, .trirow { display:flex; gap:5px; }
+.r5, .tri {
+  min-width:38px; min-height:38px; padding:0 9px; border:1px solid var(--line);
+  border-radius:5px; font-size:13px; color:var(--muted);
+}
+.r5:hover, .tri:hover { border-color:var(--ink); color:var(--ink); }
+.r5.on, .tri.on { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:600; }
+.r5.clear { color:var(--muted); font-size:16px; }
+.tri { min-width:52px; }
+
+/* ---- Factor grid ---------------------------------------------------------- */
+.facgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(112px,1fr)); gap:10px; }
+.facin { display:flex; flex-direction:column; gap:5px; }
+.facin span { font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.facin input {
+  min-height:40px; padding:0 10px; border:1px solid var(--line); background:var(--bg);
+  color:var(--ink); font-size:14px; text-align:center;
+}
+
+/* ---- Tone review ----------------------------------------------------------
+   Advisory, and styled to read as a colleague's note rather than an error. */
+.tone { margin-top:12px; padding:13px 15px; border-radius:6px; border:1px solid currentColor; }
+.tone-review { color:var(--warn); }
+.tone-strong { color:var(--danger); }
+.tone-h { margin:0 0 8px; font-size:13px; font-weight:600; }
+.tone ul { margin:0 0 8px; padding-left:17px; font-size:12px; line-height:1.6; }
+.tone q { font-style:italic; }
+.tone-f { margin:0; font-size:12px; line-height:1.6; color:var(--muted); }
+
+.form-foot { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:18px; }
+.foot-right { display:flex; gap:8px; }
+.btn.danger { color:var(--danger); }
+.err { color:var(--danger); font-size:13px; margin:12px 0 0; }
+
+/* ==========================================================================
+   BROWSE INTEGRATION
+   ========================================================================== */
+/* One more column than app.css's default, for the fit chip. Kept in sync with
+   the base rule at app.css:770 — if that grid changes, this one has to too. */
+.rowhead.with-fit, .crow.with-fit {
+  grid-template-columns:minmax(0,1fr) 118px 118px 142px 60px 78px 92px 62px;
+}
+@media (max-width:900px) {
+  .rowhead.with-fit, .crow.with-fit { grid-template-columns:minmax(0,1fr) auto; }
+}
+.c-fit { display:flex; align-items:center; }
+.card-intel {
+  margin-top:8px; font-size:11px; color:var(--muted);
+  display:flex; align-items:center; gap:6px;
+}
+.intel-dot {
+  display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--prov-member);
+}
+.btn-detail { margin-left:auto; }

@@ -30,7 +30,11 @@ import sys
 from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CATALOGUE = os.path.join(ROOT, "tracker", "catalogue.json")
+# Pristine ZAPP export. Read-only input: the build WRITES tracker/catalogue.json,
+# so it must never also read it, or a second run would treat its own output as
+# source and quietly upgrade the provenance of rows it invented itself.
+CATALOGUE_SRC = os.path.join(ROOT, "build", "catalogue-source.json")
+CATALOGUE_OUT = os.path.join(ROOT, "tracker", "catalogue.json")
 FIT_SOURCE = os.path.join(ROOT, "build", "fit-source.json")
 OVERRIDES = os.path.join(ROOT, "build", "research-overrides.json")
 OUT = os.path.join(ROOT, "tracker", "fit-data.json")
@@ -121,7 +125,7 @@ def load(path, default=None):
 
 
 def main():
-    catalogue = load(CATALOGUE)["shows"]
+    catalogue = load(CATALOGUE_SRC)["shows"]
     fit_rows = load(FIT_SOURCE)
     overrides = load(OVERRIDES, default={})
 
@@ -177,6 +181,8 @@ def main():
         json.dump(payload, fh, indent=1, sort_keys=False)
         fh.write("\n")
 
+    write_catalogue(out, catalogue)
+
     verified = sum(1 for r in out if r["confidence"] == "High")
     scored = sum(1 for r in out if any(v is not None for v in r["factors"].values()))
     est_dates = sum(1 for r in out if r["datesEstimated"])
@@ -189,6 +195,63 @@ def main():
     missing_odds = sum(1 for r in out if r["factors"]["juryOdds"] is None)
     print("  unscored: logistics %d, juryOdds %d  (renormalised, never defaulted)"
           % (missing_logistics, missing_odds))
+
+
+STATE_NAME = {v: k for k, v in STATE_ABBR.items()}
+
+
+def write_catalogue(records, original):
+    """Fold the fit-only shows back into catalogue.json.
+
+    The 34 marquee national shows — Cherry Creek, Park City, Saint Louis, Ann
+    Arbor and the rest — were added to the scoring model by hand and never
+    existed in the ZAPP export. Without this they would carry a fit score that
+    nothing ever displays, because the browser, the map and the ledger all read
+    the catalogue rather than the fit layer.
+
+    Rather than teach three surfaces about a second list, the union is written
+    back to the one file they already read. Rows keep their `fit-` ids, so a
+    later ZAPP export that does contain them joins on name and replaces them
+    rather than duplicating.
+    """
+    have = {row["id"] for row in original}
+    rows = list(original)
+    added = 0
+    for rec in records:
+        if rec["id"] in have:
+            continue
+        f = rec["facts"]
+        rows.append({
+            "id": rec["id"],
+            "name": rec["name"],
+            "city": rec["city"],
+            "state": rec["state"],
+            "stateName": STATE_NAME.get(rec["state"], rec["state"]),
+            "startDate": f["startDate"] or "",
+            "endDate": f["endDate"] or "",
+            "applyBy": f["applyBy"] or "",
+            "deadlineNote": f["deadlineNote"] or "",
+            "earlyBird": "",
+            "notifyDate": f["notifyDate"] or "",
+            "fee": f["juryFee"],
+            "feeLabel": f["juryFeeLabel"] or "",
+            "url": f["officialUrl"] or "",
+        })
+        added += 1
+
+    rows.sort(key=lambda r: (r.get("name") or "").lower())
+    payload = {
+        "schemaVersion": 1,
+        "source": "Art_Show_Tracker.xlsx + fit model additions",
+        "importedAt": __import__("datetime").date.today().isoformat(),
+        "count": len(rows),
+        "shows": rows,
+    }
+    with open(CATALOGUE_OUT, "w") as fh:
+        json.dump(payload, fh, indent=1)
+        fh.write("\n")
+    print("  catalogue.json rewritten: %d shows (%d folded in from the fit model)"
+          % (len(rows), added))
 
 
 def build_record(fit, cat):

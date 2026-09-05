@@ -1935,8 +1935,8 @@
     "qualifiedTraffic": 8,
     "costEfficiency": 6,
     "lowCompetition": 5,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 3
    },
    "byDiscipline": {
     "painting": {
@@ -1961,22 +1961,22 @@
     "applyBy": "2026-10-09",
     "deadlineNote": null,
     "notifyDate": "2026-12-12",
-    "juryFee": 45.0,
+    "juryFee": 45,
     "juryFeeLabel": "Jury Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14681",
-    "officialUrl": null,
+    "officialUrl": "https://artisphere.org/applications/",
     "boothFee": null,
-    "boothFeeNote": null,
+    "boothFeeNote": "12'x12' booths; doubles available",
     "commissionPct": null,
-    "boothCount": null,
-    "attendance": null,
+    "boothCount": 140,
+    "attendance": 80000,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Downtown Greenville",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -2018,27 +2018,71 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14681"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "basis": "23rd annual, 7-9 May 2027",
+     "checked": "2026-09-05",
+     "source": "https://www.wheretheshowsare.com/email/artisphere/",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.wheretheshowsare.com/email/artisphere/",
+     "status": "corroborated"
     },
     "applyBy": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artisphere.org/applications/",
+     "status": "search"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artisphere.org/applications/",
+     "status": "search"
+    },
+    "attendance": {
+     "checked": "2026-09-05",
+     "source": "https://www.visitgreenvillesc.com/events/signature-events/artisphere/",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "140 juried visual artists on Artist Row",
+     "checked": "2026-09-05",
+     "source": "https://artisphere.org/",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://artisphere.org/applications/",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://artisphere.org/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "140 places, national reputation, heavily oversubscribed",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "12x12 booths are unusually generous and materially easier for sculpture, glass and large 2D than the standard 10x10",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://artisphere.org/applications/",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://artisphere.org/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Greenville, SC. Repeatedly cited as a top-selling fine art fair with an unusually art-literate audience for its market size.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "The 12'x12' booth is the detail worth acting on: two extra feet each way changes what a sculptor or glass artist can physically show.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14885",
@@ -4323,8 +4367,8 @@
     "qualifiedTraffic": 7,
     "costEfficiency": 6,
     "lowCompetition": 6,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 5
    },
    "byDiscipline": {
     "painting": {
@@ -4349,10 +4393,10 @@
     "applyBy": "2026-09-12",
     "deadlineNote": null,
     "notifyDate": null,
-    "juryFee": 40.0,
+    "juryFee": 40,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14654",
-    "officialUrl": null,
+    "officialUrl": "https://artsbonita.org/artfest-application-info/",
     "boothFee": null,
     "boothFeeNote": null,
     "commissionPct": null,
@@ -4363,8 +4407,8 @@
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Riverside Park",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -4406,27 +4450,54 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14654"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "corroborated"
     },
     "applyBy": {
      "status": "verified",
      "basis": "ZAPPlication export"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "basis": "up to 4 applications per artist across the three editions",
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "three editions a season widens the chance of a place relative to a single-weekend show of the same standing",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "flat riverside municipal park, straightforward load-in",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Three separate shows in peak SW Florida season. Strong per-artist numbers for original 2D/3D at real prices.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Show 1 of three. Applying to all three is the normal play; the jury treats them as separate events.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14655",
@@ -4443,8 +4514,8 @@
     "qualifiedTraffic": 7,
     "costEfficiency": 6,
     "lowCompetition": 6,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 5
    },
    "byDiscipline": {
     "painting": {
@@ -4469,10 +4540,10 @@
     "applyBy": "2026-09-30",
     "deadlineNote": null,
     "notifyDate": null,
-    "juryFee": 40.0,
+    "juryFee": 40,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14655",
-    "officialUrl": null,
+    "officialUrl": "https://artsbonita.org/artfest-application-info/",
     "boothFee": null,
     "boothFeeNote": null,
     "commissionPct": null,
@@ -4483,8 +4554,8 @@
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Riverside Park",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -4526,27 +4597,53 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14655"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "corroborated"
     },
     "applyBy": {
      "status": "verified",
      "basis": "ZAPPlication export"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "three editions a season widens the chance of a place",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "flat riverside municipal park, straightforward load-in",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Three separate shows in peak SW Florida season. Strong per-artist numbers for original 2D/3D at real prices.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Show 2 of three. February is the strongest of the three weekends for season traffic.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14656",
@@ -4563,8 +4660,8 @@
     "qualifiedTraffic": 7,
     "costEfficiency": 6,
     "lowCompetition": 6,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 5
    },
    "byDiscipline": {
     "painting": {
@@ -4589,10 +4686,10 @@
     "applyBy": "2026-10-31",
     "deadlineNote": null,
     "notifyDate": "2026-11-23",
-    "juryFee": 40.0,
+    "juryFee": 40,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14656",
-    "officialUrl": null,
+    "officialUrl": "https://artsbonita.org/artfest-application-info/",
     "boothFee": null,
     "boothFeeNote": null,
     "commissionPct": null,
@@ -4603,8 +4700,8 @@
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Riverside Park",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -4646,27 +4743,53 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14656"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "corroborated"
     },
     "applyBy": {
      "status": "verified",
      "basis": "ZAPPlication export"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "three editions a season widens the chance of a place",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "flat riverside municipal park, straightforward load-in",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://artsbonita.org/artfest-application-info/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Three separate shows in peak SW Florida season. Strong per-artist numbers for original 2D/3D at real prices.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Show 3 of three. Latest in the season, so competing against the tail of the snowbird calendar.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "fit-boston-mills-artfest",
@@ -6115,8 +6238,8 @@
     "qualifiedTraffic": 9,
     "costEfficiency": 5,
     "lowCompetition": 4,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 6,
+    "juryOdds": 3
    },
    "byDiscipline": {
     "painting": {
@@ -6138,15 +6261,15 @@
    "facts": {
     "startDate": "2027-07-02",
     "endDate": "2027-07-04",
-    "applyBy": "2026-11-30",
+    "applyBy": "2026-12-01",
     "deadlineNote": null,
     "notifyDate": null,
     "juryFee": 45,
     "juryFeeLabel": "Application Fee (estimated)",
     "applicationUrl": null,
-    "officialUrl": null,
-    "boothFee": null,
-    "boothFeeNote": null,
+    "officialUrl": "https://cherryarts.org/events/cherry-creek-arts-festival/apply/artist-application/",
+    "boothFee": 900,
+    "boothFeeNote": "$900 row, $1,100 corner, $2,300 double, $350 emerging-artist programme",
     "commissionPct": null,
     "boothCount": null,
     "attendance": null,
@@ -6202,19 +6325,44 @@
      "basis": "inferred from the show's usual calendar slot"
     },
     "applyBy": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "basis": "2027 visual-artist application window stated as 1 Oct - 1 Dec 2026",
+     "checked": "2026-09-05",
+     "source": "https://cherryarts.org/events/cherry-creek-arts-festival/apply/artist-application/",
+     "status": "search"
     },
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://cherryarts.org/events/cherry-creek-arts-festival/apply/artist-application/",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://cherryarts.org/events/cherry-creek-arts-festival/apply/artist-application/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "among the hardest juries in the country relative to places available",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "urban street closure; staged load-in windows and no all-day vehicle access",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://cherryarts.org/events/cherry-creek-arts-festival/apply/artist-application/",
+     "status": "search"
     }
    },
    "confidence": "High",
    "datesEstimated": true,
-   "editorialNote": "The biggest summer date on the circuit and one of the very few that combines Denver collector money with a gate in the hundreds of thousands. Expensive to do and hard to jury into. If you get one summer show, this is the one to fight for.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "2027 dates not published at time of research. An emerging-artist booth at $350 against a $900 row booth is unusual and worth knowing if you are early in the circuit.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14785",
@@ -13035,8 +13183,8 @@
     "qualifiedTraffic": 8,
     "costEfficiency": 4,
     "lowCompetition": 5,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -13061,22 +13209,22 @@
     "applyBy": "2026-10-01",
     "deadlineNote": null,
     "notifyDate": "2026-11-21",
-    "juryFee": 50.0,
+    "juryFee": 50,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14569",
-    "officialUrl": null,
-    "boothFee": null,
-    "boothFeeNote": null,
+    "officialUrl": "https://www.laquintaartcelebration.org/artist-applications",
+    "boothFee": 400,
+    "boothFeeNote": "$400-$1,200 depending on space and placement",
     "commissionPct": null,
-    "boothCount": null,
-    "attendance": null,
+    "boothCount": 220,
+    "attendance": 15000,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "La Quinta Civic Center Campus",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -13118,27 +13266,78 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14569"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "basis": "listed as starting 2027-03-04 and running four days",
+     "checked": "2026-09-05",
+     "source": "https://sunshineartist.com/events/ky7g/la-quinta-art-celebration-spring",
+     "status": "search"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "basis": "inferred from the four-day run length",
+     "checked": "2026-09-05",
+     "source": "https://sunshineartist.com/events/ky7g/la-quinta-art-celebration-spring",
+     "status": "search"
     },
     "applyBy": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.laquintaartcelebration.org/artist-applications",
+     "status": "search"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.laquintaartcelebration.org/artist-applications",
+     "status": "corroborated"
+    },
+    "attendance": {
+     "basis": "15,000 against a paid $25 gate",
+     "checked": "2026-09-05",
+     "source": "https://artfairsourcebook.com/art-fairs/79892/la-quinta-art-celebration-spring-la-quinta-ca",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "220 juried artists; the 2026 spring edition ran 200",
+     "checked": "2026-09-05",
+     "source": "https://www.laquintaartcelebration.org/",
+     "status": "search"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://www.laquintaartcelebration.org/artist-applications",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://www.laquintaartcelebration.org/artist-applications",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.laquintaartcelebration.org/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "220 places against the strongest applicant pool on the winter circuit",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "flat civic-centre campus on desert hardstand, drive-in load-in; easy by circuit standards",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.laquintaartcelebration.org/artist-applications",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.laquintaartcelebration.org/",
+     "status": "search"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Widely regarded as the strongest US outdoor fair for expensive originals. Desert-season second-home collectors, ticketed gate, buyers who arrive intending to buy wall-sized work.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "A $25 paid gate is the single most useful fact here: it filters the crowd down to people who decided in advance to spend money on art. Highest price tolerance on the circuit.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14876",
@@ -14715,8 +14914,8 @@
     "qualifiedTraffic": 6,
     "costEfficiency": 6,
     "lowCompetition": 7,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 8,
+    "juryOdds": 3
    },
    "byDiscipline": {
     "painting": {
@@ -14744,19 +14943,19 @@
     "juryFee": 45,
     "juryFeeLabel": "Application Fee (estimated)",
     "applicationUrl": null,
-    "officialUrl": null,
+    "officialUrl": "https://www.longspark.org/art-festival",
     "boothFee": null,
     "boothFeeNote": null,
     "commissionPct": null,
-    "boothCount": null,
+    "boothCount": 200,
     "attendance": null,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Long's Park",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -14808,13 +15007,42 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "boothCount": {
+     "basis": "200 artists across 25 categories",
+     "checked": "2026-09-05",
+     "source": "https://www.longspark.org/art-festival",
+     "status": "corroborated"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.discoverlancaster.com/events/longs-park-labor-day-art-festival/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "200 places across 25 categories, competitive national pool",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "open parkland with drive-up access; among the easiest load-ins of any top-tier show",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.longspark.org/art-festival",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.longspark.org/art-festival",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": true,
-   "editorialNote": "Deliberately small and deliberately expensive \u2014 around 200 artists, no craft filler, and a buyer base that has been trained for decades to spend. One of the best structural fits on this list for $2-10k work.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Runs Friday to Sunday of Labor Day weekend; the foundation posts specifics in the spring, so 2027 dates remain the usual slot rather than a published calendar. No craft filler and a buyer base trained for decades to spend.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14661",
@@ -17343,8 +17571,8 @@
     "qualifiedTraffic": 7,
     "costEfficiency": 5,
     "lowCompetition": 5,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -17369,24 +17597,31 @@
     "applyBy": "2026-10-05",
     "deadlineNote": null,
     "notifyDate": "2026-10-21",
-    "juryFee": 40.0,
+    "juryFee": 40,
     "juryFeeLabel": "Application & Jury Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14705",
-    "officialUrl": null,
-    "boothFee": null,
+    "officialUrl": "https://www.naplesart.org/national-art-fair",
+    "boothFee": 650,
     "boothFeeNote": null,
     "commissionPct": null,
     "boothCount": null,
     "attendance": null,
     "acceptanceRatePct": null,
-    "mediaCategories": null,
+    "mediaCategories": [
+     "painting",
+     "works_on_paper",
+     "ceramics",
+     "sculpture",
+     "wood"
+    ],
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Cambier Park",
+    "indoorOutdoor": "outdoor",
     "lat": null,
-    "lng": null
+    "lng": null,
+    "mediaCategoriesComplete": false
    },
    "provenance": {
     "buyerWealth": {
@@ -17426,27 +17661,69 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14705"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.naplesart.org/national-art-fair",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.naplesart.org/national-art-fair",
+     "status": "corroborated"
     },
     "applyBy": {
      "status": "verified",
      "basis": "ZAPPlication export"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.naplesart.org/national-art-fair",
+     "status": "search"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://www.naplesart.org/national-art-fair",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.naplesart.org/national-art-fair",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "long-running national fair with a deep applicant pool",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "flat municipal park, established load-in",
+     "status": "editorial"
+    },
+    "mediaCategories": {
+     "basis": "17 categories advertised; only five mapped to fine-art disciplines from the sources seen, so the list is explicitly incomplete and does not gate",
+     "checked": "2026-09-05",
+     "source": "https://www.naplesart.org/national-art-fair",
+     "status": "search"
+    },
+    "mediaCategoriesComplete": {
+     "checked": "2026-09-05",
+     "source": "https://www.naplesart.org/national-art-fair",
+     "status": "search"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.naplesart.org/national-art-fair",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.naplesart.org/national-art-fair",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Naples Art Institute's flagship. One of the deepest collector bases in the country and a jury that keeps the field genuinely fine-art.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Described by the organisers as a fine art AND craft show across 17 categories including jewellery. Strong Naples money, but the field is broader than the name suggests.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14704",
@@ -18179,8 +18456,8 @@
     "qualifiedTraffic": 7,
     "costEfficiency": 6,
     "lowCompetition": 5,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 4,
+    "juryOdds": 3
    },
    "byDiscipline": {
     "painting": {
@@ -18205,22 +18482,22 @@
     "applyBy": "2027-02-26",
     "deadlineNote": null,
     "notifyDate": null,
-    "juryFee": 50,
+    "juryFee": 45,
     "juryFeeLabel": "Application Fee (estimated)",
     "applicationUrl": null,
-    "officialUrl": null,
-    "boothFee": null,
+    "officialUrl": "https://www.oldtownartfair.org/artists/",
+    "boothFee": 775,
     "boothFeeNote": null,
     "commissionPct": null,
-    "boothCount": null,
-    "attendance": null,
+    "boothCount": 200,
+    "attendance": 35000,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
-    "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "vehicleAccessToBooth": false,
+    "venue": "Old Town Triangle Historic District",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -18258,27 +18535,76 @@
      "basis": "authored as a 2D/mixed-media field estimate; approximate for three-dimensional media until member data replaces it"
     },
     "startDate": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "checked": "2026-09-05",
+     "source": "https://www.oldtownartfair.org/",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "checked": "2026-09-05",
+     "source": "https://www.oldtownartfair.org/",
+     "status": "corroborated"
     },
     "applyBy": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
     },
     "juryFee": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "basis": "reported from a prior year; 2027 figures not yet posted",
+     "checked": "2026-09-05",
+     "source": "https://www.artshowreviews.com/reviews/chicago-old-town-art-fair-reviews",
+     "status": "search"
+    },
+    "attendance": {
+     "basis": "estimated 35,000",
+     "checked": "2026-09-05",
+     "source": "https://www.oldtownartfair.org/",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "200+ nationally acclaimed artists",
+     "checked": "2026-09-05",
+     "source": "https://www.oldtownartfair.org/",
+     "status": "search"
+    },
+    "boothFee": {
+     "basis": "reported from a prior year; 2027 figures not yet posted",
+     "checked": "2026-09-05",
+     "source": "https://www.artshowreviews.com/reviews/chicago-old-town-art-fair-reviews",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.oldtownartfair.org/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "200 places, long-established national standing",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "tight historic-district streets, restricted vehicle access, difficult for heavy or fragile work",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.oldtownartfair.org/artists/",
+     "status": "search"
+    },
+    "vehicleAccessToBooth": {
+     "basis": "narrow residential streets in a historic district; load-in is staged and hand-carry is normal",
+     "status": "editorial"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.oldtownartfair.org/getting-here/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
-   "datesEstimated": true,
-   "editorialNote": "Lincoln Park. Tight jury, wealthy neighbourhood, buyers walking home to big walls. One of the strongest urban fairs in the country for original work at your prices.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "datesEstimated": false,
+   "editorialNote": "Applications post to ZAPPlication in mid-August 2026. A 35,000 gate against 200 artists is a low crowd-to-booth ratio by top-tier standards, and the neighbourhood money is the reason the show works anyway.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14823",
@@ -19731,8 +20057,8 @@
     "qualifiedTraffic": 8,
     "costEfficiency": 4,
     "lowCompetition": 5,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 3,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -19758,21 +20084,21 @@
     "deadlineNote": null,
     "notifyDate": null,
     "juryFee": 50,
-    "juryFeeLabel": "Application Fee (estimated)",
+    "juryFeeLabel": "$50 per media category applied to",
     "applicationUrl": null,
-    "officialUrl": null,
-    "boothFee": null,
-    "boothFeeNote": null,
+    "officialUrl": "https://kimballartsfestival.org/just-for-artists/",
+    "boothFee": 890,
+    "boothFeeNote": "$890-$2,400 by booth type and placement",
     "commissionPct": null,
-    "boothCount": null,
-    "attendance": null,
+    "boothCount": 200,
+    "attendance": 50000,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
-    "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "vehicleAccessToBooth": false,
+    "venue": "Historic Main Street",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -19822,15 +20148,71 @@
      "basis": "inferred from the show's usual calendar slot"
     },
     "juryFee": {
-     "status": "estimated",
-     "basis": "inferred from the show's usual calendar slot"
+     "checked": "2026-09-05",
+     "source": "https://kimballartsfestival.org/just-for-artists/",
+     "status": "search"
+    },
+    "attendance": {
+     "basis": "50,000+ claimed",
+     "checked": "2026-09-05",
+     "source": "https://www.visitparkcity.com/blog/stories/post/kimball-arts-festival/",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "nearly 200 artists",
+     "checked": "2026-09-05",
+     "source": "https://kimballartsfestival.org/",
+     "status": "search"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://kimballartsfestival.org/just-for-artists/",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://kimballartsfestival.org/just-for-artists/",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://kimballartsfestival.org/festival-details/",
+     "status": "search"
+    },
+    "juryFeeLabel": {
+     "basis": "charged per category; up to 13 applications, once per category",
+     "checked": "2026-09-05",
+     "source": "https://kimballartsfestival.org/just-for-artists/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "~200 places, national pool, per-category jury",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "the hardest load-in of any top-twenty show: steep grade, narrow street, tight staging windows, 7,000ft altitude",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://kimballartsfestival.org/just-for-artists/",
+     "status": "search"
+    },
+    "vehicleAccessToBooth": {
+     "basis": "Historic Main Street is a steep closed urban street with staged load-in; no standing vehicle access",
+     "status": "editorial"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://kimballartsfestival.org/festival-details/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": true,
-   "editorialNote": "Peak-season second-home wealth, ticketed gate, Main Street setting. Consistently near the top of fine-art sales rankings. Booth and lodging costs are brutal, so it needs a real day to pay off.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Applications open each November and close in February, notifications in April; 2027 specifics not yet posted. The per-category application fee means a multi-category artist pays $50 each time. Main Street's grade is a genuine cost for heavy or fragile work.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-13866",
@@ -21763,8 +22145,8 @@
     "qualifiedTraffic": 8,
     "costEfficiency": 6,
     "lowCompetition": 5,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 6,
+    "juryOdds": 2
    },
    "byDiscipline": {
     "painting": {
@@ -21792,19 +22174,19 @@
     "juryFee": 50,
     "juryFeeLabel": "Application Fee (estimated)",
     "applicationUrl": null,
-    "officialUrl": null,
+    "officialUrl": "https://saintlouisartfair.org/saint-louis-art-fair/artists-application.html",
     "boothFee": null,
     "boothFeeNote": null,
     "commissionPct": null,
-    "boothCount": null,
-    "attendance": null,
-    "acceptanceRatePct": null,
+    "boothCount": 145,
+    "attendance": 130000,
+    "acceptanceRatePct": 14,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Downtown Clayton",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -21856,13 +22238,56 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "acceptanceRatePct": {
+     "basis": "145 places from a jury pool of roughly 1,000+ applicants in the most recent year with published figures (2023); ~14%",
+     "checked": "2026-09-05",
+     "source": "https://saintlouisartfair.org/saint-louis-art-fair/artists-application.html",
+     "status": "search"
+    },
+    "attendance": {
+     "basis": "over 130,000 across three days",
+     "checked": "2026-09-05",
+     "source": "https://stlouisarts.org/place/saint-louis-art-fair/",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "145 selected plus a wait list",
+     "checked": "2026-09-05",
+     "source": "https://saintlouisartfair.org/saint-louis-art-fair/artists-application.html",
+     "status": "corroborated"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://stlouisarts.org/place/saint-louis-art-fair/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "derived from a ~14% acceptance rate \u2014 one of the hardest juries in the country",
+     "checked": "2026-09-05",
+     "source": "https://saintlouisartfair.org/saint-louis-art-fair/artists-application.html",
+     "status": "search"
+    },
+    "logistics": {
+     "basis": "downtown street closure with staged load-in windows",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://saintlouisartfair.org/saint-louis-art-fair/artists-application.html",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.yahoo.com/news/articles/st-louis-art-fair-returns-210026268.html",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": true,
-   "editorialNote": "Widely considered the best-run fair in the Midwest. Heavily juried, well funded, and a Clayton audience that buys seriously.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "The only show in the top ten with a published acceptance rate: roughly 145 places against a thousand-plus applicants. Budget the jury fee as a real cost, not a formality.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "fit-salt-fork-arts-and-crafts-festival",
@@ -27735,8 +28160,8 @@
     "qualifiedTraffic": 9,
     "costEfficiency": 6,
     "lowCompetition": 3,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 7,
+    "juryOdds": 3
    },
    "byDiscipline": {
     "painting": {
@@ -27761,22 +28186,22 @@
     "applyBy": "2026-09-23",
     "deadlineNote": null,
     "notifyDate": "2026-11-03",
-    "juryFee": 45.0,
+    "juryFee": 45,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14678",
-    "officialUrl": null,
-    "boothFee": null,
-    "boothFeeNote": null,
+    "officialUrl": "https://www.wpsaf.org/info-for-artists/general-information/",
+    "boothFee": 575,
+    "boothFeeNote": "includes $37.38 Florida sales tax at 6.5%",
     "commissionPct": null,
-    "boothCount": null,
-    "attendance": null,
+    "boothCount": 221,
+    "attendance": 250000,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "Central Park and Park Avenue",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -27818,27 +28243,75 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14678"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/info-for-artists/dates-and-deadlines/",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/info-for-artists/dates-and-deadlines/",
+     "status": "corroborated"
     },
     "applyBy": {
      "status": "verified",
      "basis": "ZAPPlication export"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/info-for-artists/artist-application/",
+     "status": "search"
+    },
+    "attendance": {
+     "basis": "over 250,000 claimed across three days",
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/about/about-the-festival/",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "218 artists plus 3 emerging artists",
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/info-for-artists/general-information/",
+     "status": "search"
+    },
+    "boothFee": {
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/info-for-artists/general-information/",
+     "status": "search"
+    },
+    "boothFeeNote": {
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/info-for-artists/general-information/",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/about/festival-maps/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "221 places against one of the largest applicant pools in the country",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "flat park and avenue layout, long-established load-in",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/info-for-artists/general-information/",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.wpsaf.org/about/festival-maps/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Enormous prestige and enormous crowds. Sells extremely well overall, but volume skews to mid-price; expect competition from a very deep 2D field.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "A quarter of a million people against a $575 booth. This is the clearest volume show in the top twenty: switch to a lower price band and it climbs to the top of the list, which is exactly what the band axis is for.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14825",
@@ -27855,8 +28328,8 @@
     "qualifiedTraffic": 8,
     "costEfficiency": 6,
     "lowCompetition": 6,
-    "logistics": null,
-    "juryOdds": null
+    "logistics": 6,
+    "juryOdds": 4
    },
    "byDiscipline": {
     "painting": {
@@ -27881,22 +28354,22 @@
     "applyBy": "2026-10-12",
     "deadlineNote": null,
     "notifyDate": "2026-11-23",
-    "juryFee": 40.0,
+    "juryFee": 40,
     "juryFeeLabel": "Jury fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14825",
-    "officialUrl": null,
+    "officialUrl": "https://www.thewoodlandsartscouncil.org/p/festival",
     "boothFee": null,
     "boothFeeNote": null,
     "commissionPct": null,
-    "boothCount": null,
+    "boothCount": 200,
     "attendance": null,
     "acceptanceRatePct": null,
     "mediaCategories": null,
     "editionedWorkAllowed": null,
     "powerAvailable": null,
     "vehicleAccessToBooth": null,
-    "venue": null,
-    "indoorOutdoor": null,
+    "venue": "The Woodlands Waterway",
+    "indoorOutdoor": "outdoor",
     "lat": null,
     "lng": null
    },
@@ -27938,27 +28411,60 @@
      "source": "https://www.zapplication.org/event-info.php?ID=14825"
     },
     "startDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://hellowoodlands.com/the-woodlands-waterway-arts-festival-announces-dates-for-2027-show/",
+     "status": "corroborated"
     },
     "endDate": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "checked": "2026-09-05",
+     "source": "https://hellowoodlands.com/the-woodlands-waterway-arts-festival-announces-dates-for-2027-show/",
+     "status": "corroborated"
     },
     "applyBy": {
      "status": "verified",
      "basis": "ZAPPlication export"
     },
     "juryFee": {
-     "status": "verified",
-     "basis": "ZAPPlication export"
+     "basis": "up to 2 applications per artist",
+     "checked": "2026-09-05",
+     "source": "https://www.woodlandsonline.com/npps/story.cfm?nppage=84528",
+     "status": "search"
+    },
+    "boothCount": {
+     "basis": "200 juried fine artists",
+     "checked": "2026-09-05",
+     "source": "https://www.thewoodlandsartscouncil.org/p/festival",
+     "status": "search"
+    },
+    "indoorOutdoor": {
+     "checked": "2026-09-05",
+     "source": "https://www.visitthewoodlands.com/events/art-events/waterway-arts-festival/",
+     "status": "search"
+    },
+    "juryOdds": {
+     "basis": "200 places; Best of Show winners are jury-exempt for two years, which removes some places from open competition",
+     "status": "editorial"
+    },
+    "logistics": {
+     "basis": "waterway promenade; mixed vehicle access by booth position",
+     "status": "editorial"
+    },
+    "officialUrl": {
+     "checked": "2026-09-05",
+     "source": "https://www.thewoodlandsartscouncil.org/p/festival",
+     "status": "search"
+    },
+    "venue": {
+     "checked": "2026-09-05",
+     "source": "https://www.visitthewoodlands.com/events/art-events/waterway-arts-festival/",
+     "status": "corroborated"
     }
    },
    "confidence": "High",
    "datesEstimated": false,
-   "editorialNote": "Affluent north-Houston suburb, high average sales per fine-art exhibitor, buyers with big new walls to fill.",
-   "researchStatus": "none",
-   "researchedAt": null
+   "editorialNote": "Best of Show wins a free booth the following year plus two years jury-exempt. Worth knowing that a slice of the field each year is invited rather than juried.",
+   "researchStatus": "deep",
+   "researchedAt": "2026-09-05"
   },
   {
    "id": "zapp-14003",

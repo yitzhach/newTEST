@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="intel.css">
 </head>
 <body>
 <header class="app-header">
@@ -29,9 +30,16 @@
         <path d="M16.5 11.8A6.9 6.9 0 0 1 8.2 3.5a6.9 6.9 0 1 0 8.3 8.3z"/>
       </svg>
     </button>
+    <button class="btn btn-quiet" id="btnNetwork" type="button">Network</button>
     <a class="btn btn-primary" href="index.html">&larr; Show Ledger</a>
   </div>
 </header>
+
+<!-- ==========================================================================
+     ARTIST PROFILE — what you make, what it sells for, what you want this
+     season. Everything below re-ranks from these three controls.
+     ========================================================================== -->
+<div class="profilebar" id="profileBar"></div>
 
 <div class="browse">
   <!-- ==========================================================================
@@ -48,6 +56,8 @@
         <button class="chip" type="button" data-quick="all" aria-pressed="true">All</button>
         <button class="chip" type="button" data-quick="liked" aria-pressed="false">Liked</button>
         <button class="chip" type="button" data-quick="added" aria-pressed="false">In ledger</button>
+        <button class="chip" type="button" data-quick="reported" aria-pressed="false"
+                title="Shows the network has reported on">Reported</button>
       </div>
     </div>
 
@@ -56,12 +66,15 @@
         <span>Deadline still open</span></label>
       <label class="cbx"><input type="checkbox" id="fHideAdded">
         <span>Hide what's already in the ledger</span></label>
+      <label class="cbx"><input type="checkbox" id="fHideBlocked">
+        <span>Hide shows that don't jury my medium</span></label>
     </div>
 
     <div class="f-block">
       <label class="label" for="fSort">Sort</label>
       <div class="sort-row">
         <select class="control" id="fSort">
+          <option value="fit">Fit for me</option>
           <option value="date">Event date</option>
           <option value="deadline">Application deadline</option>
           <option value="name">Name (A&ndash;Z)</option>
@@ -104,13 +117,14 @@
     </div>
     <!-- Clickable column headings. Same sort state as the rail's menu — one
          sort, two ways to reach it. -->
-    <div class="rowhead" id="rowHead" hidden role="row">
+    <div class="rowhead with-fit" id="rowHead" hidden role="row">
       <button type="button" data-sort="name">Show</button>
       <button type="button" data-sort="place">Where</button>
       <button type="button" data-sort="date">Dates</button>
       <button type="button" data-sort="deadline">Deadline</button>
       <button type="button" data-sort="fee">Fee</button>
       <button type="button" data-sort="rating">Rating</button>
+      <button type="button" data-sort="fit">Fit</button>
       <span></span>
     </div>
     <div id="cards" class="cards"></div>
@@ -170,6 +184,10 @@
 </div>
 
 <script src="core.js"></script>
+<script src="fit.js"></script>
+<script src="intel.js"></script>
+<script src="members.js"></script>
+<script src="intel-ui.js"></script>
 <script src="catalogue.js"></script>
 <script src="store-supabase.js"></script>
 <script src="import.js"></script>
@@ -183,7 +201,74 @@
 const { Store, Settings, Theme, esc, fmtRange, fmtDay, daysUntil, fmtCountdown,
         starsSVG, ratingText, clampRating } = window.AST;
 const C = window.ASTCatalogue;
+const FIT = window.ASTFit;
+const INTEL = window.ASTIntel;
+const MEMBERS = window.ASTMembers;
+const UI = window.ASTIntelUI;
 const $ = sel => document.querySelector(sel);
+
+/* Fit records, by show id. Loaded once alongside the catalogue; the scores
+   themselves are recomputed on every profile change, because a sculptor and a
+   printmaker are looking at genuinely different rankings of the same list. */
+const fit = { byId: {}, meta: null };
+
+async function loadFit() {
+  try {
+    const res = await fetch('fit-data.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    (data.shows || []).forEach(s => { fit.byId[s.id] = s; });
+    fit.meta = data;
+    return true;
+  } catch (e) {
+    /* The catalogue still works without it — you lose the ranking, not the
+       list. Say so rather than rendering a page full of dashes. */
+    console.warn('fit-data.json did not load:', e);
+    return false;
+  }
+}
+
+/* Attach a score to every row for the current profile. Member consensus, where
+   there is enough of it, replaces the editorial estimate before scoring. */
+function rescore() {
+  const profile = INTEL.getProfile();
+  state.profile = profile;
+  state.rows.forEach(r => {
+    const rec = fit.byId[r.id];
+    if (!rec) { r.fit = null; r.fitDetail = null; r.gates = []; r.blocked = false; return; }
+    const reports = state.reportsByShow[r.id] || [];
+    const cons = INTEL.consensus(reports, profile.discipline);
+    const scored = FIT.scoreShow(rec, profile, {
+      memberConsensus: cons.ready ? cons.factors : null
+    });
+    r.fit = scored.fit;
+    r.fitDetail = scored;
+    r.gates = FIT.gates(rec, profile);
+    r.blocked = r.gates.some(g => g.level === 'blocking');
+    r.reportCount = reports.filter(x => x.visibility !== 'private').length;
+  });
+}
+
+/* Register fit as a first-class sort key. Blocked shows sink regardless of
+   direction — reversing the order should not promote a show that will not
+   jury your medium to the top of the page. */
+C.SORTS.fit = (a, b) => {
+  if (a.blocked !== b.blocked) return a.blocked ? 1 : -1;
+  if (a.fit == null && b.fit == null) return 0;
+  if (a.fit == null) return 1;
+  if (b.fit == null) return -1;
+  return a.fit - b.fit;
+};
+C.SORT_DEFAULT_DIR.fit = 'desc';
+
+function fitChip(r) {
+  if (r.fit == null) return '<span class="fitchip sc-none" title="Not scored yet">—</span>';
+  const title = 'Fit for ' + FIT.DISCIPLINE_BY_KEY[state.profile.discipline].label.toLowerCase() +
+    ' — scored on ' + Math.round(r.fitDetail.coverage * 100) + '% of your weighting' +
+    (r.blocked ? '. This show does not jury your medium.' : '');
+  return '<span class="fitchip ' + UI.scoreClass(r.fit) + '" title="' + esc(title) + '">' +
+    r.fit.toFixed(1) + '</span>';
+}
 
 const state = {
   rows: [],
@@ -191,7 +276,9 @@ const state = {
   q: { text:'', states:[], liked:false, added:null, deadline:'open', maxFee:null,
        sort:'date', dir:'asc' },
   quick: 'all',
-  view: 'cards'
+  view: 'cards',
+  profile: null,
+  reportsByShow: {}
 };
 
 /* ---- Toast --------------------------------------------------------------- */
@@ -227,9 +314,11 @@ function deadlineBits(r) {
 function cardHtml(r) {
   const dl = deadlineBits(r);
   const fee = r.fee == null ? '' : '$' + (Number.isInteger(r.fee) ? r.fee : r.fee.toFixed(2));
-  return '<article class="card' + (r.addedShowId ? ' is-added' : '') + '" data-id="' + esc(r.id) + '">' +
+  return '<article class="card' + (r.addedShowId ? ' is-added' : '') +
+    (r.blocked ? ' is-blocked' : '') + '" data-id="' + esc(r.id) + '">' +
     '<div class="card-top">' +
       '<h3 class="card-name">' + esc(r.name) + '</h3>' +
+      fitChip(r) +
       '<button type="button" class="card-like" data-like="' + esc(r.id) + '" ' +
         'aria-pressed="' + (r.liked ? 'true' : 'false') + '" ' +
         'style="--fill:' + (r.liked ? 'currentColor' : 'none') + '" ' +
@@ -241,6 +330,12 @@ function cardHtml(r) {
     '<p class="' + dl.cls + '">' + esc(dl.text) +
       (r.deadlineNote ? ' <span class="muted-inline">' + esc(r.deadlineNote) + '</span>' : '') + '</p>' +
     (fee ? '<p class="meta">' + esc(fee + (r.feeLabel ? ' · ' + r.feeLabel : '')) + '</p>' : '') +
+    '<p class="card-intel">' +
+      (r.reportCount
+        ? '<span class="intel-dot"></span>' + r.reportCount + ' member report' + (r.reportCount === 1 ? '' : 's')
+        : '<span class="muted-inline">no reports yet</span>') +
+      '<button type="button" class="btn-mini btn-detail" data-detail="' + esc(r.id) + '">Detail</button>' +
+    '</p>' +
     '<div class="card-foot">' +
       '<span class="card-stars" data-rate="' + esc(r.id) + '" role="slider" tabindex="0" ' +
         'aria-label="Rating for ' + esc(r.name) + '" aria-valuemin="0" aria-valuemax="10" ' +
@@ -264,7 +359,8 @@ function cardHtml(r) {
 function rowHtml(r) {
   const dl = deadlineBits(r);
   const fee = r.fee == null ? '—' : '$' + (Number.isInteger(r.fee) ? r.fee : r.fee.toFixed(2));
-  return '<div class="crow' + (r.addedShowId ? ' is-added' : '') + '" data-id="' + esc(r.id) + '">' +
+  return '<div class="crow with-fit' + (r.addedShowId ? ' is-added' : '') +
+    (r.blocked ? ' is-blocked' : '') + '" data-id="' + esc(r.id) + '">' +
     '<span class="c-name">' +
       '<button type="button" class="card-like" data-like="' + esc(r.id) + '" ' +
         'aria-pressed="' + (r.liked ? 'true' : 'false') + '" ' +
@@ -286,6 +382,9 @@ function rowHtml(r) {
       'title="' + ratingText(r.rating) + '" ' +
       'style="color:' + (r.rating ? 'var(--ink)' : 'var(--muted)') + '">' +
       starsSVG(r.rating, 13) + '</span>' +
+    '<span class="c-fit">' + fitChip(r) +
+      '<button type="button" class="btn-mini btn-detail" data-detail="' + esc(r.id) +
+      '" title="Open the full breakdown">&#8250;</button></span>' +
     '<span class="c-act">' + (r.addedShowId
       ? '<span class="added-tag" title="Already in your ledger">In ledger</span>'
       : '<button type="button" class="btn-mini add" data-add="' + esc(r.id) + '">Add</button>') +
@@ -298,7 +397,10 @@ function visible() {
   if (state.quick === 'liked') q.liked = true;
   if (state.quick === 'added') q.added = 'only';
   else if ($('#fHideAdded').checked) q.added = 'hide';
-  return C.query(state.rows, q);
+  let rows = C.query(state.rows, q);
+  if (state.quick === 'reported') rows = rows.filter(r => r.reportCount > 0);
+  if ($('#fHideBlocked').checked) rows = rows.filter(r => !r.blocked);
+  return rows;
 }
 
 function render() {
@@ -342,7 +444,23 @@ async function refresh() {
     if (r.addedShowId && !ids.has(r.addedShowId)) C.markAdded(r.id, '');
   });
   state.rows = C.all();
+  await loadReports();
+  rescore();
   render();
+}
+
+/* Every report in one call, indexed by show, so the list can show a report
+   count per row without 236 round trips. */
+async function loadReports() {
+  try {
+    const all = await INTEL.store.list();
+    const by = {};
+    all.forEach(r => { (by[r.showId] = by[r.showId] || []).push(r); });
+    state.reportsByShow = by;
+  } catch (e) {
+    console.warn('intel did not load:', e);
+    state.reportsByShow = {};
+  }
 }
 
 /* ---- Adding to the ledger ------------------------------------------------ */
@@ -411,9 +529,11 @@ $('#fText').addEventListener('input', e => { state.q.text = e.target.value; rend
    whichever key is chosen. That is what "newest to oldest" is: date, reversed. */
 const DIR_LABEL = {
   asc:  { date:'Oldest first', deadline:'Soonest deadline first', name:'A to Z',
-          place:'City A to Z', rating:'Lowest rated first', fee:'Cheapest first' },
+          place:'City A to Z', rating:'Lowest rated first', fee:'Cheapest first',
+          fit:'Worst fit first' },
   desc: { date:'Newest first', deadline:'Latest deadline first', name:'Z to A',
-          place:'City Z to A', rating:'Highest rated first', fee:'Most expensive first' }
+          place:'City Z to A', rating:'Highest rated first', fee:'Most expensive first',
+          fit:'Best fit first' }
 };
 
 /* One sort state, two ways to reach it: the rail's menu and the column
@@ -487,6 +607,7 @@ $('#fOpen').addEventListener('change', e => {
   state.q.deadline = e.target.checked ? 'open' : null; render();
 });
 $('#fHideAdded').addEventListener('change', render);
+$('#fHideBlocked').addEventListener('change', render);
 $('#fMaxFee').addEventListener('input', e => {
   const v = Number(e.target.value);
   state.q.maxFee = v >= 150 ? null : v;
@@ -509,7 +630,17 @@ $('#fQuick').addEventListener('click', e => {
   render();
 });
 
+$('#cards').addEventListener('click', e => {
+  const btn = e.target.closest('[data-detail]');
+  if (!btn) return;
+  const rec = fit.byId[btn.dataset.detail];
+  if (!rec) { toast('No fit record for that show yet.'); return; }
+  e.stopPropagation();
+  UI.openShow(rec);
+});
+
 $('#cards').addEventListener('click', async e => {
+  if (e.target.closest('[data-detail]')) return;
   const like = e.target.closest('[data-like]');
   if (like) {
     const id = like.dataset.like;
@@ -626,8 +757,24 @@ $('#btnTheme').addEventListener('click', () => {
       'Catalogue of ' + m.count + ' shows' + (m.importedAt ? ', imported ' + m.importedAt : '') +
       '. Liking and rating here changes nothing in your ledger until you add a show across.';
   }
+  const fitOk = await loadFit();
+  if (!fitOk) {
+    $('#catNote').textContent =
+      'fit-data.json did not load, so the ranking is unavailable. The catalogue still works.';
+  }
+  await loadReports();
+
+  /* The profile bar drives everything below it: change the discipline and
+     the whole list re-ranks, because the same show is a different business
+     proposition depending on what you make. */
+  UI.mountProfileBar($('#profileBar'), () => {
+    UI.invalidate();
+    loadReports().then(() => { rescore(); render(); });
+  });
+  $('#btnNetwork').addEventListener('click', () => UI.openNetwork());
+
   const l = Settings.getLayout();
-  if (C.SORTS[l.catalogueSort]) state.q.sort = l.catalogueSort;
+  state.q.sort = C.SORTS[l.catalogueSort] ? l.catalogueSort : 'fit';
   state.q.dir = (l.catalogueDir === 'desc' || l.catalogueDir === 'asc')
     ? l.catalogueDir
     : (C.SORT_DEFAULT_DIR[state.q.sort] || 'asc');

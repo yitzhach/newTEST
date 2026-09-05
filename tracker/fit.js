@@ -344,10 +344,21 @@ window.ASTFit = (function () {
     var out = [];
     var media = show.facts && show.facts.mediaCategories;
 
+    /* A blocking gate is only honest on a COMPLETE category list. Half a list
+       says nothing about what is missing from it, and telling a sculptor a
+       show does not take sculpture — because the research only captured seven
+       of seventeen categories — is worse than saying nothing. So the gate
+       fires on completeness, and a partial list downgrades to a hint. */
     if (Array.isArray(media) && media.length) {
-      if (media.indexOf(p.discipline) === -1) {
+      var listed = media.indexOf(p.discipline) !== -1;
+      var complete = show.facts.mediaCategoriesComplete === true;
+      if (!listed && complete) {
         out.push({ level:'blocking', code:'medium_not_juried',
           text:'This show does not list a category for ' + DISCIPLINE_BY_KEY[p.discipline].label.toLowerCase() + '.' });
+      } else if (!listed) {
+        out.push({ level:'hint', code:'medium_unconfirmed',
+          text:'We have only a partial category list for this show, and ' +
+               DISCIPLINE_BY_KEY[p.discipline].label.toLowerCase() + ' is not among the categories captured. Confirm before applying.' });
       }
     }
     if (show.facts && show.facts.editionedWorkAllowed === false && p.discipline === 'printmaking') {
