@@ -50,7 +50,7 @@
    "notifyDate": "",
    "fee": 50,
    "feeLabel": "Application Fee (estimated)",
-   "url": ""
+   "url": "https://www.theannarborartfair.com/"
   },
   {
    "id": "zapp-13930",
@@ -96,9 +96,9 @@
    "deadlineNote": "",
    "earlyBird": "",
    "notifyDate": "",
-   "fee": 45,
+   "fee": 40,
    "feeLabel": "Application Fee (estimated)",
-   "url": ""
+   "url": "https://armonkoutdoorartshow.org/artists-by-category/for-artists/"
   },
   {
    "id": "fit-art-fair-on-the-square",
@@ -1008,9 +1008,9 @@
    "deadlineNote": "",
    "earlyBird": "",
    "notifyDate": "",
-   "fee": 40,
+   "fee": 45,
    "feeLabel": "Application Fee (estimated)",
-   "url": ""
+   "url": "https://www.crestedbutteartsfestival.com/artist-registration"
   },
   {
    "id": "fit-des-moines-arts-festival",
@@ -1024,9 +1024,9 @@
    "deadlineNote": "",
    "earlyBird": "",
    "notifyDate": "",
-   "fee": 45,
-   "feeLabel": "Application Fee (estimated)",
-   "url": ""
+   "fee": 40,
+   "feeLabel": "$40 early, $55 after the early deadline",
+   "url": "https://www.desmoinesartsfestival.org/forexhibitingartists"
   },
   {
    "id": "zapp-14624",
@@ -1728,9 +1728,9 @@
    "deadlineNote": "",
    "earlyBird": "",
    "notifyDate": "",
-   "fee": 45,
+   "fee": 50,
    "feeLabel": "Application Fee (estimated)",
-   "url": ""
+   "url": "https://krasl.org/art-fair/artist-information/"
   },
   {
    "id": "fit-la-jolla-festival-of-the-arts",
@@ -2770,7 +2770,7 @@
    "notifyDate": "",
    "fee": 45,
    "feeLabel": "Application Fee (estimated)",
-   "url": ""
+   "url": "https://www.plazaartfair.com/"
   },
   {
    "id": "zapp-14660",
@@ -3106,7 +3106,7 @@
    "notifyDate": "",
    "fee": 55,
    "feeLabel": "Application Fee (estimated)",
-   "url": ""
+   "url": "https://www.sausalitoartfestival.org/"
   },
   {
    "id": "zapp-14747",
@@ -3554,7 +3554,7 @@
    "notifyDate": "",
    "fee": 45,
    "feeLabel": "Application Fee (estimated)",
-   "url": ""
+   "url": "https://www.uptownminneapolis.com/uptown-art-fair/art/"
   },
   {
    "id": "fit-vail-arts-festival",

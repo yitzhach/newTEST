@@ -1,4 +1,27 @@
+/* ==========================================================================
+   Browser tests for the members' intel layer.
+
+   Drives the real page in Chromium rather than asserting on functions in
+   isolation: the things worth proving here — that changing discipline re-ranks
+   the list, that an unscored factor says so instead of showing a five, that the
+   tone check catches a rant and lets factual criticism through — only exist
+   once the model, the data and the DOM are all in play.
+
+   .cjs because the repo root is an ES module package and this is plain
+   CommonJS.
+
+   Usage:
+     npm i -D playwright             # once
+     python3 -m http.server 8765     # from the repo root
+     node build/browser-tests.cjs
+   ========================================================================== */
 const { chromium } = require('playwright');
+
+/* This sandbox ships Chromium at a pinned path and blocks the download
+   Playwright would otherwise attempt. Unset PW_CHROMIUM and delete the file at
+   that path and it falls back to Playwright's own resolution. */
+const EXECUTABLE = process.env.PW_CHROMIUM ||
+  '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const BASE = 'http://127.0.0.1:8765/tracker/browse.html';
 
 const results = [];
@@ -8,7 +31,8 @@ function check(name, pass, detail) {
 }
 
 (async () => {
-  const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const browser = await chromium.launch(
+    require('fs').existsSync(EXECUTABLE) ? { executablePath: EXECUTABLE } : {});
   const page = await browser.newPage({ viewport: { width: 1440, height: 950 } });
 
   const errors = [];
