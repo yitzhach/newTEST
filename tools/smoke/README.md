@@ -9,7 +9,7 @@ now served from GitHub Pages at a **subpath** (`/newTEST/tracker/`) over
 **https**, which is a shape it had never run in. These harnesses serve the
 repo at that exact path over real HTTP and drive it in headless Chromium.
 
-## What they cover (205 checks)
+## What they cover (226 checks)
 - `01-pages-and-map.cjs` (15) — `index.html` and `map.html` load with no
   uncaught errors at the subpath, Leaflet initialises, tile URLs are
   well-formed and paint, 9 markers render, the `#stop=6a` deep link selects
@@ -31,11 +31,12 @@ repo at that exact path over real HTTP and drive it in headless Chromium.
   and the exports, survives a reload), and the All shows catalogue (202 cards,
   Zapp links, filters, like, rate, Add to ledger through the Store, automatic
   geocoding, and two checks that the catalogue never leaks into the ledger).
-- `06-list-view-sorts.cjs` (46) — Phase 8: the All shows list view (rows
+- `06-list-view-sorts.cjs` (67) — Phase 8: the All shows list view (rows
   instead of cards, with the like/rating/Add/Zapp link intact and remembered
   across a reload) and sorting in both directions (A-Z, event date, deadline,
   rating, fee), checked against the ISO values in the model rather than the
-  rendered text, plus multi-word keyword search.
+  rendered text, driven from both the rail's menu and the clickable
+  column headings, plus multi-word keyword search.
 - `03-degradation.cjs` (7) — the failure modes a visitor can actually hit:
   cdnjs blocked by an adblocker (ledger and drawer still work, no uncaught
   errors) and tiles refused while Leaflet loads (markers still drawn).

@@ -178,13 +178,18 @@ window.ASTCatalogue = (function () {
     date:     function (a, b) { return cmpStr(a.startDate, b.startDate); },
     deadline: function (a, b) { return cmpStr(a.applyBy, b.applyBy); },
     name:     function (a, b) { return a.name.localeCompare(b.name); },
+    /* "Where" is city first, then state, so the same town stays together. */
+    place:    function (a, b) {
+                return (a.city || '\uffff').localeCompare(b.city || '\uffff') ||
+                       (a.state || '\uffff').localeCompare(b.state || '\uffff');
+              },
     fee:      function (a, b) { return cmpNum(a.fee, b.fee); },
     rating:   function (a, b) { return cmpNum(a.rating || 0, b.rating || 0); }
   };
 
   /** Which way round each sort is most useful when you first pick it. */
   var SORT_DEFAULT_DIR = {
-    date: 'asc', deadline: 'asc', name: 'asc', fee: 'asc', rating: 'desc'
+    date: 'asc', deadline: 'asc', name: 'asc', place: 'asc', fee: 'asc', rating: 'desc'
   };
 
   /* Empty sorts last in an ascending order, so a missing date does not

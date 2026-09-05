@@ -143,6 +143,102 @@ ok('the sort comes back on reload',await p3.locator('#fSort').inputValue()==='ra
 ok('and so does the direction',await p3.locator('#fSortDir').textContent()==='↓');
 await p3.close();
 
+/* ---------- CLICKABLE COLUMN HEADINGS ---------- */
+console.log('\n--- sorting from the column headings ---');
+async function head(k){return p.locator('#rowHead [data-sort="'+k+'"]');}
+async function isoBy(field){return await p.evaluate(f=>{
+  const ids=[...document.querySelectorAll('.crow')].map(r=>r.dataset.id);
+  const by={}; window.ASTCatalogue.all().forEach(r=>by[r.id]=r[f]||'');
+  return ids.map(i=>by[i]);},field);}
+function ascending(a){for(let i=1;i<a.length;i++) if(a[i-1]>a[i]) return false; return true;}
+function descending(a){for(let i=1;i<a.length;i++) if(a[i-1]<a[i]) return false; return true;}
+/* Text columns sort with localeCompare, so check them the same way. A raw
+   `>` disagrees on the all-caps city names in the source data (PHOENIX,
+   SALINA), where ASCII puts every capital ahead of every lowercase letter. */
+function ascendingText(a){
+  for(let i=1;i<a.length;i++) if(a[i-1].localeCompare(a[i])>0) return false;
+  return true;}
+
+await setSort('date');
+ok('all six headings are clickable controls',
+   await p.locator('#rowHead [data-sort]').count()===6,
+   'n='+await p.locator('#rowHead [data-sort]').count());
+ok('the active column is marked for screen readers',
+   await (await head('date')).getAttribute('aria-sort')==='ascending');
+ok('and the inactive ones are not',
+   await (await head('name')).getAttribute('aria-sort')==='none');
+
+// Show -> name
+await (await head('name')).click(); await p.waitForTimeout(450);
+let ns2=await names();
+ok('clicking Show sorts by name A-Z',ns2[0].localeCompare(ns2[ns2.length-1])<0,
+   `${ns2[0]} … ${ns2[ns2.length-1]}`);
+ok('the rail menu follows the heading',await p.locator('#fSort').inputValue()==='name');
+ok('the heading is marked sorted',
+   await (await head('name')).getAttribute('aria-sort')==='ascending');
+// clicking the same heading reverses
+await (await head('name')).click(); await p.waitForTimeout(450);
+let ns3=await names();
+ok('clicking it again reverses to Z-A',ns3[0]===ns2[ns2.length-1],`${ns3[0]}`);
+ok('aria-sort follows the reversal',
+   await (await head('name')).getAttribute('aria-sort')==='descending');
+ok('the rail arrow follows too',await p.locator('#fSortDir').textContent()==='↓');
+
+// Where -> city
+await (await head('place')).click(); await p.waitForTimeout(450);
+const cities=await isoBy('city');
+ok('clicking Where sorts by city A-Z',ascendingText(cities),`${cities[0]} … ${cities[cities.length-1]}`);
+ok('a new column starts ascending, not carrying the last direction',
+   await p.locator('#fSortDir').textContent()==='↑');
+
+// Dates
+await (await head('date')).click(); await p.waitForTimeout(450);
+ok('clicking Dates sorts oldest first',ascending(await isoBy('startDate')));
+await (await head('date')).click(); await p.waitForTimeout(450);
+ok('clicking Dates again gives newest first',descending(await isoBy('startDate')));
+
+// Deadline
+await (await head('deadline')).click(); await p.waitForTimeout(450);
+ok('clicking Deadline sorts soonest first',ascending(await isoBy('applyBy')));
+
+// Fee
+await (await head('fee')).click(); await p.waitForTimeout(450);
+const fees=await p.evaluate(()=>{
+  const ids=[...document.querySelectorAll('.crow')].map(r=>r.dataset.id);
+  const by={}; window.ASTCatalogue.all().forEach(r=>by[r.id]=r.fee==null?1e9:r.fee);
+  return ids.map(i=>by[i]);});
+ok('clicking Fee sorts cheapest first',ascending(fees),`${fees[0]} … ${fees[fees.length-1]}`);
+
+// Rating — its natural direction is highest first
+await (await head('rating')).click(); await p.waitForTimeout(450);
+ok('clicking Rating puts the highest first',
+   await p.locator('#fSortDir').textContent()==='↓');
+const rr=await p.evaluate(()=>{
+  const ids=[...document.querySelectorAll('.crow')].map(r=>r.dataset.id);
+  const by={}; window.ASTCatalogue.all().forEach(r=>by[r.id]=r.rating||0);
+  return ids.map(i=>by[i]);});
+ok('and really does',rr[0]===9&&rr[1]===4,'top: '+rr.slice(0,3).join(','));
+
+// the rail can still drive it, and the headings follow
+await setSort('date'); await p.waitForTimeout(200);
+ok('sorting from the rail marks the matching heading',
+   await (await head('date')).getAttribute('aria-sort')==='ascending'
+   && await (await head('rating')).getAttribute('aria-sort')==='none');
+// a heading sort survives a reload
+await (await head('fee')).click(); await p.waitForTimeout(450);
+const p4=await ctx.newPage();await p4.goto(BASE+'browse.html',{waitUntil:'networkidle'});await p4.waitForTimeout(1200);
+ok('a heading sort is remembered like any other',
+   await p4.locator('#fSort').inputValue()==='fee'
+   && await p4.locator('#rowHead [data-sort=\"fee\"]').getAttribute('aria-sort')==='ascending');
+await p4.close();
+ok('headings are keyboard reachable',await p.evaluate(()=>{
+  const h=document.querySelector('#rowHead [data-sort]');
+  h.focus(); return document.activeElement===h;}));
+ok('and sort on Enter',await (async()=>{
+  await (await head('name')).focus();
+  await p.keyboard.press('Enter'); await p.waitForTimeout(400);
+  return await p.locator('#fSort').inputValue()==='name';})());
+
 /* ---------- KEYWORD SEARCH ---------- */
 console.log('\n--- keyword search ---');
 await setSort('date');

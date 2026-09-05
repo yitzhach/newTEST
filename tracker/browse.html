@@ -65,6 +65,7 @@
           <option value="date">Event date</option>
           <option value="deadline">Application deadline</option>
           <option value="name">Name (A&ndash;Z)</option>
+          <option value="place">Where (city)</option>
           <option value="rating">My rating</option>
           <option value="fee">Fee</option>
         </select>
@@ -101,9 +102,16 @@
         </div>
       </div>
     </div>
-    <div class="rowhead" id="rowHead" hidden aria-hidden="true">
-      <span>Show</span><span>Where</span><span>Dates</span>
-      <span>Deadline</span><span>Fee</span><span>Rating</span><span></span>
+    <!-- Clickable column headings. Same sort state as the rail's menu — one
+         sort, two ways to reach it. -->
+    <div class="rowhead" id="rowHead" hidden role="row">
+      <button type="button" data-sort="name">Show</button>
+      <button type="button" data-sort="place">Where</button>
+      <button type="button" data-sort="date">Dates</button>
+      <button type="button" data-sort="deadline">Deadline</button>
+      <button type="button" data-sort="fee">Fee</button>
+      <button type="button" data-sort="rating">Rating</button>
+      <span></span>
     </div>
     <div id="cards" class="cards"></div>
     <p class="list-note" id="catNote"></p>
@@ -401,28 +409,60 @@ $('#fText').addEventListener('input', e => { state.q.text = e.target.value; rend
 /* Picking a sort key snaps the direction to whatever is most useful for it —
    earliest date first, but highest rating first — and the arrow then flips
    whichever key is chosen. That is what "newest to oldest" is: date, reversed. */
+const DIR_LABEL = {
+  asc:  { date:'Oldest first', deadline:'Soonest deadline first', name:'A to Z',
+          place:'City A to Z', rating:'Lowest rated first', fee:'Cheapest first' },
+  desc: { date:'Newest first', deadline:'Latest deadline first', name:'Z to A',
+          place:'City Z to A', rating:'Highest rated first', fee:'Most expensive first' }
+};
+
+/* One sort state, two ways to reach it: the rail's menu and the column
+   headings. Everything that changes the sort goes through applySort, so the
+   two can never drift apart. */
 function paintSortDir() {
-  const desc = state.q.dir === 'desc';
+  const key = state.q.sort, desc = state.q.dir === 'desc';
+  const label = (DIR_LABEL[desc ? 'desc' : 'asc'][key]) || (desc ? 'Descending' : 'Ascending');
+
   const b = $('#fSortDir');
   b.textContent = desc ? '\u2193' : '\u2191';
   b.setAttribute('aria-pressed', String(desc));
-  const key = state.q.sort;
-  const label = desc
-    ? { date:'Newest first', deadline:'Latest deadline first', name:'Z to A',
-        rating:'Highest rated first', fee:'Most expensive first' }[key]
-    : { date:'Oldest first', deadline:'Soonest deadline first', name:'A to Z',
-        rating:'Lowest rated first', fee:'Cheapest first' }[key];
   b.setAttribute('aria-label', label);
   b.title = label + ' — click to reverse';
+  $('#fSort').value = key;
+
+  /* Mark the sorted column so the heading shows which way the list is going.
+     aria-sort is what a screen reader reads; the arrow is for everyone else. */
+  $('#rowHead').querySelectorAll('[data-sort]').forEach(h => {
+    const on = h.dataset.sort === key;
+    h.classList.toggle('is-sorted', on);
+    h.setAttribute('aria-sort', on ? (desc ? 'descending' : 'ascending') : 'none');
+    h.title = on ? label + ' — click to reverse' : 'Sort by ' + h.textContent.trim().toLowerCase();
+  });
 }
-$('#fSort').addEventListener('change', e => {
-  state.q.sort = e.target.value;
-  state.q.dir = C.SORT_DEFAULT_DIR[state.q.sort] || 'asc';
+
+/**
+ * @param key   sort key, or null to keep the current one
+ * @param opts.toggle  true -> picking the key that is already active reverses
+ *                     it instead of resetting to its natural direction
+ */
+function applySort(key, opts) {
+  opts = opts || {};
+  if (key && key !== state.q.sort) {
+    state.q.sort = key;
+    state.q.dir = C.SORT_DEFAULT_DIR[key] || 'asc';
+  } else if (opts.toggle) {
+    state.q.dir = state.q.dir === 'desc' ? 'asc' : 'desc';
+  }
   paintSortDir(); saveLayout(); render();
-});
-$('#fSortDir').addEventListener('click', () => {
-  state.q.dir = state.q.dir === 'desc' ? 'asc' : 'desc';
-  paintSortDir(); saveLayout(); render();
+}
+
+$('#fSort').addEventListener('change', e => applySort(e.target.value));
+$('#fSortDir').addEventListener('click', () => applySort(null, { toggle: true }));
+
+/* Clicking a column heading sorts by it; clicking the sorted one reverses. */
+$('#rowHead').addEventListener('click', e => {
+  const h = e.target.closest('[data-sort]');
+  if (h) applySort(h.dataset.sort, { toggle: true });
 });
 
 /* Cards or list. Remembered, like the ledger's own view choice. */
@@ -591,7 +631,6 @@ $('#btnTheme').addEventListener('click', () => {
   state.q.dir = (l.catalogueDir === 'desc' || l.catalogueDir === 'asc')
     ? l.catalogueDir
     : (C.SORT_DEFAULT_DIR[state.q.sort] || 'asc');
-  $('#fSort').value = state.q.sort;
   paintSortDir();
   setView(l.catalogueView === 'rows' ? 'rows' : 'cards');
 

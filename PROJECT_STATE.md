@@ -401,6 +401,17 @@ https://claude.ai/code/artifact/a1fcd724-d87d-4c62-83fc-66ddf1f2494a
     then flips whichever is chosen. Both the key and the direction are
     remembered, and the arrow carries a written label ("Z to A", "Newest
     first") so the direction is never conveyed by a glyph alone.
+  - **The column headings are the sort control too.** Show / Where / Dates /
+    Deadline / Fee / Rating are buttons: clicking one sorts by it, clicking
+    the sorted one reverses. They are styled to still read as headings — the
+    affordance is the hover and the arrow, and the arrow's space is reserved
+    on every heading so the columns do not shift when the sorted one changes.
+    **There is one sort state, not two:** everything that changes it goes
+    through `applySort()`, so the headings and the rail's menu can never
+    drift apart, and the active column carries `aria-sort` for screen readers
+    rather than relying on the arrow alone. "Where" needed a comparator of its
+    own — city first, then state, so one town stays together — and it is in
+    the rail's menu as well, so both controls offer the same six keys.
   - **Empty values sink.** A show with no date or no fee sorts to the bottom
     of an ascending order rather than masquerading as the earliest or the
     cheapest, and **name breaks every tie**, so equal rows keep a stable order
@@ -713,6 +724,23 @@ one, and the key and direction both surviving a reload. Search: a city, a full
 state name, the two-letter code, two words that must both match, and a miss
 saying so rather than silently showing everything. Plus no horizontal overflow
 at 1400 / 1280 / 900 / 390px in list view.
+
+**Phase 8b (2026-09-05).** 21 further checks in
+`06-list-view-sorts.cjs` (67 in that file, **226** in the harness), all
+passing: all six headings are controls, clicking each one sorts by it and
+clicking it again reverses, a newly picked column starts in its own natural
+direction rather than inheriting the last one, the rail's menu and arrow
+follow a heading click and vice versa, `aria-sort` tracks the active column
+and clears on the others, a heading sort is remembered across a reload, and
+the headings are focusable and sort on Enter. Order is checked against the
+values in the model, not the rendered text.
+
+A test-method bug was caught here, not an app one: the city check compared
+with a raw `>`, which disagrees with the `localeCompare` the sort actually
+uses on the all-caps city names in the source data (`PHOENIX`, `SALINA`) —
+ASCII puts every capital ahead of every lowercase letter. Verified the sort
+itself was right (zero out-of-order pairs by `localeCompare`) before changing
+the check to match.
 
 **Not verified from here:** the cdnjs, OpenStreetMap tile and Nominatim
 requests themselves, and the live Pages URL. Re-checked 2026-09-04 and all
