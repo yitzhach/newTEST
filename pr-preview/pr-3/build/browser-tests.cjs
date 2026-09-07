@@ -294,7 +294,21 @@ function check(name, pass, detail) {
       located: fit.shows.filter(s => typeof s.facts.lat === 'number' &&
                                      typeof s.facts.lng === 'number').length,
       catalogueLocated: cat.shows.filter(s => typeof s.lat === 'number').length,
-      provenance: fit.shows.filter(s => s.provenance && s.provenance.coordinates).length
+      provenance: fit.shows.filter(s => s.provenance && s.provenance.coordinates).length,
+      boothFee: fit.shows.filter(s => s.facts.boothFee != null).length,
+      jurySubs: fit.shows.filter(s => s.facts.avgSubmissionsPerYear != null).length,
+      juryOdds: fit.shows.filter(s => s.factors.juryOdds != null).length,
+      // Not mentioned is not zero. If this ever stops being 0, the importer
+      // has started asserting a commission rate nobody published.
+      fakeZeroCommission: fit.shows.filter(
+        s => s.facts.commissionPct === 0 && s.facts.commissionNote).length,
+      // Every booth fee has to be traceable to something a reader can check:
+      // the fee-schedule line it was parsed out of, or the page it was read
+      // from. Which of the two depends on which research pass found it.
+      boothFeeUntraceable: fit.shows.filter(
+        s => s.facts.boothFee != null &&
+             !(s.provenance.boothFee &&
+               (s.provenance.boothFee.basis || s.provenance.boothFee.source))).length
     };
   });
   check('no notify date precedes its own deadline in fit-data',
@@ -315,6 +329,20 @@ function check(name, pass, detail) {
   check('every coordinate carries provenance',
         hygiene.provenance === hygiene.located,
         hygiene.provenance + ' provenance entries for ' + hygiene.located + ' coordinates');
+
+  // ---- 19b. the ZAPPlication research pass ------------------------------
+  /* Booth fee coverage was 24/236 before this import and blocks the whole of
+     Phase 2 costing, so it is worth asserting rather than assuming. */
+  check('booth fee coverage is at least 100 shows',
+        hygiene.boothFee >= 100, hygiene.boothFee + '/236');
+  check('jury statistics landed on 100 shows',
+        hygiene.jurySubs >= 100, hygiene.jurySubs + '/236');
+  check('jury odds are scored from those statistics',
+        hygiene.juryOdds >= 130, hygiene.juryOdds + '/236');
+  check('every booth fee is traceable to a line or a page',
+        hygiene.boothFeeUntraceable === 0, hygiene.boothFeeUntraceable + ' untraceable');
+  check('"no commission mentioned" is never recorded as 0%',
+        hygiene.fakeZeroCommission === 0, hygiene.fakeZeroCommission + ' shows');
 
   // ---- 20. a closed deadline is surfaced, not ranked as live -------------
   await page.click('#idrClose');
@@ -373,6 +401,36 @@ function check(name, pass, detail) {
         !!wx && /not known/i.test(wx), wx);
   check('it does not invent a number when the lookup failed',
         !!wx && !/\d+%/.test(wx) && !/\u00b0F/.test(wx), wx);
+
+  // ---- 24. the jury numbers reach the drawer ----------------------------
+  await page.click('#idrClose');
+  await page.fill('#fText', 'Art on the Fox Algonquin');
+  await page.waitForTimeout(400);
+  await page.click('[data-detail="zapp-13982"]');
+  await page.waitForTimeout(500);
+  const gettingIn = await page.evaluate(() => {
+    const heads = [...document.querySelectorAll('.idr-body .sd-h')];
+    const h = heads.find(x => /Getting in/i.test(x.textContent));
+    if (!h) return null;
+    let text = '', node = h.nextElementSibling;
+    while (node && node.tagName !== 'H3') { text += ' ' + node.textContent; node = node.nextElementSibling; }
+    return text;
+  });
+  check('the drawer has a "Getting in" section', gettingIn !== null);
+  check('it shows how many apply and how many get in',
+        !!gettingIn && /100/.test(gettingIn) && /65/.test(gettingIn),
+        (gettingIn || '').slice(0, 90));
+  /* The number that makes the exempt count worth collecting: 65 of 100 looks
+     generous until you learn 20 of those places never faced the jury. */
+  check('it discounts places that never faced the jury',
+        !!gettingIn && /exempt from the jury/i.test(gettingIn) && /45/.test(gettingIn),
+        (gettingIn || '').slice(0, 140));
+
+  const drawerText = await page.textContent('.idr-body');
+  check('the full fee schedule is available verbatim',
+        /full fee schedule/i.test(drawerText));
+  check('commission shows what the page said, not a fabricated 0%',
+        /No commission mentioned/i.test(drawerText) && !/\b0% of sales/.test(drawerText));
 
   console.log('\nlate console errors: ' + (errors.length ? errors.join(' | ') : 'none'));
   await browser.close();

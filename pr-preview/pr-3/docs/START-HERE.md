@@ -86,6 +86,48 @@ combined rate** — see the note below.
 New provenance grade: `dataset`, for a value looked up in a reference dataset
 rather than read off a show's page. Coordinates and weather carry it.
 
+### The ZAPPlication research pass — 100 shows deep
+
+`build/show-research-source.xlsx` is a research spreadsheet: 236 rows, 34
+columns, 100 of them marked `Enriched` with things that exist only on a show's
+own event page. Every enriched row carries its ZAPP URL, and the event id in
+that URL is the id the catalogue already uses — so the join is exact, 100 of
+100. `build/import_show_research.py` parses it into `build/show-research.json`,
+which the build folds in.
+
+What it moved:
+
+| | before | after |
+|---|---|---|
+| booth fee | 24/236 | **106/236** |
+| jury odds scored | 37/236 | **131/236** |
+| jury statistics | 0/236 | **100/236** |
+
+Booth fee coverage was what blocked Phase 2 costing. It is no longer the
+blocker.
+
+Two decisions inside the importer worth knowing about, both about not
+overclaiming:
+
+- **It leaves `commissionPct` null.** All 100 enriched rows say "No commission
+  mentioned — booth-fee model", and *not mentioned* is not *zero*. The wording
+  is passed through as `commissionNote` instead. An artist who reads "0%" and
+  then loses 15% at the door has been misled by this repository.
+- **A booth fee cites the line it came from.** The raw field is a whole fee
+  schedule — singles, corners, doubles, food stalls, electrical hookups, late
+  penalties — so picking "the" fee is an interpretation. The parser records the
+  number, the schedule line it read it from, and the full schedule, and the
+  drawer shows all three. 84 of 100 schedules yielded a confident standard
+  rate; the rest keep the text and claim no number. An audit pass while writing
+  it caught the parser reading "Ad in Event Program: Add $75" and a $60
+  membership as booth fees, which is why the tests assert the coverage numbers.
+
+**Getting in**, a new drawer section, is the payoff: how many apply, how many
+are accepted, how many of those places never faced the jury, and what that
+leaves. A show that accepts 65 of 100 looks generous until you learn 20 of
+those places went to exempt artists — applying cold you are competing for 45,
+not 65. `effectiveAcceptanceRatePct` is what feeds the jury-odds factor.
+
 ### The one thing to know about the sales tax panel
 
 It carries the **state rate only** and says so in those words, because the
@@ -184,6 +226,16 @@ exits non-zero on anything it cannot repair. `python3 build/build_fit_data.py
 --selftest` exercises those rules against constructed inputs without touching
 the data.
 
+**The research import is a separate, occasional step**, like the geocode.
+`build/show-research.json` is committed and the build just reads it. Re-run it
+only when the spreadsheet changes:
+
+```bash
+pip install openpyxl
+python3 build/import_show_research.py    # rewrites build/show-research.json
+python3 build/build_fit_data.py          # folds it in
+```
+
 **Geocoding is a separate, occasional step.** `build/geocode.json` is committed
 and the build just reads it, so an ordinary data edit needs nothing extra. Only
 when the *show list itself* changes:
@@ -223,8 +275,9 @@ Then:
 
 ```bash
 python3 -m http.server 8765          # from the repo root, leave running
-node build/browser-tests.cjs         # 53 checks — the model, the drawer, provenance,
-                                     #   date hygiene, geocode coverage, tax guard rails
+node build/browser-tests.cjs         # 63 checks — the model, the drawer, provenance,
+                                     #   date hygiene, geocode coverage, tax guard
+                                     #   rails, the research import
 node build/ledger-view-tests.cjs     # 21 checks — details/link split, badges, lenses
 cd worker && npm test                # 45 API checks — manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 checks — the date rules themselves
@@ -235,7 +288,7 @@ The deploy rig needs no network and no GitHub: it clones this repo into a temp
 directory and pushes to a local bare repo standing in for origin. Run it if you
 touch anything in `.github/scripts/`.
 
-All pass as of the Phase 1 session: 53/53, 21/21, 45/45, 11/11, 19/19.
+All pass as of the Phase 1 session: 63/63, 21/21, 45/45, 11/11, 19/19.
 
 `browser-tests.cjs` deliberately asserts that the weather panel degrades to
 "not known": this sandbox blocks the weather API, which makes it the ideal

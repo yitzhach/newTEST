@@ -398,3 +398,26 @@ body.idr-open { overflow:hidden; }
 .tax-warn { margin:0 0 8px; font-size:13px; font-weight:500; color:var(--warn); line-height:1.5; }
 .tax-local { margin:0 0 8px; font-size:13px; line-height:1.5; }
 .tax-note { margin:0 0 8px; font-size:13px; color:var(--muted); line-height:1.6; }
+
+/* ==========================================================================
+   GETTING IN — the jury numbers, from the show's own reporting
+   ========================================================================== */
+.gi-stats { margin-bottom:10px; }
+.gi-note {
+  margin:0 0 8px; font-size:13px; line-height:1.6; color:var(--muted);
+  max-width:70ch;
+}
+.gi-extra { margin-top:0 !important; }
+
+/* The full fee schedule, verbatim. Collapsed because it is often twenty lines
+   of corner upgrades and electrical hookups — and open to anyone who wants to
+   check the number above it against the source. */
+.fee-detail { margin:14px 0 0; font-size:13px; }
+.fee-detail summary { cursor:pointer; color:var(--muted); }
+.fee-detail summary:hover { color:var(--ink); }
+.fee-detail pre {
+  margin:10px 0 0; padding:12px 14px; background:var(--surface);
+  border-left:2px solid var(--line); border-radius:3px;
+  font-family:inherit; font-size:12px; line-height:1.6;
+  white-space:pre-wrap; overflow-x:auto;
+}
