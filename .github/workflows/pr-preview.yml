@@ -23,9 +23,13 @@ permissions:
   contents: write        # publish to the gh-pages branch
   pull-requests: write   # leave the preview link on the PR
 
-# Shared with static.yml. See the note there.
+# One group per pull request. Repeated pushes to the same PR queue behind each
+# other, which is what you want; two different PRs, and a PR versus the
+# production deploy, do not contend at all. See the longer note in static.yml
+# for why they must not share: a shared group cost a production deploy on the
+# very first merge.
 concurrency:
-  group: "gh-pages"
+  group: "gh-pages-preview-${{ github.event.pull_request.number }}"
   cancel-in-progress: false
 
 jobs:
