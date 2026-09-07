@@ -25,6 +25,16 @@ function safeFilename(url, index) {
   return `${String(index + 1).padStart(3, '0')}_${base}`;
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Random-ish pause between page loads so requests don't fire back-to-back
+// like a bot. Widen or narrow this range if a site is still rate-limiting you.
+function randomDelayMs(minMs = 3000, maxMs = 7000) {
+  return minMs + Math.floor(Math.random() * (maxMs - minMs));
+}
+
 function normalizeUrl(raw) {
   const trimmed = raw.trim();
   if (!trimmed) return null;
@@ -80,6 +90,9 @@ app.post('/api/convert', async (req, res) => {
 
   try {
     for (let i = 0; i < cleanUrls.length; i++) {
+      if (i > 0) {
+        await sleep(randomDelayMs());
+      }
       const url = cleanUrls[i];
       const name = safeFilename(url, i);
       const page = await browser.newPage();
