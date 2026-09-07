@@ -40,6 +40,10 @@ OVERRIDES = os.path.join(ROOT, "build", "research-overrides.json")
 # Written by build/geocode_shows.py from an offline gazetteer. Committed, so
 # the build needs no geocoding dependency and every coordinate is auditable.
 GEOCODE = os.path.join(ROOT, "build", "geocode.json")
+# Written by build/import_show_research.py from the ZAPPlication research
+# spreadsheet. 100 shows deep: booth fees, jury statistics, what applying
+# actually involves.
+SHOW_RESEARCH = os.path.join(ROOT, "build", "show-research.json")
 OUT = os.path.join(ROOT, "tracker", "fit-data.json")
 
 SCHEMA_VERSION = 1
@@ -259,6 +263,7 @@ def main():
     fit_rows = load(FIT_SOURCE)
     overrides = load(OVERRIDES, default={})
     geocode = load(GEOCODE, default={"shows": {}, "gazetteer": {}})
+    research = load(SHOW_RESEARCH, default={"shows": {}})
 
     today = __import__("datetime").date.today().isoformat()
 
@@ -288,6 +293,7 @@ def main():
             stats["fit_only"] += 1
 
         rec = build_record(fit, cat)
+        apply_research(rec, (research.get("shows") or {}).get(rec["id"]))
         apply_override(rec, overrides.get(rec["id"]))
         apply_geocode(rec, geocode)
         out.append(rec)
@@ -299,6 +305,7 @@ def main():
             continue
         stats["catalogue_only"] += 1
         rec = build_record(None, row)
+        apply_research(rec, (research.get("shows") or {}).get(rec["id"]))
         apply_override(rec, overrides.get(rec["id"]))
         apply_geocode(rec, geocode)
         out.append(rec)
@@ -484,6 +491,21 @@ def build_record(fit, cat):
         "indoorOutdoor": None,
         "lat": None,
         "lng": None,
+        # Filled by the ZAPPlication research pass. See import_show_research.py.
+        "boothFeeDetail": None,        # the fee schedule verbatim
+        "commissionNote": None,        # what the page says, which is not the same
+                                       # as a percentage — see the importer
+        "avgSubmissionsPerYear": None,
+        "avgAccepted": None,
+        "avgExemptFromJury": None,
+        "effectiveAcceptanceRatePct": None,   # accepted less exempt, over submitted
+        "imagesRequired": None,
+        "boothShotRequired": None,
+        "applicationsAllowed": None,
+        "emergingArtistProgram": None,
+        "jurorCount": None,
+        "juryScoringScale": None,
+        "refundPolicy": None,
     }
 
     if facts["applicationUrl"]:
@@ -513,6 +535,26 @@ def build_record(fit, cat):
         "researchStatus": "none",
         "researchedAt": None,
     }
+
+
+def apply_research(rec, entry):
+    """Merge one show's row from the ZAPPlication research pass.
+
+    Applied BEFORE apply_override on purpose. This is a bulk import of a
+    hundred shows; research-overrides.json is a hand-curated pass over
+    twenty-nine of them. Where the two disagree, a person who looked at one
+    show closely should beat a parser that looked at a hundred quickly, so
+    the hand-curated layer lands last and wins.
+    """
+    if not entry:
+        return
+    for key, value in (entry.get("facts") or {}).items():
+        rec["facts"][key] = value
+    for key, value in (entry.get("factors") or {}).items():
+        rec["factors"][key] = value
+    rec["provenance"].update(entry.get("provenance") or {})
+    if entry.get("researchStatus"):
+        rec["researchStatus"] = entry["researchStatus"]
 
 
 def apply_geocode(rec, geocode):

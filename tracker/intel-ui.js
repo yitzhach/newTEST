@@ -321,6 +321,14 @@ window.ASTIntelUI = (function () {
       ['Setting', f.indoorOutdoor, 'indoorOutdoor'],
       ['Vehicle access to booth', f.vehicleAccessToBooth == null ? null : (f.vehicleAccessToBooth ? 'Yes' : 'No'), 'vehicleAccessToBooth'],
       ['Booth power', f.powerAvailable == null ? null : (f.powerAvailable ? 'Yes' : 'No'), 'powerAvailable'],
+      /* The percentage where a show states one, and otherwise what the
+         application page actually said. "No commission mentioned" is not the
+         same claim as "no commission", and the difference is 15% of a
+         weekend, so the wording is passed through rather than rounded to a
+         number. See build/import_show_research.py. */
+      ['Commission', f.commissionPct != null ? f.commissionPct + '% of sales'
+        : (f.commissionNote ? '<span class="muted-inline">' + esc(f.commissionNote) + '</span>' : null),
+        f.commissionPct != null ? 'commissionPct' : 'commissionNote'],
       /* Shown because the weather and sales-tax panels below are computed from
          it, and a number nothing explains is the one thing this drawer is not
          allowed to contain. The chip says it locates the city, not the venue. */
@@ -353,9 +361,65 @@ window.ASTIntelUI = (function () {
       '<table class="factable"><tbody>' + bars + '</tbody></table>' +
       '<h3 class="sd-h">The facts</h3>' +
       '<table class="facttable"><tbody>' + factRows + '</tbody></table>' +
+      (f.boothFeeDetail
+        ? '<details class="fee-detail"><summary>The show\'s full fee schedule</summary>' +
+          '<pre>' + esc(f.boothFeeDetail) + '</pre></details>'
+        : '') +
       (links.length ? '<p class="sd-links">' + links.join(' ') + '</p>' : '') +
-      weatherSection(show) + taxSection(show) +
+      gettingInSection(show) + weatherSection(show) + taxSection(show) +
       intel;
+  }
+
+  /* ---- 2c. GETTING IN -----------------------------------------------------
+     What the jury actually does, from the show's own numbers. The reason this
+     is its own section rather than four more rows in the facts table: an
+     artist deciding whether a $45 jury fee is worth posting is asking one
+     question, and the answer is spread across three counts that only mean
+     something together.                                                     */
+  function gettingInSection(show) {
+    var f = show.facts || {};
+    var subs = f.avgSubmissionsPerYear, acc = f.avgAccepted, exempt = f.avgExemptFromJury;
+    var rate = f.effectiveAcceptanceRatePct != null ? f.effectiveAcceptanceRatePct
+                                                    : f.acceptanceRatePct;
+    var images = f.imagesRequired, apps = f.applicationsAllowed, jurors = f.jurorCount;
+    if (subs == null && acc == null && rate == null && images == null && apps == null) return '';
+
+    var stat = function (value, label) {
+      return value == null ? '' :
+        '<li><strong>' + esc(String(value)) + '</strong><span>' + esc(label) + '</span></li>';
+    };
+    var cells =
+      stat(subs == null ? null : Number(subs).toLocaleString('en-US'), 'apply in a typical year') +
+      stat(acc == null ? null : Number(acc).toLocaleString('en-US'), 'are accepted') +
+      stat(exempt == null ? null : Number(exempt).toLocaleString('en-US'), 'of those skip the jury') +
+      stat(rate == null ? null : rate + '%', 'your odds applying cold');
+
+    /* The sentence that makes the exempt count worth collecting. A show that
+       accepts 65 of 100 looks generous until you learn 20 of those places
+       were never in front of the jury. */
+    var caveat = '';
+    if (exempt != null && exempt > 0 && subs && acc != null) {
+      caveat = '<p class="gi-note">' + acc + ' of ' + subs + ' applicants get in, but ' +
+        exempt + ' of those places go to artists exempt from the jury — returning ' +
+        'award winners, invited artists. Applying cold, you are competing for ' +
+        Math.max(acc - exempt, 0) + ' places, not ' + acc + '.</p>';
+    }
+
+    var extra = [];
+    if (images != null) extra.push(images + ' images required');
+    if (f.boothShotRequired === true) extra.push('booth shot required');
+    if (apps != null) extra.push(apps + ' application' + (apps === 1 ? '' : 's') + ' allowed');
+    if (jurors != null) extra.push(jurors + ' juror' + (jurors === 1 ? '' : 's'));
+    if (f.juryScoringScale) extra.push('scored ' + f.juryScoringScale);
+
+    return '<h3 class="sd-h">Getting in</h3>' +
+      (cells ? '<ul class="wx-stats gi-stats">' + cells + '</ul>' : '') +
+      caveat +
+      (extra.length ? '<p class="fine gi-extra">' + esc(extra.join(' \u00b7 ')) + ' ' +
+        provChip((show.provenance || {}).avgSubmissionsPerYear ||
+                 (show.provenance || {}).imagesRequired) + '</p>' : '') +
+      (f.emergingArtistProgram
+        ? '<p class="gi-note">' + esc(f.emergingArtistProgram) + '</p>' : '');
   }
 
   /* ---- 2b. WHAT THE PLACE IS LIKE ----------------------------------------
