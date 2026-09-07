@@ -322,6 +322,7 @@ def main():
             rec["provenance"].pop("notifyDate", None)
 
     report_hygiene(cat_repairs + rec_repairs, cat_fatals + rec_fatals, expired)
+    stamp_assets()
 
     payload = {
         "schemaVersion": SCHEMA_VERSION,
@@ -535,6 +536,59 @@ def build_record(fit, cat):
         "researchStatus": "none",
         "researchedAt": None,
     }
+
+
+# ---------------------------------------------------------------------------
+# Cache busting
+#
+# tracker/ is served as static files with no build step, so every script keeps
+# its name from one release to the next. Browsers cache aggressively on name,
+# which means a visitor who has been to the site before can refresh and still
+# be running last week's intel-ui.js against this week's fit-data.json. That
+# failure is invisible and infuriating: the page looks fine, it is just old.
+#
+# So the HTML carries `?v=<hash>` on every local script and stylesheet, where
+# the hash is derived from the contents of those same files. Change any of
+# them, the token changes, the browser fetches. Change none, it stays put and
+# the cache still works. Nobody has to remember to bump anything.
+# ---------------------------------------------------------------------------
+
+ASSET_TAG = re.compile(
+    r'(?P<attr>src|href)="(?P<file>[^"?#:]+\.(?:js|css))(?:\?[^"]*)?"')
+
+
+def stamp_assets():
+    """Version every local asset reference in tracker/*.html. Returns the tag."""
+    import hashlib
+
+    tracker = os.path.join(ROOT, "tracker")
+    digest = hashlib.sha256()
+    for name in sorted(os.listdir(tracker)):
+        if name.endswith((".js", ".css")):
+            with open(os.path.join(tracker, name), "rb") as fh:
+                # The name goes in too, so renaming a file changes the tag.
+                digest.update(name.encode())
+                digest.update(fh.read())
+    tag = digest.hexdigest()[:8]
+
+    touched = []
+    for name in sorted(os.listdir(tracker)):
+        if not name.endswith(".html"):
+            continue
+        path = os.path.join(tracker, name)
+        with open(path) as fh:
+            html = fh.read()
+        # Only rewrites relative paths: the pattern excludes ':' so a CDN URL
+        # never matches, and those must not be touched anyway.
+        stamped = ASSET_TAG.sub(
+            lambda m: '%s="%s?v=%s"' % (m.group("attr"), m.group("file"), tag), html)
+        if stamped != html:
+            with open(path, "w") as fh:
+                fh.write(stamped)
+            touched.append(name)
+
+    print("  asset version %s stamped into %s" % (tag, ", ".join(touched) or "nothing"))
+    return tag
 
 
 def apply_research(rec, entry):
