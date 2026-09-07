@@ -52,6 +52,20 @@ app.post('/api/convert', async (req, res) => {
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'batch-url-'));
   const results = [];
 
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      channel: 'chrome',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+  } catch (err) {
+    fs.rmSync(workDir, { recursive: true, force: true });
+    return res.status(500).json({
+      error: `Could not launch a browser to render pages: ${String(err.message || err)}`,
+    });
+  }
+
   res.writeHead(200, {
     'Content-Type': 'application/zip',
     'Content-Disposition': `attachment; filename="batch-export-${Date.now()}.zip"`,
@@ -59,11 +73,6 @@ app.post('/api/convert', async (req, res) => {
 
   const archive = archiver('zip', { zlib: { level: 9 } });
   archive.pipe(res);
-
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
 
   try {
     for (let i = 0; i < cleanUrls.length; i++) {
