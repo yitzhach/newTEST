@@ -22,6 +22,9 @@ Paste this at the top of a new session, then say what you want:
 > `docs/START-HERE.md` for what's done, what's next, and the environment
 > gotchas.
 >
+> For buildout work, `docs/build-phases.md` has the phase map and the
+> per-phase prompt.
+>
 > Live site: https://yitzhach.github.io/newTEST/tracker/browse.html
 >
 > Run the three test suites before you finish, and push.
@@ -50,7 +53,13 @@ report stays in the browser and behaves as private.
 
 ## What is next
 
-**Deploy the Worker.** Nothing is shared between artists yet, and that is the
+**Phase 1 of the buildout** — see `docs/build-phases.md`, which carries the
+26-idea numbering, the seven-phase map, the verified environment facts and the
+paste-ready prompt for each phase. Phase 1 is data hygiene, geocoding all 236
+shows, weather history and sales tax by jurisdiction.
+
+The Worker deploy is separate and blocks only Phase 6. **Deploy it when the
+network layer matters.** Nothing is shared between artists yet, and that is the
 whole premise. `worker/README.md` has the full sequence: create D1 + KV + R2,
 paste the two ids into `wrangler.toml`, set `SESSION_SECRET`, `IP_SALT` and
 `BOOTSTRAP_CODE` as secrets, apply migrations, set `ALLOWED_ORIGINS`, deploy,
