@@ -1,6 +1,6 @@
 {
   "name": "batch-url-converter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Paste a batch of URLs, save each one as a standalone HTML file and/or a printed PDF, delivered as a single zip.",
   "private": true,
   "main": "server.js",

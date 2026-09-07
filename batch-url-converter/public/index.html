@@ -33,6 +33,11 @@
   p.sub {
     color: var(--muted);
     margin-top: 0;
+    margin-bottom: 8px;
+  }
+  .version {
+    color: var(--muted);
+    font-size: 0.78rem;
     margin-bottom: 28px;
   }
   .panel {
@@ -76,6 +81,26 @@
     font-size: 0.95rem;
     cursor: pointer;
   }
+  .delay-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .delay-row label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  .delay-note {
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin-top: 4px;
+  }
   button#go {
     background: var(--accent);
     color: var(--accent-ink);
@@ -105,6 +130,7 @@
 <div class="wrap">
   <h1>Batch URL Converter</h1>
   <p class="sub">Paste 50+ URLs (one per line), pick your output, get a single zip back with every page saved.</p>
+  <div class="version" id="version">Version —</div>
 
   <div class="panel">
     <label class="field-label" for="urls">URLs</label>
@@ -116,6 +142,12 @@
       <label><input type="checkbox" id="fmtPdf" checked /> Save as PDF</label>
     </div>
 
+    <div class="delay-row">
+      <label><input type="checkbox" id="delayEnabled" checked /> Pause between pages</label>
+      <span id="delayLabel" class="delay-note"></span>
+    </div>
+    <div class="delay-note">Keeps requests spaced out like a normal person browsing, so the site you're pulling from is less likely to flag or block you. Turning it off converts faster but hits the site back-to-back.</div>
+
     <button id="go">Convert &amp; Download Zip</button>
     <div id="status"></div>
   </div>
@@ -126,6 +158,18 @@
   const countEl = document.getElementById('count');
   const goBtn = document.getElementById('go');
   const statusEl = document.getElementById('status');
+  const versionEl = document.getElementById('version');
+  const delayLabelEl = document.getElementById('delayLabel');
+
+  fetch('/api/info')
+    .then(r => r.json())
+    .then(info => {
+      versionEl.textContent = `Version ${info.version}`;
+      delayLabelEl.textContent = `(${(info.delayMinMs / 1000).toFixed(0)}–${(info.delayMaxMs / 1000).toFixed(0)}s between pages)`;
+    })
+    .catch(() => {
+      versionEl.textContent = '';
+    });
 
   function parseUrls() {
     return urlsEl.value
@@ -144,6 +188,7 @@
       html: document.getElementById('fmtHtml').checked,
       pdf: document.getElementById('fmtPdf').checked,
     };
+    const delayEnabled = document.getElementById('delayEnabled').checked;
 
     if (urls.length === 0) {
       statusEl.textContent = 'Paste at least one URL first.';
@@ -164,7 +209,7 @@
       const resp = await fetch('/api/convert', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ urls, formats }),
+        body: JSON.stringify({ urls, formats, delayEnabled }),
       });
 
       if (!resp.ok) {

@@ -7,6 +7,10 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 4173;
+const VERSION = require('./package.json').version;
+
+const DEFAULT_DELAY_MIN_MS = 3000;
+const DEFAULT_DELAY_MAX_MS = 7000;
 
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -42,10 +46,19 @@ function normalizeUrl(raw) {
   return trimmed;
 }
 
+app.get('/api/info', (_req, res) => {
+  res.json({
+    version: VERSION,
+    delayMinMs: DEFAULT_DELAY_MIN_MS,
+    delayMaxMs: DEFAULT_DELAY_MAX_MS,
+  });
+});
+
 app.post('/api/convert', async (req, res) => {
-  const { urls, formats } = req.body || {};
+  const { urls, formats, delayEnabled } = req.body || {};
   const wantHtml = !!(formats && formats.html);
   const wantPdf = !!(formats && formats.pdf);
+  const useDelay = delayEnabled !== false;
 
   if (!Array.isArray(urls) || urls.length === 0) {
     return res.status(400).json({ error: 'No URLs provided.' });
@@ -90,8 +103,8 @@ app.post('/api/convert', async (req, res) => {
 
   try {
     for (let i = 0; i < cleanUrls.length; i++) {
-      if (i > 0) {
-        await sleep(randomDelayMs());
+      if (i > 0 && useDelay) {
+        await sleep(randomDelayMs(DEFAULT_DELAY_MIN_MS, DEFAULT_DELAY_MAX_MS));
       }
       const url = cleanUrls[i];
       const name = safeFilename(url, i);
