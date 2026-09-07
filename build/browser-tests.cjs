@@ -560,6 +560,33 @@ function check(name, pass, detail) {
 
   await page.unroute('**/*open-meteo.com/**');
 
+  // ---- 27. which build is this ------------------------------------------
+  /* The question that cost more time on this project than any feature. The
+     page must be able to answer it without anybody reading behaviour. */
+  const stamp = await page.evaluate(() => {
+    const el = document.querySelector('#buildStamp');
+    return el ? el.textContent.trim() : null;
+  });
+  check('the page states which build it is',
+        !!stamp && /^v\d{4}\.\d{2}\.\d{2}-\d{4}/.test(stamp), stamp);
+  /* Built and published are different states, and a build that has not been
+     deployed has to say so rather than implying it is live. */
+  check('it distinguishes built from published',
+        !!stamp && /(published|not published yet)/.test(stamp), stamp);
+
+  const version = await page.evaluate(async () => {
+    const r = await fetch('version.json', { cache: 'no-cache' });
+    return r.ok ? r.json() : null;
+  });
+  check('version.json is readable without opening the app', !!version);
+  check('it records the build, the assets and the show count',
+        !!version && !!version.version && !!version.assetVersion && version.shows > 0,
+        JSON.stringify(version && { v: version.version, shows: version.shows }));
+  /* The keys the deploy fills in must exist even before it runs, so their
+     absence is never mistaken for an older file that lacks the feature. */
+  check('the deploy fields are present before deployment',
+        !!version && 'commit' in version && 'deployedAt' in version);
+
   console.log('\nlate console errors: ' + (errors.length ? errors.join(' | ') : 'none'));
   await browser.close();
 

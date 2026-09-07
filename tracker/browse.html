@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=51812322">
-<link rel="stylesheet" href="intel.css?v=51812322">
+<link rel="stylesheet" href="app.css?v=a63d5b4a">
+<link rel="stylesheet" href="intel.css?v=a63d5b4a">
 </head>
 <body>
 <header class="app-header">
@@ -129,6 +129,7 @@
     </div>
     <div id="cards" class="cards"></div>
     <p class="list-note" id="catNote"></p>
+    <p class="build-stamp" id="buildStamp"></p>
   </main>
 </div>
 
@@ -183,18 +184,19 @@
   <button class="t-act" id="toastAct" type="button" hidden></button>
 </div>
 
-<script src="core.js?v=51812322"></script>
-<script src="fit.js?v=51812322"></script>
-<script src="intel.js?v=51812322"></script>
-<script src="members.js?v=51812322"></script>
+<script src="core.js?v=a63d5b4a"></script>
+<script src="version.js?v=a63d5b4a"></script>
+<script src="fit.js?v=a63d5b4a"></script>
+<script src="intel.js?v=a63d5b4a"></script>
+<script src="members.js?v=a63d5b4a"></script>
 <!-- Weather fetches at runtime from the visitor's browser; sales tax is a
      static table. Both are optional: intel-ui.js renders without either. -->
-<script src="weather.js?v=51812322"></script>
-<script src="salestax.js?v=51812322"></script>
-<script src="intel-ui.js?v=51812322"></script>
-<script src="catalogue.js?v=51812322"></script>
-<script src="store-supabase.js?v=51812322"></script>
-<script src="import.js?v=51812322"></script>
+<script src="weather.js?v=a63d5b4a"></script>
+<script src="salestax.js?v=a63d5b4a"></script>
+<script src="intel-ui.js?v=a63d5b4a"></script>
+<script src="catalogue.js?v=a63d5b4a"></script>
+<script src="store-supabase.js?v=a63d5b4a"></script>
+<script src="import.js?v=a63d5b4a"></script>
 <script type="module">
 /* ==========================================================================
    ALL SHOWS
@@ -861,5 +863,6 @@ $('#btnTheme').addEventListener('click', () => {
   render();
 })();
 </script>
+<script>window.ASTVersion.mount(document.getElementById('buildStamp'));</script>
 </body>
 </html>
