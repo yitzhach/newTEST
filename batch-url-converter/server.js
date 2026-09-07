@@ -72,6 +72,10 @@ app.post('/api/convert', async (req, res) => {
   });
 
   const archive = archiver('zip', { zlib: { level: 9 } });
+  archive.on('error', (err) => {
+    console.error('Zip archive error:', err);
+    res.end();
+  });
   archive.pipe(res);
 
   try {
@@ -93,7 +97,7 @@ app.post('/api/convert', async (req, res) => {
             printBackground: true,
             margin: { top: '15mm', bottom: '15mm', left: '10mm', right: '10mm' },
           });
-          archive.append(pdfBuffer, { name: `pdf/${name}.pdf` });
+          archive.append(Buffer.from(pdfBuffer), { name: `pdf/${name}.pdf` });
         }
         results.push({ url, status: 'ok' });
       } catch (err) {
