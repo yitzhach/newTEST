@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upcoming shows</title>
+<!-- ==========================================================================
+     Art Show Tracker — embeddable upcoming list (Phase 5)
+
+     Host this next to the tracker and point an <iframe> at it from
+     isaacandersonart.com. Read-only: it renders the list and nothing else —
+     no editing, no storage writes, no account.
+
+     It draws with ASTShare.mountEmbed, the same function the pasted script
+     snippet carries, so the two embeds cannot drift apart.
+
+     Where the shows come from, in order:
+       1. `#d=<base64 JSON>` in the URL — a frozen list, no requests.
+       2. `shows.json` beside this file — the list the tracker exported.
+       3. The tracker's own storage — only over file://, which is the local
+          double-click preview. On a real host that path is off, so a missing
+          shows.json says so instead of seeding a stranger's browser with the
+          demo season.
+
+     Query string: ?n=5&theme=auto|light|dark&mode=accepted|confirmed|planned
+                   &alt=1&title=Upcoming%20shows&link=isaacandersonart.com
+     ========================================================================== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
+<style>
+  html, body { margin:0; background:transparent; }
+  body { padding:4px; }
+  .ias-msg {
+    font:400 13px/1.6 "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color:#737373;
+  }
+</style>
+</head>
+<body>
+<div id="ias-upcoming"></div>
+<script src="core.js"></script>
+<script src="share.js"></script>
+<script>
+(function () {
+  'use strict';
+  var A = window.AST, S = window.ASTShare;
+  var el = document.getElementById('ias-upcoming');
+  var qs = new URLSearchParams(location.search);
+
+  var opts = {
+    count: Math.max(1, Number(qs.get('n')) || 5),
+    statusMode: qs.get('mode') || null,
+    includeAlternates: qs.get('alt') === '1',
+    theme: qs.get('theme') || 'auto',
+    kicker: qs.get('title') || 'Upcoming shows',
+    url: qs.get('link') || '',
+    postHeight: true
+  };
+
+  function paint(data) {
+    data.theme = opts.theme;
+    data.postHeight = true;
+    S.mountEmbed(el, data);
+  }
+  function fail(msg) {
+    el.className = 'ias-msg';
+    el.textContent = msg;
+    try { parent.postMessage({ type:'ias-upcoming-height', height: document.documentElement.scrollHeight }, '*'); } catch (_) {}
+  }
+  function fromShows(shows) {
+    var mode = opts.statusMode || S.defaultStatusMode(shows);
+    var sel = { count: opts.count, statusMode: mode, includeAlternates: opts.includeAlternates };
+    var rows = S.upcoming(shows, sel);
+    if (!rows.length) return fail('No upcoming shows listed yet.');
+    paint(S.embedData(rows, {
+      kicker: opts.kicker, theme: opts.theme, url: opts.url,
+      more: S.remaining(shows, sel), postHeight: true
+    }));
+  }
+
+  /* 1. A frozen list carried in the URL. */
+  var hash = location.hash.replace(/^#/, '');
+  var packed = new URLSearchParams(hash).get('d');
+  if (packed) {
+    try {
+      paint(JSON.parse(decodeURIComponent(escape(atob(packed.replace(/-/g, '+').replace(/_/g, '/'))))));
+      return;
+    } catch (_) { /* fall through to the other sources */ }
+  }
+
+  /* 2. shows.json beside this file. Over file:// fetch is blocked, which is
+        expected — the local preview falls through to the tracker's storage. */
+  fetch('shows.json', { cache: 'no-cache' })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (json) {
+      var shows = (Array.isArray(json) ? json : (json.shows || [])).map(A.makeShow)
+        .filter(function (s) { return !s.deletedAt; });
+      fromShows(shows);
+    })
+    .catch(function () {
+      /* 3. The local double-click preview, and only that: reading the
+            tracker's own storage on someone else's site would write the demo
+            season into a visitor's browser. */
+      if (location.protocol !== 'file:') {
+        return fail('Upcoming shows are not available here yet — shows.json is missing.');
+      }
+      A.Store.list().then(fromShows).catch(function () {
+        fail('Upcoming shows are not available here yet.');
+      });
+    });
+})();
+</script>
+</body>
+</html>
