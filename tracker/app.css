@@ -830,3 +830,17 @@ body.is-splitting-v .leaflet-container { pointer-events:none; }
   .crow .card-stars { grid-column:1; margin-top:3px; }
   .crow .c-act { grid-column:2; grid-row:2 / span 5; align-self:center; }
 }
+
+/* The route into a show's breakdown from the ledger. The name reads as a link
+   because it behaves as one; the `i` beside the eye is the same destination
+   for anyone not using a mouse. */
+.show-row .name[data-detail] { cursor:pointer; text-decoration:underline; text-decoration-style:dotted;
+  text-underline-offset:3px; text-decoration-color:var(--line); }
+.show-row .name[data-detail]:hover { text-decoration-color:currentColor; }
+.row-info {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; flex:none; border:1px solid var(--line);
+  border-radius:50%; background:none; color:var(--muted); cursor:pointer;
+  font-size:12px; font-style:italic; font-family:Georgia, serif; line-height:1;
+}
+.row-info:hover { color:var(--ink); border-color:var(--ink); }

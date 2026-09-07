@@ -51,6 +51,25 @@ tone check, and a complete Worker + D1 backend.
 The site runs in **solo mode**. Everything works, nothing is shared — every
 report stays in the browser and behaves as private.
 
+### The practice show
+
+`build/test-show.json` is one fictitious record — Seattle "This is a Test"
+Festival — so an artist can file a report, try the lenses and open every panel
+without touching notes on a show they might really apply to. It is kept in its
+own input file so it can never be confused with a real one and can be deleted
+in a single step, and every field on it carries a `fixture` provenance status
+that renders as a loud TEST DATA chip. It is tagged in the list and banners
+itself at the top of its drawer. A fabricated row in a database whose whole
+premise is "never let an estimate pass as a fact" has to be unmistakable.
+
+### The ledger opens the same drawer
+
+Clicking a show's **name** in the ledger (or the `i` button beside the eye)
+opens the fit/intel breakdown the catalogue shows; clicking anywhere else on
+the row still opens the edit pane, which is where the personal fields live. A
+show typed in by hand has no catalogue record, and says so rather than
+guessing from the name.
+
 ### Phase 1 of the buildout — done, on `claude/phase-1-build-134uv0`
 
 **Data hygiene.** 12 shows carried a jury notification date earlier than their
@@ -89,7 +108,7 @@ rather than read off a show's page. Coordinates and weather carry it.
 ### The ZAPPlication research pass — 100 shows deep
 
 `build/show-research-source.xlsx` is a research spreadsheet: 236 rows, 34
-columns, 100 of them marked `Enriched` with things that exist only on a show's
+columns, 213 of them carrying research with things that exist only on a show's
 own event page. Every enriched row carries its ZAPP URL, and the event id in
 that URL is the id the catalogue already uses — so the join is exact, 100 of
 100. `build/import_show_research.py` parses it into `build/show-research.json`,
@@ -99,11 +118,11 @@ What it moved:
 
 | | before | after |
 |---|---|---|
-| booth fee (single) | 24/236 | **104/236** |
-| booth fee (double) | 0/236 | **48/236** |
-| booth fee (corner) | 0/236 | **42/236** |
-| jury odds scored | 37/236 | **131/236** |
-| jury statistics | 0/236 | **100/236** |
+| booth fee (single) | 24/236 | **179/237** |
+| booth fee (double) | 0/236 | **87/237** |
+| booth fee (corner) | 0/236 | **88/237** |
+| jury odds scored | 37/236 | **220/237** |
+| jury statistics | 0/236 | **203/237** |
 
 Booth fee coverage was what blocked Phase 2 costing. It is no longer the
 blocker.

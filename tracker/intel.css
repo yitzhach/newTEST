@@ -9,14 +9,14 @@
   --sc-low:#a4652a; --sc-poor:#9b4a34; --sc-none:#a3a3a3;
   --prov-verified:#1d6b52; --prov-corroborated:#3f7f8a;
   --prov-search:#8a6d2b; --prov-editorial:#737373; --prov-member:#5b53a6;
-  --prov-dataset:#4a6d8a;
+  --prov-dataset:#4a6d8a; --prov-fixture:#8a4a7a;
 }
 html[data-theme="dark"] {
   --sc-top:#6fc39c; --sc-high:#7fb09c; --sc-mid:#d0b95e;
   --sc-low:#e0a06a; --sc-poor:#f08d76; --sc-none:#737373;
   --prov-verified:#6fc39c; --prov-corroborated:#7dc4d1;
   --prov-search:#d8b45e; --prov-editorial:#a3a3a3; --prov-member:#a9a2e8;
-  --prov-dataset:#8fb6d4;
+  --prov-dataset:#8fb6d4; --prov-fixture:#d49ec8;
 }
 
 /* ==========================================================================
@@ -428,3 +428,18 @@ body.idr-open { overflow:hidden; }
 .fee-stats { margin-bottom:10px; }
 .fee-stats .fee-na { color:var(--muted); font-weight:400; }
 .fee-note { margin-top:0 !important; }
+
+/* ==========================================================================
+   THE PRACTICE SHOW
+   Its own provenance status, because it is not a weak grade of evidence — it
+   is the absence of any. It must not be able to read as `estimate`.
+   ========================================================================== */
+.prov-fixture {
+  color:var(--prov-fixture); border-style:solid; border-width:2px;
+}
+.tag-test { color:var(--prov-fixture); }
+.test-banner {
+  margin:0 0 18px; padding:11px 14px; border-radius:4px;
+  border:2px solid var(--prov-fixture); color:var(--prov-fixture);
+  font-size:13px; line-height:1.6;
+}

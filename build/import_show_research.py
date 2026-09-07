@@ -83,7 +83,11 @@ HARD_SKIP = re.compile(
     # for, and it is always the cheapest line on the schedule — so "cheapest
     # wins" walks straight into it. One show quoted $495 standard and $250
     # resident, and the parser took the $250.
-    r"\bresidents?\b|discount|\bseniors?\b|veterans?|alumni|\blocal\b",
+    r"\bresidents?\b|discount|\bseniors?\b|veterans?|alumni|\blocal\b|"
+    # "Save $50 & Guaranteed Booth Placement" is a saving, not a price.
+    r"\bsaves?\b|savings|"
+    # "October 31, 2026: Early Decision Booth Fee Due" is a date, not a rate.
+    r"\bdue\b|deadline",
     re.I)
 
 # The line is about renting space rather than about something else entirely.
@@ -150,6 +154,13 @@ def parse_booth_fees(raw):
                 continue
 
             corner = bool(IS_CORNER.search(testable))
+
+            # A surcharge is only ever meaningful for a corner. "All booth
+            # payments made after February 1 will be an additional $50" is a
+            # late fee wearing the word "booth", and read as a base rate it
+            # made a $50 show out of a real one.
+            if not corner and IS_INCREMENT.search(segment):
+                continue
             width = WIDTH.search(testable)
             double = bool(IS_DOUBLE.search(testable)) or \
                 (width is not None and int(width.group(1)) >= 15)
@@ -163,7 +174,21 @@ def parse_booth_fees(raw):
             if double and IS_STANDARD.search(testable):
                 continue
 
-            amounts = [float(m.replace(",", "")) for m in MONEY.findall(segment)]
+            # Where the prices are read from matters as much as which one is
+            # picked. "10' x 10' (+ $50 vendor permit) = $550" carries two
+            # numbers and only the second is the booth: the first is an
+            # add-on parked in brackets, and taking the cheaper made it a $50
+            # booth. So brackets that contain a surcharge are dropped — but
+            # only those, because "Single 5x8 ($225)" keeps its price inside
+            # brackets and dropping all of them would lose it entirely.
+            priced = re.sub(
+                r"\([^)]*(?:\+|permit|tax|surcharge|fee|save)[^)]*\)", " ", segment,
+                flags=re.I)
+            # And where a line does its own arithmetic, the total is what
+            # follows the equals sign.
+            if "=" in priced:
+                priced = priced.split("=")[-1]
+            amounts = [float(m.replace(",", "")) for m in MONEY.findall(priced)]
             # Tested against the raw segment, not the parenthetical-stripped
             # one: "Corner Fee (Additional): $100" hides the only word that
             # says it is a surcharge inside the brackets this strips out.
@@ -307,14 +332,23 @@ def main():
 
     shows, stats = {}, {"rows": 0, "enriched": 0, "matched": 0,
                         "boothFee": 0, "boothDouble": 0, "boothCorner": 0,
-                        "juryStats": 0, "juryOdds": 0}
+                        "juryStats": 0, "juryOdds": 0, "flagged": 0}
     unparsed_fees = []
 
     for row in rows[1:]:
         stats["rows"] += 1
-        if str(cell(row, "Research Status") or "").strip() != "Enriched":
+        # The status column is free text and its vocabulary grew: alongside
+        # "Enriched" there are now a dozen "Enriched (partial - ...)" variants
+        # naming exactly what could not be captured, plus rows that failed
+        # outright. A partial row still carries real data for the fields it
+        # did get, so the test is a prefix rather than equality — an earlier
+        # exact match would have silently dropped nine shows' worth of it.
+        status = str(cell(row, "Research Status") or "").strip()
+        if not status.startswith("Enriched") and not status.startswith("FLAGGED"):
             continue
         stats["enriched"] += 1
+        if status.startswith("FLAGGED"):
+            stats["flagged"] += 1
 
         found = re.search(r"ID=(\d+)", str(cell(row, "URL") or ""))
         if not found:
@@ -414,9 +448,16 @@ def main():
         if commission:
             record("commissionNote", commission)
 
+        # The status is recorded verbatim rather than flattened to a boolean.
+        # "Enriched (partial - booth fees not captured, likely behind an
+        # interactive page element)" tells the next person exactly where to
+        # look; "enriched" tells them nothing.
+        if status.startswith("FLAGGED"):
+            record("researchFlag", status,
+                   "the research pass flagged this show rather than trusting it")
         shows[show_id] = {"facts": facts, "factors": factors,
                           "provenance": provenance,
-                          "researchStatus": "enriched"}
+                          "researchStatus": status}
 
     payload = {
         "generatedAt": __import__("datetime").date.today().isoformat(),
@@ -431,8 +472,11 @@ def main():
         fh.write("\n")
 
     print("wrote %s" % os.path.relpath(OUT, ROOT))
-    print("  %d rows read, %d enriched, %d joined on their ZAPP id"
+    print("  %d rows read, %d carrying research, %d joined on their ZAPP id"
           % (stats["rows"], stats["enriched"], stats["matched"]))
+    if stats["flagged"]:
+        print("  %d flagged by the research pass and imported with the flag"
+              % stats["flagged"])
     print("  booth fees read out of the schedules: %d single, %d double, %d corner"
           % (stats["boothFee"], stats["boothDouble"], stats["boothCorner"]))
     print("  %d shows with jury statistics, %d scored for jury odds"

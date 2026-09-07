@@ -2,7 +2,7 @@
  "schemaVersion": 1,
  "source": "Art_Show_Tracker.xlsx + fit model additions",
  "importedAt": "2026-09-07",
- "count": 236,
+ "count": 237,
  "shows": [
   {
    "id": "zapp-14594",
@@ -3549,6 +3549,24 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14745",
    "lat": 32.0247,
    "lng": -81.0979
+  },
+  {
+   "id": "test-seattle",
+   "name": "Seattle \"This is a Test\" Festival",
+   "city": "Seattle",
+   "state": "WA",
+   "stateName": "Washington",
+   "startDate": "2027-01-01",
+   "endDate": "2027-01-02",
+   "applyBy": "2026-11-15",
+   "deadlineNote": "a made-up deadline, far enough out that the show stays open for testing",
+   "earlyBird": "",
+   "notifyDate": "2026-12-01",
+   "fee": 30,
+   "feeLabel": "invented jury fee",
+   "url": "",
+   "lat": 47.6062,
+   "lng": -122.3321
   },
   {
    "id": "zapp-14558",
