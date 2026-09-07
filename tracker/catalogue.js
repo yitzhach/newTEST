@@ -87,6 +87,12 @@ window.ASTCatalogue = (function () {
       fee: A.numOrNull(input.fee),
       feeLabel: String(input.feeLabel || '').trim(),
       url: String(input.url || '').trim(),
+      /* City-level coordinates from the offline gazetteer, or null. Carried
+         on the record so the map and the route planner can pin a show the
+         moment it reaches the ledger. See build/geocode_shows.py for what
+         these are and, importantly, what they are not. */
+      lat: A.numOrNull(input.lat),
+      lng: A.numOrNull(input.lng),
       custom: !!input.custom
     };
   }
@@ -272,10 +278,14 @@ window.ASTCatalogue = (function () {
   /* ---- Handing a record to the ledger ------------------------------------ */
 
   /**
-   * Catalogue record -> a ledger show. Coordinates are deliberately left
-   * empty: the catalogue carries city and state, and geocoding is the import
-   * modal's job, so a show added here gets pinned the same way an imported
-   * one does rather than through a second, parallel path.
+   * Catalogue record -> a ledger show.
+   *
+   * Coordinates used to be left empty here, because the catalogue only knew
+   * city and state and geocoding was the import modal's job. The catalogue
+   * now carries city-level coordinates for 234 of the 236 shows, so a show
+   * added from here arrives pinned. The two that have no coordinate — their
+   * city column holds a region rather than a city — still fall through to
+   * the import modal's geocoder, which is the same path as before.
    */
   function toShow(rec, opts) {
     opts = opts || {};
@@ -283,6 +293,8 @@ window.ASTCatalogue = (function () {
       name: rec.name,
       city: rec.city,
       state: rec.state,
+      lat: rec.lat,
+      lng: rec.lng,
       startDate: rec.startDate,
       endDate: rec.endDate,
       applyBy: rec.applyBy,

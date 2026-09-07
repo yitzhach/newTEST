@@ -360,10 +360,62 @@ window.ASTFit = (function () {
      a weighted average is how an artist ends up applying to a show that does
      not jury their medium at all. These are facts, so they only fire when the
      fact is actually known.                                                  */
-  function gates(show, profile) {
+  /* Today, as an ISO date string, in the visitor's own timezone. The build
+     cannot answer this — a JSON file baked in September is still being read in
+     March — so the calendar questions are asked here, where the browser knows
+     what day it is. `opts.today` exists so tests can pin it. */
+  function todayISO(opts) {
+    if (opts && opts.today) return opts.today;
+    var t = new Date();
+    return t.getFullYear() + '-' +
+           ('0' + (t.getMonth() + 1)).slice(-2) + '-' +
+           ('0' + t.getDate()).slice(-2);
+  }
+
+  /* Dates as a reader would say them. core.js owns the formatting; fit.js is
+     loaded alongside it everywhere, but falls back to the raw ISO rather than
+     throwing if it ever is not. */
+  function fmtSpan(startISO, endISO) {
+    var A = window.AST;
+    if (!startISO) return '';
+    if (endISO && A && A.fmtRange) return A.fmtRange(startISO, endISO);
+    if (A && A.fmtDay) {
+      var day = A.fmtDay(startISO);
+      if (day) return day + ', ' + startISO.slice(0, 4);
+    }
+    return endISO ? startISO + ' – ' + endISO : startISO;
+  }
+
+  function gates(show, profile, opts) {
     var p = makeProfile(profile);
     var out = [];
     var media = show.facts && show.facts.mediaCategories;
+
+    /* THE CALENDAR GATE.
+
+       A show whose application window has closed is not an opportunity, and
+       ranking it among the live ones is the most expensive kind of wrong this
+       tool can be: an artist plans a season around a list, and a dead show in
+       it displaces a real one.
+
+       Its own level, not `blocking`. Blocking means the show will not jury
+       your medium — a permanent property of the show — and the list has a
+       filter labelled in exactly those words. A closed deadline is temporary
+       and about the calendar, so it sinks separately and says why. The scores
+       stay visible either way: what a show is worth is still worth knowing in
+       the month you are deciding whether to apply next year. */
+    var f = show.facts || {};
+    var now = todayISO(opts);
+    if (f.endDate && f.endDate < now) {
+      out.push({ level:'closed', code:'show_over',
+        text:'This edition is over — it ran ' + fmtSpan(f.startDate, f.endDate) +
+             '. The scores still describe the show; the next edition has not been listed here yet.' });
+    } else if (f.applyBy && f.applyBy < now) {
+      out.push({ level:'closed', code:'deadline_passed',
+        text:'Applications closed on ' + fmtSpan(f.applyBy, null) +
+             (f.startDate ? ', though the show itself runs ' + fmtSpan(f.startDate, f.endDate) : '') +
+             '. You cannot enter this edition.' });
+    }
 
     /* A blocking gate is only honest on a COMPLETE category list. Half a list
        says nothing about what is missing from it, and telling a sculptor a
@@ -428,11 +480,16 @@ window.ASTFit = (function () {
     });
     /* Blocking gates sink to the bottom rather than vanishing — an artist is
        entitled to see that a show they have heard of does not take their
-       medium, instead of wondering why it never appears. */
+       medium, instead of wondering why it never appears. A closed deadline
+       sinks for the same reason and above the blocked ones, because it is the
+       softer of the two: next year it comes back. */
     scored.sort(function (a, b) {
       var ab = a.gates.some(isBlocking) ? 1 : 0;
       var bb = b.gates.some(isBlocking) ? 1 : 0;
       if (ab !== bb) return ab - bb;
+      var ac = a.gates.some(isClosed) ? 1 : 0;
+      var bc = b.gates.some(isClosed) ? 1 : 0;
+      if (ac !== bc) return ac - bc;
       if (a.fit == null) return 1;
       if (b.fit == null) return -1;
       return b.fit - a.fit;
@@ -441,6 +498,7 @@ window.ASTFit = (function () {
     return scored;
   }
   function isBlocking(g) { return g.level === 'blocking'; }
+  function isClosed(g) { return g.level === 'closed'; }
 
   /* ---- 9. BUYER TYPE (derived, never authored) ---------------------------- */
   function buyerType(show, disciplineKey) {

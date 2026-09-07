@@ -37,6 +37,13 @@ CATALOGUE_SRC = os.path.join(ROOT, "build", "catalogue-source.json")
 CATALOGUE_OUT = os.path.join(ROOT, "tracker", "catalogue.json")
 FIT_SOURCE = os.path.join(ROOT, "build", "fit-source.json")
 OVERRIDES = os.path.join(ROOT, "build", "research-overrides.json")
+# Written by build/geocode_shows.py from an offline gazetteer. Committed, so
+# the build needs no geocoding dependency and every coordinate is auditable.
+GEOCODE = os.path.join(ROOT, "build", "geocode.json")
+# Written by build/import_show_research.py from the ZAPPlication research
+# spreadsheet. 100 shows deep: booth fees, jury statistics, what applying
+# actually involves.
+SHOW_RESEARCH = os.path.join(ROOT, "build", "show-research.json")
 OUT = os.path.join(ROOT, "tracker", "fit-data.json")
 
 SCHEMA_VERSION = 1
@@ -77,6 +84,133 @@ STATE_ABBR = {
 }
 
 NOISE = re.compile(r"\b(festival|fine|art|arts|show|fair|the|of|a|an|and|annual)\b")
+
+# ---------------------------------------------------------------------------
+# Date hygiene
+#
+# The ZAPP export ships two defects that the build used to pass straight
+# through, and they fail in different ways, so they are handled differently.
+#
+# REPAIRABLE — a notify date EARLIER than the deadline it belongs to. That is
+# not a close call; it is impossible, and it happens because a listing carries
+# its previous edition's notify date forward. Nine of the twelve are almost
+# exactly a year early, which is the giveaway. There is no honest way to
+# recover the real date from the row — the previous edition's deadline is not
+# in the export either — so the value is dropped and renders as "not known".
+# Dropping is the repair. Guessing a year forward would put a fabricated date
+# in front of an artist planning around it.
+#
+# FATAL — anything the build cannot repair honestly: a date it cannot parse, a
+# show that ends before it starts, a deadline after the show is over. These
+# stop the build, because shipping them means shipping a lie about a real
+# date and there is nothing sensible to substitute.
+#
+# NOT FATAL, deliberately — a deadline in the past. That is not a defect in
+# the data; it is what a real deadline does when the calendar moves. Making it
+# fatal would mean the repo stops building in October unless somebody edits
+# the data, which trains people to disable the check. It is reported here and
+# surfaced at runtime instead, where the browser knows what day it is:
+# fit.js gates() raises it in the drawer and the list already renders "closed".
+# ---------------------------------------------------------------------------
+
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def check_dates(label, row, today):
+    """Inspect and repair one row's dates in place.
+
+    `row` is any mapping carrying startDate / endDate / applyBy / notifyDate —
+    a raw catalogue record or a built `facts` block, since both use these
+    names. Returns (repairs, fatals, expired) as lists of readable strings.
+    """
+    repairs, fatals, expired = [], [], []
+
+    def get(k):
+        v = clean(row.get(k))
+        return str(v) if v is not None else None
+
+    for k in ("startDate", "endDate", "applyBy", "notifyDate"):
+        v = get(k)
+        if v is not None and not DATE_RE.match(v):
+            fatals.append("%s: %s is not a date: %r" % (label, k, v))
+
+    start, end = get("startDate"), get("endDate")
+    apply_by, notify = get("applyBy"), get("notifyDate")
+
+    if start and end and DATE_RE.match(start) and DATE_RE.match(end) and end < start:
+        fatals.append("%s: ends %s but starts %s" % (label, end, start))
+    if apply_by and end and DATE_RE.match(apply_by) and DATE_RE.match(end) and apply_by > end:
+        fatals.append("%s: deadline %s falls after the show ends %s" % (label, apply_by, end))
+
+    if apply_by and notify and DATE_RE.match(apply_by) and DATE_RE.match(notify) and notify < apply_by:
+        repairs.append("%s: notify %s precedes deadline %s — dropped" % (label, notify, apply_by))
+        # Written back in the shape it arrived: a raw catalogue row spells
+        # not-known as "", a built facts block spells it None. Both render as
+        # "not known"; mixing them would make the catalogue schema lumpy.
+        row["notifyDate"] = "" if isinstance(row.get("notifyDate"), str) else None
+
+    if apply_by and DATE_RE.match(apply_by) and apply_by < today:
+        expired.append("%s: deadline closed %s" % (label, apply_by))
+
+    return repairs, fatals, expired
+
+
+def run_hygiene(labelled_rows, today):
+    """Apply check_dates across a list of (label, row) pairs."""
+    repairs, fatals, expired = [], [], []
+    for label, row in labelled_rows:
+        r, f, e = check_dates(label, row, today)
+        repairs += r
+        fatals += f
+        expired += e
+    return repairs, fatals, expired
+
+
+def report_hygiene(repairs, fatals, expired):
+    """Say what was found, loudly, and stop the build on anything unrepairable.
+
+    Printed in full rather than counted. A repair that only shows up as a
+    number is a repair nobody reads, and these are edits to real dates that a
+    real artist plans around.
+
+    Deduplicated, because a show whose stale notify date sits in BOTH the ZAPP
+    export and the fit-source pass gets repaired in both places and is still
+    one show with one bad date.
+    """
+    def unique(lines):
+        seen, out = set(), []
+        for line in lines:
+            if line not in seen:
+                seen.add(line)
+                out.append(line)
+        return out
+
+    repairs, fatals, expired = unique(repairs), unique(fatals), unique(expired)
+
+    print("date hygiene:")
+    if repairs:
+        print("  %d impossible notify date%s dropped to 'not known':"
+              % (len(repairs), "" if len(repairs) == 1 else "s"))
+        for line in repairs:
+            print("    - %s" % line)
+    else:
+        print("  no impossible notify dates")
+
+    if expired:
+        # Not an error. See the note at the top of this section: the browser
+        # is what knows today's date, and fit.js gates() raises this in the
+        # drawer so a closed show stops reading as a live opportunity.
+        print("  %d deadline%s already closed (surfaced in the UI, not an error):"
+              % (len(expired), "" if len(expired) == 1 else "s"))
+        for line in expired:
+            print("    - %s" % line)
+
+    if fatals:
+        print("  %d unrepairable date error%s:"
+              % (len(fatals), "" if len(fatals) == 1 else "s"))
+        for line in fatals:
+            print("    - %s" % line)
+        sys.exit("build stopped: fix the dates above rather than shipping them")
 
 
 def norm_name(s):
@@ -128,6 +262,17 @@ def main():
     catalogue = load(CATALOGUE_SRC)["shows"]
     fit_rows = load(FIT_SOURCE)
     overrides = load(OVERRIDES, default={})
+    geocode = load(GEOCODE, default={"shows": {}, "gazetteer": {}})
+    research = load(SHOW_RESEARCH, default={"shows": {}})
+
+    today = __import__("datetime").date.today().isoformat()
+
+    # Pass one, on the raw export rows. This has to happen before build_record
+    # reads them, because write_catalogue emits these same objects — repairing
+    # only the fit layer would leave catalogue.json still shipping the defect
+    # to the browser, the map and the ledger, which all read it.
+    cat_repairs, cat_fatals, _ = run_hygiene(
+        [(row.get("id") or row.get("name") or "?", row) for row in catalogue], today)
 
     by_norm = defaultdict(list)
     for row in catalogue:
@@ -148,7 +293,9 @@ def main():
             stats["fit_only"] += 1
 
         rec = build_record(fit, cat)
+        apply_research(rec, (research.get("shows") or {}).get(rec["id"]))
         apply_override(rec, overrides.get(rec["id"]))
+        apply_geocode(rec, geocode)
         out.append(rec)
 
     # Any catalogue row the fit pass never scored still belongs in the members'
@@ -158,10 +305,23 @@ def main():
             continue
         stats["catalogue_only"] += 1
         rec = build_record(None, row)
+        apply_research(rec, (research.get("shows") or {}).get(rec["id"]))
         apply_override(rec, overrides.get(rec["id"]))
+        apply_geocode(rec, geocode)
         out.append(rec)
 
     out.sort(key=lambda r: (r["name"] or "").lower())
+
+    # Pass two, on the built records. Catches the fit-only shows, whose dates
+    # come from fit-source rather than the export, and catches a research
+    # override that reintroduces a defect the first pass had already cleared.
+    rec_repairs, rec_fatals, expired = run_hygiene(
+        [(r["id"], r["facts"]) for r in out], today)
+    for rec in out:
+        if rec["facts"].get("notifyDate") is None:
+            rec["provenance"].pop("notifyDate", None)
+
+    report_hygiene(cat_repairs + rec_repairs, cat_fatals + rec_fatals, expired)
 
     payload = {
         "schemaVersion": SCHEMA_VERSION,
@@ -215,8 +375,21 @@ def write_catalogue(records, original):
     rather than duplicating.
     """
     have = {row["id"] for row in original}
+    by_id = {rec["id"]: rec for rec in records}
     rows = list(original)
     added = 0
+
+    # Coordinates travel with the catalogue, not just the fit layer. The map,
+    # the route planner and the ledger all read catalogue.json, and a show
+    # added to the ledger used to arrive unpinned — geocoding was the import
+    # modal's job because nothing else knew where the show was. Now something
+    # does.
+    for row in rows:
+        rec = by_id.get(row["id"])
+        if rec:
+            row["lat"] = rec["facts"].get("lat")
+            row["lng"] = rec["facts"].get("lng")
+
     for rec in records:
         if rec["id"] in have:
             continue
@@ -236,6 +409,8 @@ def write_catalogue(records, original):
             "fee": f["juryFee"],
             "feeLabel": f["juryFeeLabel"] or "",
             "url": f["officialUrl"] or "",
+            "lat": f.get("lat"),
+            "lng": f.get("lng"),
         })
         added += 1
 
@@ -316,6 +491,21 @@ def build_record(fit, cat):
         "indoorOutdoor": None,
         "lat": None,
         "lng": None,
+        # Filled by the ZAPPlication research pass. See import_show_research.py.
+        "boothFeeDetail": None,        # the fee schedule verbatim
+        "commissionNote": None,        # what the page says, which is not the same
+                                       # as a percentage — see the importer
+        "avgSubmissionsPerYear": None,
+        "avgAccepted": None,
+        "avgExemptFromJury": None,
+        "effectiveAcceptanceRatePct": None,   # accepted less exempt, over submitted
+        "imagesRequired": None,
+        "boothShotRequired": None,
+        "applicationsAllowed": None,
+        "emergingArtistProgram": None,
+        "jurorCount": None,
+        "juryScoringScale": None,
+        "refundPolicy": None,
     }
 
     if facts["applicationUrl"]:
@@ -347,6 +537,59 @@ def build_record(fit, cat):
     }
 
 
+def apply_research(rec, entry):
+    """Merge one show's row from the ZAPPlication research pass.
+
+    Applied BEFORE apply_override on purpose. This is a bulk import of a
+    hundred shows; research-overrides.json is a hand-curated pass over
+    twenty-nine of them. Where the two disagree, a person who looked at one
+    show closely should beat a parser that looked at a hundred quickly, so
+    the hand-curated layer lands last and wins.
+    """
+    if not entry:
+        return
+    for key, value in (entry.get("facts") or {}).items():
+        rec["facts"][key] = value
+    for key, value in (entry.get("factors") or {}).items():
+        rec["factors"][key] = value
+    rec["provenance"].update(entry.get("provenance") or {})
+    if entry.get("researchStatus"):
+        rec["researchStatus"] = entry["researchStatus"]
+
+
+def apply_geocode(rec, geocode):
+    """Fill lat/lng from the committed gazetteer output.
+
+    Only ever fills a null. A research pass that found the venue's own
+    coordinates has better information than a city centroid, and this must not
+    overwrite it — the same rule the whole provenance model runs on: certainty
+    only ever goes up.
+    """
+    if rec["facts"].get("lat") is not None or rec["facts"].get("lng") is not None:
+        return
+    entry = (geocode.get("shows") or {}).get(rec["id"])
+    if not entry:
+        return
+
+    rec["facts"]["lat"] = entry["lat"]
+    rec["facts"]["lng"] = entry["lng"]
+
+    gaz = geocode.get("gazetteer") or {}
+    rec["provenance"]["coordinates"] = {
+        # Its own status. Not `verified` — nobody opened a page — and not
+        # `search`, which renders "unconfirmed" and would understate a
+        # deterministic lookup in a shipped dataset. A dataset is a third
+        # kind of claim and the chip says which one it is.
+        "status": "dataset",
+        "basis": "%s for %s, %s (mean of %d ZIP centroid%s). %s" % (
+            gaz.get("name", "offline gazetteer"),
+            entry.get("city") or "?", entry.get("state") or "?",
+            entry.get("zipCount", 0), "" if entry.get("zipCount") == 1 else "s",
+            gaz.get("note", "")),
+        "checked": geocode.get("generatedAt") or "",
+    }
+
+
 def apply_override(rec, ov):
     """Research output, merged in. Overrides only ever ADD certainty: they can
     fill a null, correct a value, or raise a confidence grade, and each field
@@ -365,5 +608,66 @@ def apply_override(rec, ov):
             rec[k] = ov[k]
 
 
+def selftest():
+    """Prove the date rules, without needing the real data to be broken.
+
+    The shipped artifacts are asserted on by build/browser-tests.cjs, which is
+    the right place for "does the defect reach the browser". This is the other
+    half: does the rule itself fire, on inputs constructed to trip it. Run with
+        python3 build/build_fit_data.py --selftest
+    """
+    failures = []
+
+    def case(name, row, expect_repair=False, expect_fatal=False, expect_expired=False,
+             today="2026-09-07"):
+        repairs, fatals, expired = check_dates(name, row, today)
+        got = (bool(repairs), bool(fatals), bool(expired))
+        want = (expect_repair, expect_fatal, expect_expired)
+        if got != want:
+            failures.append("%s: expected %s, got %s %r" % (name, want, got, row))
+        return row
+
+    # The defect this whole pass exists for: a notify date a year stale.
+    row = case("stale notify", {"applyBy": "2026-09-18", "notifyDate": "2025-09-22"},
+               expect_repair=True)
+    if row.get("notifyDate") not in (None, ""):
+        failures.append("stale notify: value was not dropped, got %r" % row["notifyDate"])
+
+    # Same defect in a raw catalogue row, which spells not-known as "".
+    row = case("stale notify, catalogue shape",
+               {"applyBy": "2026-09-18", "notifyDate": "2025-09-22", "startDate": ""},
+               expect_repair=True)
+    if row["notifyDate"] != "":
+        failures.append("catalogue shape: expected '', got %r" % row["notifyDate"])
+
+    # A notify date on the deadline itself is legal — juries do announce same-day.
+    case("notify on the deadline", {"applyBy": "2026-09-18", "notifyDate": "2026-09-18"})
+
+    # Unrepairable: nothing sensible to substitute, so the build must stop.
+    case("ends before it starts",
+         {"startDate": "2026-09-13", "endDate": "2026-09-11"}, expect_fatal=True)
+    case("deadline after the show ends",
+         {"startDate": "2026-09-11", "endDate": "2026-09-13", "applyBy": "2026-10-01"},
+         expect_fatal=True)
+    case("not a date", {"applyBy": "September 4th"}, expect_fatal=True)
+
+    # A passed deadline is reported, never fatal — the calendar moves on its own.
+    case("closed deadline", {"applyBy": "2026-09-04"}, expect_expired=True)
+    case("open deadline", {"applyBy": "2026-12-04"})
+
+    # Empty and absent both mean not known, and neither is an error.
+    case("nothing known", {})
+    case("all blank", {"startDate": "", "endDate": "", "applyBy": "", "notifyDate": ""})
+
+    for line in failures:
+        print("  FAIL  " + line)
+    if failures:
+        sys.exit("%d date-rule check%s failed" % (len(failures), "" if len(failures) == 1 else "s"))
+    print("date rules: 11/11 checks passed")
+
+
 if __name__ == "__main__":
-    main()
+    if "--selftest" in sys.argv:
+        selftest()
+    else:
+        main()

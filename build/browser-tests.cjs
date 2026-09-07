@@ -38,7 +38,12 @@ function check(name, pass, detail) {
   const errors = [];
   // Google Fonts and the favicon are blocked by this sandbox's egress proxy;
   // both resolve on the live site. Filter them so a real error stands out.
-  const IGNORE = /fonts\.googleapis|fonts\.gstatic|favicon/;
+  //
+  // archive-api.open-meteo.com is blocked for the same reason, and its failure
+  // is a tested behaviour rather than a defect — see the weather check below,
+  // which asserts that the panel degrades to "not known" precisely because
+  // these requests fail here. Filtering it keeps a real error visible.
+  const IGNORE = /fonts\.googleapis|fonts\.gstatic|favicon|archive-api\.open-meteo/;
   page.on('requestfailed', r => { if (!IGNORE.test(r.url())) errors.push('reqfail: ' + r.url()); });
   page.on('console', m => {
     if (m.type() !== 'error') return;
@@ -265,6 +270,167 @@ function check(name, pass, detail) {
   await page.waitForTimeout(300);
   const netTxt = await page.textContent('.idr-body');
   check('network panel explains solo mode', /Running solo/i.test(netTxt));
+
+  // ---- 18. date hygiene actually ships clean -----------------------------
+  /* The build repairs impossible notify dates and stops on anything it cannot
+     repair. These assert on the SHIPPED artifacts, which is the thing that
+     matters — a rule that runs in the build but leaks into the JSON has not
+     done its job. Both files are checked: catalogue.json is what the browser,
+     the map and the ledger read, and it used to carry the defect too. */
+  const hygiene = await page.evaluate(async () => {
+    const bad = { fit: [], catalogue: [] };
+    const fit = await (await fetch('fit-data.json')).json();
+    for (const s of fit.shows) {
+      const f = s.facts;
+      if (f.applyBy && f.notifyDate && f.notifyDate < f.applyBy) bad.fit.push(s.id);
+    }
+    const cat = await (await fetch('catalogue.json')).json();
+    for (const s of cat.shows) {
+      if (s.applyBy && s.notifyDate && s.notifyDate < s.applyBy) bad.catalogue.push(s.id);
+    }
+    return {
+      bad,
+      total: fit.shows.length,
+      located: fit.shows.filter(s => typeof s.facts.lat === 'number' &&
+                                     typeof s.facts.lng === 'number').length,
+      catalogueLocated: cat.shows.filter(s => typeof s.lat === 'number').length,
+      provenance: fit.shows.filter(s => s.provenance && s.provenance.coordinates).length,
+      boothFee: fit.shows.filter(s => s.facts.boothFee != null).length,
+      jurySubs: fit.shows.filter(s => s.facts.avgSubmissionsPerYear != null).length,
+      juryOdds: fit.shows.filter(s => s.factors.juryOdds != null).length,
+      // Not mentioned is not zero. If this ever stops being 0, the importer
+      // has started asserting a commission rate nobody published.
+      fakeZeroCommission: fit.shows.filter(
+        s => s.facts.commissionPct === 0 && s.facts.commissionNote).length,
+      // Every booth fee has to be traceable to something a reader can check:
+      // the fee-schedule line it was parsed out of, or the page it was read
+      // from. Which of the two depends on which research pass found it.
+      boothFeeUntraceable: fit.shows.filter(
+        s => s.facts.boothFee != null &&
+             !(s.provenance.boothFee &&
+               (s.provenance.boothFee.basis || s.provenance.boothFee.source))).length
+    };
+  });
+  check('no notify date precedes its own deadline in fit-data',
+        hygiene.bad.fit.length === 0, hygiene.bad.fit.join(','));
+  check('no notify date precedes its own deadline in catalogue.json',
+        hygiene.bad.catalogue.length === 0, hygiene.bad.catalogue.join(','));
+
+  // ---- 19. geocode coverage ----------------------------------------------
+  /* 234 of 236. The two without coordinates hold a region rather than a city
+     in their city column, and are deliberately left null rather than guessed;
+     if that number moves, the gazetteer pass needs re-reading, not silencing. */
+  check('at least 234 of 236 shows carry coordinates',
+        hygiene.located >= 234 && hygiene.total === 236,
+        hygiene.located + '/' + hygiene.total);
+  check('coordinates reach catalogue.json too',
+        hygiene.catalogueLocated === hygiene.located,
+        hygiene.catalogueLocated + ' vs ' + hygiene.located);
+  check('every coordinate carries provenance',
+        hygiene.provenance === hygiene.located,
+        hygiene.provenance + ' provenance entries for ' + hygiene.located + ' coordinates');
+
+  // ---- 19b. the ZAPPlication research pass ------------------------------
+  /* Booth fee coverage was 24/236 before this import and blocks the whole of
+     Phase 2 costing, so it is worth asserting rather than assuming. */
+  check('booth fee coverage is at least 100 shows',
+        hygiene.boothFee >= 100, hygiene.boothFee + '/236');
+  check('jury statistics landed on 100 shows',
+        hygiene.jurySubs >= 100, hygiene.jurySubs + '/236');
+  check('jury odds are scored from those statistics',
+        hygiene.juryOdds >= 130, hygiene.juryOdds + '/236');
+  check('every booth fee is traceable to a line or a page',
+        hygiene.boothFeeUntraceable === 0, hygiene.boothFeeUntraceable + ' untraceable');
+  check('"no commission mentioned" is never recorded as 0%',
+        hygiene.fakeZeroCommission === 0, hygiene.fakeZeroCommission + ' shows');
+
+  // ---- 20. a closed deadline is surfaced, not ranked as live -------------
+  await page.click('#idrClose');
+  await page.uncheck('#fOpen');            // closed shows are hidden by default
+  await page.fill('#fText', 'Bar Harbor Fine Arts Festival II');
+  await page.waitForTimeout(400);
+  const closed = await page.evaluate(() => {
+    const el = document.querySelector('.card[data-id="zapp-13837"], .crow[data-id="zapp-13837"]');
+    return el ? { found: true, isClosed: el.classList.contains('is-closed') } : { found: false };
+  });
+  check('a show whose deadline has passed is marked closed in the list',
+        closed.found && closed.isClosed, JSON.stringify(closed));
+
+  await page.click('[data-detail="zapp-13837"]');
+  await page.waitForTimeout(500);
+  const closedDrawer = await page.textContent('.idr-body');
+  check('the drawer says the application window has closed',
+        /Applications closed on/i.test(closedDrawer) || /This edition is over/i.test(closedDrawer),
+        (closedDrawer || '').slice(0, 80));
+
+  // ---- 21. the show's coordinates are shown with their source ------------
+  check('the drawer shows coordinates with a dataset chip',
+        /Coordinates/.test(closedDrawer) && /city centre/.test(closedDrawer));
+
+  // ---- 22. sales tax: state-only, never a combined rate ------------------
+  /* The whole risk of this feature is an artist reading one number and
+     collecting it. These assert the guard rails rather than the rate. */
+  const taxPanel = await page.evaluate(() => {
+    const heads = [...document.querySelectorAll('.idr-body .sd-h')];
+    const h = heads.find(x => /Sales tax/i.test(x.textContent));
+    const box = h && h.nextElementSibling;
+    return box ? { text: box.textContent, links: [...box.querySelectorAll('a')].map(a => a.href) } : null;
+  });
+  check('the sales tax panel renders for a state in the table', !!taxPanel);
+  check('it says the rate is state-only',
+        !!taxPanel && /State rate only/i.test(taxPanel.text));
+  check('it names local taxes as extra and not included',
+        !!taxPanel && /not included here/i.test(taxPanel.text));
+  check('it says plainly that it is not tax advice',
+        !!taxPanel && /not tax advice/i.test(taxPanel.text));
+  check('it links out to the issuing authority',
+        !!taxPanel && taxPanel.links.some(u => /maine\.gov/.test(u)),
+        taxPanel && taxPanel.links.join(' '));
+
+  // ---- 23. weather degrades to "not known" when the API is unreachable ---
+  /* This sandbox blocks archive-api.open-meteo.com, which makes it the ideal
+     place to prove the failure path: a dead provider must read as "not known",
+     never as a broken panel or a fabricated average. */
+  await page.waitForTimeout(1200);
+  const wx = await page.evaluate(() => {
+    const el = document.querySelector('#wxPanel');
+    return el ? el.textContent.trim() : null;
+  });
+  check('the weather panel exists', wx !== null);
+  check('an unreachable weather API degrades to "not known"',
+        !!wx && /not known/i.test(wx), wx);
+  check('it does not invent a number when the lookup failed',
+        !!wx && !/\d+%/.test(wx) && !/\u00b0F/.test(wx), wx);
+
+  // ---- 24. the jury numbers reach the drawer ----------------------------
+  await page.click('#idrClose');
+  await page.fill('#fText', 'Art on the Fox Algonquin');
+  await page.waitForTimeout(400);
+  await page.click('[data-detail="zapp-13982"]');
+  await page.waitForTimeout(500);
+  const gettingIn = await page.evaluate(() => {
+    const heads = [...document.querySelectorAll('.idr-body .sd-h')];
+    const h = heads.find(x => /Getting in/i.test(x.textContent));
+    if (!h) return null;
+    let text = '', node = h.nextElementSibling;
+    while (node && node.tagName !== 'H3') { text += ' ' + node.textContent; node = node.nextElementSibling; }
+    return text;
+  });
+  check('the drawer has a "Getting in" section', gettingIn !== null);
+  check('it shows how many apply and how many get in',
+        !!gettingIn && /100/.test(gettingIn) && /65/.test(gettingIn),
+        (gettingIn || '').slice(0, 90));
+  /* The number that makes the exempt count worth collecting: 65 of 100 looks
+     generous until you learn 20 of those places never faced the jury. */
+  check('it discounts places that never faced the jury',
+        !!gettingIn && /exempt from the jury/i.test(gettingIn) && /45/.test(gettingIn),
+        (gettingIn || '').slice(0, 140));
+
+  const drawerText = await page.textContent('.idr-body');
+  check('the full fee schedule is available verbatim',
+        /full fee schedule/i.test(drawerText));
+  check('commission shows what the page said, not a fabricated 0%',
+        /No commission mentioned/i.test(drawerText) && !/\b0% of sales/.test(drawerText));
 
   console.log('\nlate console errors: ' + (errors.length ? errors.join(' | ') : 'none'));
   await browser.close();

@@ -1,5 +1,14 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+# Publish the production site.
+#
+# This used to upload an artifact and deploy it through the Pages API. It now
+# publishes to the `gh-pages` branch instead, because a Pages site can only
+# have one source and the branch is the only source that can hold more than
+# one thing at a time — which is what makes per-pull-request previews possible
+# alongside production. See .github/workflows/pr-preview.yml.
+#
+# Repository setting this depends on:
+#   Settings -> Pages -> Source: "Deploy from a branch", branch `gh-pages`, / (root)
+name: Deploy site to GitHub Pages
 
 on:
   # Runs on pushes targeting the default branch
@@ -9,35 +18,33 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  # Pushing the site to the gh-pages branch. No pages: write or id-token:
+  # write any more — nothing here talks to the Pages deployment API.
+  contents: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# Shared with pr-preview.yml on purpose. Both workflows push to the same
+# branch, and two pushes landing together means one of them is rejected. The
+# deploy script can recover from that on its own, but not racing in the first
+# place is cheaper than recovering.
 concurrency:
-  group: "pages"
+  group: "gh-pages"
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+
+      - name: Publish to gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .github/scripts/deploy-pages.sh site
+
+      - name: Say where it went
+        run: |
+          echo "### Published" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/tracker/browse.html" >> "$GITHUB_STEP_SUMMARY"
