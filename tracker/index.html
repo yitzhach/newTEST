@@ -9,11 +9,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
       referrerpolicy="no-referrer">
-<link rel="stylesheet" href="app.css?v=a7394aae">
+<link rel="stylesheet" href="app.css?v=51812322">
 <!-- The ledger shows the same fit/intel drawer the catalogue does, so it needs
      the same styles. Scoped to .idr/.fitchip/.prov and its own tokens; it adds
      to app.css rather than competing with it. -->
-<link rel="stylesheet" href="intel.css?v=a7394aae">
+<link rel="stylesheet" href="intel.css?v=51812322">
 </head>
 <body>
 <!-- ==========================================================================
@@ -30,7 +30,7 @@
       <button id="btnViewMap"  type="button" aria-pressed="false">Map</button>
     </div>
     <button class="btn btn-quiet" id="btnFullScreen" type="button"
-            title="Fill the screen with the map (Escape to come back)">Full screen</button>
+            title="Fill the screen with the map (Escape to come back)">Map full screen</button>
     <a class="btn btn-quiet" href="browse.html" id="btnBrowse"
        title="Browse the shows catalogue and pick what to apply to">All shows</a>
     <button class="sync-pill" id="syncPill" type="button" data-state="local"
@@ -218,6 +218,7 @@
       <div class="form-row">
         <label class="label" for="f_boothFee">Booth fee ($)</label>
         <input class="control" id="f_boothFee" name="boothFee" inputmode="decimal" autocomplete="off">
+        <div class="hint" id="h_boothFee" hidden></div>
         <div class="err" id="e_boothFee" hidden></div>
       </div>
     </div>
@@ -593,23 +594,23 @@
      sandbox and an unverified hash would break the map outright. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
         referrerpolicy="no-referrer"></script>
-<script src="core.js?v=a7394aae"></script>
-<script src="map.js?v=a7394aae"></script>
+<script src="core.js?v=51812322"></script>
+<script src="map.js?v=51812322"></script>
 <!-- The fit/intel layer, so a show in the ledger opens the same breakdown
      it does in the catalogue. weather.js and salestax.js are optional to
      intel-ui.js, but without them the drawer silently loses two panels,
      which is worse than carrying two small files. -->
-<script src="fit.js?v=a7394aae"></script>
-<script src="intel.js?v=a7394aae"></script>
-<script src="members.js?v=a7394aae"></script>
-<script src="weather.js?v=a7394aae"></script>
-<script src="salestax.js?v=a7394aae"></script>
-<script src="intel-ui.js?v=a7394aae"></script>
-<script src="store-supabase.js?v=a7394aae"></script>
-<script src="import.js?v=a7394aae"></script>
-<script src="import-ui.js?v=a7394aae"></script>
-<script src="share.js?v=a7394aae"></script>
-<script src="share-ui.js?v=a7394aae"></script>
+<script src="fit.js?v=51812322"></script>
+<script src="intel.js?v=51812322"></script>
+<script src="members.js?v=51812322"></script>
+<script src="weather.js?v=51812322"></script>
+<script src="salestax.js?v=51812322"></script>
+<script src="intel-ui.js?v=51812322"></script>
+<script src="store-supabase.js?v=51812322"></script>
+<script src="import.js?v=51812322"></script>
+<script src="import-ui.js?v=51812322"></script>
+<script src="share.js?v=51812322"></script>
+<script src="share-ui.js?v=51812322"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE
@@ -841,7 +842,19 @@ function openDrawer(show) {
   $('#f_routeNumber').value = s.routeNumber;
   $('#f_isAlternate').checked = s.isAlternate;
   $('#f_juryFee').value = s.juryFee === null ? '' : s.juryFee;
-  $('#f_boothFee').value = s.boothFee === null ? '' : s.boothFee;
+  /* A blank booth fee is filled from the catalogue if we know one, so the
+     field starts costed rather than empty. It stays entirely the artist's:
+     this only ever suggests into an empty box, never over a number they
+     typed, and nothing is saved until they save. */
+  const known = s.boothFee === null ? catalogueBoothFee(s) : null;
+  $('#f_boothFee').value = s.boothFee !== null ? s.boothFee
+                         : (known !== null ? known : '');
+  const boothHint = $('#h_boothFee');
+  if (boothHint) {
+    boothHint.hidden = known === null;
+    boothHint.textContent = known === null ? ''
+      : 'Filled in from the catalogue. Change it to whatever you were actually quoted.';
+  }
   $('#f_lat').value = s.lat === null ? '' : s.lat;
   $('#f_lng').value = s.lng === null ? '' : s.lng;
   $('#f_url').value = s.url;
@@ -1280,6 +1293,14 @@ async function loadFit() {
   }
 }
 
+/* The researched booth fee for a ledger show, or null. Only ever read. */
+function catalogueBoothFee(show) {
+  if (!show || !show.catalogueId) return null;
+  const rec = fit.byId[show.catalogueId];
+  const fee = rec && rec.facts ? rec.facts.boothFee : null;
+  return typeof fee === 'number' ? fee : null;
+}
+
 function openIntel(id) {
   const show = state.shows.find(s => s.id === id);
   if (!show) return;
@@ -1481,7 +1502,7 @@ $('#btnFullScreen').addEventListener('click', async () => {
 /* Entering or leaving changes the box, so Leaflet has to be told either way. */
 document.addEventListener('fullscreenchange', () => {
   const on = !!document.fullscreenElement;
-  $('#btnFullScreen').textContent = on ? 'Exit full screen' : 'Full screen';
+  $('#btnFullScreen').textContent = on ? 'Exit full screen' : 'Map full screen';
   if (routeMap) requestAnimationFrame(() => { routeMap.invalidateSize(); routeMap.fitAll(); });
 });
 

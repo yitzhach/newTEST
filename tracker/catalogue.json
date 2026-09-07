@@ -20,7 +20,8 @@
    "feeLabel": "2027 4 Bridges Arts Festival Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14594",
    "lat": 35.0414,
-   "lng": -85.2835
+   "lng": -85.2835,
+   "boothFee": 500
   },
   {
    "id": "zapp-14106",
@@ -38,7 +39,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14106",
    "lat": 38.8003,
-   "lng": -77.09
+   "lng": -77.09,
+   "boothFee": 625.0
   },
   {
    "id": "fit-ann-arbor-art-fair",
@@ -56,7 +58,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://www.theannarborartfair.com/",
    "lat": 42.2655,
-   "lng": -83.7714
+   "lng": -83.7714,
+   "boothFee": 700
   },
   {
    "id": "zapp-13930",
@@ -74,7 +77,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13930",
    "lat": 34.7055,
-   "lng": -112.0091
+   "lng": -112.0091,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-13931",
@@ -92,7 +96,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13931",
    "lat": 34.7055,
-   "lng": -112.0091
+   "lng": -112.0091,
+   "boothFee": 300.0
   },
   {
    "id": "fit-armonk-outdoor-art-show",
@@ -110,7 +115,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://armonkoutdoorartshow.org/artists-by-category/for-artists/",
    "lat": 41.136,
-   "lng": -73.7009
+   "lng": -73.7009,
+   "boothFee": 500
   },
   {
    "id": "fit-art-fair-on-the-square",
@@ -128,7 +134,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 43.0724,
-   "lng": -89.4023
+   "lng": -89.4023,
+   "boothFee": null
   },
   {
    "id": "fit-art-in-the-high-desert",
@@ -146,7 +153,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://www.artinthehighdesert.com/ForArtists.html",
    "lat": 44.0277,
-   "lng": -121.3677
+   "lng": -121.3677,
+   "boothFee": 600
   },
   {
    "id": "zapp-14759",
@@ -164,7 +172,8 @@
    "feeLabel": "Art in the Square Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14759",
    "lat": 32.9485,
-   "lng": -97.1524
+   "lng": -97.1524,
+   "boothFee": 550
   },
   {
    "id": "zapp-13982",
@@ -182,7 +191,8 @@
    "feeLabel": "Art on the Fox Algonquin 2026 Late Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13982",
    "lat": 42.1729,
-   "lng": -88.3184
+   "lng": -88.3184,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14847",
@@ -200,7 +210,8 @@
    "feeLabel": "Application fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14847",
    "lat": 45.608,
-   "lng": -84.4867
+   "lng": -84.4867,
+   "boothFee": null
   },
   {
    "id": "zapp-14302",
@@ -218,7 +229,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14302",
    "lat": 40.6568,
-   "lng": -74.3224
+   "lng": -74.3224,
+   "boothFee": 625.0
   },
   {
    "id": "zapp-14673",
@@ -236,7 +248,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14673",
    "lat": 26.9388,
-   "lng": -80.1227
+   "lng": -80.1227,
+   "boothFee": 625.0
   },
   {
    "id": "zapp-14585",
@@ -254,7 +267,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14585",
    "lat": 26.5911,
-   "lng": -81.8646
+   "lng": -81.8646,
+   "boothFee": 517
   },
   {
    "id": "zapp-14555",
@@ -272,7 +286,8 @@
    "feeLabel": "Application fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14555",
    "lat": 26.8,
-   "lng": -80.1191
+   "lng": -80.1191,
+   "boothFee": 589
   },
   {
    "id": "zapp-14408",
@@ -290,7 +305,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14408",
    "lat": 33.9315,
-   "lng": -112.795
+   "lng": -112.795,
+   "boothFee": 400.0
   },
   {
    "id": "zapp-14681",
@@ -308,7 +324,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14681",
    "lat": 34.8581,
-   "lng": -82.3946
+   "lng": -82.3946,
+   "boothFee": 600.0
   },
   {
    "id": "zapp-14885",
@@ -326,7 +343,8 @@
    "feeLabel": "Application plus Late Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14885",
    "lat": 37.6356,
-   "lng": -76.5918
+   "lng": -76.5918,
+   "boothFee": null
   },
   {
    "id": "zapp-14612",
@@ -344,7 +362,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14612",
    "lat": 32.7894,
-   "lng": -96.7896
+   "lng": -96.7896,
+   "boothFee": 450.0
   },
   {
    "id": "zapp-14580",
@@ -362,7 +381,8 @@
    "feeLabel": "Jury Fee - Submission, judging, web posting, etc",
    "url": "https://www.zapplication.org/event-info.php?ID=14580",
    "lat": 27.1762,
-   "lng": -80.2311
+   "lng": -80.2311,
+   "boothFee": 350.0
   },
   {
    "id": "zapp-14573",
@@ -380,7 +400,8 @@
    "feeLabel": "Application fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14573",
    "lat": 35.9682,
-   "lng": -83.9694
+   "lng": -83.9694,
+   "boothFee": 150.0
   },
   {
    "id": "zapp-14658",
@@ -398,7 +419,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14658",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 600.0
   },
   {
    "id": "zapp-14586",
@@ -416,7 +438,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14586",
    "lat": 26.8407,
-   "lng": -81.7948
+   "lng": -81.7948,
+   "boothFee": 325.0
   },
   {
    "id": "fit-bam-arts-fair",
@@ -434,7 +457,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 47.6059,
-   "lng": -122.1698
+   "lng": -122.1698,
+   "boothFee": null
   },
   {
    "id": "zapp-13837",
@@ -452,7 +476,8 @@
    "feeLabel": "non-refundable application fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13837",
    "lat": 44.3738,
-   "lng": -68.2448
+   "lng": -68.2448,
+   "boothFee": 405.0
   },
   {
    "id": "zapp-14884",
@@ -470,7 +495,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14884",
    "lat": 29.7934,
-   "lng": -95.4165
+   "lng": -95.4165,
+   "boothFee": 525.0
   },
   {
    "id": "fit-bayou-city-art-festival-memorial-park",
@@ -488,7 +514,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 29.7934,
-   "lng": -95.4165
+   "lng": -95.4165,
+   "boothFee": null
   },
   {
    "id": "zapp-14613",
@@ -506,7 +533,8 @@
    "feeLabel": "Non-Refundable Application Fee*",
    "url": "https://www.zapplication.org/event-info.php?ID=14613",
    "lat": 25.7291,
-   "lng": -80.2612
+   "lng": -80.2612,
+   "boothFee": 475
   },
   {
    "id": "fit-beaver-creek-art-festival",
@@ -524,7 +552,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 39.6313,
-   "lng": -106.5108
+   "lng": -106.5108,
+   "boothFee": null
   },
   {
    "id": "zapp-14850",
@@ -542,7 +571,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14850",
    "lat": 42.3457,
-   "lng": -83.1001
+   "lng": -83.1001,
+   "boothFee": 525.0
   },
   {
    "id": "zapp-14489",
@@ -560,7 +590,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14489",
    "lat": 26.7545,
-   "lng": -82.2611
+   "lng": -82.2611,
+   "boothFee": 450.0
   },
   {
    "id": "zapp-14610",
@@ -578,7 +609,8 @@
    "feeLabel": "Application/Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14610",
    "lat": 26.3677,
-   "lng": -80.1207
+   "lng": -80.1207,
+   "boothFee": 595.0
   },
   {
    "id": "zapp-14609",
@@ -596,7 +628,8 @@
    "feeLabel": "Application/Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14609",
    "lat": 26.3677,
-   "lng": -80.1207
+   "lng": -80.1207,
+   "boothFee": 595.0
   },
   {
    "id": "zapp-14611",
@@ -614,7 +647,8 @@
    "feeLabel": "Application/Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14611",
    "lat": 26.3677,
-   "lng": -80.1207
+   "lng": -80.1207,
+   "boothFee": 595.0
   },
   {
    "id": "zapp-14711",
@@ -632,7 +666,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14711",
    "lat": 26.3677,
-   "lng": -80.1207
+   "lng": -80.1207,
+   "boothFee": 375
   },
   {
    "id": "zapp-14665",
@@ -650,7 +685,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14665",
    "lat": 26.3677,
-   "lng": -80.1207
+   "lng": -80.1207,
+   "boothFee": 625.0
   },
   {
    "id": "zapp-14654",
@@ -668,7 +704,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14654",
    "lat": 26.3744,
-   "lng": -81.8118
+   "lng": -81.8118,
+   "boothFee": 570.0
   },
   {
    "id": "zapp-14655",
@@ -686,7 +723,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14655",
    "lat": 26.3744,
-   "lng": -81.8118
+   "lng": -81.8118,
+   "boothFee": 570.0
   },
   {
    "id": "zapp-14656",
@@ -704,7 +742,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14656",
    "lat": 26.3744,
-   "lng": -81.8118
+   "lng": -81.8118,
+   "boothFee": 570.0
   },
   {
    "id": "fit-boston-mills-artfest",
@@ -722,7 +761,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 41.2256,
-   "lng": -81.54
+   "lng": -81.54,
+   "boothFee": null
   },
   {
    "id": "zapp-13879",
@@ -740,7 +780,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13879",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-13825",
@@ -758,7 +799,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13825",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 300.0
   },
   {
    "id": "fit-cain-park-arts-festival",
@@ -776,7 +818,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 41.5181,
-   "lng": -81.5663
+   "lng": -81.5663,
+   "boothFee": null
   },
   {
    "id": "zapp-14677",
@@ -794,7 +837,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14677",
    "lat": 26.6253,
-   "lng": -81.9712
+   "lng": -81.9712,
+   "boothFee": 450.0
   },
   {
    "id": "zapp-14269",
@@ -812,7 +856,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14269",
    "lat": 38.9902,
-   "lng": -77.3916
+   "lng": -77.3916,
+   "boothFee": 750.0
   },
   {
    "id": "zapp-14578",
@@ -830,7 +875,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14578",
    "lat": 33.824,
-   "lng": -111.913
+   "lng": -111.913,
+   "boothFee": 550.0
   },
   {
    "id": "zapp-14545",
@@ -848,7 +894,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14545",
    "lat": 33.8592,
-   "lng": -111.9428
+   "lng": -111.9428,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14863",
@@ -866,7 +913,8 @@
    "feeLabel": "Application Fee (students, use waiver code)",
    "url": "https://www.zapplication.org/event-info.php?ID=14863",
    "lat": 39.9949,
-   "lng": -82.9874
+   "lng": -82.9874,
+   "boothFee": null
   },
   {
    "id": "zapp-14614",
@@ -884,7 +932,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14614",
    "lat": 30.4548,
-   "lng": -84.2802
+   "lng": -84.2802,
+   "boothFee": 375
   },
   {
    "id": "zapp-14077",
@@ -902,7 +951,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14077",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 350.0
   },
   {
    "id": "zapp-14633",
@@ -920,7 +970,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14633",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 350.0
   },
   {
    "id": "fit-cherry-creek-arts-festival",
@@ -938,7 +989,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://cherryarts.org/events/cherry-creek-arts-festival/apply/artist-application/",
    "lat": 39.7379,
-   "lng": -104.9775
+   "lng": -104.9775,
+   "boothFee": 900
   },
   {
    "id": "zapp-14785",
@@ -956,7 +1008,8 @@
    "feeLabel": "Jury Fee - Non Refundable",
    "url": "https://www.zapplication.org/event-info.php?ID=14785",
    "lat": 34.7245,
-   "lng": -86.5788
+   "lng": -86.5788,
+   "boothFee": null
   },
   {
    "id": "zapp-14559",
@@ -974,7 +1027,8 @@
    "feeLabel": "Application/Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14559",
    "lat": 33.2386,
-   "lng": -116.3514
+   "lng": -116.3514,
+   "boothFee": 150.0
   },
   {
    "id": "zapp-14864",
@@ -992,7 +1046,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14864",
    "lat": 28.3898,
-   "lng": -80.7693
+   "lng": -80.7693,
+   "boothFee": 235.0
   },
   {
    "id": "zapp-13856",
@@ -1010,7 +1065,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13856",
    "lat": 28.3898,
-   "lng": -80.7693
+   "lng": -80.7693,
+   "boothFee": 235.0
   },
   {
    "id": "zapp-14788",
@@ -1028,7 +1084,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14788",
    "lat": 25.771,
-   "lng": -80.2516
+   "lng": -80.2516,
+   "boothFee": 850
   },
   {
    "id": "zapp-14669",
@@ -1046,7 +1103,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14669",
    "lat": 26.417,
-   "lng": -81.7962
+   "lng": -81.7962,
+   "boothFee": 615.0
   },
   {
    "id": "zapp-14526",
@@ -1064,7 +1122,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14526",
    "lat": 26.417,
-   "lng": -81.7962
+   "lng": -81.7962,
+   "boothFee": 595.0
   },
   {
    "id": "fit-columbus-arts-festival",
@@ -1082,7 +1141,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 39.9949,
-   "lng": -82.9874
+   "lng": -82.9874,
+   "boothFee": null
   },
   {
    "id": "zapp-14839",
@@ -1100,7 +1160,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14839",
    "lat": 27.8273,
-   "lng": -82.7001
+   "lng": -82.7001,
+   "boothFee": 270.0
   },
   {
    "id": "zapp-14616",
@@ -1118,7 +1179,8 @@
    "feeLabel": "Jury/Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14616",
    "lat": 32.8867,
-   "lng": -96.7384
+   "lng": -96.7384,
+   "boothFee": null
   },
   {
    "id": "fit-crested-butte-arts-festival",
@@ -1136,7 +1198,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://www.crestedbutteartsfestival.com/artist-registration",
    "lat": 38.8849,
-   "lng": -106.9625
+   "lng": -106.9625,
+   "boothFee": 600
   },
   {
    "id": "fit-des-moines-arts-festival",
@@ -1154,7 +1217,8 @@
    "feeLabel": "$40 early, $55 after the early deadline",
    "url": "https://www.desmoinesartsfestival.org/forexhibitingartists",
    "lat": 40.9835,
-   "lng": -92.1104
+   "lng": -92.1104,
+   "boothFee": 600
   },
   {
    "id": "zapp-14624",
@@ -1172,7 +1236,8 @@
    "feeLabel": "application fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14624",
    "lat": 33.7643,
-   "lng": -116.4225
+   "lng": -116.4225,
+   "boothFee": 400.0
   },
   {
    "id": "zapp-14625",
@@ -1190,7 +1255,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14625",
    "lat": 33.7643,
-   "lng": -116.4225
+   "lng": -116.4225,
+   "boothFee": null
   },
   {
    "id": "zapp-14527",
@@ -1208,7 +1274,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14527",
    "lat": 26.457,
-   "lng": -80.0948
+   "lng": -80.0948,
+   "boothFee": 695.0
   },
   {
    "id": "zapp-14664",
@@ -1226,7 +1293,8 @@
    "feeLabel": "Non-refundable Jury Fee (Application Fee)",
    "url": "https://www.zapplication.org/event-info.php?ID=14664",
    "lat": 26.457,
-   "lng": -80.0948
+   "lng": -80.0948,
+   "boothFee": 635.0
   },
   {
    "id": "zapp-14400",
@@ -1244,7 +1312,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14400",
    "lat": 25.785,
-   "lng": -80.2852
+   "lng": -80.2852,
+   "boothFee": 400.0
   },
   {
    "id": "zapp-14663",
@@ -1262,7 +1331,8 @@
    "feeLabel": "Non-refundable Jury Fee (Application Fee)",
    "url": "https://www.zapplication.org/event-info.php?ID=14663",
    "lat": null,
-   "lng": null
+   "lng": null,
+   "boothFee": 525.0
   },
   {
    "id": "zapp-14525",
@@ -1280,7 +1350,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14525",
    "lat": 26.8,
-   "lng": -80.1191
+   "lng": -80.1191,
+   "boothFee": 555.0
   },
   {
    "id": "zapp-14684",
@@ -1298,7 +1369,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14684",
    "lat": 26.8,
-   "lng": -80.1191
+   "lng": -80.1191,
+   "boothFee": 525.0
   },
   {
    "id": "zapp-14685",
@@ -1316,7 +1388,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14685",
    "lat": 26.8,
-   "lng": -80.1191
+   "lng": -80.1191,
+   "boothFee": 595.0
   },
   {
    "id": "zapp-14668",
@@ -1334,7 +1407,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14668",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 625.0
   },
   {
    "id": "zapp-14675",
@@ -1352,7 +1426,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14675",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 525.0
   },
   {
    "id": "zapp-14670",
@@ -1370,7 +1445,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14670",
    "lat": 27.1762,
-   "lng": -80.2311
+   "lng": -80.2311,
+   "boothFee": 525.0
   },
   {
    "id": "zapp-14671",
@@ -1388,7 +1464,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14671",
    "lat": 27.0849,
-   "lng": -82.3036
+   "lng": -82.3036,
+   "boothFee": 550.0
   },
   {
    "id": "zapp-14523",
@@ -1406,7 +1483,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14523",
    "lat": 27.0849,
-   "lng": -82.3036
+   "lng": -82.3036,
+   "boothFee": 555.0
   },
   {
    "id": "zapp-14406",
@@ -1424,7 +1502,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14406",
    "lat": 33.9911,
-   "lng": -84.1257
+   "lng": -84.1257,
+   "boothFee": 100.0
   },
   {
    "id": "zapp-14640",
@@ -1442,7 +1521,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14640",
    "lat": 33.9911,
-   "lng": -84.1257
+   "lng": -84.1257,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14905",
@@ -1460,7 +1540,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14905",
    "lat": 42.732,
-   "lng": -84.4783
+   "lng": -84.4783,
+   "boothFee": 400.0
   },
   {
    "id": "fit-edmonds-arts-festival",
@@ -1478,7 +1559,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 47.8207,
-   "lng": -122.3497
+   "lng": -122.3497,
+   "boothFee": null
   },
   {
    "id": "zapp-14417",
@@ -1496,7 +1578,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14417",
    "lat": 26.9909,
-   "lng": -82.3679
+   "lng": -82.3679,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14419",
@@ -1514,7 +1597,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14419",
    "lat": 26.9909,
-   "lng": -82.3679
+   "lng": -82.3679,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14418",
@@ -1532,7 +1616,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14418",
    "lat": 26.9909,
-   "lng": -82.3679
+   "lng": -82.3679,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14539",
@@ -1550,7 +1635,8 @@
    "feeLabel": "Artist Jury Fee (non-refundable)",
    "url": "https://www.zapplication.org/event-info.php?ID=14539",
    "lat": 30.4927,
-   "lng": -87.8721
+   "lng": -87.8721,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14298",
@@ -1568,7 +1654,8 @@
    "feeLabel": "Application Fee (Non-refundable)",
    "url": "https://www.zapplication.org/event-info.php?ID=14298",
    "lat": 42.0471,
-   "lng": -87.6921
+   "lng": -87.6921,
+   "boothFee": null
   },
   {
    "id": "zapp-14601",
@@ -1586,7 +1673,8 @@
    "feeLabel": "2027 75th Annual",
    "url": "https://www.zapplication.org/event-info.php?ID=14601",
    "lat": 30.4927,
-   "lng": -87.8721
+   "lng": -87.8721,
+   "boothFee": 375.0
   },
   {
    "id": "zapp-14491",
@@ -1604,7 +1692,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14491",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-13943",
@@ -1622,7 +1711,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13943",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14828",
@@ -1640,7 +1730,8 @@
    "feeLabel": "Early Bird FAF Application Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14828",
    "lat": 29.4632,
-   "lng": -98.4982
+   "lng": -98.4982,
+   "boothFee": null
   },
   {
    "id": "zapp-14815",
@@ -1658,7 +1749,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14815",
    "lat": 41.4748,
-   "lng": -84.5629
+   "lng": -84.5629,
+   "boothFee": 100.0
   },
   {
    "id": "zapp-14563",
@@ -1676,7 +1768,8 @@
    "feeLabel": "Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14563",
    "lat": 32.2281,
-   "lng": -110.9436
+   "lng": -110.9436,
+   "boothFee": 570.0
   },
   {
    "id": "zapp-14737",
@@ -1694,7 +1787,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14737",
    "lat": 27.9426,
-   "lng": -82.4636
+   "lng": -82.4636,
+   "boothFee": null
   },
   {
    "id": "zapp-14514",
@@ -1712,7 +1806,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14514",
    "lat": 33.3595,
-   "lng": -111.421
+   "lng": -111.421,
+   "boothFee": null
   },
   {
    "id": "fit-great-gulfcoast-arts-festival",
@@ -1730,7 +1825,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 30.4356,
-   "lng": -87.2459
+   "lng": -87.2459,
+   "boothFee": null
   },
   {
    "id": "zapp-14557",
@@ -1748,7 +1844,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14557",
    "lat": 27.7507,
-   "lng": -82.7053
+   "lng": -82.7053,
+   "boothFee": 325.0
   },
   {
    "id": "zapp-14402",
@@ -1766,7 +1863,8 @@
    "feeLabel": "Application Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14402",
    "lat": 29.1917,
-   "lng": -81.0299
+   "lng": -81.0299,
+   "boothFee": 350.0
   },
   {
    "id": "zapp-14587",
@@ -1784,7 +1882,8 @@
    "feeLabel": "Entry Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14587",
    "lat": 32.4369,
-   "lng": -97.7514
+   "lng": -97.7514,
+   "boothFee": 350.0
   },
   {
    "id": "zapp-14667",
@@ -1802,7 +1901,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14667",
    "lat": 27.0704,
-   "lng": -80.1436
+   "lng": -80.1436,
+   "boothFee": 450.0
   },
   {
    "id": "zapp-14637",
@@ -1820,7 +1920,8 @@
    "feeLabel": "Jury/Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14637",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14628",
@@ -1838,7 +1939,8 @@
    "feeLabel": "Jury fee is non-refundable",
    "url": "https://www.zapplication.org/event-info.php?ID=14628",
    "lat": 29.0226,
-   "lng": -80.9246
+   "lng": -80.9246,
+   "boothFee": null
   },
   {
    "id": "fit-jackson-hole-fall-arts-festival",
@@ -1856,7 +1958,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 43.4664,
-   "lng": -110.7508
+   "lng": -110.7508,
+   "boothFee": null
   },
   {
    "id": "zapp-14536",
@@ -1874,7 +1977,8 @@
    "feeLabel": "Early Bird Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14536",
    "lat": 24.5552,
-   "lng": -81.7816
+   "lng": -81.7816,
+   "boothFee": 340.0
   },
   {
    "id": "zapp-14546",
@@ -1892,7 +1996,8 @@
    "feeLabel": "Application/Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14546",
    "lat": 33.5854,
-   "lng": -111.8536
+   "lng": -111.8536,
+   "boothFee": 450.0
   },
   {
    "id": "zapp-14826",
@@ -1910,7 +2015,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14826",
    "lat": 29.4632,
-   "lng": -98.4982
+   "lng": -98.4982,
+   "boothFee": 335.0
   },
   {
    "id": "fit-kings-mountain-art-fair",
@@ -1928,7 +2034,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://kingsmountainartfair.org/call-for-entry/",
    "lat": 37.4446,
-   "lng": -122.2632
+   "lng": -122.2632,
+   "boothFee": 100
   },
   {
    "id": "fit-krasl-art-fair-on-the-bluff",
@@ -1946,7 +2053,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://krasl.org/art-fair/artist-information/",
    "lat": 42.064,
-   "lng": -86.4783
+   "lng": -86.4783,
+   "boothFee": 300
   },
   {
    "id": "fit-la-jolla-festival-of-the-arts",
@@ -1964,7 +2072,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 32.8469,
-   "lng": -117.2698
+   "lng": -117.2698,
+   "boothFee": null
   },
   {
    "id": "zapp-14569",
@@ -1982,7 +2091,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14569",
    "lat": 33.6719,
-   "lng": -116.2994
+   "lng": -116.2994,
+   "boothFee": 400
   },
   {
    "id": "zapp-14876",
@@ -2000,7 +2110,8 @@
    "feeLabel": "Non-refundable application fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14876",
    "lat": 28.7512,
-   "lng": -81.287
+   "lng": -81.287,
+   "boothFee": null
   },
   {
    "id": "zapp-14911",
@@ -2018,7 +2129,8 @@
    "feeLabel": "Early Bird Jury fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14911",
    "lat": 27.8615,
-   "lng": -81.4943
+   "lng": -81.4943,
+   "boothFee": null
   },
   {
    "id": "zapp-14528",
@@ -2036,7 +2148,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14528",
    "lat": 27.4234,
-   "lng": -82.3812
+   "lng": -82.3812,
+   "boothFee": 575.0
   },
   {
    "id": "zapp-14728",
@@ -2054,7 +2167,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14728",
    "lat": 27.4234,
-   "lng": -82.3812
+   "lng": -82.3812,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14727",
@@ -2072,7 +2186,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14727",
    "lat": 27.4234,
-   "lng": -82.3812
+   "lng": -82.3812,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14629",
@@ -2090,7 +2205,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14629",
    "lat": 27.4234,
-   "lng": -82.3812
+   "lng": -82.3812,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14662",
@@ -2108,7 +2224,8 @@
    "feeLabel": "Non-refundable Jury Fee (Application Fee)",
    "url": "https://www.zapplication.org/event-info.php?ID=14662",
    "lat": 26.1277,
-   "lng": -80.2126
+   "lng": -80.2126,
+   "boothFee": 610.0
   },
   {
    "id": "zapp-14672",
@@ -2126,7 +2243,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14672",
    "lat": 26.1277,
-   "lng": -80.2126
+   "lng": -80.2126,
+   "boothFee": 610.0
   },
   {
    "id": "zapp-14522",
@@ -2144,7 +2262,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14522",
    "lat": 26.1277,
-   "lng": -80.2126
+   "lng": -80.2126,
+   "boothFee": 565.0
   },
   {
    "id": "zapp-14412",
@@ -2162,7 +2281,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14412",
    "lat": 41.808,
-   "lng": -87.8714
+   "lng": -87.8714,
+   "boothFee": 375.0
   },
   {
    "id": "zapp-14782",
@@ -2180,7 +2300,8 @@
    "feeLabel": "Early Bird Laumeier Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14782",
    "lat": 38.639,
-   "lng": -90.2811
+   "lng": -90.2811,
+   "boothFee": 400
   },
   {
    "id": "zapp-14714",
@@ -2198,7 +2319,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14714",
    "lat": 34.0284,
-   "lng": -84.3526
+   "lng": -84.3526,
+   "boothFee": 125.0
   },
   {
    "id": "zapp-14802",
@@ -2216,7 +2338,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14802",
    "lat": 28.8296,
-   "lng": -81.8561
+   "lng": -81.8561,
+   "boothFee": null
   },
   {
    "id": "fit-long-s-park-art-festival",
@@ -2234,7 +2357,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://www.longspark.org/art-festival",
    "lat": 40.0395,
-   "lng": -76.2974
+   "lng": -76.2974,
+   "boothFee": null
   },
   {
    "id": "zapp-14661",
@@ -2252,7 +2376,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14661",
    "lat": 27.4125,
-   "lng": -82.659
+   "lng": -82.659,
+   "boothFee": 595.0
   },
   {
    "id": "zapp-14676",
@@ -2270,7 +2395,8 @@
    "feeLabel": "Non-refundable jury fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14676",
    "lat": 27.4125,
-   "lng": -82.659
+   "lng": -82.659,
+   "boothFee": 595.0
   },
   {
    "id": "zapp-14653",
@@ -2288,7 +2414,8 @@
    "feeLabel": "Early Bird Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14653",
    "lat": 33.5741,
-   "lng": -101.87
+   "lng": -101.87,
+   "boothFee": 375.0
   },
   {
    "id": "zapp-14600",
@@ -2306,7 +2433,8 @@
    "feeLabel": "Application Fee, Non-Refundable",
    "url": "https://www.zapplication.org/event-info.php?ID=14600",
    "lat": 33.062,
-   "lng": -85.6778
+   "lng": -85.6778,
+   "boothFee": 395.0
   },
   {
    "id": "zapp-14649",
@@ -2324,7 +2452,8 @@
    "feeLabel": "Artist Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14649",
    "lat": 32.7683,
-   "lng": -97.312
+   "lng": -97.312,
+   "boothFee": 995.0
   },
   {
    "id": "zapp-14287",
@@ -2342,7 +2471,8 @@
    "feeLabel": "35 Application Fee and 100 *Refundable Deposit",
    "url": "https://www.zapplication.org/event-info.php?ID=14287",
    "lat": 30.4548,
-   "lng": -84.2802
+   "lng": -84.2802,
+   "boothFee": null
   },
   {
    "id": "fit-mill-valley-fall-arts-festival",
@@ -2360,7 +2490,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 37.9009,
-   "lng": -122.5395
+   "lng": -122.5395,
+   "boothFee": null
   },
   {
    "id": "fit-milwaukee-lakefront-festival-of-art",
@@ -2378,7 +2509,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://mam.org/lfoa",
    "lat": 43.0455,
-   "lng": -87.95
+   "lng": -87.95,
+   "boothFee": null
   },
   {
    "id": "zapp-14570",
@@ -2396,7 +2528,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14570",
    "lat": 44.9609,
-   "lng": -93.1064
+   "lng": -93.1064,
+   "boothFee": 400.0
   },
   {
    "id": "zapp-14445",
@@ -2414,7 +2547,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14445",
    "lat": 28.7925,
-   "lng": -81.6488
+   "lng": -81.6488,
+   "boothFee": 475.0
   },
   {
    "id": "zapp-14115",
@@ -2432,7 +2566,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14115",
    "lat": 39.322,
-   "lng": -77.9588
+   "lng": -77.9588,
+   "boothFee": 400.0
   },
   {
    "id": "zapp-14772",
@@ -2450,7 +2585,8 @@
    "feeLabel": "Application & Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14772",
    "lat": 42.732,
-   "lng": -84.4783
+   "lng": -84.4783,
+   "boothFee": 225.0
   },
   {
    "id": "zapp-14707",
@@ -2468,7 +2604,8 @@
    "feeLabel": "Application and Jury Fee (non-refundable)",
    "url": "https://www.zapplication.org/event-info.php?ID=14707",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": 225.0
   },
   {
    "id": "zapp-14709",
@@ -2486,7 +2623,8 @@
    "feeLabel": "Application and Jury Fee - non-refundable",
    "url": "https://www.zapplication.org/event-info.php?ID=14709",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": 225.0
   },
   {
    "id": "zapp-14708",
@@ -2504,7 +2642,8 @@
    "feeLabel": "Application and Jury Fee (non-refundable)",
    "url": "https://www.zapplication.org/event-info.php?ID=14708",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": 225.0
   },
   {
    "id": "zapp-14697",
@@ -2522,7 +2661,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14697",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": null
   },
   {
    "id": "zapp-14695",
@@ -2540,7 +2680,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14695",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": null
   },
   {
    "id": "zapp-14694",
@@ -2558,7 +2699,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14694",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": null
   },
   {
    "id": "zapp-14693",
@@ -2576,7 +2718,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14693",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": null
   },
   {
    "id": "zapp-14706",
@@ -2594,7 +2737,8 @@
    "feeLabel": "Application & Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14706",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": 720.0
   },
   {
    "id": "zapp-14699",
@@ -2612,7 +2756,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14699",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": 525.0
   },
   {
    "id": "zapp-14705",
@@ -2630,7 +2775,8 @@
    "feeLabel": "Application & Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14705",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": 650
   },
   {
    "id": "zapp-14704",
@@ -2648,7 +2794,8 @@
    "feeLabel": "Application & Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14704",
    "lat": 26.1736,
-   "lng": -81.7293
+   "lng": -81.7293,
+   "boothFee": 720.0
   },
   {
    "id": "fit-northern-virginia-fine-arts-festival-at-reston-town-center",
@@ -2666,7 +2813,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://www.tephraica.org/festival",
    "lat": 38.8978,
-   "lng": -77.3151
+   "lng": -77.3151,
+   "boothFee": 525
   },
   {
    "id": "zapp-14687",
@@ -2684,7 +2832,8 @@
    "feeLabel": "OKC Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14687",
    "lat": 35.4937,
-   "lng": -97.4903
+   "lng": -97.4903,
+   "boothFee": 150.0
   },
   {
    "id": "zapp-14692",
@@ -2702,7 +2851,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14692",
    "lat": 29.171,
-   "lng": -83.0168
+   "lng": -83.0168,
+   "boothFee": null
   },
   {
    "id": "zapp-13892",
@@ -2720,7 +2870,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13892",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14779",
@@ -2738,7 +2889,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14779",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 300.0
   },
   {
    "id": "fit-old-town-art-fair",
@@ -2756,7 +2908,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://www.oldtownartfair.org/artists/",
    "lat": 41.8507,
-   "lng": -87.6792
+   "lng": -87.6792,
+   "boothFee": 775
   },
   {
    "id": "zapp-14823",
@@ -2774,7 +2927,8 @@
    "feeLabel": "Application Fee - non refundable",
    "url": "https://www.zapplication.org/event-info.php?ID=14823",
    "lat": 29.9064,
-   "lng": -81.3855
+   "lng": -81.3855,
+   "boothFee": 375.0
   },
   {
    "id": "zapp-14231",
@@ -2792,7 +2946,8 @@
    "feeLabel": "One of a Kind Chicago 2026 Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14231",
    "lat": 41.8507,
-   "lng": -87.6792
+   "lng": -87.6792,
+   "boothFee": 2675.0
   },
   {
    "id": "zapp-14599",
@@ -2810,7 +2965,8 @@
    "feeLabel": "2027 Spring Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14599",
    "lat": 41.8507,
-   "lng": -87.6792
+   "lng": -87.6792,
+   "boothFee": 1985.0
   },
   {
    "id": "zapp-14592",
@@ -2828,7 +2984,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14592",
    "lat": 30.281,
-   "lng": -87.5815
+   "lng": -87.5815,
+   "boothFee": null
   },
   {
    "id": "zapp-14845",
@@ -2846,7 +3003,8 @@
    "feeLabel": "Early Jury and Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14845",
    "lat": 42.5917,
-   "lng": -83.382
+   "lng": -83.382,
+   "boothFee": 475.0
   },
   {
    "id": "zapp-14622",
@@ -2864,7 +3022,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14622",
    "lat": 33.8086,
-   "lng": -116.5319
+   "lng": -116.5319,
+   "boothFee": null
   },
   {
    "id": "zapp-14621",
@@ -2882,7 +3041,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14621",
    "lat": 33.8086,
-   "lng": -116.5319
+   "lng": -116.5319,
+   "boothFee": null
   },
   {
    "id": "zapp-14623",
@@ -2900,7 +3060,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14623",
    "lat": 33.8086,
-   "lng": -116.5319
+   "lng": -116.5319,
+   "boothFee": null
   },
   {
    "id": "zapp-14620",
@@ -2918,7 +3079,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14620",
    "lat": 33.8086,
-   "lng": -116.5319
+   "lng": -116.5319,
+   "boothFee": null
   },
   {
    "id": "zapp-14741",
@@ -2936,7 +3098,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14741",
    "lat": 42.3457,
-   "lng": -83.1001
+   "lng": -83.1001,
+   "boothFee": 475.0
   },
   {
    "id": "fit-palo-alto-festival-of-the-arts",
@@ -2954,7 +3117,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 37.4386,
-   "lng": -122.1497
+   "lng": -122.1497,
+   "boothFee": null
   },
   {
    "id": "zapp-14579",
@@ -2972,7 +3136,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14579",
    "lat": 33.5494,
-   "lng": -111.9565
+   "lng": -111.9565,
+   "boothFee": 500.0
   },
   {
    "id": "fit-park-city-kimball-arts-festival",
@@ -2990,7 +3155,8 @@
    "feeLabel": "$50 per media category applied to",
    "url": "https://kimballartsfestival.org/just-for-artists/",
    "lat": 40.6744,
-   "lng": -111.5184
+   "lng": -111.5184,
+   "boothFee": 890
   },
   {
    "id": "zapp-13866",
@@ -3008,7 +3174,8 @@
    "feeLabel": "Application Fee is separate from booth fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13866",
    "lat": 30.32,
-   "lng": -97.9269
+   "lng": -97.9269,
+   "boothFee": 600.0
   },
   {
    "id": "zapp-14776",
@@ -3026,7 +3193,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14776",
    "lat": 34.6369,
-   "lng": -82.7406
+   "lng": -82.7406,
+   "boothFee": 175.0
   },
   {
    "id": "zapp-14780",
@@ -3044,7 +3212,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14780",
    "lat": 40.7793,
-   "lng": -77.7822
+   "lng": -77.7822,
+   "boothFee": 475.0
   },
   {
    "id": "zapp-14877",
@@ -3062,7 +3231,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14877",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 375.0
   },
   {
    "id": "zapp-14172",
@@ -3080,7 +3250,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14172",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 350.0
   },
   {
    "id": "zapp-14743",
@@ -3098,7 +3269,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14743",
    "lat": 25.7212,
-   "lng": -80.2455
+   "lng": -80.2455,
+   "boothFee": null
   },
   {
    "id": "fit-plaza-art-fair",
@@ -3116,7 +3288,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://www.plazaartfair.com/",
    "lat": 39.1096,
-   "lng": -94.5705
+   "lng": -94.5705,
+   "boothFee": null
   },
   {
    "id": "zapp-14660",
@@ -3134,7 +3307,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14660",
    "lat": 34.0534,
-   "lng": -117.1767
+   "lng": -117.1767,
+   "boothFee": 275.0
   },
   {
    "id": "zapp-14882",
@@ -3152,7 +3326,8 @@
    "feeLabel": "Early Bird Jury & Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14882",
    "lat": 38.1381,
-   "lng": -107.7533
+   "lng": -107.7533,
+   "boothFee": 425.0
   },
   {
    "id": "zapp-13875",
@@ -3170,7 +3345,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13875",
    "lat": 40.843,
-   "lng": -74.2011
+   "lng": -74.2011,
+   "boothFee": null
   },
   {
    "id": "zapp-13979",
@@ -3188,7 +3364,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13979",
    "lat": 40.8035,
-   "lng": -74.1891
+   "lng": -74.1891,
+   "boothFee": null
   },
   {
    "id": "zapp-14855",
@@ -3206,7 +3383,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14855",
    "lat": 40.8035,
-   "lng": -74.1891
+   "lng": -74.1891,
+   "boothFee": 545.0
   },
   {
    "id": "zapp-14854",
@@ -3224,7 +3402,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14854",
    "lat": 40.8319,
-   "lng": -74.2428
+   "lng": -74.2428,
+   "boothFee": 545.0
   },
   {
    "id": "zapp-14853",
@@ -3242,7 +3421,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14853",
    "lat": 39.9908,
-   "lng": -75.1426
+   "lng": -75.1426,
+   "boothFee": 680.0
   },
   {
    "id": "zapp-14619",
@@ -3260,7 +3440,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14619",
    "lat": 34.0284,
-   "lng": -84.3526
+   "lng": -84.3526,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14717",
@@ -3278,7 +3459,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14717",
    "lat": 30.0532,
-   "lng": -96.7151
+   "lng": -96.7151,
+   "boothFee": 400.0
   },
   {
    "id": "fit-saint-louis-art-fair",
@@ -3296,7 +3478,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://saintlouisartfair.org/saint-louis-art-fair/artists-application.html",
    "lat": 38.6373,
-   "lng": -90.3454
+   "lng": -90.3454,
+   "boothFee": null
   },
   {
    "id": "fit-salt-fork-arts-and-crafts-festival",
@@ -3314,7 +3497,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 40.0108,
-   "lng": -81.5413
+   "lng": -81.5413,
+   "boothFee": null
   },
   {
    "id": "zapp-14561",
@@ -3332,7 +3516,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14561",
    "lat": 33.8817,
-   "lng": -84.3973
+   "lng": -84.3973,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-13857",
@@ -3350,7 +3535,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=13857",
    "lat": 33.8817,
-   "lng": -84.3973
+   "lng": -84.3973,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14890",
@@ -3368,7 +3554,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14890",
    "lat": 33.316,
-   "lng": -111.7541
+   "lng": -111.7541,
+   "boothFee": 400.0
   },
   {
    "id": "zapp-14626",
@@ -3386,7 +3573,8 @@
    "feeLabel": "Application Fee (",
    "url": "https://www.zapplication.org/event-info.php?ID=14626",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14731",
@@ -3404,7 +3592,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14731",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": null
   },
   {
    "id": "zapp-14618",
@@ -3422,7 +3611,8 @@
    "feeLabel": "Jury/Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14618",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 475.0
   },
   {
    "id": "zapp-14639",
@@ -3440,7 +3630,8 @@
    "feeLabel": "Jury/Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14639",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 510.0
   },
   {
    "id": "zapp-14636",
@@ -3458,7 +3649,8 @@
    "feeLabel": "Jury/Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14636",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 510.0
   },
   {
    "id": "zapp-14631",
@@ -3476,7 +3668,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14631",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": null
   },
   {
    "id": "fit-sausalito-art-festival",
@@ -3494,7 +3687,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://www.sausalitoartfestival.org/",
    "lat": 37.8596,
-   "lng": -122.4899
+   "lng": -122.4899,
+   "boothFee": null
   },
   {
    "id": "zapp-14747",
@@ -3512,7 +3706,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14747",
    "lat": 32.0247,
-   "lng": -81.0979
+   "lng": -81.0979,
+   "boothFee": 400.0
   },
   {
    "id": "zapp-14746",
@@ -3530,7 +3725,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14746",
    "lat": 32.0247,
-   "lng": -81.0979
+   "lng": -81.0979,
+   "boothFee": 400.0
   },
   {
    "id": "zapp-14745",
@@ -3548,7 +3744,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14745",
    "lat": 32.0247,
-   "lng": -81.0979
+   "lng": -81.0979,
+   "boothFee": 400.0
   },
   {
    "id": "test-seattle",
@@ -3566,7 +3763,8 @@
    "feeLabel": "invented jury fee",
    "url": "",
    "lat": 47.6062,
-   "lng": -122.3321
+   "lng": -122.3321,
+   "boothFee": 450
   },
   {
    "id": "zapp-14558",
@@ -3584,7 +3782,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14558",
    "lat": 27.789,
-   "lng": -80.5309
+   "lng": -80.5309,
+   "boothFee": 200.0
   },
   {
    "id": "fit-sedona-arts-festival",
@@ -3602,7 +3801,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 34.8407,
-   "lng": -111.7696
+   "lng": -111.7696,
+   "boothFee": null
   },
   {
    "id": "zapp-14597",
@@ -3620,7 +3820,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14597",
    "lat": 33.4947,
-   "lng": -112.076
+   "lng": -112.076,
+   "boothFee": 350.0
   },
   {
    "id": "zapp-14887",
@@ -3638,7 +3839,8 @@
    "feeLabel": "Early Bird Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14887",
    "lat": 38.832,
-   "lng": -97.6268
+   "lng": -97.6268,
+   "boothFee": 325.0
   },
   {
    "id": "zapp-14679",
@@ -3656,7 +3858,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14679",
    "lat": 25.7323,
-   "lng": -80.2548
+   "lng": -80.2548,
+   "boothFee": 475.0
   },
   {
    "id": "zapp-14434",
@@ -3674,7 +3877,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14434",
    "lat": null,
-   "lng": null
+   "lng": null,
+   "boothFee": null
   },
   {
    "id": "zapp-14571",
@@ -3692,7 +3896,8 @@
    "feeLabel": "Non-Refundable Administrative Processing Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14571",
    "lat": 33.8012,
-   "lng": -84.4058
+   "lng": -84.4058,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14524",
@@ -3710,7 +3915,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14524",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 630.0
   },
   {
    "id": "zapp-14158",
@@ -3728,7 +3934,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14158",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 535.0
   },
   {
    "id": "zapp-14666",
@@ -3746,7 +3953,8 @@
    "feeLabel": "Non-refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14666",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 650.0
   },
   {
    "id": "zapp-14449",
@@ -3764,7 +3972,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14449",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14733",
@@ -3782,7 +3991,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14733",
    "lat": 27.3237,
-   "lng": -82.4954
+   "lng": -82.4954,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14902",
@@ -3800,7 +4010,8 @@
    "feeLabel": "Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14902",
    "lat": 37.0989,
-   "lng": -113.5776
+   "lng": -113.5776,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14735",
@@ -3818,7 +4029,8 @@
    "feeLabel": "Application and jury fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14735",
    "lat": 28.791,
-   "lng": -81.2724
+   "lng": -81.2724,
+   "boothFee": 235.0
   },
   {
    "id": "zapp-14729",
@@ -3836,7 +4048,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14729",
    "lat": 27.8273,
-   "lng": -82.7001
+   "lng": -82.7001,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14798",
@@ -3854,7 +4067,8 @@
    "feeLabel": "Early Bird App/Jury Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14798",
    "lat": 25.7292,
-   "lng": -80.2488
+   "lng": -80.2488,
+   "boothFee": null
   },
   {
    "id": "fit-sun-valley-center-arts-and-crafts-festival",
@@ -3872,7 +4086,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 43.6692,
-   "lng": -114.4858
+   "lng": -114.4858,
+   "boothFee": null
   },
   {
    "id": "zapp-14787",
@@ -3890,7 +4105,8 @@
    "feeLabel": "Jury/Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14787",
    "lat": 27.9426,
-   "lng": -82.4636
+   "lng": -82.4636,
+   "boothFee": 515.0
   },
   {
    "id": "zapp-14674",
@@ -3908,7 +4124,8 @@
    "feeLabel": "Non Refundable Jury Fee (APF)",
    "url": "https://www.zapplication.org/event-info.php?ID=14674",
    "lat": 28.1667,
-   "lng": -82.7274
+   "lng": -82.7274,
+   "boothFee": 525.0
   },
   {
    "id": "zapp-14603",
@@ -3926,7 +4143,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14603",
    "lat": 33.4947,
-   "lng": -112.076
+   "lng": -112.076,
+   "boothFee": 375.0
   },
   {
    "id": "zapp-14804",
@@ -3944,7 +4162,8 @@
    "feeLabel": "Early Bird Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14804",
    "lat": 30.43,
-   "lng": -86.6245
+   "lng": -86.6245,
+   "boothFee": 200.0
   },
   {
    "id": "zapp-14046",
@@ -3962,7 +4181,8 @@
    "feeLabel": "The Fall Magnificent Mile Art Festival 2026 Late App Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14046",
    "lat": 41.8507,
-   "lng": -87.6792
+   "lng": -87.6792,
+   "boothFee": 975.0
   },
   {
    "id": "zapp-14790",
@@ -3980,7 +4200,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14790",
    "lat": 37.7257,
-   "lng": -88.9294
+   "lng": -88.9294,
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14530",
@@ -3998,7 +4219,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14530",
    "lat": 27.6449,
-   "lng": -80.4321
+   "lng": -80.4321,
+   "boothFee": 485.0
   },
   {
    "id": "fit-uptown-art-fair",
@@ -4016,7 +4238,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "https://www.uptownminneapolis.com/uptown-art-fair/art/",
    "lat": 44.9823,
-   "lng": -93.2956
+   "lng": -93.2956,
+   "boothFee": null
   },
   {
    "id": "fit-vail-arts-festival",
@@ -4034,7 +4257,8 @@
    "feeLabel": "Application Fee (estimated)",
    "url": "",
    "lat": 39.6377,
-   "lng": -106.4103
+   "lng": -106.4103,
+   "boothFee": null
   },
   {
    "id": "zapp-14899",
@@ -4052,7 +4276,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14899",
    "lat": 44.9823,
-   "lng": -93.2956
+   "lng": -93.2956,
+   "boothFee": 375.0
   },
   {
    "id": "zapp-14730",
@@ -4070,7 +4295,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14730",
    "lat": 27.0849,
-   "lng": -82.3036
+   "lng": -82.3036,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14630",
@@ -4088,7 +4314,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14630",
    "lat": 27.0849,
-   "lng": -82.3036
+   "lng": -82.3036,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14794",
@@ -4106,7 +4333,8 @@
    "feeLabel": "Jury/Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14794",
    "lat": 42.5917,
-   "lng": -83.382
+   "lng": -83.382,
+   "boothFee": 450.0
   },
   {
    "id": "zapp-14732",
@@ -4124,7 +4352,8 @@
    "feeLabel": "Application",
    "url": "https://www.zapplication.org/event-info.php?ID=14732",
    "lat": 40.8295,
-   "lng": -72.6473
+   "lng": -72.6473,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14775",
@@ -4142,7 +4371,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14775",
    "lat": 41.1837,
-   "lng": -73.3545
+   "lng": -73.3545,
+   "boothFee": 625.0
   },
   {
    "id": "zapp-14547",
@@ -4160,7 +4390,8 @@
    "feeLabel": "Application Processing",
    "url": "https://www.zapplication.org/event-info.php?ID=14547",
    "lat": 33.5098,
-   "lng": -112.4135
+   "lng": -112.4135,
+   "boothFee": 400.0
   },
   {
    "id": "zapp-14572",
@@ -4178,7 +4409,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14572",
    "lat": 28.5006,
-   "lng": -81.5354
+   "lng": -81.5354,
+   "boothFee": null
   },
   {
    "id": "zapp-14657",
@@ -4196,7 +4428,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14657",
    "lat": 28.5006,
-   "lng": -81.5354
+   "lng": -81.5354,
+   "boothFee": null
   },
   {
    "id": "zapp-14678",
@@ -4214,7 +4447,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14678",
    "lat": 28.5819,
-   "lng": -81.2947
+   "lng": -81.2947,
+   "boothFee": 575
   },
   {
    "id": "zapp-14825",
@@ -4232,7 +4466,8 @@
    "feeLabel": "Jury fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14825",
    "lat": 30.1754,
-   "lng": -95.4913
+   "lng": -95.4913,
+   "boothFee": null
   },
   {
    "id": "zapp-14003",
@@ -4250,7 +4485,8 @@
    "feeLabel": "Woodstock Art Fair on the Square 2026 Late App Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14003",
    "lat": 42.3198,
-   "lng": -88.4477
+   "lng": -88.4477,
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14700",
@@ -4268,7 +4504,8 @@
    "feeLabel": "Application Fee",
    "url": "https://www.zapplication.org/event-info.php?ID=14700",
    "lat": 26.7545,
-   "lng": -82.2611
+   "lng": -82.2611,
+   "boothFee": 450.0
   }
  ]
 }

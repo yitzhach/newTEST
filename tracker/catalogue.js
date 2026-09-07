@@ -93,6 +93,9 @@ window.ASTCatalogue = (function () {
          these are and, importantly, what they are not. */
       lat: A.numOrNull(input.lat),
       lng: A.numOrNull(input.lng),
+      /* The researched booth fee, where one is known. A starting value for
+         the ledger's own editable field — never written back here. */
+      boothFee: A.numOrNull(input.boothFee),
       custom: !!input.custom
     };
   }
@@ -301,6 +304,7 @@ window.ASTCatalogue = (function () {
       status: opts.status || 'interested',
       rating: rec.rating || 0,
       juryFee: rec.fee,
+      boothFee: rec.boothFee,
       url: rec.url,
       notes: rec.deadlineNote ? ('Deadline ' + rec.deadlineNote + '.') : '',
       source: 'catalogue',

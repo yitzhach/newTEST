@@ -92,10 +92,15 @@ lookup runs in `build/geocode_shows.py` and its output is committed as
 reach `catalogue.json` too, which means a show added to the ledger now arrives
 pinned on the map.
 
-**Weather history.** A drawer panel giving the chance of rain, the average
-high and the average peak wind for the show's own calendar window, over the
-last ten years. Fetched at runtime from the visitor's browser — the container
-has no egress and the deployed site does — and cached per show.
+**Weather.** A drawer panel with one card per show day: high, low, wind, and
+what the sky was doing. Which question it answers depends on how far away the
+show is — inside a fortnight it is the **real forecast**, and beyond that it is
+**what these same calendar dates have done over ten years**, each day averaged
+against the same date in every year. The panel says which of the two it got,
+because "76 on Saturday" and "76 on an average Saturday in early March" are
+different claims and only one is about this year. Fetched at runtime from the
+visitor's browser — the container has no egress and the deployed site does —
+cached per show, and it fails closed to "not known".
 
 **Sales tax and permits.** A drawer panel per state: the state rate, what
 local jurisdictions add on top, the state's own address lookup, how a visiting
@@ -257,7 +262,11 @@ python3 build/geocode_shows.py      # rewrites build/geocode.json
 python3 build/build_fit_data.py     # folds the coordinates in
 ```
 
-**The weather API has not been verified from a container.** `tracker/weather.js`
+**The weather panel is verified working** on the deployed site — Open-Meteo
+needs no key and permits cross-origin requests, confirmed from a browser. The
+note below is kept because the reasoning still applies to anything similar.
+
+**The weather API cannot be verified from a container.** `tracker/weather.js`
 calls Open-Meteo's historical archive, chosen because it needs no key, permits
 cross-origin browser requests and serves daily data back to 1940. None of those
 three could be confirmed here, because this environment cannot reach it. The
@@ -285,7 +294,7 @@ Then:
 
 ```bash
 python3 -m http.server 8765          # from the repo root, leave running
-node build/browser-tests.cjs         # 68 checks — the model, the drawer, provenance,
+node build/browser-tests.cjs         # 74 checks — the model, the drawer, provenance,
                                      #   date hygiene, geocode coverage, tax guard
                                      #   rails, the research import
 node build/ledger-view-tests.cjs     # 21 checks — details/link split, badges, lenses
@@ -293,7 +302,7 @@ cd worker && npm test                # 45 API checks — manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 checks — the date rules themselves
 ```
 
-All pass as of the Phase 1 session: 68/68, 21/21, 45/45, 11/11.
+All pass as of the Phase 1 session: 74/74, 21/21, 45/45, 11/11.
 
 `browser-tests.cjs` deliberately asserts that the weather panel degrades to
 "not known": this sandbox blocks the weather API, which makes it the ideal
