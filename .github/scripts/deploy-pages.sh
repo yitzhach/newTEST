@@ -73,10 +73,14 @@ else
   : "${GITHUB_REPOSITORY:?GITHUB_REPOSITORY is required}"
   REMOTE="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 fi
-WORK="$(mktemp -d)"
-# The token is in the remote URL, so the checkout must not outlive the run
-# even if something below fails.
-trap 'rm -rf "$WORK"' EXIT
+# Each attempt clones the branch fresh, re-applies the change and pushes. If
+# the push is rejected because somebody else landed a commit in between, the
+# next attempt starts from what they landed rather than trying to replay onto
+# it — a deploy branch is a published artifact, and rebuilding it from the
+# current tip is both simpler and safer than rebasing a shallow clone.
+WORK=""
+cleanup() { [ -n "$WORK" ] && rm -rf "$WORK"; }
+trap cleanup EXIT
 
 # Unpack the committed tree into a directory. `git archive` writes a tar of
 # exactly the tracked files at HEAD, so nothing untracked can leak through.
@@ -88,82 +92,70 @@ publish() {
   git -C "$SOURCE" archive --format=tar HEAD | tar -x -C "$1"
 }
 
-# --- get the branch, or start it ------------------------------------------
-# --depth 1: the deploy branch's history is not interesting and cloning it in
-# full gets slower every deploy.
-if git clone --quiet --depth 1 --branch "$BRANCH" "$REMOTE" "$WORK" 2>/dev/null; then
-  echo "cloned existing $BRANCH"
-else
-  echo "$BRANCH does not exist yet — starting it"
-  git clone --quiet --depth 1 "$REMOTE" "$WORK"
-  git -C "$WORK" checkout --quiet --orphan "$BRANCH"
-  git -C "$WORK" rm -rqf . 2>/dev/null || true
-fi
+attempt_deploy() {
+  cleanup
+  WORK="$(mktemp -d)"
 
-git -C "$WORK" config user.name "github-actions[bot]"
-git -C "$WORK" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+  # --depth 1: the deploy branch's history is not interesting, and cloning it
+  # in full gets slower every deploy.
+  if git clone --quiet --depth 1 --branch "$BRANCH" "$REMOTE" "$WORK" 2>/dev/null; then
+    :
+  else
+    echo "$BRANCH does not exist yet — starting it"
+    git clone --quiet --depth 1 "$REMOTE" "$WORK"
+    git -C "$WORK" checkout --quiet --orphan "$BRANCH"
+    git -C "$WORK" rm -rqf . 2>/dev/null || true
+  fi
 
-# --- apply the change ------------------------------------------------------
-case "$MODE" in
-  site)
-    # Clear the root, keeping the previews. `find -maxdepth 1` rather than a
-    # wildcard so dotfiles are included: a leftover dotfile at the root of a
-    # deploy branch is exactly the kind of thing that survives for months.
-    find "$WORK" -maxdepth 1 -mindepth 1 \
-      ! -name '.git' ! -name "$UMBRELLA" -exec rm -rf {} +
-    publish "$WORK"
-    ;;
-  preview)
-    TARGET="$WORK/$UMBRELLA/pr-$PR"
-    rm -rf "$TARGET"
-    mkdir -p "$TARGET"
-    publish "$TARGET"
-    ;;
-  remove)
-    rm -rf "${WORK:?}/$UMBRELLA/pr-$PR"
-    ;;
-esac
+  git -C "$WORK" config user.name "github-actions[bot]"
+  git -C "$WORK" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-# Serve the tree as-is. Without this GitHub runs the branch through Jekyll,
-# which silently drops anything whose name starts with an underscore. Nothing
-# here is named that way today, and this is the kind of trap that is much
-# easier to prevent than to diagnose.
-[ "$MODE" = "remove" ] || touch "$WORK/.nojekyll"
+  case "$MODE" in
+    site)
+      # Clear the root, keeping the previews. `find -maxdepth 1` rather than a
+      # wildcard so dotfiles are included: a leftover dotfile at the root of a
+      # deploy branch is exactly the kind of thing that survives for months.
+      find "$WORK" -maxdepth 1 -mindepth 1 \
+        ! -name '.git' ! -name "$UMBRELLA" -exec rm -rf {} +
+      publish "$WORK"
+      ;;
+    preview)
+      TARGET="$WORK/$UMBRELLA/pr-$PR"
+      rm -rf "$TARGET"
+      mkdir -p "$TARGET"
+      publish "$TARGET"
+      ;;
+    remove)
+      rm -rf "${WORK:?}/$UMBRELLA/pr-$PR"
+      ;;
+  esac
 
-# --- commit and push -------------------------------------------------------
-cd "$WORK"
-git add --all
+  # Serve the tree as-is. Without this GitHub runs the branch through Jekyll,
+  # which silently drops anything whose name starts with an underscore.
+  [ "$MODE" = "remove" ] || touch "$WORK/.nojekyll"
 
-if git diff --cached --quiet; then
-  echo "nothing changed — not pushing"
-  exit 0
-fi
+  git -C "$WORK" add --all
+  if git -C "$WORK" diff --cached --quiet; then
+    echo "nothing changed — not pushing"
+    return 0
+  fi
 
-case "$MODE" in
-  site)    MESSAGE="Publish site from ${GITHUB_SHA:-local}" ;;
-  preview) MESSAGE="Preview for PR #$PR from ${GITHUB_SHA:-local}" ;;
-  remove)  MESSAGE="Remove preview for PR #$PR" ;;
-esac
-git commit --quiet -m "$MESSAGE"
+  case "$MODE" in
+    site)    MESSAGE="Publish site from ${GITHUB_SHA:-local}" ;;
+    preview) MESSAGE="Preview for PR #$PR from ${GITHUB_SHA:-local}" ;;
+    remove)  MESSAGE="Remove preview for PR #$PR" ;;
+  esac
+  git -C "$WORK" commit --quiet -m "$MESSAGE"
 
-# A production deploy and a preview deploy can be told to run at the same
-# moment. The workflows share a concurrency group to stop that, but a shared
-# group is a promise about scheduling and this is the thing that actually
-# holds: fetch what landed, replay this commit on top, try again.
+  git -C "$WORK" push --quiet "$REMOTE" "HEAD:$BRANCH" 2>/dev/null
+}
+
 for attempt in 1 2 3 4 5; do
-  if git push --quiet "$REMOTE" "HEAD:$BRANCH" 2>/dev/null; then
-    echo "pushed to $BRANCH"
+  if attempt_deploy; then
+    echo "published to $BRANCH"
     exit 0
   fi
-  echo "push rejected (attempt $attempt) — rebasing onto the branch"
-  git fetch --quiet --depth 1 "$REMOTE" "$BRANCH" || true
-  git rebase --quiet FETCH_HEAD || {
-    # A rebase conflict here means two deploys wrote the same file. Ours is
-    # the newer intent, so it wins, rather than the run failing.
-    git checkout --theirs . 2>/dev/null || true
-    git add --all
-    GIT_EDITOR=true git rebase --continue || git rebase --abort
-  }
+  echo "push rejected (attempt $attempt) — someone else landed first, starting over"
   sleep $((attempt * 3))
 done
 

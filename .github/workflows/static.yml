@@ -23,12 +23,22 @@ permissions:
   # write any more — nothing here talks to the Pages deployment API.
   contents: write
 
-# Shared with pr-preview.yml on purpose. Both workflows push to the same
-# branch, and two pushes landing together means one of them is rejected. The
-# deploy script can recover from that on its own, but not racing in the first
-# place is cheaper than recovering.
+# Production gets its OWN group, separate from the previews.
+#
+# These used to share one, on the reasoning that both push to the same branch
+# so they may as well queue. That was wrong, and it cost a deploy: GitHub keeps
+# at most one *pending* run per concurrency group, so when merging a pull
+# request fired three runs into the group within five seconds — the preview
+# build, the preview teardown, and this — the production deploy was superseded
+# and cancelled before it ran. cancel-in-progress only protects a run that has
+# already started.
+#
+# Collisions on the branch itself are the deploy script's problem, and it
+# handles them: a rejected push means someone landed first, so it re-clones
+# from their commit and re-applies. That is the real protection. Queueing was
+# only ever an optimisation, and it was a harmful one.
 concurrency:
-  group: "gh-pages"
+  group: "gh-pages-production"
   cancel-in-progress: false
 
 jobs:
