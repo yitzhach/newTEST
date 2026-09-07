@@ -21,7 +21,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14594",
    "lat": 35.0414,
    "lng": -85.2835,
-   "boothFee": 500
+   "boothFee": 550.0
   },
   {
    "id": "zapp-14106",
@@ -211,7 +211,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14847",
    "lat": 45.608,
    "lng": -84.4867,
-   "boothFee": null
+   "boothFee": 200.0
   },
   {
    "id": "zapp-14302",
@@ -287,7 +287,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14555",
    "lat": 26.8,
    "lng": -80.1191,
-   "boothFee": 589
+   "boothFee": 675.0
   },
   {
    "id": "zapp-14408",
@@ -344,7 +344,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14885",
    "lat": 37.6356,
    "lng": -76.5918,
-   "boothFee": null
+   "boothFee": 225.0
   },
   {
    "id": "zapp-14612",
@@ -534,7 +534,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14613",
    "lat": 25.7291,
    "lng": -80.2612,
-   "boothFee": 475
+   "boothFee": 475.0
   },
   {
    "id": "fit-beaver-creek-art-festival",
@@ -1009,7 +1009,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14785",
    "lat": 34.7245,
    "lng": -86.5788,
-   "boothFee": null
+   "boothFee": 180.0
   },
   {
    "id": "zapp-14559",
@@ -1180,7 +1180,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14616",
    "lat": 32.8867,
    "lng": -96.7384,
-   "boothFee": null
+   "boothFee": 500.0
   },
   {
    "id": "fit-crested-butte-arts-festival",
@@ -1731,7 +1731,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14828",
    "lat": 29.4632,
    "lng": -98.4982,
-   "boothFee": null
+   "boothFee": 425.0
   },
   {
    "id": "zapp-14815",
@@ -1788,7 +1788,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14737",
    "lat": 27.9426,
    "lng": -82.4636,
-   "boothFee": null
+   "boothFee": 525.0
   },
   {
    "id": "zapp-14514",
@@ -1807,7 +1807,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14514",
    "lat": 33.3595,
    "lng": -111.421,
-   "boothFee": null
+   "boothFee": 150.0
   },
   {
    "id": "fit-great-gulfcoast-arts-festival",
@@ -1940,7 +1940,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14628",
    "lat": 29.0226,
    "lng": -80.9246,
-   "boothFee": null
+   "boothFee": 350.0
   },
   {
    "id": "fit-jackson-hole-fall-arts-festival",
@@ -2111,7 +2111,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14876",
    "lat": 28.7512,
    "lng": -81.287,
-   "boothFee": null
+   "boothFee": 275.0
   },
   {
    "id": "zapp-14911",
@@ -2130,7 +2130,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14911",
    "lat": 27.8615,
    "lng": -81.4943,
-   "boothFee": null
+   "boothFee": 195.0
   },
   {
    "id": "zapp-14528",
@@ -2339,7 +2339,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14802",
    "lat": 28.8296,
    "lng": -81.8561,
-   "boothFee": null
+   "boothFee": 150.0
   },
   {
    "id": "fit-long-s-park-art-festival",
@@ -2472,7 +2472,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14287",
    "lat": 30.4548,
    "lng": -84.2802,
-   "boothFee": null
+   "boothFee": 290.0
   },
   {
    "id": "fit-mill-valley-fall-arts-festival",
@@ -2852,7 +2852,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14692",
    "lat": 29.171,
    "lng": -83.0168,
-   "boothFee": null
+   "boothFee": 200.0
   },
   {
    "id": "zapp-13892",
@@ -2985,7 +2985,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14592",
    "lat": 30.281,
    "lng": -87.5815,
-   "boothFee": null
+   "boothFee": 325.0
   },
   {
    "id": "zapp-14845",
@@ -3270,7 +3270,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14743",
    "lat": 25.7212,
    "lng": -80.2455,
-   "boothFee": null
+   "boothFee": 350.0
   },
   {
    "id": "fit-plaza-art-fair",
@@ -3346,7 +3346,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=13875",
    "lat": 40.843,
    "lng": -74.2011,
-   "boothFee": null
+   "boothFee": 495.0
   },
   {
    "id": "zapp-13979",
@@ -3365,7 +3365,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=13979",
    "lat": 40.8035,
    "lng": -74.1891,
-   "boothFee": null
+   "boothFee": 495.0
   },
   {
    "id": "zapp-14855",
@@ -4410,7 +4410,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14572",
    "lat": 28.5006,
    "lng": -81.5354,
-   "boothFee": null
+   "boothFee": 300.0
   },
   {
    "id": "zapp-14657",
@@ -4429,7 +4429,7 @@
    "url": "https://www.zapplication.org/event-info.php?ID=14657",
    "lat": 28.5006,
    "lng": -81.5354,
-   "boothFee": null
+   "boothFee": 250.0
   },
   {
    "id": "zapp-14678",
