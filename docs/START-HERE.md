@@ -175,37 +175,19 @@ export fields have earned it. Search-derived facts are `search`, and render as
 *"unconfirmed"*. `record_research.py` rejects any batch missing provenance —
 do not route around it.
 
-**Pages serves the `gh-pages` branch, and every PR gets its own preview.**
+**Pages deploys from `main` only.** `.github/workflows/static.yml` triggers on
+push to `main` (or manual dispatch), uploads the whole repo, and deploys it
+through the Pages Actions source. Work lands on the live site when it merges —
+push to `main`, wait about a minute, refresh. No repository settings involved.
 
-| | URL | Published by |
-|---|---|---|
-| production | `…github.io/newTEST/tracker/browse.html` | `static.yml`, on push to `main` |
-| preview | `…github.io/newTEST/pr-preview/pr-<n>/tracker/browse.html` | `pr-preview.yml`, on every PR push |
-
-Both write to the one `gh-pages` branch: production owns the root, each PR
-owns `pr-preview/pr-<n>/`. A production deploy clears the root **but steps
-around the previews**, and a preview deploy touches only its own directory —
-that rule lives in `.github/scripts/deploy-pages.sh` and is the thing
-`test-deploy-pages.sh` exists to protect. Previews are deleted when the PR
-closes, and the bot leaves the link as a comment on the PR.
-
-Two consequences worth holding on to:
-
-- **Work still only reaches production when it merges to `main`.** A preview
-  URL is a real, public page on the real host, but it is not the live site.
-- **Previews share production's origin.** That is why this is on GitHub Pages
-  rather than a preview host: when the Worker is deployed it refuses browser
-  requests from origins outside `ALLOWED_ORIGINS`, and a preview served from
-  `…github.io` is already inside it. A preview on another domain would need a
-  new entry per pull request.
-
-This depends on one repository setting: **Settings → Pages → Source =
-"Deploy from a branch", branch `gh-pages`, folder `/ (root)`**. If previews
-404, check that first — it is the setting, not the workflow.
-
-No third-party actions are involved. The publish logic is a shell script in
-this repo, so nothing in the deploy path can change under you when someone
-else moves a release tag.
+*A note for the next session, so nobody repeats it:* this was briefly replaced
+with a `gh-pages` branch deploy in order to give every pull request its own
+preview URL under `/pr-preview/pr-<n>/`. It worked, and the cost was not worth
+paying: a Pages site has exactly one source, so switching to branch-based
+previews meant the live site stopped updating until somebody changed
+**Settings → Pages** by hand. Reverted. The preview machinery is in git
+history at `2a7e6bf` if it is ever wanted — but it needs that settings change,
+and it should not be reintroduced without the repo owner making it first.
 
 **No build step, deliberately.** `tracker/` is plain HTML, CSS and JS served
 as-is; the Worker is plain modules. The Vite/React app at the repo root
@@ -281,14 +263,9 @@ node build/browser-tests.cjs         # 63 checks — the model, the drawer, prov
 node build/ledger-view-tests.cjs     # 21 checks — details/link split, badges, lenses
 cd worker && npm test                # 45 API checks — manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 checks — the date rules themselves
-bash .github/scripts/test-deploy-pages.sh    # 19 checks — the Pages deploy rules
 ```
 
-The deploy rig needs no network and no GitHub: it clones this repo into a temp
-directory and pushes to a local bare repo standing in for origin. Run it if you
-touch anything in `.github/scripts/`.
-
-All pass as of the Phase 1 session: 63/63, 21/21, 45/45, 11/11, 19/19.
+All pass as of the Phase 1 session: 63/63, 21/21, 45/45, 11/11.
 
 `browser-tests.cjs` deliberately asserts that the weather panel degrades to
 "not known": this sandbox blocks the weather API, which makes it the ideal
