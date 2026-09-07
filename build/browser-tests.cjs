@@ -39,11 +39,11 @@ function check(name, pass, detail) {
   // Google Fonts and the favicon are blocked by this sandbox's egress proxy;
   // both resolve on the live site. Filter them so a real error stands out.
   //
-  // archive-api.open-meteo.com is blocked for the same reason, and its failure
+  // Both open-meteo hosts are blocked for the same reason, and their failure
   // is a tested behaviour rather than a defect — see the weather check below,
   // which asserts that the panel degrades to "not known" precisely because
   // these requests fail here. Filtering it keeps a real error visible.
-  const IGNORE = /fonts\.googleapis|fonts\.gstatic|favicon|archive-api\.open-meteo/;
+  const IGNORE = /fonts\.googleapis|fonts\.gstatic|favicon|open-meteo/;
   page.on('requestfailed', r => { if (!IGNORE.test(r.url())) errors.push('reqfail: ' + r.url()); });
   page.on('console', m => {
     if (m.type() !== 'error') return;
@@ -408,7 +408,7 @@ function check(name, pass, detail) {
         taxPanel && taxPanel.links.join(' '));
 
   // ---- 23. weather degrades to "not known" when the API is unreachable ---
-  /* This sandbox blocks archive-api.open-meteo.com, which makes it the ideal
+  /* This sandbox blocks both open-meteo hosts, which makes it the ideal
      place to prove the failure path: a dead provider must read as "not known",
      never as a broken panel or a fabricated average. */
   await page.waitForTimeout(1200);
@@ -487,6 +487,78 @@ function check(name, pass, detail) {
         !!partial && /n\/a.*double/.test(partial), (partial || '').slice(0, 80));
   check('commission shows what the page said, not a fabricated 0%',
         /No commission mentioned/i.test(drawerText) && !/\b0% of sales/.test(drawerText));
+
+  // ---- 26. weather renders a card per show day --------------------------
+  /* This sandbox has no egress, which is why the checks above assert the
+     failure path. To exercise the success path the provider is stubbed: the
+     stub answers with the shape Open-Meteo actually returns, so what is
+     tested is this code's reading and rendering of it, not the network. */
+  await page.route('**/*open-meteo.com/**', route => {
+    const u = new URL(route.request().url());
+    const from = u.searchParams.get('start_date');
+    const to = u.searchParams.get('end_date');
+    const time = [];
+    for (let d = new Date(from + 'T00:00:00'); d <= new Date(to + 'T00:00:00');
+         d.setDate(d.getDate() + 1)) {
+      time.push(d.toISOString().slice(0, 10));
+    }
+    const n = time.length;
+    route.fulfill({
+      status: 200, contentType: 'application/json',
+      body: JSON.stringify({ daily: {
+        time,
+        weather_code: time.map(() => 0),          // clear
+        temperature_2m_max: time.map(() => 76),
+        temperature_2m_min: time.map(() => 50),
+        wind_speed_10m_max: time.map(() => 22),   // over the canopy threshold
+        precipitation_sum: time.map(() => 0)
+      }})
+    });
+  });
+
+  const weatherFor = async (id) => {
+    await page.evaluate(() => {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('artShowTracker.weather'))
+        .forEach(k => localStorage.removeItem(k));
+    });
+    await page.evaluate(i => document.querySelector(`[data-detail="${i}"]`)?.click(), id);
+    await page.waitForTimeout(1800);
+    const t = await page.evaluate(() => {
+      const el = document.querySelector('#wxPanel');
+      return el ? el.textContent.replace(/\s+/g, ' ').trim() : null;
+    });
+    const cards = await page.evaluate(() => document.querySelectorAll('.wx-day').length);
+    await page.click('#idrClose');
+    await page.waitForTimeout(200);
+    return { t, cards };
+  };
+
+  await page.click('#idrClose').catch(() => {});
+  await page.fill('#fText', '');
+  await page.waitForTimeout(300);
+
+  /* Bar Harbor runs 11-13 September 2026 — inside the forecast horizon from
+     the date this data was built, so it must take the forecast path. */
+  const soon = await weatherFor('zapp-13837');
+  check('weather renders one card per show day',
+        soon.cards === 3, soon.cards + ' cards');
+  check('each card carries a high, a low and a wind speed',
+        !!soon.t && /76/.test(soon.t) && /50/.test(soon.t) && /22 mph/.test(soon.t),
+        (soon.t || '').slice(0, 90));
+  check('a windy day is called out',
+        !!soon.t && /canopy weather/i.test(soon.t), (soon.t || '').slice(0, 90));
+  check('a near show says it is the real forecast',
+        !!soon.t && /actual forecast/i.test(soon.t), (soon.t || '').slice(0, 70));
+
+  /* The practice show is in January 2027, far outside the horizon, so it must
+     fall back to the ten-year record and say so. */
+  const far = await weatherFor('test-seattle');
+  check('a distant show falls back to the historical record',
+        !!far.t && /not a forecast/i.test(far.t), (far.t || '').slice(0, 90));
+  check('and still renders a card per day', far.cards === 2, far.cards + ' cards');
+
+  await page.unroute('**/*open-meteo.com/**');
 
   console.log('\nlate console errors: ' + (errors.length ? errors.join(' | ') : 'none'));
   await browser.close();

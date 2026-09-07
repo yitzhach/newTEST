@@ -404,6 +404,10 @@ def write_catalogue(records, original):
         if rec:
             row["lat"] = rec["facts"].get("lat")
             row["lng"] = rec["facts"].get("lng")
+            # The booth fee travels too, so a show added to the ledger arrives
+            # costed rather than blank. It is the artist's field from then on:
+            # this is a starting value, not a managed one.
+            row["boothFee"] = rec["facts"].get("boothFee")
 
     for rec in records:
         if rec["id"] in have:
@@ -426,6 +430,7 @@ def write_catalogue(records, original):
             "url": f["officialUrl"] or "",
             "lat": f.get("lat"),
             "lng": f.get("lng"),
+            "boothFee": f.get("boothFee"),
         })
         added += 1
 

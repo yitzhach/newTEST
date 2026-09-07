@@ -443,3 +443,22 @@ body.idr-open { overflow:hidden; }
   border:2px solid var(--prov-fixture); color:var(--prov-fixture);
   font-size:13px; line-height:1.6;
 }
+
+/* ---- Weather, one card per show day -------------------------------------- */
+.wx-days {
+  list-style:none; margin:0 0 4px; padding:0;
+  display:flex; gap:10px; flex-wrap:wrap;
+}
+.wx-day {
+  flex:1 1 132px; min-width:132px; padding:11px 12px;
+  border:1px solid var(--line); border-radius:5px;
+  display:flex; flex-direction:column; gap:3px;
+}
+.wx-day.is-windy { border-color:var(--warn); }
+.wx-when { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.wx-icon { margin:3px 0; color:var(--muted); }
+.wx-temp { font-size:19px; font-weight:600; font-variant-numeric:tabular-nums; }
+.wx-low { font-size:14px; font-weight:400; color:var(--muted); }
+.wx-cond { font-size:13px; }
+.wx-wind, .wx-rain { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.wx-flag { color:var(--warn); }

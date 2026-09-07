@@ -486,9 +486,12 @@ window.ASTIntelUI = (function () {
     /* Rendered as a placeholder and filled in wireWeather(). The lookup is a
        network call and the drawer must open at once — an artist clicking a
        show should never wait on a third-party API to see the fit score. */
-    return '<h3 class="sd-h">Weather in the show\'s own window</h3>' +
-      '<div class="wx" id="wxPanel"><p class="fine">Checking the last ' +
-      W.YEARS + ' years&hellip;</p></div>';
+    /* The heading cannot know yet whether this will be a forecast or the
+       ten-year record — that depends on a lookup that has not happened. So it
+       names the window, and the panel below says which kind of answer it
+       got. */
+    return '<h3 class="sd-h">Weather on the show\'s own days</h3>' +
+      '<div class="wx" id="wxPanel"><p class="fine">Checking&hellip;</p></div>';
   }
 
   function wireWeather(root, show) {
@@ -508,32 +511,46 @@ window.ASTIntelUI = (function () {
   }
 
   function weatherHtml(show, r) {
-    var f = show.facts || {};
-    var stat = function (value, label) {
-      return '<li><strong>' + esc(value) + '</strong><span>' + esc(label) + '</span></li>';
-    };
-    var cells = '';
-    if (r.rainChancePct != null) cells += stat(r.rainChancePct + '%', 'of show days saw rain');
-    if (r.meanHighF != null) cells += stat(r.meanHighF + '\u00b0F', 'average daily high');
-    if (r.meanWindMph != null) cells += stat(r.meanWindMph + ' mph', 'average peak wind');
+    var forecast = r.mode === 'forecast';
+
+    var cards = (r.days || []).map(function (d) {
+      var temps = (d.high == null ? '—' : d.high + '\u00b0') +
+        (d.low == null ? '' : ' <span class="wx-low">' + d.low + '\u00b0</span>');
+      return '<li class="wx-day' + (d.windy ? ' is-windy' : '') + '">' +
+        '<span class="wx-when">' + esc(d.label) + '</span>' +
+        d.icon +
+        '<span class="wx-temp">' + temps + '</span>' +
+        '<span class="wx-cond">' + esc(d.condition || '—') + '</span>' +
+        '<span class="wx-wind">' + (d.wind == null ? '' : d.wind + ' mph') +
+          (d.windy ? ' <span class="wx-flag">canopy weather</span>' : '') + '</span>' +
+        (d.rainChancePct == null ? ''
+          : '<span class="wx-rain">' + d.rainChancePct + '% of years wet</span>') +
+      '</li>';
+    }).join('');
+
+    /* The distinction the whole panel turns on. "76 on Saturday" and "76 on
+       an average Saturday in early March" are different claims, and only one
+       of them is about this year — so the panel says which it is rather than
+       leaving the reader to infer it from how far away the show is. */
+    var caption = forecast
+      ? 'The actual forecast for these dates.'
+      : 'What these dates have done over the last ' + r.years +
+        ' year' + (r.years === 1 ? '' : 's') + ' — ' + r.observations +
+        ' days of history, and not a forecast. Close to the show this panel ' +
+        'switches to the real one.';
 
     var prov = provChip({
       status: 'dataset',
       source: r.source,
-      basis: r.sourceName + '. ' + r.observations + ' days observed across ' +
-             r.years + ' year' + (r.years === 1 ? '' : 's') +
-             ', at the city coordinates rather than the venue.',
+      basis: r.sourceName + '. ' +
+        (forecast ? 'A live forecast for the show\'s own dates.'
+                  : 'Each day averaged against the same calendar date in every ' +
+                    'year, at the city coordinates rather than the venue.'),
       checked: (r.fetchedAt || '').slice(0, 10)
     });
 
-    return '<ul class="wx-stats">' + cells + '</ul>' +
-      (r.windyDayPct
-        ? '<p class="wx-warn">' + r.windyDayPct + '% of those days peaked over ' +
-          r.windyThresholdMph + ' mph — enough to matter for a canopy.</p>'
-        : '') +
-      '<p class="fine">' + esc(A.fmtRange(f.startDate, f.endDate)) +
-      ', across the last ' + r.years + ' year' + (r.years === 1 ? '' : 's') +
-      ' — ' + r.observations + ' days of history, not a forecast. ' + prov + '</p>';
+    return '<ul class="wx-days">' + cards + '</ul>' +
+      '<p class="fine">' + esc(caption) + ' ' + prov + '</p>';
   }
 
   /* The one panel on this site that can cost somebody money if it is wrong.
