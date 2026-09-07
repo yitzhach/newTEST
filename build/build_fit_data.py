@@ -44,6 +44,10 @@ GEOCODE = os.path.join(ROOT, "build", "geocode.json")
 # spreadsheet. 100 shows deep: booth fees, jury statistics, what applying
 # actually involves.
 SHOW_RESEARCH = os.path.join(ROOT, "build", "show-research.json")
+# One fictitious show, so an artist can try every feature without touching
+# their notes on a show they might actually apply to. Kept in its own file so
+# it can never be mistaken for a real input and can be removed in one step.
+TEST_SHOW = os.path.join(ROOT, "build", "test-show.json")
 OUT = os.path.join(ROOT, "tracker", "fit-data.json")
 
 SCHEMA_VERSION = 1
@@ -264,6 +268,7 @@ def main():
     overrides = load(OVERRIDES, default={})
     geocode = load(GEOCODE, default={"shows": {}, "gazetteer": {}})
     research = load(SHOW_RESEARCH, default={"shows": {}})
+    test_show = load(TEST_SHOW, default=None)
 
     today = __import__("datetime").date.today().isoformat()
 
@@ -310,6 +315,14 @@ def main():
         apply_geocode(rec, geocode)
         out.append(rec)
 
+    # Appended after the real shows and before the sort, so it sits in the
+    # list alphabetically like anything else. Every field on it carries the
+    # `fixture` provenance status, which the UI renders as a loud TEST DATA
+    # chip — it cannot be read as sourced, estimated, or anything in between.
+    if test_show and test_show.get("show"):
+        out.append(test_show["show"])
+        print("  test show included: %s" % test_show["show"]["name"])
+
     out.sort(key=lambda r: (r["name"] or "").lower())
 
     # Pass two, on the built records. Catches the fit-only shows, whose dates
@@ -321,6 +334,7 @@ def main():
         if rec["facts"].get("notifyDate") is None:
             rec["provenance"].pop("notifyDate", None)
 
+    reject_free_booths(out)
     report_hygiene(cat_repairs + rec_repairs, cat_fatals + rec_fatals, expired)
     stamp_assets()
 
@@ -593,6 +607,29 @@ def stamp_assets():
 
     print("  asset version %s stamped into %s" % (tag, ", ".join(touched) or "nothing"))
     return tag
+
+
+def reject_free_booths(records):
+    """A booth fee of zero is not a cheap show, it is a missing number.
+
+    One record carried $0 from an earlier research pass, with a note saying it
+    was "unusual and worth confirming". Rendered in the fee box that reads as
+    a free booth, which is a claim nobody made. Null says what is actually
+    known, and the note survives in the provenance either way.
+    """
+    dropped = []
+    for rec in records:
+        for key in ("boothFee", "boothFeeDouble", "boothFeeCorner"):
+            value = rec["facts"].get(key)
+            if value is not None and value <= 0:
+                dropped.append("%s: %s was %s" % (rec["id"], key, value))
+                rec["facts"][key] = None
+                rec["provenance"].pop(key, None)
+    if dropped:
+        print("  booth fees of zero dropped to 'not known':")
+        for line in dropped:
+            print("    - %s" % line)
+    return dropped
 
 
 def apply_research(rec, entry):

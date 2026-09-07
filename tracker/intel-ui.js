@@ -57,7 +57,10 @@ window.ASTIntelUI = (function () {
     search:       { text:'unconfirmed',  title:'Found in a search result and not yet confirmed against the source page. Open the link before you rely on it.' },
     editorial:    { text:'estimate',     title:'An informed editorial estimate, not sourced data.' },
     dataset:      { text:'dataset',      title:'Looked up in a reference dataset shipped with the build. Deterministic and citeable, but nobody opened the show\'s own page to confirm it.' },
-    member:       { text:'reported',     title:'Reported by artists in the network.' }
+    member:       { text:'reported',     title:'Reported by artists in the network.' },
+    /* Not a grade of evidence — the absence of any. Only the practice show
+       carries it, and it says so in capitals so it cannot be skimmed past. */
+    fixture:      { text:'test data',    title:'Invented. This is the practice show — nothing on this record describes a real event.' }
   };
   function provChip(entry) {
     if (!entry) return '';
@@ -350,7 +353,16 @@ window.ASTIntelUI = (function () {
     /* --- network intel --- */
     var intel = intelSection(show, cons, reports, p);
 
-    return head + gateHtml +
+    /* The practice show says what it is before anything else in the drawer,
+       above the score, because a fabricated 8.2 read as a real one is the
+       single worst thing this tool could do. */
+    var testBanner = show.isTest
+      ? '<p class="test-banner"><strong>Practice show.</strong> Nothing here is real — ' +
+        'not the festival, not the venue, not one number. Use it to try the ' +
+        'features without touching a show you might actually apply to.</p>'
+      : '';
+
+    return testBanner + head + gateHtml +
       (show.editorialNote
         ? '<p class="sd-note">' + esc(show.editorialNote) +
           ' <span class="prov prov-editorial" title="Editorial read, not sourced data.">estimate</span></p>'

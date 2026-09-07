@@ -60,7 +60,9 @@ function check(name, pass, detail) {
 
   // ---- 2. catalogue size -------------------------------------------------
   const count = await page.textContent('#catCount');
-  check('catalogue shows 236', /236/.test(count || ''), 'got: ' + count);
+  /* 236 real shows plus the practice show, which is deliberately in the list
+     rather than hidden behind a flag: an artist has to be able to find it. */
+  check('catalogue shows 237', /237/.test(count || ''), 'got: ' + count);
 
   // ---- 3. profile bar present -------------------------------------------
   const discOpts = await page.$$eval('#pfDiscipline option', els => els.map(e => e.value));
@@ -304,7 +306,10 @@ function check(name, pass, detail) {
       feeNonsense: fit.shows.filter(s => {
         const f = s.facts;
         return (f.boothFee && f.boothFeeCorner && f.boothFeeCorner < f.boothFee) ||
-               (f.boothFee && f.boothFeeDouble && f.boothFeeDouble <= f.boothFee);
+               (f.boothFee && f.boothFeeDouble && f.boothFeeDouble <= f.boothFee) ||
+               // A free booth is a missing number, not a cheap show.
+               [f.boothFee, f.boothFeeDouble, f.boothFeeCorner]
+                 .some(v => v !== null && v !== undefined && v <= 0);
       }).length,
       jurySubs: fit.shows.filter(s => s.facts.avgSubmissionsPerYear != null).length,
       juryOdds: fit.shows.filter(s => s.factors.juryOdds != null).length,
@@ -330,8 +335,8 @@ function check(name, pass, detail) {
   /* 234 of 236. The two without coordinates hold a region rather than a city
      in their city column, and are deliberately left null rather than guessed;
      if that number moves, the gazetteer pass needs re-reading, not silencing. */
-  check('at least 234 of 236 shows carry coordinates',
-        hygiene.located >= 234 && hygiene.total === 236,
+  check('all but two shows carry coordinates',
+        hygiene.located >= 235 && hygiene.total === 237,
         hygiene.located + '/' + hygiene.total);
   check('coordinates reach catalogue.json too',
         hygiene.catalogueLocated === hygiene.located,
@@ -343,18 +348,18 @@ function check(name, pass, detail) {
   // ---- 19b. the ZAPPlication research pass ------------------------------
   /* Booth fee coverage was 24/236 before this import and blocks the whole of
      Phase 2 costing, so it is worth asserting rather than assuming. */
-  check('booth fee coverage is at least 100 shows',
-        hygiene.boothFee >= 100, hygiene.boothFee + '/236');
-  check('jury statistics landed on 100 shows',
-        hygiene.jurySubs >= 100, hygiene.jurySubs + '/236');
+  check('booth fee coverage is at least 175 shows',
+        hygiene.boothFee >= 175, hygiene.boothFee + '/236');
+  check('jury statistics landed on 200 shows',
+        hygiene.jurySubs >= 200, hygiene.jurySubs + '/236');
   check('jury odds are scored from those statistics',
-        hygiene.juryOdds >= 130, hygiene.juryOdds + '/236');
+        hygiene.juryOdds >= 215, hygiene.juryOdds + '/236');
   check('every booth fee is traceable to a line or a page',
         hygiene.boothFeeUntraceable === 0, hygiene.boothFeeUntraceable + ' untraceable');
   check('"no commission mentioned" is never recorded as 0%',
         hygiene.fakeZeroCommission === 0, hygiene.fakeZeroCommission + ' shows');
   check('double and corner rates were read too',
-        hygiene.boothDouble >= 45 && hygiene.boothCorner >= 40,
+        hygiene.boothDouble >= 80 && hygiene.boothCorner >= 80,
         hygiene.boothDouble + ' double, ' + hygiene.boothCorner + ' corner');
   check('no corner cheaper than its single, no double at or below it',
         hygiene.feeNonsense === 0, hygiene.feeNonsense + ' impossible fee sets');
