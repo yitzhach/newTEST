@@ -37,7 +37,7 @@ That points a cold session at two files instead of forty.
 
 ## What is done
 
-Both merged to `main` and live:
+Merged to `main` and live:
 
 - **PR #1** — members' intel network: fit ranking by discipline, artist
   reports, the Cloudflare backend.
@@ -51,12 +51,61 @@ tone check, and a complete Worker + D1 backend.
 The site runs in **solo mode**. Everything works, nothing is shared — every
 report stays in the browser and behaves as private.
 
+### Phase 1 of the buildout — done, on `claude/phase-1-build-134uv0`
+
+**Data hygiene.** 12 shows carried a jury notification date earlier than their
+own application deadline, which is impossible — a previous edition's date
+carried forward. The build now drops those to "not known" rather than guessing
+a year forward, and stops outright on anything it cannot repair honestly (a
+date it cannot parse, a show that ends before it starts, a deadline after the
+show is over). A deadline that has merely *passed* is not a build error — the
+calendar moves on its own — so it is reported at build time and raised at
+runtime instead: `fit.js gates()` has a new `closed` level, and closed shows
+sink in the fit ranking rather than being offered as live opportunities.
+
+**Geocoding.** 234 of 236 shows now carry coordinates, up from 0. The two
+without are rows whose city column holds a region rather than a city, and are
+left null. `geonamescache` turned out to be the wrong tool — it floors at
+population 15,001 and missed 28% of these shows, because art fairs happen in
+small resort towns — so the gazetteer is the `zipcodes` package instead. The
+lookup runs in `build/geocode_shows.py` and its output is committed as
+`build/geocode.json`, so the build has no geocoding dependency. Coordinates
+reach `catalogue.json` too, which means a show added to the ledger now arrives
+pinned on the map.
+
+**Weather history.** A drawer panel giving the chance of rain, the average
+high and the average peak wind for the show's own calendar window, over the
+last ten years. Fetched at runtime from the visitor's browser — the container
+has no egress and the deployed site does — and cached per show.
+
+**Sales tax and permits.** A drawer panel per state: the state rate, what
+local jurisdictions add on top, the state's own address lookup, how a visiting
+artist registers, and the trap specific to that state. It **never publishes a
+combined rate** — see the note below.
+
+New provenance grade: `dataset`, for a value looked up in a reference dataset
+rather than read off a show's page. Coordinates and weather carry it.
+
+### The one thing to know about the sales tax panel
+
+It carries the **state rate only** and says so in those words, because the
+number an artist actually collects is state + county + city + special district
+and the local part cannot be sourced honestly from here. There is no keyless,
+CORS-permitting national rate API, and no offline dataset of local rates that
+would still be right next quarter. So the panel leads with the caveat, links
+to the state's own address lookup, and says plainly that it is not tax advice.
+
+Three states — **Ohio, Utah and Wyoming** — ship with a null rate. Utah is the
+instructive one: the search summary blended the reduced grocery rate into the
+general rate. That is exactly the failure the honesty rules exist to catch, and
+null was the right answer.
+
 ## What is next
 
-**Phase 1 of the buildout** — see `docs/build-phases.md`, which carries the
-26-idea numbering, the seven-phase map, the verified environment facts and the
-paste-ready prompt for each phase. Phase 1 is data hygiene, geocoding all 236
-shows, weather history and sales tax by jurisdiction.
+**Phase 3** — see `docs/build-phases.md`. Phase 2 is blocked on booth fee
+coverage; Phase 3 is not blocked and is the commercial keystone (the
+application pipeline is the first thing that earns a weekly open). Phase 5's
+route planner is now unblocked too, since the geocode landed.
 
 The Worker deploy is separate and blocks only Phase 6. **Deploy it when the
 network layer matters.** Nothing is shared between artists yet, and that is the
@@ -102,6 +151,31 @@ python3 build/build_fit_data.py     # rewrites tracker/fit-data.json AND tracker
 `build/catalogue-source.json` is the pristine ZAPP export. Read-only input,
 never written to.
 
+The build also runs the date rules on every row, prints what it repaired, and
+exits non-zero on anything it cannot repair. `python3 build/build_fit_data.py
+--selftest` exercises those rules against constructed inputs without touching
+the data.
+
+**Geocoding is a separate, occasional step.** `build/geocode.json` is committed
+and the build just reads it, so an ordinary data edit needs nothing extra. Only
+when the *show list itself* changes:
+
+```bash
+pip install zipcodes
+python3 build/build_fit_data.py     # so fit-data.json is current
+python3 build/geocode_shows.py      # rewrites build/geocode.json
+python3 build/build_fit_data.py     # folds the coordinates in
+```
+
+**The weather API has not been verified from a container.** `tracker/weather.js`
+calls Open-Meteo's historical archive, chosen because it needs no key, permits
+cross-origin browser requests and serves daily data back to 1940. None of those
+three could be confirmed here, because this environment cannot reach it. The
+first person to open the live site should check the panel shows numbers rather
+than "not known". If the service turns out to need a key or to refuse the
+origin, every call fails closed and swapping providers means changing
+`ENDPOINT` and `readDaily()` and nothing else.
+
 ---
 
 ## The three test suites
@@ -121,12 +195,19 @@ Then:
 
 ```bash
 python3 -m http.server 8765          # from the repo root, leave running
-node build/browser-tests.cjs         # 37 checks — the model, the drawer, provenance
+node build/browser-tests.cjs         # 53 checks — the model, the drawer, provenance,
+                                     #   date hygiene, geocode coverage, tax guard rails
 node build/ledger-view-tests.cjs     # 21 checks — details/link split, badges, lenses
 cd worker && npm test                # 45 API checks — manages its own worker
+python3 build/build_fit_data.py --selftest   # 11 checks — the date rules themselves
 ```
 
-All three pass on `main` as of the last session: 37/37, 21/21, 45/45.
+All pass as of the Phase 1 session: 53/53, 21/21, 45/45, 11/11.
+
+`browser-tests.cjs` deliberately asserts that the weather panel degrades to
+"not known": this sandbox blocks the weather API, which makes it the ideal
+place to prove the failure path. Both browser suites filter that host out of
+their request-failure check so a genuine error still stands out.
 
 `ledger-view-tests.cjs` files a report, so it clears `localStorage` first and
 runs standalone. The worker suite starts and stops its own `wrangler dev`.

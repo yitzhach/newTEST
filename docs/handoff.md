@@ -262,29 +262,58 @@ tracker/
   intel.js          member report model, consensus, tone check, split store
   intel-ui.js       profile bar, show drawer, report form, network panel
   members.js        invite-only auth client; solo mode when no network configured
+  weather.js        runtime weather history for a show's own window, from the
+                    visitor's browser. Fails closed to "not known"
+  salestax.js       state rate, local warning, permit and lookup links per state.
+                    NEVER publishes a combined rate — read its header first
   intel.css         the intel layer's styles, on app.css's tokens
   browse.html       integrated: fit chips, fit sort, discipline filters, drawer
-  catalogue.json    236 shows (202 from ZAPP + 34 folded in from the fit model)
+  catalogue.json    236 shows (202 from ZAPP + 34 folded in from the fit model),
+                    now carrying city-level coordinates
 
 build/
-  build_fit_data.py     catalogue-source + fit-source + overrides -> fit-data.json
+  build_fit_data.py     catalogue-source + fit-source + overrides + geocode
+                        -> fit-data.json. Also enforces the date rules;
+                        `--selftest` runs 11 checks on those rules
+  geocode_shows.py      offline gazetteer pass -> build/geocode.json. Occasional:
+                        only when the show list changes
+  geocode.json          committed output, 234/236 located. The build reads this
+                        rather than depending on a geocoder
   record_research.py    merges a research batch, REJECTS anything missing provenance
   research-overrides.json  the research pass output, 29 shows deep
   catalogue-source.json    pristine ZAPP export. Read-only input, never written
-  browser-tests.cjs     37 Playwright checks: the model, the drawer, provenance
+  browser-tests.cjs     53 Playwright checks: the model, the drawer, provenance,
+                        date hygiene, geocode coverage, the tax guard rails
   ledger-view-tests.cjs 21 checks: details/link split, report badge, the lenses
 
 worker/               Cloudflare Worker + D1. Complete, NOT deployed. See its README
 docs/
   handoff.md          this file
+  START-HERE.md       cold-start orientation: what is done, what is next
+  build-phases.md     the 26 ideas, the seven-phase map, the per-phase prompt
   community-build.md  the future discussion layer, specified not built
 ```
+
+### A fifth provenance grade: `dataset`
+
+Added in Phase 1, and it sits between `search` and `verified`. It means the
+value was looked up in a reference dataset — deterministic and citeable — but
+nobody opened the show's own page for it. Coordinates (an offline US ZIP
+gazetteer) and weather history (Open-Meteo's archive) carry it. It renders in
+its own colour with a solid border: sourced, but not `verified`.
 
 ### Rebuilding after a data edit
 
 ```bash
 python3 build/build_fit_data.py      # rewrites tracker/fit-data.json AND catalogue.json
 ```
+
+The build now also enforces the date rules: it drops a notify date that
+precedes its own deadline (impossible, and a previous edition's date carried
+forward), reports deadlines that have already passed, and exits non-zero on
+anything it cannot repair honestly. A passed deadline is deliberately not an
+error — the calendar moves on its own — and is surfaced at runtime by
+`fit.js gates()` instead, where the browser knows what day it is.
 
 `catalogue-source.json` is the pristine input and is never written to. The build
 folds the 34 fit-only shows into `catalogue.json` as output, so the browser, the
@@ -334,6 +363,16 @@ Membership is invite-only. The first steward gets in via a one-time
   Aug 6–15 is a pick-one between Park City, Crested Butte and Sun Valley.
   Ranking has hit diminishing returns; scheduling has not.
 - **Images on reports.** The R2 binding exists, the API does not write to it yet.
+- **Verify the weather provider from a browser.** `tracker/weather.js` calls
+  Open-Meteo's historical archive. It needs no key, permits cross-origin
+  requests and holds daily data back to 1940 — but none of that was confirmed
+  against a live response, because the container that wrote it has no egress.
+  It fails closed, so a wrong choice reads as "not known" rather than as a
+  wrong number.
+- **Local sales tax rates.** The panel ships the state rate only, because no
+  free, keyless, CORS-permitting source for combined local rates exists. Ohio,
+  Utah and Wyoming ship with a null rate rather than a guessed one. See
+  `docs/build-phases.md` §6 for the three options.
 - **Money in the lenses.** "My results" and "The network" currently rank on the
   ten factor ratings. Ranking directly on reported net — the number an artist
   actually cares about — is the obvious next lens, and needs a decision about

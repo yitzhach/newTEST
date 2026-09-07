@@ -187,6 +187,10 @@
 <script src="fit.js"></script>
 <script src="intel.js"></script>
 <script src="members.js"></script>
+<!-- Weather fetches at runtime from the visitor's browser; sales tax is a
+     static table. Both are optional: intel-ui.js renders without either. -->
+<script src="weather.js"></script>
+<script src="salestax.js"></script>
 <script src="intel-ui.js"></script>
 <script src="catalogue.js"></script>
 <script src="store-supabase.js"></script>
@@ -235,7 +239,10 @@ function rescore() {
   state.profile = profile;
   state.rows.forEach(r => {
     const rec = fit.byId[r.id];
-    if (!rec) { r.fit = null; r.fitDetail = null; r.gates = []; r.blocked = false; return; }
+    if (!rec) {
+      r.fit = null; r.fitDetail = null; r.gates = []; r.blocked = false; r.closed = false;
+      return;
+    }
     const reports = state.reportsByShow[r.id] || [];
     const cons = INTEL.consensus(reports, profile.discipline);
     /* Under a reported lens the score comes ONLY from reports, so a show
@@ -250,16 +257,23 @@ function rescore() {
     r.fitDetail = scored;
     r.gates = FIT.gates(rec, profile);
     r.blocked = r.gates.some(g => g.level === 'blocking');
+    /* Two different reasons a show is not an opportunity, kept apart on
+       purpose: `blocked` is permanent (it does not jury your medium),
+       `closed` is the calendar (the deadline has passed, or the show has
+       already run). Both sink; only one of them comes back next year. */
+    r.closed = r.gates.some(g => g.level === 'closed');
     r.reportCount = reports.filter(x => x.visibility !== 'private' && !x.deletedAt).length;
     r.myReportCount = INTEL.mineOf(reports).length;
   });
 }
 
-/* Register fit as a first-class sort key. Blocked shows sink regardless of
-   direction — reversing the order should not promote a show that will not
-   jury your medium to the top of the page. */
+/* Register fit as a first-class sort key. Blocked and closed shows sink
+   regardless of direction — reversing the order should not promote a show
+   that will not jury your medium, or one whose deadline has passed, to the
+   top of the page. */
 C.SORTS.fit = (a, b) => {
   if (a.blocked !== b.blocked) return a.blocked ? 1 : -1;
+  if (a.closed !== b.closed) return a.closed ? 1 : -1;
   if (a.fit == null && b.fit == null) return 0;
   if (a.fit == null) return 1;
   if (b.fit == null) return -1;
@@ -302,9 +316,14 @@ function fitChip(r) {
           : 'Not scored yet');
     return '<span class="fitchip sc-none" title="' + esc(why) + '">—</span>';
   }
+  /* Say which gate actually fired. A single hardcoded reason was fine when
+     `blocked` was the only one; it would now tell an artist their medium is
+     not juried when the truth is that they are three days late. */
+  const why = r.blocked ? '. This show does not jury your medium.'
+            : r.closed  ? '. ' + (r.gates.find(g => g.level === 'closed') || {}).text
+            : '';
   const title = 'Fit for ' + FIT.DISCIPLINE_BY_KEY[state.profile.discipline].label.toLowerCase() +
-    ' — scored on ' + Math.round(r.fitDetail.coverage * 100) + '% of your weighting' +
-    (r.blocked ? '. This show does not jury your medium.' : '');
+    ' — scored on ' + Math.round(r.fitDetail.coverage * 100) + '% of your weighting' + why;
   return '<span class="fitchip ' + UI.scoreClass(r.fit) + '" title="' + esc(title) + '">' +
     r.fit.toFixed(1) + '</span>';
 }
@@ -354,7 +373,8 @@ function cardHtml(r) {
   const dl = deadlineBits(r);
   const fee = r.fee == null ? '' : '$' + (Number.isInteger(r.fee) ? r.fee : r.fee.toFixed(2));
   return '<article class="card' + (r.addedShowId ? ' is-added' : '') +
-    (r.blocked ? ' is-blocked' : '') + '" data-id="' + esc(r.id) + '">' +
+    (r.blocked ? ' is-blocked' : '') + (r.closed ? ' is-closed' : '') +
+    '" data-id="' + esc(r.id) + '">' +
     '<div class="card-top">' +
       '<h3 class="card-name">' +
         '<button type="button" class="namebtn" data-detail="' + esc(r.id) + '">' +
@@ -405,7 +425,8 @@ function rowHtml(r) {
   const dl = deadlineBits(r);
   const fee = r.fee == null ? '—' : '$' + (Number.isInteger(r.fee) ? r.fee : r.fee.toFixed(2));
   return '<div class="crow with-fit' + (r.addedShowId ? ' is-added' : '') +
-    (r.blocked ? ' is-blocked' : '') + '" data-id="' + esc(r.id) + '">' +
+    (r.blocked ? ' is-blocked' : '') + (r.closed ? ' is-closed' : '') +
+    '" data-id="' + esc(r.id) + '">' +
     '<span class="c-name">' +
       '<button type="button" class="card-like" data-like="' + esc(r.id) + '" ' +
         'aria-pressed="' + (r.liked ? 'true' : 'false') + '" ' +

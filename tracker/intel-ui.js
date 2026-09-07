@@ -56,6 +56,7 @@ window.ASTIntelUI = (function () {
     corroborated: { text:'corroborated', title:'Two or more independent sources agree on this.' },
     search:       { text:'unconfirmed',  title:'Found in a search result and not yet confirmed against the source page. Open the link before you rely on it.' },
     editorial:    { text:'estimate',     title:'An informed editorial estimate, not sourced data.' },
+    dataset:      { text:'dataset',      title:'Looked up in a reference dataset shipped with the build. Deterministic and citeable, but nobody opened the show\'s own page to confirm it.' },
     member:       { text:'reported',     title:'Reported by artists in the network.' }
   };
   function provChip(entry) {
@@ -199,6 +200,8 @@ window.ASTIntelUI = (function () {
   var reportTab = 'mine';
 
   function wireShow(root, show, p) {
+    wireWeather(root, show);
+
     var add = root.querySelector('#btnAddIntel');
     if (add) add.addEventListener('click', function () { openReport(show); });
 
@@ -302,6 +305,12 @@ window.ASTIntelUI = (function () {
     /* --- facts --- */
     var factRows = [
       ['Application deadline', f.applyBy ? A.fmtDay(f.applyBy) : null, 'applyBy'],
+      /* Shown even when it is null, and often it is: a notify date earlier
+         than its own deadline is impossible, and the build drops those to
+         "not known" rather than carrying a previous edition's date forward.
+         An artist waiting on a jury result would rather read "not known" than
+         a date that has already passed. */
+      ['Jury notification', f.notifyDate ? A.fmtDay(f.notifyDate) : null, 'notifyDate'],
       ['Jury fee', f.juryFee == null ? null : money(f.juryFee), 'juryFee'],
       ['Booth fee', f.boothFee == null ? null : money(f.boothFee) +
         (f.boothFeeNote ? ' <span class="muted-inline">' + esc(f.boothFeeNote) + '</span>' : ''), 'boothFee'],
@@ -311,7 +320,13 @@ window.ASTIntelUI = (function () {
       ['Venue', f.venue, 'venue'],
       ['Setting', f.indoorOutdoor, 'indoorOutdoor'],
       ['Vehicle access to booth', f.vehicleAccessToBooth == null ? null : (f.vehicleAccessToBooth ? 'Yes' : 'No'), 'vehicleAccessToBooth'],
-      ['Booth power', f.powerAvailable == null ? null : (f.powerAvailable ? 'Yes' : 'No'), 'powerAvailable']
+      ['Booth power', f.powerAvailable == null ? null : (f.powerAvailable ? 'Yes' : 'No'), 'powerAvailable'],
+      /* Shown because the weather and sales-tax panels below are computed from
+         it, and a number nothing explains is the one thing this drawer is not
+         allowed to contain. The chip says it locates the city, not the venue. */
+      ['Coordinates', (f.lat == null || f.lng == null) ? null :
+        f.lat.toFixed(4) + ', ' + f.lng.toFixed(4) +
+        ' <span class="muted-inline">city centre</span>', 'coordinates']
     ].map(function (row) {
       var known = row[1] != null && row[1] !== '';
       return '<tr' + (known ? '' : ' class="is-unknown"') + '>' +
@@ -339,7 +354,111 @@ window.ASTIntelUI = (function () {
       '<h3 class="sd-h">The facts</h3>' +
       '<table class="facttable"><tbody>' + factRows + '</tbody></table>' +
       (links.length ? '<p class="sd-links">' + links.join(' ') + '</p>' : '') +
+      weatherSection(show) + taxSection(show) +
       intel;
+  }
+
+  /* ---- 2b. WHAT THE PLACE IS LIKE ----------------------------------------
+     Two panels that only exist because the shows now have coordinates: what
+     the weather has done in this calendar window, and what an artist has to
+     collect and register for in this jurisdiction. Both are about the venue
+     rather than the show, and both are built to say "not known" cleanly.   */
+
+  function weatherSection(show) {
+    var W = window.ASTWeather;
+    if (!W) return '';
+    /* Rendered as a placeholder and filled in wireWeather(). The lookup is a
+       network call and the drawer must open at once — an artist clicking a
+       show should never wait on a third-party API to see the fit score. */
+    return '<h3 class="sd-h">Weather in the show\'s own window</h3>' +
+      '<div class="wx" id="wxPanel"><p class="fine">Checking the last ' +
+      W.YEARS + ' years&hellip;</p></div>';
+  }
+
+  function wireWeather(root, show) {
+    var W = window.ASTWeather;
+    var mount = root.querySelector('#wxPanel');
+    if (!W || !mount) return;
+
+    W.forShow(show).then(function (r) {
+      /* The drawer may have been closed or replaced while the request was in
+         flight. Writing into a detached node is harmless but pointless;
+         writing into the NEXT show's drawer would be a lie. */
+      if (!mount.isConnected) return;
+      mount.innerHTML = r.ok ? weatherHtml(show, r)
+        : '<p class="wx-none"><span class="unknown">not known</span> ' +
+          esc(W.reasonText(r.reason)) + '</p>';
+    });
+  }
+
+  function weatherHtml(show, r) {
+    var f = show.facts || {};
+    var stat = function (value, label) {
+      return '<li><strong>' + esc(value) + '</strong><span>' + esc(label) + '</span></li>';
+    };
+    var cells = '';
+    if (r.rainChancePct != null) cells += stat(r.rainChancePct + '%', 'of show days saw rain');
+    if (r.meanHighF != null) cells += stat(r.meanHighF + '\u00b0F', 'average daily high');
+    if (r.meanWindMph != null) cells += stat(r.meanWindMph + ' mph', 'average peak wind');
+
+    var prov = provChip({
+      status: 'dataset',
+      source: r.source,
+      basis: r.sourceName + '. ' + r.observations + ' days observed across ' +
+             r.years + ' year' + (r.years === 1 ? '' : 's') +
+             ', at the city coordinates rather than the venue.',
+      checked: (r.fetchedAt || '').slice(0, 10)
+    });
+
+    return '<ul class="wx-stats">' + cells + '</ul>' +
+      (r.windyDayPct
+        ? '<p class="wx-warn">' + r.windyDayPct + '% of those days peaked over ' +
+          r.windyThresholdMph + ' mph — enough to matter for a canopy.</p>'
+        : '') +
+      '<p class="fine">' + esc(A.fmtRange(f.startDate, f.endDate)) +
+      ', across the last ' + r.years + ' year' + (r.years === 1 ? '' : 's') +
+      ' — ' + r.observations + ' days of history, not a forecast. ' + prov + '</p>';
+  }
+
+  /* The one panel on this site that can cost somebody money if it is wrong.
+     It therefore leads with what it does NOT know, and the state rate is
+     never presented as the rate to collect. See tracker/salestax.js. */
+  function taxSection(show) {
+    var T = window.ASTSalesTax;
+    if (!T) return '';
+    var row = T.forState(show.state);
+    if (!row) return '';
+
+    var rate = row.stateRatePct == null
+      ? '<span class="unknown">not known</span>'
+      : (row.stateRatePct === 0 ? 'No sales tax' : row.stateRatePct + '%');
+
+    var links = [];
+    if (row.lookupUrl) {
+      links.push('<a class="btn-mini" href="' + esc(row.lookupUrl) +
+        '" target="_blank" rel="noopener noreferrer">Look up this address &#8599;</a>');
+    }
+    if (row.permitUrl) {
+      links.push('<a class="btn-mini" href="' + esc(row.permitUrl) +
+        '" target="_blank" rel="noopener noreferrer">Registering to collect &#8599;</a>');
+    }
+
+    return '<h3 class="sd-h">Sales tax and permits</h3>' +
+      '<div class="tax' + (row.stale ? ' is-stale' : '') + '">' +
+        '<p class="tax-rate"><strong>' + rate + '</strong> ' +
+          '<span class="tax-rate-label">state rate in ' + esc(row.state) + '</span> ' +
+          provChip(T.provenanceFor(show.state)) + '</p>' +
+        '<p class="tax-warn">' + esc(row.stateOnly) + '</p>' +
+        (row.localAdded
+          ? '<p class="tax-local"><strong>On top of that:</strong> ' + esc(row.localAdded) + '</p>'
+          : '') +
+        (row.note ? '<p class="tax-note">' + esc(row.note) + '</p>' : '') +
+        (links.length ? '<p class="sd-links">' + links.join(' ') + '</p>' : '') +
+        '<p class="fine">' + esc(row.authority) + ', captured ' + esc(row.capturedAt) +
+          (row.stale ? ' — <strong>over ' + T.STALE_AFTER_DAYS +
+                       ' days old, treat as stale and re-check</strong>' : '') +
+          '. ' + esc(row.notAdvice) + '</p>' +
+      '</div>';
   }
 
   /* The top-of-drawer shortcut. Only appears when there is something to read,

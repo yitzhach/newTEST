@@ -61,11 +61,11 @@ These numbers are referenced across sessions. Do not renumber them; append.
 
 | Phase | Contains | Blocked on |
 |---|---|---|
-| **1** | Data hygiene, geocode (1), weather (2), sales tax (9) | nothing |
+| **1** | ~~Data hygiene, geocode (1), weather (2), sales tax (9)~~ **done** | — |
 | **2** | Landed cost (8), break-even (13), cash flow (16), expense log (18) | booth fees — needs Phase 7 capture |
 | **3** | Application pipeline (11), jury fee tracker (12), expected value (14), image sets (21) | nothing |
 | **4** | Square import (15), sell-through (19), debrief (22), collector CRM (20) | nothing |
-| **5** | Route planner (17), demographics (3), tourism (4) | Phase 1 geocode |
+| **5** | Route planner (17), demographics (3), tourism (4) | ~~Phase 1 geocode~~ — unblocked |
 | **6** | Booth-level (23), benchmarking (24), weather-adjusted (25), load-in (26), wait-list (10) | **Worker deployed + ~20 members** |
 | **7** | Field composition (5), stability signals (6), prospectus diff (7) | saved ZAPP pages — the container cannot fetch them |
 
@@ -85,8 +85,12 @@ weekly open. Phases 2 and 4 are worth more once 3 exists.
   years and listings — a search for our `zapp-14594` returned figures for a
   different ZAPP id and a different year, stated confidently. It earns
   `search`, never `verified`.
-- **PyPI and npm are reachable.** `geonamescache` 3.0.2 installs and bundles US
-  city coordinates offline, which is how Phase 1 geocodes with no network.
+- **PyPI and npm are reachable.** This is how Phase 1 geocoded with no
+  network. Note that `geonamescache` was **not** good enough: it ships only
+  GeoNames cities above population 15,000 and missed 66 of these 236 shows —
+  a 28% miss rate concentrated on exactly the small resort towns the good
+  shows are in. The `zipcodes` package (42,789 US ZIP records, offline)
+  matched 234 of 236 and is what shipped.
 - **The deployed site runs in a visitor's browser, which has egress.** Anything
   needing live external data belongs in a client-side fetch, not the build.
   This is what makes weather (2) buildable despite the block.
@@ -147,7 +151,29 @@ under-collect and owe money later. So:
 
 ---
 
-## 5. Phase 1 — the current phase
+## 5. Phase 1 — SHIPPED
+
+Delivered on `claude/phase-1-build-134uv0`. What changed is summarised in
+`docs/START-HERE.md`; the original spec is kept below unaltered, because the
+next phase's session should be able to see what was asked for as well as what
+was done.
+
+Three things the phase settled that later phases need:
+
+- **Coordinates exist**, 234/236, city-level, in `facts.lat/lng` and in
+  `catalogue.json`. Idea 17 (route planner) and ideas 3 and 4 are unblocked.
+- **The weather API question (§6) is answered** — Open-Meteo's historical
+  archive — but **not verified**, because this container cannot reach it.
+  Someone on the live site needs to confirm the panel shows numbers.
+- **Sales tax shipped without a combined rate, deliberately.** There is no
+  keyless, CORS-permitting national rate source, so the panel carries the
+  state rate, says "state rate only" in those words, and links to each
+  state's own address lookup. Ohio, Utah and Wyoming ship with a null rate
+  rather than a guessed one.
+
+---
+
+## 5a. Phase 1 — the original spec
 
 ### 0. Data hygiene, first because it is a live bug
 
@@ -198,9 +224,12 @@ the state's temporary-vendor registration page.
 
 Not blocking Phase 1, but they need an answer before the phase that needs them:
 
-- **Which weather API.** Needs keyless, CORS-permitting, historical daily data.
-  Cannot be evaluated from the container — the Phase 1 session must verify
-  from the browser or ask.
+- ~~**Which weather API.**~~ Answered: Open-Meteo's historical archive
+  (`archive-api.open-meteo.com`, ERA5 reanalysis), for the three reasons the
+  decision required — no key, cross-origin permitted, daily data back to 1940.
+  **Still unverified against a live response**, because the container cannot
+  reach it. `tracker/weather.js` fails closed and the panel reads "not known",
+  so a wrong choice is visible rather than silent. Confirm on the live site.
 - **Where booth fees come from.** Phase 2 costing is blocked until booth fee
   coverage rises above 24/236. That means saved ZAPP pages (Phase 7) or member
   reports. Decide which before starting Phase 2.
@@ -209,3 +238,11 @@ Not blocking Phase 1, but they need an answer before the phase that needs them:
   comparing a $900 booth weekend against a $2,400 one fairly.
 - **Whether the Worker gets deployed before Phase 6.** Nothing in phases 1–5
   needs it; everything in Phase 6 does.
+
+- **Whether local sales tax rates are worth buying.** Phase 1 established that
+  no free, keyless, CORS-permitting source for combined local rates exists. The
+  options are: leave it as it is (state rate plus a link to the state's own
+  lookup, which is honest and is what shipped), pay for a rate API and proxy it
+  through the Worker so the key stays server-side, or capture rates per show
+  once a year by hand. The middle option is the only one that gets an artist a
+  number they can collect, and it needs the Worker deployed first.

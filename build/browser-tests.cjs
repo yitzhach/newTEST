@@ -38,7 +38,12 @@ function check(name, pass, detail) {
   const errors = [];
   // Google Fonts and the favicon are blocked by this sandbox's egress proxy;
   // both resolve on the live site. Filter them so a real error stands out.
-  const IGNORE = /fonts\.googleapis|fonts\.gstatic|favicon/;
+  //
+  // archive-api.open-meteo.com is blocked for the same reason, and its failure
+  // is a tested behaviour rather than a defect — see the weather check below,
+  // which asserts that the panel degrades to "not known" precisely because
+  // these requests fail here. Filtering it keeps a real error visible.
+  const IGNORE = /fonts\.googleapis|fonts\.gstatic|favicon|archive-api\.open-meteo/;
   page.on('requestfailed', r => { if (!IGNORE.test(r.url())) errors.push('reqfail: ' + r.url()); });
   page.on('console', m => {
     if (m.type() !== 'error') return;
@@ -265,6 +270,109 @@ function check(name, pass, detail) {
   await page.waitForTimeout(300);
   const netTxt = await page.textContent('.idr-body');
   check('network panel explains solo mode', /Running solo/i.test(netTxt));
+
+  // ---- 18. date hygiene actually ships clean -----------------------------
+  /* The build repairs impossible notify dates and stops on anything it cannot
+     repair. These assert on the SHIPPED artifacts, which is the thing that
+     matters — a rule that runs in the build but leaks into the JSON has not
+     done its job. Both files are checked: catalogue.json is what the browser,
+     the map and the ledger read, and it used to carry the defect too. */
+  const hygiene = await page.evaluate(async () => {
+    const bad = { fit: [], catalogue: [] };
+    const fit = await (await fetch('fit-data.json')).json();
+    for (const s of fit.shows) {
+      const f = s.facts;
+      if (f.applyBy && f.notifyDate && f.notifyDate < f.applyBy) bad.fit.push(s.id);
+    }
+    const cat = await (await fetch('catalogue.json')).json();
+    for (const s of cat.shows) {
+      if (s.applyBy && s.notifyDate && s.notifyDate < s.applyBy) bad.catalogue.push(s.id);
+    }
+    return {
+      bad,
+      total: fit.shows.length,
+      located: fit.shows.filter(s => typeof s.facts.lat === 'number' &&
+                                     typeof s.facts.lng === 'number').length,
+      catalogueLocated: cat.shows.filter(s => typeof s.lat === 'number').length,
+      provenance: fit.shows.filter(s => s.provenance && s.provenance.coordinates).length
+    };
+  });
+  check('no notify date precedes its own deadline in fit-data',
+        hygiene.bad.fit.length === 0, hygiene.bad.fit.join(','));
+  check('no notify date precedes its own deadline in catalogue.json',
+        hygiene.bad.catalogue.length === 0, hygiene.bad.catalogue.join(','));
+
+  // ---- 19. geocode coverage ----------------------------------------------
+  /* 234 of 236. The two without coordinates hold a region rather than a city
+     in their city column, and are deliberately left null rather than guessed;
+     if that number moves, the gazetteer pass needs re-reading, not silencing. */
+  check('at least 234 of 236 shows carry coordinates',
+        hygiene.located >= 234 && hygiene.total === 236,
+        hygiene.located + '/' + hygiene.total);
+  check('coordinates reach catalogue.json too',
+        hygiene.catalogueLocated === hygiene.located,
+        hygiene.catalogueLocated + ' vs ' + hygiene.located);
+  check('every coordinate carries provenance',
+        hygiene.provenance === hygiene.located,
+        hygiene.provenance + ' provenance entries for ' + hygiene.located + ' coordinates');
+
+  // ---- 20. a closed deadline is surfaced, not ranked as live -------------
+  await page.click('#idrClose');
+  await page.uncheck('#fOpen');            // closed shows are hidden by default
+  await page.fill('#fText', 'Bar Harbor Fine Arts Festival II');
+  await page.waitForTimeout(400);
+  const closed = await page.evaluate(() => {
+    const el = document.querySelector('.card[data-id="zapp-13837"], .crow[data-id="zapp-13837"]');
+    return el ? { found: true, isClosed: el.classList.contains('is-closed') } : { found: false };
+  });
+  check('a show whose deadline has passed is marked closed in the list',
+        closed.found && closed.isClosed, JSON.stringify(closed));
+
+  await page.click('[data-detail="zapp-13837"]');
+  await page.waitForTimeout(500);
+  const closedDrawer = await page.textContent('.idr-body');
+  check('the drawer says the application window has closed',
+        /Applications closed on/i.test(closedDrawer) || /This edition is over/i.test(closedDrawer),
+        (closedDrawer || '').slice(0, 80));
+
+  // ---- 21. the show's coordinates are shown with their source ------------
+  check('the drawer shows coordinates with a dataset chip',
+        /Coordinates/.test(closedDrawer) && /city centre/.test(closedDrawer));
+
+  // ---- 22. sales tax: state-only, never a combined rate ------------------
+  /* The whole risk of this feature is an artist reading one number and
+     collecting it. These assert the guard rails rather than the rate. */
+  const taxPanel = await page.evaluate(() => {
+    const heads = [...document.querySelectorAll('.idr-body .sd-h')];
+    const h = heads.find(x => /Sales tax/i.test(x.textContent));
+    const box = h && h.nextElementSibling;
+    return box ? { text: box.textContent, links: [...box.querySelectorAll('a')].map(a => a.href) } : null;
+  });
+  check('the sales tax panel renders for a state in the table', !!taxPanel);
+  check('it says the rate is state-only',
+        !!taxPanel && /State rate only/i.test(taxPanel.text));
+  check('it names local taxes as extra and not included',
+        !!taxPanel && /not included here/i.test(taxPanel.text));
+  check('it says plainly that it is not tax advice',
+        !!taxPanel && /not tax advice/i.test(taxPanel.text));
+  check('it links out to the issuing authority',
+        !!taxPanel && taxPanel.links.some(u => /maine\.gov/.test(u)),
+        taxPanel && taxPanel.links.join(' '));
+
+  // ---- 23. weather degrades to "not known" when the API is unreachable ---
+  /* This sandbox blocks archive-api.open-meteo.com, which makes it the ideal
+     place to prove the failure path: a dead provider must read as "not known",
+     never as a broken panel or a fabricated average. */
+  await page.waitForTimeout(1200);
+  const wx = await page.evaluate(() => {
+    const el = document.querySelector('#wxPanel');
+    return el ? el.textContent.trim() : null;
+  });
+  check('the weather panel exists', wx !== null);
+  check('an unreachable weather API degrades to "not known"',
+        !!wx && /not known/i.test(wx), wx);
+  check('it does not invent a number when the lookup failed',
+        !!wx && !/\d+%/.test(wx) && !/\u00b0F/.test(wx), wx);
 
   console.log('\nlate console errors: ' + (errors.length ? errors.join(' | ') : 'none'));
   await browser.close();

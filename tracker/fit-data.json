@@ -1,6 +1,6 @@
 {
  "schemaVersion": 1,
- "builtAt": "2026-09-05",
+ "builtAt": "2026-09-07",
  "count": 236,
  "factorOrder": [
   "buyerWealth",
@@ -73,8 +73,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Chattanooga riverfront",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 35.0414,
+    "lng": -85.2835
    },
    "provenance": {
     "buyerWealth": {
@@ -168,6 +168,11 @@
      "checked": "2026-09-05",
      "source": "https://www.visitchattanooga.com/listing/4-bridges-arts-festival/1264/",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Chattanooga, TN (mean of 20 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -233,8 +238,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 38.8003,
+    "lng": -77.09
    },
    "provenance": {
     "buyerWealth": {
@@ -288,6 +293,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Alexandria, VA (mean of 24 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -353,8 +363,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 42.2655,
+    "lng": -83.7714
    },
    "provenance": {
     "buyerWealth": {
@@ -453,6 +463,11 @@
      "checked": "2026-09-05",
      "source": "https://statestreetdistrict.org/art-fair-application",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Ann Arbor, MI (mean of 8 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -518,8 +533,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 34.7055,
+    "lng": -112.0091
    },
    "provenance": {
     "buyerWealth": {
@@ -573,6 +588,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cottonwood, AZ (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -638,8 +658,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 34.7055,
+    "lng": -112.0091
    },
    "provenance": {
     "buyerWealth": {
@@ -693,6 +713,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cottonwood, AZ (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -758,8 +783,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 41.136,
+    "lng": -73.7009
    },
    "provenance": {
     "buyerWealth": {
@@ -846,6 +871,11 @@
      "checked": "2026-09-05",
      "source": "https://armonkoutdoorartshow.org/artists-by-category/for-artists/",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Armonk, NY (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -911,8 +941,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 43.0724,
+    "lng": -89.4023
    },
    "provenance": {
     "buyerWealth": {
@@ -962,6 +992,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Madison, WI (mean of 35 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -1027,8 +1062,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Riverbend Park, on the Deschutes",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 44.0277,
+    "lng": -121.3677
    },
    "provenance": {
     "buyerWealth": {
@@ -1119,6 +1154,11 @@
      "checked": "2026-09-05",
      "source": "https://visitcentraloregon.com/event/art-in-the-high-desert/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bend, OR (mean of 6 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -1187,8 +1227,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Southlake Town Square",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 32.9485,
+    "lng": -97.1524
    },
    "provenance": {
     "buyerWealth": {
@@ -1290,6 +1330,11 @@
      "checked": "2026-09-05",
      "source": "http://www.artinthesquare.com/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Southlake, TX (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -1338,7 +1383,7 @@
     "endDate": "2026-09-13",
     "applyBy": "2026-09-06",
     "deadlineNote": "at Midnight CST",
-    "notifyDate": "2026-02-16",
+    "notifyDate": "",
     "juryFee": 25.0,
     "juryFeeLabel": "Art on the Fox Algonquin 2026 Late Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=13982",
@@ -1355,8 +1400,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 42.1729,
+    "lng": -88.3184
    },
    "provenance": {
     "buyerWealth": {
@@ -1410,6 +1455,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Algonquin, IL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -1475,8 +1525,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 45.608,
+    "lng": -84.4867
    },
    "provenance": {
     "buyerWealth": {
@@ -1530,6 +1580,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cheboygan, MI (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -1595,8 +1650,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 40.6568,
+    "lng": -74.3224
    },
    "provenance": {
     "buyerWealth": {
@@ -1650,6 +1705,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Westfield, NJ (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -1715,8 +1775,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.9388,
+    "lng": -80.1227
    },
    "provenance": {
     "buyerWealth": {
@@ -1770,6 +1830,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Jupiter-Juno Beach, FL (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -1835,8 +1900,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Historic Fort Myers River District",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 26.5911,
+    "lng": -81.8646
    },
    "provenance": {
     "buyerWealth": {
@@ -1939,6 +2004,11 @@
      "checked": "2026-09-05",
      "source": "https://www.artfestfortmyers.com/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Fort Myers, FL (mean of 20 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -2004,8 +2074,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 26.8,
+    "lng": -80.1191
    },
    "provenance": {
     "buyerWealth": {
@@ -2096,6 +2166,11 @@
      "checked": "2026-09-05",
      "source": "https://www.artigras.org/artist-applications/",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Palm Beach Gardens, FL (mean of 6 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -2161,8 +2236,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.9315,
+    "lng": -112.795
    },
    "provenance": {
     "buyerWealth": {
@@ -2216,6 +2291,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Wickenburg, AZ (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -2281,8 +2361,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Downtown Greenville",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 34.8581,
+    "lng": -82.3946
    },
    "provenance": {
     "buyerWealth": {
@@ -2380,6 +2460,11 @@
      "checked": "2026-09-05",
      "source": "https://artisphere.org/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Greenville, SC (mean of 18 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -2445,8 +2530,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 37.6356,
+    "lng": -76.5918
    },
    "provenance": {
     "buyerWealth": {
@@ -2500,6 +2585,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Urbanna, VA (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -2565,8 +2655,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 32.7894,
+    "lng": -96.7896
    },
    "provenance": {
     "buyerWealth": {
@@ -2620,6 +2710,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Dallas, TX (mean of 121 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -2685,8 +2780,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.1762,
+    "lng": -80.2311
    },
    "provenance": {
     "buyerWealth": {
@@ -2740,6 +2835,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Stuart, Florida, FL (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -2805,8 +2905,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 35.9682,
+    "lng": -83.9694
    },
    "provenance": {
     "buyerWealth": {
@@ -2860,6 +2960,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Knoxville, TN (mean of 32 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -2925,8 +3030,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -2980,6 +3085,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -3045,8 +3155,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.8407,
+    "lng": -81.7948
    },
    "provenance": {
     "buyerWealth": {
@@ -3100,6 +3210,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Babcock Ranch, FL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -3165,8 +3280,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 47.6059,
+    "lng": -122.1698
    },
    "provenance": {
     "buyerWealth": {
@@ -3216,6 +3331,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bellevue, WA (mean of 7 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -3281,8 +3401,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 44.3738,
+    "lng": -68.2448
    },
    "provenance": {
     "buyerWealth": {
@@ -3336,6 +3456,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bar Harbor, ME (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -3401,8 +3526,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 29.7934,
+    "lng": -95.4165
    },
    "provenance": {
     "buyerWealth": {
@@ -3456,6 +3581,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Houston, TX (mean of 190 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -3521,8 +3651,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 29.7934,
+    "lng": -95.4165
    },
    "provenance": {
     "buyerWealth": {
@@ -3572,6 +3702,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Houston, TX (mean of 190 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -3637,8 +3772,8 @@
     "vehicleAccessToBooth": null,
     "venue": "University of Miami campus",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 25.7291,
+    "lng": -80.2612
    },
    "provenance": {
     "buyerWealth": {
@@ -3741,6 +3876,11 @@
      "checked": "2026-09-05",
      "source": "https://events.miami.edu/event/75th-annual-beaux-arts-festival-of-art",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Coral Gables, FL (mean of 11 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -3806,8 +3946,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 39.6313,
+    "lng": -106.5108
    },
    "provenance": {
     "buyerWealth": {
@@ -3857,6 +3997,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Avon, CO (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -3922,8 +4067,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 42.3457,
+    "lng": -83.1001
    },
    "provenance": {
     "buyerWealth": {
@@ -3977,6 +4122,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Detroit, MI (mean of 57 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -4042,8 +4192,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.7545,
+    "lng": -82.2611
    },
    "provenance": {
     "buyerWealth": {
@@ -4097,6 +4247,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Boca Grande, FL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -4162,8 +4317,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.3677,
+    "lng": -80.1207
    },
    "provenance": {
     "buyerWealth": {
@@ -4217,6 +4372,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Boca Raton, FL (mean of 16 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -4282,8 +4442,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.3677,
+    "lng": -80.1207
    },
    "provenance": {
     "buyerWealth": {
@@ -4337,6 +4497,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Boca Raton, FL (mean of 16 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -4402,8 +4567,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.3677,
+    "lng": -80.1207
    },
    "provenance": {
     "buyerWealth": {
@@ -4457,6 +4622,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Boca Raton, FL (mean of 16 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -4532,8 +4702,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Mizner Park",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null,
+    "lat": 26.3677,
+    "lng": -80.1207,
     "mediaCategoriesComplete": false
    },
    "provenance": {
@@ -4639,6 +4809,11 @@
      "checked": "2026-09-05",
      "source": "https://bocamuseumartfestival.com/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Boca Raton, FL (mean of 16 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -4704,8 +4879,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.3677,
+    "lng": -80.1207
    },
    "provenance": {
     "buyerWealth": {
@@ -4759,6 +4934,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Boca Raton, FL (mean of 16 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -4824,8 +5004,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Riverside Park",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 26.3744,
+    "lng": -81.8118
    },
    "provenance": {
     "buyerWealth": {
@@ -4906,6 +5086,11 @@
      "checked": "2026-09-05",
      "source": "https://artsbonita.org/artfest-application-info/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bonita Springs, FL (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -4971,8 +5156,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Riverside Park",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 26.3744,
+    "lng": -81.8118
    },
    "provenance": {
     "buyerWealth": {
@@ -5052,6 +5237,11 @@
      "checked": "2026-09-05",
      "source": "https://artsbonita.org/artfest-application-info/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bonita Springs, FL (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -5117,8 +5307,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Riverside Park",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 26.3744,
+    "lng": -81.8118
    },
    "provenance": {
     "buyerWealth": {
@@ -5198,6 +5388,11 @@
      "checked": "2026-09-05",
      "source": "https://artsbonita.org/artfest-application-info/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bonita Springs, FL (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -5263,8 +5458,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 41.2256,
+    "lng": -81.54
    },
    "provenance": {
     "buyerWealth": {
@@ -5314,6 +5509,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Peninsula, OH (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -5379,8 +5579,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -5434,6 +5634,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -5499,8 +5704,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -5554,6 +5759,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -5619,8 +5829,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 41.5181,
+    "lng": -81.5663
    },
    "provenance": {
     "buyerWealth": {
@@ -5670,6 +5880,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cleveland Heights, OH (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -5735,8 +5950,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.6253,
+    "lng": -81.9712
    },
    "provenance": {
     "buyerWealth": {
@@ -5790,6 +6005,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cape Coral, FL (mean of 8 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -5855,8 +6075,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 38.9902,
+    "lng": -77.3916
    },
    "provenance": {
     "buyerWealth": {
@@ -5910,6 +6130,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sterling, VA (mean of 6 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -5975,8 +6200,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.824,
+    "lng": -111.913
    },
    "provenance": {
     "buyerWealth": {
@@ -6030,6 +6255,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Carefree, AZ (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -6095,8 +6325,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8592,
+    "lng": -111.9428
    },
    "provenance": {
     "buyerWealth": {
@@ -6150,6 +6380,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cave Creek, AZ (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -6215,8 +6450,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 39.9949,
+    "lng": -82.9874
    },
    "provenance": {
     "buyerWealth": {
@@ -6270,6 +6505,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Columbus, OH, OH (mean of 48 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -6335,8 +6575,8 @@
     "vehicleAccessToBooth": null,
     "venue": "the downtown chain of parks",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 30.4548,
+    "lng": -84.2802
    },
    "provenance": {
     "buyerWealth": {
@@ -6433,6 +6673,11 @@
      "checked": "2026-09-05",
      "source": "https://chainofparks.org/about-the-festival/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Tallahassee, FL (mean of 20 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -6498,8 +6743,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -6553,6 +6798,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -6618,8 +6868,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -6673,6 +6923,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -6738,8 +6993,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 39.7379,
+    "lng": -104.9775
    },
    "provenance": {
     "buyerWealth": {
@@ -6814,6 +7069,11 @@
      "checked": "2026-09-05",
      "source": "https://cherryarts.org/events/cherry-creek-arts-festival/apply/artist-application/",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Denver, CO (mean of 76 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -6879,8 +7139,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 34.7245,
+    "lng": -86.5788
    },
    "provenance": {
     "buyerWealth": {
@@ -6934,6 +7194,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Huntsville, AL (mean of 24 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -6999,8 +7264,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.2386,
+    "lng": -116.3514
    },
    "provenance": {
     "buyerWealth": {
@@ -7054,6 +7319,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Borrego Springs, CA (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -7119,8 +7389,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 28.3898,
+    "lng": -80.7693
    },
    "provenance": {
     "buyerWealth": {
@@ -7174,6 +7444,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cocoa, FL (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -7239,8 +7514,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 28.3898,
+    "lng": -80.7693
    },
    "provenance": {
     "buyerWealth": {
@@ -7294,6 +7569,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cocoa, FL (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -7359,8 +7639,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Coconut Grove",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 25.771,
+    "lng": -80.2516
    },
    "provenance": {
     "buyerWealth": {
@@ -7462,6 +7742,11 @@
      "checked": "2026-09-05",
      "source": "https://cgaf.com/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Miami, FL (mean of 109 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -7527,8 +7812,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.417,
+    "lng": -81.7962
    },
    "provenance": {
     "buyerWealth": {
@@ -7582,6 +7867,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Estero, FL (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -7647,8 +7937,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.417,
+    "lng": -81.7962
    },
    "provenance": {
     "buyerWealth": {
@@ -7702,6 +7992,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Estero, FL (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -7767,8 +8062,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 39.9949,
+    "lng": -82.9874
    },
    "provenance": {
     "buyerWealth": {
@@ -7818,6 +8113,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Columbus, OH (mean of 48 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -7883,8 +8183,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.8273,
+    "lng": -82.7001
    },
    "provenance": {
     "buyerWealth": {
@@ -7938,6 +8238,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for St. Petersburg, FL (mean of 62 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -8003,8 +8308,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Cottonwood Park",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 32.8867,
+    "lng": -96.7384
    },
    "provenance": {
     "buyerWealth": {
@@ -8096,6 +8401,11 @@
      "checked": "2026-09-05",
      "source": "https://cottonwoodartfestival.com/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Richardson, TX (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -8161,8 +8471,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 38.8849,
+    "lng": -106.9625
    },
    "provenance": {
     "buyerWealth": {
@@ -8255,6 +8565,11 @@
      "checked": "2026-09-05",
      "source": "https://www.crestedbutteartsfestival.com/artist-registration",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Crested Butte, CO (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -8320,8 +8635,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 40.9835,
+    "lng": -92.1104
    },
    "provenance": {
     "buyerWealth": {
@@ -8425,6 +8740,11 @@
      "checked": "2026-09-05",
      "source": "https://www.desmoinesartsfestival.org/forexhibitingartists",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Des Moines, IA (mean of 63 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -8490,8 +8810,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.7643,
+    "lng": -116.4225
    },
    "provenance": {
     "buyerWealth": {
@@ -8545,6 +8865,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Rancho Mirage, CA (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -8593,7 +8918,7 @@
     "endDate": "2026-11-29",
     "applyBy": "2026-09-18",
     "deadlineNote": null,
-    "notifyDate": "2025-09-22",
+    "notifyDate": "",
     "juryFee": 25.0,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14625",
@@ -8610,8 +8935,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.7643,
+    "lng": -116.4225
    },
    "provenance": {
     "buyerWealth": {
@@ -8665,6 +8990,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Rancho Mirage, CA (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -8730,8 +9060,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.457,
+    "lng": -80.0948
    },
    "provenance": {
     "buyerWealth": {
@@ -8785,6 +9115,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Delray Beach, FL (mean of 8 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -8850,8 +9185,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.457,
+    "lng": -80.0948
    },
    "provenance": {
     "buyerWealth": {
@@ -8905,6 +9240,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Delray Beach, FL (mean of 8 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -8970,8 +9310,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 25.785,
+    "lng": -80.2852
    },
    "provenance": {
     "buyerWealth": {
@@ -9025,6 +9365,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Doral, FL (mean of 11 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -9210,8 +9555,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.8,
+    "lng": -80.1191
    },
    "provenance": {
     "buyerWealth": {
@@ -9265,6 +9610,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Palm Beach Gardens, FL (mean of 6 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -9330,8 +9680,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.8,
+    "lng": -80.1191
    },
    "provenance": {
     "buyerWealth": {
@@ -9385,6 +9735,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Palm Beach Gardens, FL (mean of 6 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -9450,8 +9805,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.8,
+    "lng": -80.1191
    },
    "provenance": {
     "buyerWealth": {
@@ -9505,6 +9860,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Palm Beach Gardens, FL (mean of 6 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -9570,8 +9930,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -9625,6 +9985,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -9690,8 +10055,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -9745,6 +10110,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -9810,8 +10180,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.1762,
+    "lng": -80.2311
    },
    "provenance": {
     "buyerWealth": {
@@ -9865,6 +10235,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Stuart, FL (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -9930,8 +10305,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.0849,
+    "lng": -82.3036
    },
    "provenance": {
     "buyerWealth": {
@@ -9985,6 +10360,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Venice, FL (mean of 8 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -10050,8 +10430,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.0849,
+    "lng": -82.3036
    },
    "provenance": {
     "buyerWealth": {
@@ -10105,6 +10485,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Venice, FL (mean of 8 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -10170,8 +10555,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.9911,
+    "lng": -84.1257
    },
    "provenance": {
     "buyerWealth": {
@@ -10225,6 +10610,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Duluth, GA (mean of 7 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -10290,8 +10680,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.9911,
+    "lng": -84.1257
    },
    "provenance": {
     "buyerWealth": {
@@ -10345,6 +10735,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Duluth, GA (mean of 7 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -10410,8 +10805,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 42.732,
+    "lng": -84.4783
    },
    "provenance": {
     "buyerWealth": {
@@ -10465,6 +10860,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for East Lansing, MI (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -10530,8 +10930,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 47.8207,
+    "lng": -122.3497
    },
    "provenance": {
     "buyerWealth": {
@@ -10581,6 +10981,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Edmonds, WA (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -10646,8 +11051,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.9909,
+    "lng": -82.3679
    },
    "provenance": {
     "buyerWealth": {
@@ -10701,6 +11106,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Englewood, FL (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -10766,8 +11176,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.9909,
+    "lng": -82.3679
    },
    "provenance": {
     "buyerWealth": {
@@ -10821,6 +11231,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Englewood, FL (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -10886,8 +11301,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.9909,
+    "lng": -82.3679
    },
    "provenance": {
     "buyerWealth": {
@@ -10941,6 +11356,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Englewood, FL (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -10989,7 +11409,7 @@
     "endDate": "2027-03-21",
     "applyBy": "2026-11-01",
     "deadlineNote": null,
-    "notifyDate": "2025-11-13",
+    "notifyDate": "",
     "juryFee": 45.0,
     "juryFeeLabel": "Artist Jury Fee (non-refundable)",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14539",
@@ -11006,8 +11426,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 30.4927,
+    "lng": -87.8721
    },
    "provenance": {
     "buyerWealth": {
@@ -11061,6 +11481,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Fairhope, AL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -11126,8 +11551,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 42.0471,
+    "lng": -87.6921
    },
    "provenance": {
     "buyerWealth": {
@@ -11181,6 +11606,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Evanston, IL (mean of 6 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -11246,8 +11676,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 30.4927,
+    "lng": -87.8721
    },
    "provenance": {
     "buyerWealth": {
@@ -11301,6 +11731,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Fairhope, AL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -11366,8 +11801,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -11421,6 +11856,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -11486,8 +11926,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -11541,6 +11981,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -11606,8 +12051,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 29.4632,
+    "lng": -98.4982
    },
    "provenance": {
     "buyerWealth": {
@@ -11661,6 +12106,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for San Antonio, TX (mean of 89 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -11726,8 +12176,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 41.4748,
+    "lng": -84.5629
    },
    "provenance": {
     "buyerWealth": {
@@ -11781,6 +12231,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bryan, OH (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -11846,8 +12301,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 32.2281,
+    "lng": -110.9436
    },
    "provenance": {
     "buyerWealth": {
@@ -11901,6 +12356,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Tucson, AZ (mean of 56 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -11966,8 +12426,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Julian B. Lane Riverfront Park",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 27.9426,
+    "lng": -82.4636
    },
    "provenance": {
     "buyerWealth": {
@@ -12066,6 +12526,11 @@
      "checked": "2026-09-05",
      "source": "https://www.tampa.gov/special-events-coordination/news-and-events/featured-events/gasparilla-festival-of-the-arts",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Tampa, FL (mean of 60 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -12114,7 +12579,7 @@
     "endDate": "2027-01-23",
     "applyBy": "2026-11-02",
     "deadlineNote": null,
-    "notifyDate": "2025-11-21",
+    "notifyDate": "",
     "juryFee": 30.0,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14514",
@@ -12131,8 +12596,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.3595,
+    "lng": -111.421
    },
    "provenance": {
     "buyerWealth": {
@@ -12186,6 +12651,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Gold Canyon, AZ (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -12251,8 +12721,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 30.4356,
+    "lng": -87.2459
    },
    "provenance": {
     "buyerWealth": {
@@ -12302,6 +12772,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Pensacola, FL (mean of 25 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -12367,8 +12842,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.7507,
+    "lng": -82.7053
    },
    "provenance": {
     "buyerWealth": {
@@ -12422,6 +12897,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Gulfport, FL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -12487,8 +12967,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 29.1917,
+    "lng": -81.0299
    },
    "provenance": {
     "buyerWealth": {
@@ -12542,6 +13022,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Daytona Beach, FL (mean of 14 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -12590,7 +13075,7 @@
     "endDate": "2026-10-25",
     "applyBy": "2026-09-15",
     "deadlineNote": null,
-    "notifyDate": "2025-09-15",
+    "notifyDate": "",
     "juryFee": 45.0,
     "juryFeeLabel": "Entry Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14587",
@@ -12607,8 +13092,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 32.4369,
+    "lng": -97.7514
    },
    "provenance": {
     "buyerWealth": {
@@ -12662,6 +13147,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Granbury, TX (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -12727,8 +13217,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.0704,
+    "lng": -80.1436
    },
    "provenance": {
     "buyerWealth": {
@@ -12782,6 +13272,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Hobe Sound, FL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -12847,8 +13342,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -12902,6 +13397,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -12967,8 +13467,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 29.0226,
+    "lng": -80.9246
    },
    "provenance": {
     "buyerWealth": {
@@ -13022,6 +13522,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for New Smyrna Beach, FL (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -13087,8 +13592,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 43.4664,
+    "lng": -110.7508
    },
    "provenance": {
     "buyerWealth": {
@@ -13138,6 +13643,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Jackson, WY (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -13203,8 +13713,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 24.5552,
+    "lng": -81.7816
    },
    "provenance": {
     "buyerWealth": {
@@ -13258,6 +13768,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Key West, FL (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -13323,8 +13838,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.5854,
+    "lng": -111.8536
    },
    "provenance": {
     "buyerWealth": {
@@ -13378,6 +13893,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Scottsdale, AZ (mean of 20 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -13443,8 +13963,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 29.4632,
+    "lng": -98.4982
    },
    "provenance": {
     "buyerWealth": {
@@ -13498,6 +14018,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for San Antonio, TX (mean of 89 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -13563,8 +14088,8 @@
     "vehicleAccessToBooth": false,
     "venue": "Kings Mountain Community Center and Firehouse, in the redwoods above Woodside",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 37.4446,
+    "lng": -122.2632
    },
    "provenance": {
     "buyerWealth": {
@@ -13666,6 +14191,11 @@
      "checked": "2026-09-05",
      "source": "https://kingsmountainartfair.org/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Woodside, CA (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -13731,8 +14261,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 42.064,
+    "lng": -86.4783
    },
    "provenance": {
     "buyerWealth": {
@@ -13819,6 +14349,11 @@
      "checked": "2026-09-05",
      "source": "https://krasl.org/art-fair/artist-information/",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for St. Joseph, MI (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -13884,8 +14419,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 32.8469,
+    "lng": -117.2698
    },
    "provenance": {
     "buyerWealth": {
@@ -13935,6 +14470,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for La Jolla, CA (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -14000,8 +14540,8 @@
     "vehicleAccessToBooth": null,
     "venue": "La Quinta Civic Center Campus",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 33.6719,
+    "lng": -116.2994
    },
    "provenance": {
     "buyerWealth": {
@@ -14106,6 +14646,11 @@
      "checked": "2026-09-05",
      "source": "https://www.laquintaartcelebration.org/",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for La Quinta, CA (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -14171,8 +14716,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 28.7512,
+    "lng": -81.287
    },
    "provenance": {
     "buyerWealth": {
@@ -14226,6 +14771,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Lake Mary, FL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -14291,8 +14841,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.8615,
+    "lng": -81.4943
    },
    "provenance": {
     "buyerWealth": {
@@ -14346,6 +14896,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Lake Wales, FL (mean of 7 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -14411,8 +14966,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.4234,
+    "lng": -82.3812
    },
    "provenance": {
     "buyerWealth": {
@@ -14466,6 +15021,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Lakewood Ranch (Sarasota County), FL (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -14531,8 +15091,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.4234,
+    "lng": -82.3812
    },
    "provenance": {
     "buyerWealth": {
@@ -14586,6 +15146,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Lakewood Ranch, FL (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -14651,8 +15216,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.4234,
+    "lng": -82.3812
    },
    "provenance": {
     "buyerWealth": {
@@ -14706,6 +15271,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Lakewood Ranch, FL (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -14771,8 +15341,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.4234,
+    "lng": -82.3812
    },
    "provenance": {
     "buyerWealth": {
@@ -14826,6 +15396,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Lakewood Ranch, FL (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -14891,8 +15466,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1277,
+    "lng": -80.2126
    },
    "provenance": {
     "buyerWealth": {
@@ -14946,6 +15521,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Ft. Lauderdale, FL (mean of 96 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -15011,8 +15591,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1277,
+    "lng": -80.2126
    },
    "provenance": {
     "buyerWealth": {
@@ -15066,6 +15646,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Ft. Lauderdale, FL (mean of 96 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -15131,8 +15716,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1277,
+    "lng": -80.2126
    },
    "provenance": {
     "buyerWealth": {
@@ -15186,6 +15771,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Ft. Lauderdale, FL (mean of 96 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -15251,8 +15841,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 41.808,
+    "lng": -87.8714
    },
    "provenance": {
     "buyerWealth": {
@@ -15306,6 +15896,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for La Grange, IL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -15371,8 +15966,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Laumeier Sculpture Park",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 38.639,
+    "lng": -90.2811
    },
    "provenance": {
     "buyerWealth": {
@@ -15469,6 +16064,11 @@
      "checked": "2026-09-05",
      "source": "https://www.laumeiersculpturepark.org/artists",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for St. Louis, MO (mean of 71 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -15534,8 +16134,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 34.0284,
+    "lng": -84.3526
    },
    "provenance": {
     "buyerWealth": {
@@ -15589,6 +16189,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Roswell, GA (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -15654,8 +16259,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 28.8296,
+    "lng": -81.8561
    },
    "provenance": {
     "buyerWealth": {
@@ -15709,6 +16314,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Leesburg, FL (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -15774,8 +16384,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Long's Park",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 40.0395,
+    "lng": -76.2974
    },
    "provenance": {
     "buyerWealth": {
@@ -15854,6 +16464,11 @@
      "checked": "2026-09-05",
      "source": "https://www.longspark.org/art-festival",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Lancaster, PA (mean of 12 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -15919,8 +16534,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.4125,
+    "lng": -82.659
    },
    "provenance": {
     "buyerWealth": {
@@ -15974,6 +16589,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Longboat Key (Sarasota County), FL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -16039,8 +16659,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.4125,
+    "lng": -82.659
    },
    "provenance": {
     "buyerWealth": {
@@ -16094,6 +16714,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Longboat Key (Sarasota County), FL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -16159,8 +16784,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.5741,
+    "lng": -101.87
    },
    "provenance": {
     "buyerWealth": {
@@ -16214,6 +16839,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Lubbock, TX (mean of 27 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -16279,8 +16909,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.062,
+    "lng": -85.6778
    },
    "provenance": {
     "buyerWealth": {
@@ -16334,6 +16964,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Birmingham, AL (mean of 75 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -16399,8 +17034,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Historic Main Street, downtown Fort Worth",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 32.7683,
+    "lng": -97.312
    },
    "provenance": {
     "buyerWealth": {
@@ -16485,6 +17120,11 @@
      "checked": "2026-09-05",
      "source": "https://mainstreetartsfest.org/schedule-map/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Fort Worth, TX (mean of 121 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -16550,8 +17190,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 30.4548,
+    "lng": -84.2802
    },
    "provenance": {
     "buyerWealth": {
@@ -16605,6 +17245,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Tallahassee, FL (mean of 20 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -16670,8 +17315,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 37.9009,
+    "lng": -122.5395
    },
    "provenance": {
     "buyerWealth": {
@@ -16721,6 +17366,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Mill Valley, CA (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -16786,8 +17436,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Milwaukee Art Museum lakeside campus",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 43.0455,
+    "lng": -87.95
    },
    "provenance": {
     "buyerWealth": {
@@ -16866,6 +17516,11 @@
      "checked": "2026-09-05",
      "source": "https://mam.org/lfoa",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Milwaukee, WI (mean of 43 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -16931,8 +17586,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 44.9609,
+    "lng": -93.1064
    },
    "provenance": {
     "buyerWealth": {
@@ -16986,6 +17641,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for St. Paul, MN (mean of 51 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -17051,8 +17711,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 28.7925,
+    "lng": -81.6488
    },
    "provenance": {
     "buyerWealth": {
@@ -17106,6 +17766,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Mount Dora, FL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -17154,7 +17819,7 @@
     "endDate": "2026-09-27",
     "applyBy": "2026-09-13",
     "deadlineNote": null,
-    "notifyDate": "2026-06-01",
+    "notifyDate": "",
     "juryFee": 30.0,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14115",
@@ -17171,8 +17836,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 39.322,
+    "lng": -77.9588
    },
    "provenance": {
     "buyerWealth": {
@@ -17226,6 +17891,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Kearneysville, WV (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -17291,8 +17961,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 42.732,
+    "lng": -84.4783
    },
    "provenance": {
     "buyerWealth": {
@@ -17346,6 +18016,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for East Lansing, MI (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -17411,8 +18086,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -17466,6 +18141,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -17531,8 +18211,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -17586,6 +18266,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -17651,8 +18336,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -17706,6 +18391,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -17771,8 +18461,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -17826,6 +18516,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -17891,8 +18586,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -17946,6 +18641,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -18011,8 +18711,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -18066,6 +18766,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -18131,8 +18836,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -18186,6 +18891,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -18251,8 +18961,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -18306,6 +19016,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -18354,7 +19069,7 @@
     "endDate": "2027-04-04",
     "applyBy": "2026-12-20",
     "deadlineNote": null,
-    "notifyDate": "2025-12-24",
+    "notifyDate": "",
     "juryFee": 35.0,
     "juryFeeLabel": "Jury Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14699",
@@ -18371,8 +19086,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -18426,6 +19141,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -18497,8 +19217,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Cambier Park",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null,
+    "lat": 26.1736,
+    "lng": -81.7293,
     "mediaCategoriesComplete": false
    },
    "provenance": {
@@ -18595,6 +19315,11 @@
      "checked": "2026-09-05",
      "source": "https://www.naplesart.org/national-art-fair",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -18660,8 +19385,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.1736,
+    "lng": -81.7293
    },
    "provenance": {
     "buyerWealth": {
@@ -18715,6 +19440,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Naples, FL (mean of 17 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -18780,8 +19510,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Reston Town Center",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 38.8978,
+    "lng": -77.3151
    },
    "provenance": {
     "buyerWealth": {
@@ -18873,6 +19603,11 @@
      "checked": "2026-09-05",
      "source": "https://www.tephraica.org/festival",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Reston, VA (mean of 10 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -18938,8 +19673,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 35.4937,
+    "lng": -97.4903
    },
    "provenance": {
     "buyerWealth": {
@@ -18993,6 +19728,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Oklahoma City, OK (mean of 80 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -19058,8 +19798,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 29.171,
+    "lng": -83.0168
    },
    "provenance": {
     "buyerWealth": {
@@ -19113,6 +19853,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cedar Key, FL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -19178,8 +19923,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -19233,6 +19978,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -19298,8 +20048,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -19353,6 +20103,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -19418,8 +20173,8 @@
     "vehicleAccessToBooth": false,
     "venue": "Old Town Triangle Historic District",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 41.8507,
+    "lng": -87.6792
    },
    "provenance": {
     "buyerWealth": {
@@ -19518,6 +20273,11 @@
      "checked": "2026-09-05",
      "source": "https://www.oldtownartfair.org/getting-here/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Chicago, IL (mean of 93 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -19583,8 +20343,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 29.9064,
+    "lng": -81.3855
    },
    "provenance": {
     "buyerWealth": {
@@ -19638,6 +20398,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Saint Augustine, FL (mean of 12 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -19703,8 +20468,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 41.8507,
+    "lng": -87.6792
    },
    "provenance": {
     "buyerWealth": {
@@ -19758,6 +20523,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Chicago, IL (mean of 93 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -19823,8 +20593,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 41.8507,
+    "lng": -87.6792
    },
    "provenance": {
     "buyerWealth": {
@@ -19878,6 +20648,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Chicago, IL (mean of 93 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -19943,8 +20718,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 30.281,
+    "lng": -87.5815
    },
    "provenance": {
     "buyerWealth": {
@@ -19998,6 +20773,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Orange Beach, AL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -20046,7 +20826,7 @@
     "endDate": "2027-07-25",
     "applyBy": "2027-04-15",
     "deadlineNote": null,
-    "notifyDate": "2026-04-20",
+    "notifyDate": "",
     "juryFee": 35.0,
     "juryFeeLabel": "Early Jury and Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14845",
@@ -20063,8 +20843,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 42.5917,
+    "lng": -83.382
    },
    "provenance": {
     "buyerWealth": {
@@ -20118,6 +20898,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for West Bloomfield, MI (Next to Bloomfield Hills), MI (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -20183,8 +20968,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8086,
+    "lng": -116.5319
    },
    "provenance": {
     "buyerWealth": {
@@ -20238,6 +21023,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Palm Springs, CA (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -20303,8 +21093,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8086,
+    "lng": -116.5319
    },
    "provenance": {
     "buyerWealth": {
@@ -20358,6 +21148,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Palm Springs, CA (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -20423,8 +21218,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8086,
+    "lng": -116.5319
    },
    "provenance": {
     "buyerWealth": {
@@ -20478,6 +21273,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Palm Springs, CA (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -20543,8 +21343,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8086,
+    "lng": -116.5319
    },
    "provenance": {
     "buyerWealth": {
@@ -20598,6 +21398,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Palm Springs, CA (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -20646,7 +21451,7 @@
     "endDate": "2027-06-06",
     "applyBy": "2027-03-07",
     "deadlineNote": null,
-    "notifyDate": "2026-03-09",
+    "notifyDate": "",
     "juryFee": 30.0,
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14741",
@@ -20663,8 +21468,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 42.3457,
+    "lng": -83.1001
    },
    "provenance": {
     "buyerWealth": {
@@ -20718,6 +21523,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Detroit, MI (mean of 57 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -20783,8 +21593,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 37.4386,
+    "lng": -122.1497
    },
    "provenance": {
     "buyerWealth": {
@@ -20834,6 +21644,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Palo Alto, CA (mean of 7 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -20899,8 +21714,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.5494,
+    "lng": -111.9565
    },
    "provenance": {
     "buyerWealth": {
@@ -20954,6 +21769,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Paradise Valley, AZ (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -21019,8 +21839,8 @@
     "vehicleAccessToBooth": false,
     "venue": "Historic Main Street",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 40.6744,
+    "lng": -111.5184
    },
    "provenance": {
     "buyerWealth": {
@@ -21126,6 +21946,11 @@
      "checked": "2026-09-05",
      "source": "https://kimballartsfestival.org/festival-details/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Park City, UT (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -21191,8 +22016,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 30.32,
+    "lng": -97.9269
    },
    "provenance": {
     "buyerWealth": {
@@ -21246,6 +22071,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bee Cave, TX (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -21311,8 +22141,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 34.6369,
+    "lng": -82.7406
    },
    "provenance": {
     "buyerWealth": {
@@ -21366,6 +22196,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Pendleton, SC (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -21431,8 +22266,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 40.7793,
+    "lng": -77.7822
    },
    "provenance": {
     "buyerWealth": {
@@ -21486,6 +22321,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Boalsburg, PA (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -21551,8 +22391,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -21606,6 +22446,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -21671,8 +22516,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -21726,6 +22571,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -21791,8 +22641,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 25.7212,
+    "lng": -80.2455
    },
    "provenance": {
     "buyerWealth": {
@@ -21846,6 +22696,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Pinecrest, FL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -21911,8 +22766,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Country Club Plaza",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 39.1096,
+    "lng": -94.5705
    },
    "provenance": {
     "buyerWealth": {
@@ -22005,6 +22860,11 @@
      "checked": "2026-09-05",
      "source": "https://www.plazaartfair.com/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Kansas City, MO (mean of 79 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -22070,8 +22930,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 34.0534,
+    "lng": -117.1767
    },
    "provenance": {
     "buyerWealth": {
@@ -22125,6 +22985,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Redlands, CA (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -22190,8 +23055,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 38.1381,
+    "lng": -107.7533
    },
    "provenance": {
     "buyerWealth": {
@@ -22245,6 +23110,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Ridgway, CO (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -22310,8 +23180,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 40.843,
+    "lng": -74.2011
    },
    "provenance": {
     "buyerWealth": {
@@ -22365,6 +23235,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Upper Montclair, NJ (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -22430,8 +23305,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 40.8035,
+    "lng": -74.1891
    },
    "provenance": {
     "buyerWealth": {
@@ -22485,6 +23360,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bloomfield/Montclair, NJ (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -22550,8 +23430,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 40.8035,
+    "lng": -74.1891
    },
    "provenance": {
     "buyerWealth": {
@@ -22605,6 +23485,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Bloomfield/Montclair, NJ (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -22670,8 +23555,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 40.8319,
+    "lng": -74.2428
    },
    "provenance": {
     "buyerWealth": {
@@ -22725,6 +23610,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Verona, NJ 07044, NJ (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -22790,8 +23680,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 39.9908,
+    "lng": -75.1426
    },
    "provenance": {
     "buyerWealth": {
@@ -22845,6 +23735,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Philadelphia, PA (mean of 87 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -22910,8 +23805,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 34.0284,
+    "lng": -84.3526
    },
    "provenance": {
     "buyerWealth": {
@@ -22965,6 +23860,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Roswell, GA (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -23030,8 +23930,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 30.0532,
+    "lng": -96.7151
    },
    "provenance": {
     "buyerWealth": {
@@ -23085,6 +23985,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Round Top, TX (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -23150,8 +24055,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Downtown Clayton",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 38.6373,
+    "lng": -90.3454
    },
    "provenance": {
     "buyerWealth": {
@@ -23244,6 +24149,11 @@
      "checked": "2026-09-05",
      "source": "https://www.yahoo.com/news/articles/st-louis-art-fair-returns-210026268.html",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Clayton, MO (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -23309,8 +24219,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 40.0108,
+    "lng": -81.5413
    },
    "provenance": {
     "buyerWealth": {
@@ -23360,6 +24270,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Cambridge, OH (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -23425,8 +24340,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8817,
+    "lng": -84.3973
    },
    "provenance": {
     "buyerWealth": {
@@ -23480,6 +24395,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sandy Springs, GA (mean of 10 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -23545,8 +24465,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8817,
+    "lng": -84.3973
    },
    "provenance": {
     "buyerWealth": {
@@ -23600,6 +24520,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sandy Springs, GA (mean of 10 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -23665,8 +24590,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.316,
+    "lng": -111.7541
    },
    "provenance": {
     "buyerWealth": {
@@ -23720,6 +24645,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Gilbert, AZ (mean of 7 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -23785,8 +24715,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -23840,6 +24770,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -23905,8 +24840,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -23960,6 +24895,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -24025,8 +24965,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -24080,6 +25020,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -24145,8 +25090,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -24200,6 +25145,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -24265,8 +25215,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -24320,6 +25270,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -24385,8 +25340,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -24440,6 +25395,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -24505,8 +25465,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 37.8596,
+    "lng": -122.4899
    },
    "provenance": {
     "buyerWealth": {
@@ -24597,6 +25557,11 @@
      "checked": "2026-09-05",
      "source": "https://www.sausalitoartfestival.org/",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sausalito, CA (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -24662,8 +25627,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 32.0247,
+    "lng": -81.0979
    },
    "provenance": {
     "buyerWealth": {
@@ -24717,6 +25682,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Savannah, GA (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -24782,8 +25752,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 32.0247,
+    "lng": -81.0979
    },
    "provenance": {
     "buyerWealth": {
@@ -24837,6 +25807,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Savannah, GA (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -24902,8 +25877,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 32.0247,
+    "lng": -81.0979
    },
    "provenance": {
     "buyerWealth": {
@@ -24957,6 +25932,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Savannah, GA (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -25022,8 +26002,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.789,
+    "lng": -80.5309
    },
    "provenance": {
     "buyerWealth": {
@@ -25077,6 +26057,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sebastian, FL (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -25142,8 +26127,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 34.8407,
+    "lng": -111.7696
    },
    "provenance": {
     "buyerWealth": {
@@ -25193,6 +26178,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sedona, AZ (mean of 5 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -25258,8 +26248,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.4947,
+    "lng": -112.076
    },
    "provenance": {
     "buyerWealth": {
@@ -25313,6 +26303,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for PHOENIX, AZ (mean of 82 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -25378,8 +26373,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 38.832,
+    "lng": -97.6268
    },
    "provenance": {
     "buyerWealth": {
@@ -25433,6 +26428,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for SALINA, KS (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -25498,8 +26498,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 25.7323,
+    "lng": -80.2548
    },
    "provenance": {
     "buyerWealth": {
@@ -25553,6 +26553,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for South Miami, FL (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -25738,8 +26743,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.8012,
+    "lng": -84.4058
    },
    "provenance": {
     "buyerWealth": {
@@ -25793,6 +26798,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Atlanta, GA (mean of 106 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -25858,8 +26868,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -25913,6 +26923,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -25978,8 +26993,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -26033,6 +27048,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -26098,8 +27118,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -26153,6 +27173,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -26218,8 +27243,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -26273,6 +27298,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -26338,8 +27368,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.3237,
+    "lng": -82.4954
    },
    "provenance": {
     "buyerWealth": {
@@ -26393,6 +27423,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sarasota, FL (mean of 19 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -26458,8 +27493,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 37.0989,
+    "lng": -113.5776
    },
    "provenance": {
     "buyerWealth": {
@@ -26513,6 +27548,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for St. George, UT (mean of 8 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -26578,8 +27618,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 28.791,
+    "lng": -81.2724
    },
    "provenance": {
     "buyerWealth": {
@@ -26633,6 +27673,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Sanford, FL (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -26698,8 +27743,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.8273,
+    "lng": -82.7001
    },
    "provenance": {
     "buyerWealth": {
@@ -26753,6 +27798,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for St. Petersburg, FL (mean of 62 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -26818,8 +27868,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 25.7292,
+    "lng": -80.2488
    },
    "provenance": {
     "buyerWealth": {
@@ -26873,6 +27923,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Coconut Grove, FL (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -26938,8 +27993,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 43.6692,
+    "lng": -114.4858
    },
    "provenance": {
     "buyerWealth": {
@@ -26989,6 +28044,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Ketchum, ID (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -27037,7 +28097,7 @@
     "endDate": "2027-02-28",
     "applyBy": "2026-11-25",
     "deadlineNote": null,
-    "notifyDate": "2026-08-05",
+    "notifyDate": "",
     "juryFee": 35.0,
     "juryFeeLabel": "Jury/Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14787",
@@ -27054,8 +28114,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.9426,
+    "lng": -82.4636
    },
    "provenance": {
     "buyerWealth": {
@@ -27109,6 +28169,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Tampa, FL (mean of 60 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -27174,8 +28239,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 28.1667,
+    "lng": -82.7274
    },
    "provenance": {
     "buyerWealth": {
@@ -27229,6 +28294,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Tarpon Springs, FL (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -27294,8 +28364,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.4947,
+    "lng": -112.076
    },
    "provenance": {
     "buyerWealth": {
@@ -27349,6 +28419,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for PHOENIX, AZ (mean of 82 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -27414,8 +28489,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 30.43,
+    "lng": -86.6245
    },
    "provenance": {
     "buyerWealth": {
@@ -27469,6 +28544,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Fort Walton Beach, FL (mean of 3 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -27517,7 +28597,7 @@
     "endDate": "2026-09-20",
     "applyBy": "2026-09-13",
     "deadlineNote": null,
-    "notifyDate": "2026-02-16",
+    "notifyDate": "",
     "juryFee": 50.0,
     "juryFeeLabel": "The Fall Magnificent Mile Art Festival 2026 Late App Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14046",
@@ -27534,8 +28614,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 41.8507,
+    "lng": -87.6792
    },
    "provenance": {
     "buyerWealth": {
@@ -27589,6 +28669,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Chicago, IL (mean of 93 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -27654,8 +28739,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 37.7257,
+    "lng": -88.9294
    },
    "provenance": {
     "buyerWealth": {
@@ -27709,6 +28794,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Marion, IL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -27774,8 +28864,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.6449,
+    "lng": -80.4321
    },
    "provenance": {
     "buyerWealth": {
@@ -27829,6 +28919,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Vero Beach, FL (mean of 10 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -27894,8 +28989,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 44.9823,
+    "lng": -93.2956
    },
    "provenance": {
     "buyerWealth": {
@@ -27963,6 +29058,11 @@
      "checked": "2026-09-05",
      "source": "https://www.uptownminneapolis.com/uptown-art-fair/art/",
      "status": "search"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Minneapolis, MN (mean of 70 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -28028,8 +29128,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 39.6377,
+    "lng": -106.4103
    },
    "provenance": {
     "buyerWealth": {
@@ -28079,6 +29179,11 @@
     "juryFee": {
      "status": "estimated",
      "basis": "inferred from the show's usual calendar slot"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Vail, CO (mean of 2 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -28144,8 +29249,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 44.9823,
+    "lng": -93.2956
    },
    "provenance": {
     "buyerWealth": {
@@ -28199,6 +29304,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Minneapolis, MN (mean of 70 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -28264,8 +29374,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.0849,
+    "lng": -82.3036
    },
    "provenance": {
     "buyerWealth": {
@@ -28319,6 +29429,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Venice, FL (mean of 8 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -28384,8 +29499,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 27.0849,
+    "lng": -82.3036
    },
    "provenance": {
     "buyerWealth": {
@@ -28439,6 +29554,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Venice, FL (mean of 8 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -28504,8 +29624,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 42.5917,
+    "lng": -83.382
    },
    "provenance": {
     "buyerWealth": {
@@ -28559,6 +29679,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for West Bloomfield, MI (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -28624,8 +29749,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 40.8295,
+    "lng": -72.6473
    },
    "provenance": {
     "buyerWealth": {
@@ -28679,6 +29804,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Westhampton Beach, NY (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -28744,8 +29874,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 41.1837,
+    "lng": -73.3545
    },
    "provenance": {
     "buyerWealth": {
@@ -28799,6 +29929,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Westport, CT (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -28864,8 +29999,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 33.5098,
+    "lng": -112.4135
    },
    "provenance": {
     "buyerWealth": {
@@ -28919,6 +30054,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Litchfield Park, AZ (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",
@@ -28984,8 +30124,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 28.5006,
+    "lng": -81.5354
    },
    "provenance": {
     "buyerWealth": {
@@ -29039,6 +30179,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Windermere, FL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -29104,8 +30249,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 28.5006,
+    "lng": -81.5354
    },
    "provenance": {
     "buyerWealth": {
@@ -29159,6 +30304,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Windermere, FL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -29224,8 +30374,8 @@
     "vehicleAccessToBooth": null,
     "venue": "Central Park and Park Avenue",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 28.5819,
+    "lng": -81.2947
    },
    "provenance": {
     "buyerWealth": {
@@ -29327,6 +30477,11 @@
      "checked": "2026-09-05",
      "source": "https://www.wpsaf.org/about/festival-maps/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Winter Park, FL (mean of 4 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -29392,8 +30547,8 @@
     "vehicleAccessToBooth": null,
     "venue": "The Woodlands Waterway",
     "indoorOutdoor": "outdoor",
-    "lat": null,
-    "lng": null
+    "lat": 30.1754,
+    "lng": -95.4913
    },
    "provenance": {
     "buyerWealth": {
@@ -29480,6 +30635,11 @@
      "checked": "2026-09-05",
      "source": "https://www.visitthewoodlands.com/events/art-events/waterway-arts-festival/",
      "status": "corroborated"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for The Woodlands, TX (mean of 11 ZIP centroids). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "High",
@@ -29528,7 +30688,7 @@
     "endDate": "2026-10-04",
     "applyBy": "2026-09-27",
     "deadlineNote": null,
-    "notifyDate": "2026-02-16",
+    "notifyDate": "",
     "juryFee": 25.0,
     "juryFeeLabel": "Woodstock Art Fair on the Square 2026 Late App Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14003",
@@ -29545,8 +30705,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 42.3198,
+    "lng": -88.4477
    },
    "provenance": {
     "buyerWealth": {
@@ -29600,6 +30760,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Woodstock, IL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Low",
@@ -29665,8 +30830,8 @@
     "vehicleAccessToBooth": null,
     "venue": null,
     "indoorOutdoor": null,
-    "lat": null,
-    "lng": null
+    "lat": 26.7545,
+    "lng": -82.2611
    },
    "provenance": {
     "buyerWealth": {
@@ -29720,6 +30885,11 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
+    },
+    "coordinates": {
+     "status": "dataset",
+     "basis": "US ZIP Code dataset (zipcodes 3.0.0, PyPI) for Boca Grande, FL (mean of 1 ZIP centroid). City-level: the mean centroid of the city's ZIP codes, not the show venue.",
+     "checked": "2026-09-07"
     }
    },
    "confidence": "Medium",

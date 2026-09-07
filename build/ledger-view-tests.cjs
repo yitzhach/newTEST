@@ -30,7 +30,12 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
   const errs = [];
   p.on('pageerror', e => errs.push(e.message));
   p.on('console', m => { if (m.type()==='error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });
-  p.on('requestfailed', r => { if (!/fonts\.|favicon|cdnjs/.test(r.url())) errs.push('reqfail ' + r.url()); });
+  /* Sandbox-blocked hosts. archive-api.open-meteo is the weather lookup, whose
+     failure here is expected and is asserted on directly in browser-tests.cjs;
+     filtering it keeps a genuine error visible in this suite. */
+  p.on('requestfailed', r => {
+    if (!/fonts\.|favicon|cdnjs|archive-api\.open-meteo/.test(r.url())) errs.push('reqfail ' + r.url());
+  });
 
   await p.goto(BASE, { waitUntil: 'networkidle' });
   /* The suite files a report and asserts on the consequences, so it has to
