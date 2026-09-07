@@ -1100,6 +1100,132 @@
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
  },
+ "zapp-13875": {
+  "facts": {
+   "boothFee": 495.0,
+   "boothFeeCorner": 620.0,
+   "boothFeeDouble": 895.0,
+   "boothFeeNote": "10'x10' at the March 15 deadline rate; $545 from 3/16, $595 from 6/2. Corner is a $125 surcharge, shown here as the total."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: 10'x10' Booth March 15th Deadline $495 ... Corners $125 extra",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=13875",
+    "status": "verified"
+   },
+   "boothFeeCorner": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: 10'x10' Booth March 15th Deadline $495 ... Corners $125 extra",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=13875",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: 10'x10' Booth March 15th Deadline $495 ... Corners $125 extra",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=13875",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: 10'x10' Booth March 15th Deadline $495 ... Corners $125 extra",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=13875",
+    "status": "verified"
+   }
+  }
+ },
+ "zapp-13979": {
+  "facts": {
+   "boothFee": 495.0,
+   "boothFeeCorner": 620.0,
+   "boothFeeDouble": 895.0,
+   "boothFeeNote": "10'x10' at the March 15 deadline rate; $545 from 3/16, $595 from 6/2. Corner is a $125 surcharge, shown here as the total."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: 10'x10' Booth March 15th Deadline $495 ... Corners $125 extra",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=13979",
+    "status": "verified"
+   },
+   "boothFeeCorner": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: 10'x10' Booth March 15th Deadline $495 ... Corners $125 extra",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=13979",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: 10'x10' Booth March 15th Deadline $495 ... Corners $125 extra",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=13979",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: 10'x10' Booth March 15th Deadline $495 ... Corners $125 extra",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=13979",
+    "status": "verified"
+   }
+  }
+ },
+ "zapp-14287": {
+  "facts": {
+   "boothFee": 290.0,
+   "boothFeeDouble": 500.0,
+   "boothFeeNote": "Outdoor 10x10. Indoor spaces run $365\u2013$725 at other sizes; camping and hook-up fees are separate."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Outside Buildng - 10 ft. x 10 ft. $290 / 20 ft. x 10 ft. $500",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14287",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Outside Buildng - 10 ft. x 10 ft. $290 / 20 ft. x 10 ft. $500",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14287",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Outside Buildng - 10 ft. x 10 ft. $290 / 20 ft. x 10 ft. $500",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14287",
+    "status": "verified"
+   }
+  }
+ },
+ "zapp-14298": {
+  "facts": {
+   "boothFeeDetail": null
+  },
+  "provenance": {
+   "boothFeeDetail": {
+    "basis": "Booth fee coverage audit: the ZAPP fee cell for this show holds prospectus text about pricing artwork and quotes no booth rate, so it is not a fee schedule.",
+    "status": "editorial"
+   }
+  }
+ },
+ "zapp-14514": {
+  "facts": {
+   "boothFee": 150.0,
+   "boothFeeNote": "Listed as \u201cBoth Fee\u201d on the page."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Both Fee is $150.00",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14514",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Both Fee is $150.00",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14514",
+    "status": "verified"
+   }
+  }
+ },
  "zapp-14555": {
   "confidence": "High",
   "datesEstimated": false,
@@ -1110,8 +1236,10 @@
   },
   "facts": {
    "boothCount": 250,
-   "boothFee": 589,
-   "boothFeeNote": "$589-$1,293 by space and placement",
+   "boothFee": 675.0,
+   "boothFeeCorner": 800.0,
+   "boothFeeDouble": 1350.0,
+   "boothFeeNote": "10'x11' single, 10'x22' double. The $400 emerging artist rate is a separate category.",
    "endDate": "2027-02-07",
    "indoorOutdoor": "outdoor",
    "juryFee": 40.25,
@@ -1126,14 +1254,28 @@
     "status": "search"
    },
    "boothFee": {
-    "checked": "2026-09-05",
-    "source": "https://www.artigras.org/artist-applications/",
-    "status": "search"
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $675 10'd x11'w single / $1350 10' d x 22'w double space / $800 10'd x 17'w single with corner",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14555",
+    "status": "verified"
+   },
+   "boothFeeCorner": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $675 10'd x11'w single / $1350 10' d x 22'w double space / $800 10'd x 17'w single with corner",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14555",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $675 10'd x11'w single / $1350 10' d x 22'w double space / $800 10'd x 17'w single with corner",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14555",
+    "status": "verified"
    },
    "boothFeeNote": {
-    "checked": "2026-09-05",
-    "source": "https://www.artigras.org/artist-applications/",
-    "status": "search"
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $675 10'd x11'w single / $1350 10' d x 22'w double space / $800 10'd x 17'w single with corner",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14555",
+    "status": "verified"
    },
    "endDate": {
     "checked": "2026-09-05",
@@ -1265,6 +1407,26 @@
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
  },
+ "zapp-14572": {
+  "facts": {
+   "boothFee": 300.0,
+   "boothFeeNote": "The $50 application fee is credited towards this. Electricity $25 extra."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $300 total per 10\u2019 x 10\u2019 Booth Space",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14572",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $300 total per 10\u2019 x 10\u2019 Booth Space",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14572",
+    "status": "verified"
+   }
+  }
+ },
  "zapp-14585": {
   "confidence": "High",
   "datesEstimated": false,
@@ -1356,6 +1518,26 @@
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
  },
+ "zapp-14592": {
+  "facts": {
+   "boothFee": 325.0,
+   "boothFeeNote": "booth fee"
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fees are $325.",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14592",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fees are $325.",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14592",
+    "status": "verified"
+   }
+  }
+ },
  "zapp-14594": {
   "confidence": "High",
   "editorialNote": "Run by the Association for Visual Arts; no membership needed to apply and the application is free for emerging artists. 2027 dates not yet posted \u2014 the 2026 edition ran 17-19 April.",
@@ -1365,8 +1547,9 @@
   },
   "facts": {
    "boothCount": 143,
-   "boothFee": 500,
-   "boothFeeNote": "$500-$1,100 by space and placement; free application for emerging artists",
+   "boothFee": 550.0,
+   "boothFeeDouble": 1100.0,
+   "boothFeeNote": "10' wide x 12' deep single, 20' wide double. The page lists $650 and $1,200 tiers without labelling them, so the corner is left unknown.",
    "indoorOutdoor": "outdoor",
    "juryFee": 40,
    "officialUrl": "https://www.avarts.org/about-4baf1",
@@ -1380,14 +1563,22 @@
     "status": "search"
    },
    "boothFee": {
-    "checked": "2026-09-05",
-    "source": "https://www.avarts.org/about-4baf1",
-    "status": "search"
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Fee: $550, Size: 10\u2019 wide x 12\u2019 deep / Fee: $1,100, Size: 20' wide x 12' deep",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14594",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Fee: $550, Size: 10\u2019 wide x 12\u2019 deep / Fee: $1,100, Size: 20' wide x 12' deep",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14594",
+    "status": "verified"
    },
    "boothFeeNote": {
-    "checked": "2026-09-05",
-    "source": "https://www.avarts.org/about-4baf1",
-    "status": "search"
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Fee: $550, Size: 10\u2019 wide x 12\u2019 deep / Fee: $1,100, Size: 20' wide x 12' deep",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14594",
+    "status": "verified"
    },
    "indoorOutdoor": {
     "checked": "2026-09-05",
@@ -1433,8 +1624,9 @@
    "applyBy": "2026-10-01",
    "attendance": 25000,
    "boothCount": 200,
-   "boothFee": 475,
-   "boothFeeNote": "$475-$625 by space",
+   "boothFee": 475.0,
+   "boothFeeCorner": 625.0,
+   "boothFeeNote": "Prices include Florida sales tax.",
    "endDate": "2027-01-17",
    "indoorOutdoor": "outdoor",
    "juryFee": 50,
@@ -1461,14 +1653,22 @@
     "status": "search"
    },
    "boothFee": {
-    "checked": "2026-09-05",
-    "source": "https://beauxartsmiami.org/pages/2027-festival-of-art",
-    "status": "search"
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fees: $475. Standard and $625. Corner.",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14613",
+    "status": "verified"
+   },
+   "boothFeeCorner": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fees: $475. Standard and $625. Corner.",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14613",
+    "status": "verified"
    },
    "boothFeeNote": {
-    "checked": "2026-09-05",
-    "source": "https://beauxartsmiami.org/pages/2027-festival-of-art",
-    "status": "search"
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fees: $475. Standard and $625. Corner.",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14613",
+    "status": "verified"
    },
    "endDate": {
     "checked": "2026-09-05",
@@ -1602,6 +1802,9 @@
   "facts": {
    "applyBy": "2026-12-08",
    "boothCount": 200,
+   "boothFee": 500.0,
+   "boothFeeDouble": 1000.0,
+   "boothFeeNote": "Electricity $100 per booth, extra.",
    "endDate": "2027-05-02",
    "indoorOutdoor": "outdoor",
    "juryFee": 35,
@@ -1621,6 +1824,24 @@
     "checked": "2026-09-05",
     "source": "https://www.dallasites101.com/blog/post/cottonwood-art-festival-richardson/",
     "status": "search"
+   },
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth Fee: $500 single booth, $1,000 double booth",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14616",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth Fee: $500 single booth, $1,000 double booth",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14616",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth Fee: $500 single booth, $1,000 double booth",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14616",
+    "status": "verified"
    },
    "endDate": {
     "checked": "2026-09-05",
@@ -1668,6 +1889,33 @@
   },
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
+ },
+ "zapp-14628": {
+  "facts": {
+   "boothFee": 350.0,
+   "boothFeeDouble": 675.0,
+   "boothFeeNote": "The page quotes the corner twice, at $100 and at $150, so the corner is left unknown rather than guessed."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Single $350/ Double $675",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14628",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Single $350/ Double $675",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14628",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Single $350/ Double $675",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14628",
+    "status": "verified"
+   }
+  }
  },
  "zapp-14649": {
   "confidence": "High",
@@ -1907,6 +2155,26 @@
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
  },
+ "zapp-14657": {
+  "facts": {
+   "boothFee": 250.0,
+   "boothFeeNote": "The $50 application fee is credited towards this."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Total booth fee is $250. / $250 total per 10\u2019 x 10\u2019 Booth Space",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14657",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Total booth fee is $250. / $250 total per 10\u2019 x 10\u2019 Booth Space",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14657",
+    "status": "verified"
+   }
+  }
+ },
  "zapp-14678": {
   "confidence": "High",
   "datesEstimated": false,
@@ -2076,6 +2344,33 @@
   },
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
+ },
+ "zapp-14692": {
+  "facts": {
+   "boothFee": 200.0,
+   "boothFeeDouble": 400.0,
+   "boothFeeNote": "10'x10' tent; the space is 12' wide x 10' deep."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Tent Size 10' x 10' ($200) or 10' x 20' ($400)",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14692",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Tent Size 10' x 10' ($200) or 10' x 20' ($400)",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14692",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Tent Size 10' x 10' ($200) or 10' x 20' ($400)",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14692",
+    "status": "verified"
+   }
+  }
  },
  "zapp-14705": {
   "confidence": "High",
@@ -2260,7 +2555,10 @@
   "facts": {
    "acceptanceRatePct": 23,
    "boothCount": 233,
-   "boothFeeNote": "10x10 standard, 10x20 double; booth requests open Jan-early Feb 2027, first come first served",
+   "boothFee": 525.0,
+   "boothFeeCorner": 675.0,
+   "boothFeeDouble": 1050.0,
+   "boothFeeNote": "Double corner is $1,400.",
    "endDate": "2027-03-07",
    "indoorOutdoor": "outdoor",
    "juryFee": 50,
@@ -2281,10 +2579,29 @@
     "source": "https://gasparillaarts.com/application-rules/",
     "status": "search"
    },
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $525.00 for a single booth, $675.00 for a corner booth, $1050.00 for a double in-line booth",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14737",
+    "status": "verified"
+   },
+   "boothFeeCorner": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $525.00 for a single booth, $675.00 for a corner booth, $1050.00 for a double in-line booth",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14737",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $525.00 for a single booth, $675.00 for a corner booth, $1050.00 for a double in-line booth",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14737",
+    "status": "verified"
+   },
    "boothFeeNote": {
-    "checked": "2026-09-05",
-    "source": "https://gasparillaarts.com/application-rules/",
-    "status": "search"
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: $525.00 for a single booth, $675.00 for a corner booth, $1050.00 for a double in-line booth",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14737",
+    "status": "verified"
    },
    "endDate": {
     "checked": "2026-09-05",
@@ -2329,6 +2646,33 @@
   },
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
+ },
+ "zapp-14743": {
+  "facts": {
+   "boothFee": 350.0,
+   "boothFeeDouble": 700.0,
+   "boothFeeNote": "Plus an application platform processing fee the page does not quantify."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Single Booth: $350 ... Double Booth: $700",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14743",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Single Booth: $350 ... Double Booth: $700",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14743",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Single Booth: $350 ... Double Booth: $700",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14743",
+    "status": "verified"
+   }
+  }
  },
  "zapp-14759": {
   "byDiscipline": {
@@ -2477,6 +2821,26 @@
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
  },
+ "zapp-14785": {
+  "facts": {
+   "boothFee": 180.0,
+   "boothFeeNote": "standard booth"
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Standard Booth Fee - $180",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14785",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Standard Booth Fee - $180",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14785",
+    "status": "verified"
+   }
+  }
+ },
  "zapp-14788": {
   "confidence": "High",
   "datesEstimated": false,
@@ -2567,6 +2931,33 @@
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
  },
+ "zapp-14802": {
+  "facts": {
+   "boothFee": 150.0,
+   "boothFeeDouble": 250.0,
+   "boothFeeNote": "11'x11' space"
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth Fees: $150 11'x11', Double $250",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14802",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth Fees: $150 11'x11', Double $250",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14802",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth Fees: $150 11'x11', Double $250",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14802",
+    "status": "verified"
+   }
+  }
+ },
  "zapp-14825": {
   "confidence": "High",
   "datesEstimated": false,
@@ -2633,5 +3024,119 @@
   },
   "researchStatus": "deep",
   "researchedAt": "2026-09-05"
+ },
+ "zapp-14828": {
+  "facts": {
+   "boothFee": 425.0,
+   "boothFeeNote": "A starting price \u2014 the page says fees rise with size and location."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fees start at $425 for a 10-x-10 ft space and go up",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14828",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fees start at $425 for a 10-x-10 ft space and go up",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14828",
+    "status": "verified"
+   }
+  }
+ },
+ "zapp-14847": {
+  "facts": {
+   "boothFee": 200.0,
+   "boothFeeNote": "The juried rate. Maker\u2019s booths are $100."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Juried art booths are $200.",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14847",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Juried art booths are $200.",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14847",
+    "status": "verified"
+   }
+  }
+ },
+ "zapp-14876": {
+  "facts": {
+   "boothFee": 275.0,
+   "boothFeeDouble": 550.0,
+   "boothFeeNote": "The juried rate. A separate non-juried tier runs $175 per space."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: All Juried artists pay a booth fee of $275 for a single booth or $550 for a double",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14876",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: All Juried artists pay a booth fee of $275 for a single booth or $550 for a double",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14876",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: All Juried artists pay a booth fee of $275 for a single booth or $550 for a double",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14876",
+    "status": "verified"
+   }
+  }
+ },
+ "zapp-14885": {
+  "facts": {
+   "boothFee": 225.0,
+   "boothFeeDouble": 450.0,
+   "boothFeeNote": "10x10 single, 10x20 double."
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fee 10 x 10: $225.00 10 x 20: $450.00",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14885",
+    "status": "verified"
+   },
+   "boothFeeDouble": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fee 10 x 10: $225.00 10 x 20: $450.00",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14885",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Booth fee 10 x 10: $225.00 10 x 20: $450.00",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14885",
+    "status": "verified"
+   }
+  }
+ },
+ "zapp-14911": {
+  "facts": {
+   "boothFee": 195.0,
+   "boothFeeNote": "per exhibit space"
+  },
+  "provenance": {
+   "boothFee": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Exhibit Booth Fee: $195 per exhibit space",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14911",
+    "status": "verified"
+   },
+   "boothFeeNote": {
+    "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 booth fee coverage audit, read from the fee schedule line: Exhibit Booth Fee: $195 per exhibit space",
+    "checked": "2026-09-07",
+    "source": "https://www.zapplication.org/event-info.php?ID=14911",
+    "status": "verified"
+   }
+  }
  }
 }

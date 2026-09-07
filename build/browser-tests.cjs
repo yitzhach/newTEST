@@ -482,9 +482,12 @@ function check(name, pass, detail) {
   check('a corner quoted as a surcharge is shown as a total',
         !!upgrade && /\$400.*corner/.test(upgrade), (upgrade || '').slice(0, 80));
 
+  /* This show quotes $550 for a 10' space and $1,100 for a 20' one, plus two
+     unlabelled tiers the page never calls corners — so the corner is the rate
+     that stays unknown, and it has to say so rather than render an empty slot. */
   const partial = await feeBox('zapp-14594');
   check('unknown rates read n/a rather than blank',
-        !!partial && /n\/a.*double/.test(partial), (partial || '').slice(0, 80));
+        !!partial && /n\/a.*corner/.test(partial), (partial || '').slice(0, 80));
   check('commission shows what the page said, not a fabricated 0%',
         /No commission mentioned/i.test(drawerText) && !/\b0% of sales/.test(drawerText));
 

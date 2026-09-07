@@ -105,7 +105,7 @@ Getting in · Weather · Sales tax and permits · Reports.
 | | |
 |---|---|
 | coordinates | 235 |
-| booth fee — single / double / corner | 179 / 87 / 88 |
+| booth fee — single / double / corner | 198 / 97 / 92 |
 | jury statistics | 203 |
 | jury odds scored | 220 |
 
@@ -194,8 +194,20 @@ Phase 5's route planner is unblocked too, since the geocode landed.
 
 Smaller things left over:
 
-- **136 → 23 shows still lack booth fee text** in the research spreadsheet.
-  No parser reaches those; they need another enrichment pass on the source.
+- **16 shows have no booth fee, and each one is deliberate.** The coverage
+  audit went through all 38 the parser had left null and filled 22 by hand
+  into `research-overrides.json`, quoting the line each number came from. The
+  16 that remain state no rate a visiting artist could pay: nine say "NOT
+  LISTED on ZAPP page", two quote only a corner surcharge with no base to add
+  it to, two quote only an application or late fee, one is a residency with no
+  booth, one prices only students and alumni, and one quotes only a reduced
+  emerging-artist rate beside tent rentals. They need the organiser, not a
+  better parser.
+- **Do not make the fee parser split on runs of whitespace.** It looks like it
+  should work — the spreadsheet pads columns with spaces — and it gains one
+  show while corrupting six that already parse correctly (`zapp-14601` reads
+  $75 instead of $375, `zapp-14302` reads $1,250 instead of $625). Tried and
+  reverted during the coverage audit.
 - **Per-discipline factor scores** are structurally present and empty.
 - **The Worker is complete and undeployed.** It blocks only Phase 6.
   `worker/README.md` has the sequence.
