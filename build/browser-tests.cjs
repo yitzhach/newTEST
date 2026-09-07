@@ -296,6 +296,16 @@ function check(name, pass, detail) {
       catalogueLocated: cat.shows.filter(s => typeof s.lat === 'number').length,
       provenance: fit.shows.filter(s => s.provenance && s.provenance.coordinates).length,
       boothFee: fit.shows.filter(s => s.facts.boothFee != null).length,
+      boothDouble: fit.shows.filter(s => s.facts.boothFeeDouble != null).length,
+      boothCorner: fit.shows.filter(s => s.facts.boothFeeCorner != null).length,
+      // Structural nonsense the parser must never ship. A corner cheaper than
+      // a plain booth is a surcharge that was read as a total; a double that
+      // costs no more than a single is a misread. Both were real bugs.
+      feeNonsense: fit.shows.filter(s => {
+        const f = s.facts;
+        return (f.boothFee && f.boothFeeCorner && f.boothFeeCorner < f.boothFee) ||
+               (f.boothFee && f.boothFeeDouble && f.boothFeeDouble <= f.boothFee);
+      }).length,
       jurySubs: fit.shows.filter(s => s.facts.avgSubmissionsPerYear != null).length,
       juryOdds: fit.shows.filter(s => s.factors.juryOdds != null).length,
       // Not mentioned is not zero. If this ever stops being 0, the importer
@@ -343,6 +353,11 @@ function check(name, pass, detail) {
         hygiene.boothFeeUntraceable === 0, hygiene.boothFeeUntraceable + ' untraceable');
   check('"no commission mentioned" is never recorded as 0%',
         hygiene.fakeZeroCommission === 0, hygiene.fakeZeroCommission + ' shows');
+  check('double and corner rates were read too',
+        hygiene.boothDouble >= 45 && hygiene.boothCorner >= 40,
+        hygiene.boothDouble + ' double, ' + hygiene.boothCorner + ' corner');
+  check('no corner cheaper than its single, no double at or below it',
+        hygiene.feeNonsense === 0, hygiene.feeNonsense + ' impossible fee sets');
 
   // ---- 20. a closed deadline is surfaced, not ranked as live -------------
   await page.click('#idrClose');
@@ -429,6 +444,42 @@ function check(name, pass, detail) {
   const drawerText = await page.textContent('.idr-body');
   check('the full fee schedule is available verbatim',
         /full fee schedule/i.test(drawerText));
+
+  // ---- 25. the booth fee box -------------------------------------------
+  await page.click('#idrClose');
+  await page.fill('#fText', '');
+  await page.waitForTimeout(300);
+  const feeBox = async (id) => {
+    await page.evaluate(i => document.querySelector(`[data-detail="${i}"]`)?.click(), id);
+    await page.waitForTimeout(600);
+    const t = await page.evaluate(() => {
+      const h = [...document.querySelectorAll('.idr-body .sd-h')]
+        .find(x => /Booth fees/i.test(x.textContent));
+      if (!h) return null;
+      let out = '', n = h.nextElementSibling;
+      while (n && n.tagName !== 'H3') { out += ' ' + n.textContent.replace(/\s+/g, ' '); n = n.nextElementSibling; }
+      return out;
+    });
+    await page.click('#idrClose');
+    await page.waitForTimeout(200);
+    return t;
+  };
+
+  const allThree = await feeBox('zapp-13866');
+  check('the booth fee box shows single, double and corner',
+        !!allThree && /\$600.*single/.test(allThree) && /\$1,200.*double/.test(allThree) &&
+        /\$700.*corner/.test(allThree), (allThree || '').slice(0, 80));
+
+  /* This show quotes the corner as "Corner upgrade: $100" on a $300 booth.
+     The box must show $400 — what actually leaves your bank account — not
+     the surcharge on its own. */
+  const upgrade = await feeBox('zapp-13825');
+  check('a corner quoted as a surcharge is shown as a total',
+        !!upgrade && /\$400.*corner/.test(upgrade), (upgrade || '').slice(0, 80));
+
+  const partial = await feeBox('zapp-14594');
+  check('unknown rates read n/a rather than blank',
+        !!partial && /n\/a.*double/.test(partial), (partial || '').slice(0, 80));
   check('commission shows what the page said, not a fabricated 0%',
         /No commission mentioned/i.test(drawerText) && !/\b0% of sales/.test(drawerText));
 

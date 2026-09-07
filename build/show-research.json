@@ -8,6 +8,8 @@
    "facts": {
     "boothFee": 300.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 400.0,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $600\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 100,
@@ -31,6 +33,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13825",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13825",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13825",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -114,6 +126,8 @@
    "facts": {
     "boothFee": 405.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 670.0,
+    "boothFeeCorner": 420.0,
     "boothFeeDetail": "Outdoor booth fees are $405 and a limited number of outdoor spaces with electricity are $430. Double spaces, corner and over-size valet area spaces are also\n10' x 10' Booth space with electricity (on grass, stakes allowed) $430.00\n10' x 10' Regular booth space (on pavement, weights only, no stakes allowed) $405.00\n12' x 16' Valet booth space (on pavement, weights only, no stakes allowed. These spaces are much deeper than regular booth spaces) $405.00\n10' x 10' Corner space (on pavement, weights only, no stakes allowed) $420.00\n10' x 20' Double booth space on pavement (no stakes allowed) $670.00",
     "avgSubmissionsPerYear": 65,
     "avgAccepted": 30,
@@ -135,6 +149,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13837",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10' x 10' Regular booth space (on pavement, weights only, no stakes allowed) $405.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13837",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13837",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -208,6 +232,7 @@
    "facts": {
     "boothFee": 235.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 470.0,
     "boothFeeDetail": "Single Booth: 10'x10': $235\nDouble Booth: 10'x20': $470\nPower: optional: $50",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 250,
@@ -232,6 +257,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13856",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: 10'x10': $235"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13856",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -320,6 +350,8 @@
    "facts": {
     "boothFee": 300.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 550.0,
+    "boothFeeCorner": 375.0,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $550 (limited availability)\nCorner upgrade: $75 (limited availability)\nElectricity: $100 (limited availability)",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 125,
@@ -344,6 +376,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13857",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13857",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13857",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -432,6 +474,8 @@
    "facts": {
     "boothFee": 600.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1200.0,
+    "boothFeeCorner": 700.0,
     "boothFeeDetail": "10 X 10' Regular Booth: $600\n10 X 10' Corner Booth: $700\n10 X 20' Double Booth: $1200\n10 X 20' Double Corner Booth: $1300\n10 X 10' Food Concession Booth: $1885\n10 X 20' Food Concession Booth: $3035\nstandard 20amp plug ($100)\n30amp RV plug ($150)\nL530 ($150)\nL1430 plug ($300)\n50amp blade plug ($500)\n50amp twist plug ($300)\nCam Lock 1ph 100amp ($800)",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 180,
@@ -454,6 +498,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13866",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10 X 10' Regular Booth: $600"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13866",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13866",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -532,6 +586,7 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 620.0,
     "boothFeeDetail": "10'x10' Booth March 15th Deadline $495 | $545 (3/16-6/1) | $595 (6/2 - Full)\n10'x15' Booth March 15th Deadline $645 | $695 (3/16-6/1) | $745 (6/2 - Full)\n10'x20' Booth March 15th Deadline $895 | $945 (3/16-6/1) | $995 (6/2 - Full)\nCorners $125 extra",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 140,
@@ -555,6 +610,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13875",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10'x10' Booth March 15th Deadline $495"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13875",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -638,6 +698,8 @@
    "facts": {
     "boothFee": 300.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 400.0,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $600\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
     "avgSubmissionsPerYear": 175,
     "avgAccepted": 100,
@@ -662,6 +724,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13879",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13879",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13879",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -750,6 +822,8 @@
    "facts": {
     "boothFee": 300.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 400.0,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $600 (limited availability)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)\nLate Application: $50 (Non-refundable processing fee)",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -774,6 +848,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13892",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13892",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13892",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1074,6 +1158,8 @@
    "facts": {
     "boothFee": 300.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 375.0,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $600 (limited availability)\nCorner upgrade: $75 (limited availability)\nElectricity: $100 (limited availability)",
     "avgSubmissionsPerYear": 175,
     "avgAccepted": 2,
@@ -1098,6 +1184,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13943",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13943",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13943",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1186,6 +1282,7 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 620.0,
     "boothFeeDetail": "10'x10' Booth March 15th Deadline $495 | $545 (3/16-6/1) | $595 (6/2 - Full)\n10'x15' Booth March 15th Deadline $645 | $695 (3/16-6/1) | $745 (6/2 - Full)\n10'x20' Booth March 15th Deadline $895 | $945 (3/16-6/1) | $995 (6/2- Full)\nCorners $125 extra",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 175,
@@ -1209,6 +1306,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13979",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10'x10' Booth March 15th Deadline $495"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13979",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1292,6 +1394,8 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "boothFeeDetail": "April 1, 2026: Last day for refunds (less $50)\n12\u2019 Wide by 10\u2019 Deep Late Exhibit Space Fee: $495\n20' Wide by 10' Deep Late Exhibit Space Fee: $990\nCorner Fee Upgrade: Additional $100",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 65,
@@ -1315,6 +1419,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13982",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 12\u2019 Wide by 10\u2019 Deep Late Exhibit Space Fee: $495"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13982",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13982",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1396,8 +1510,10 @@
   },
   "zapp-14003": {
    "facts": {
-    "boothFee": 250.0,
+    "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "boothFeeDetail": "March 17, 2026 and Thereafter: Late payments apply, $20 per festival\nApril 1, 2026: Last day for refunds (less $50)\n12\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $495\nWoodstock Resident 12\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $250\n20' Wide by 10' Deep Exhibit Space Fee: $990\nCorner Fee Upgrade: Additional $100",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -1420,7 +1536,17 @@
     "boothFee": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14003",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Woodstock Resident 12\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $250"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 12\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $495"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14003",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14003",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1504,6 +1630,7 @@
    "facts": {
     "boothFee": 975.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1925.0,
     "boothFeeDetail": "March 17, 2026 and Thereafter: Late payments apply, $20 per festival\nApril 1, 2026: Last day for refunds (less $50)\n11\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $975 (includes permit fee)\n20' Wide by 10' Deeep Exhibit Space Fee: $1,925 (includes permit fee)",
     "avgSubmissionsPerYear": 140,
     "avgAccepted": 60,
@@ -1527,6 +1654,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14046",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 11\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $975 (includes permit fee)"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14046",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1610,6 +1742,8 @@
    "facts": {
     "boothFee": 350.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 500.0,
+    "boothFeeCorner": 450.0,
     "boothFeeDetail": "Standard booth fee: $350\nDouble booth fee: $700 (limited availability) (10x20)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)\nDouble deep booth: $500 (10x20 deep) *Space 5,6,7,8,9,14,18,19,20 (Limited)",
     "avgSubmissionsPerYear": 315,
     "avgAccepted": 200,
@@ -1634,6 +1768,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14077",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $350"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14077",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14077",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1722,6 +1866,7 @@
    "facts": {
     "boothFee": 625.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1250.0,
     "boothFeeDetail": "Booth fee is $625.00 - all booth fee payments are paid directly to Howard Alan Events, not Zapp.\nSingle Booth (10' x 10') - $625.00\nDouble Booth (limited) - $1,250.00",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 120,
@@ -1743,6 +1888,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14106",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $625.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14106",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1816,6 +1966,7 @@
    "facts": {
     "boothFee": 400.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1000.0,
     "boothFeeDetail": "Booth Fees: Based on size and location $400+\n$700, 15\u2019x15 $1,000 or 20\u2019x20\u2019 $1400. Or bring your own logo covered tent $450 (this only applies to Spirits and Wineries).\nFood Concessions are in various locations throughout the grounds and are all $400 for reservation.\nSales/Demonstration spaces are available indoors or outdoors. Outdoor covered pavilion spaces have two options of 10\u2019x12\u2019 $400\nor 10\u2019x24\u2019 $800. Indoor building spaces have two options of 12\u2019x12\u2019 $500 or 12\u2019x24\u2019 $1,000. We also offer tents that have flaps on\nall four sides that we provide in the following sizes; 15\u2019x15\u2019 $1,000, 20\u2019x20\u2019 $1,400 or 30\u2019x30\u2019 $1,800",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 180,
@@ -1839,6 +1990,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14115",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Booth Fees: Based on size and location $400+"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14115",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1922,6 +2078,7 @@
    "facts": {
     "boothFee": 535.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1070.0,
     "boothFeeDetail": "Booth fee is $535.00- all booth fee payments are paid directly to Howard Alan Events, not Zapp.\nSingle Booth (10' x 10') - $535.00\nDouble Booth (10' x 20') limited and must be approved- $1,070.00",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -1943,6 +2100,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14158",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $535.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14158",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -2016,6 +2178,8 @@
    "facts": {
     "boothFee": 350.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 450.0,
     "boothFeeDetail": "Standard booth fee: $350\nPremier Booth with extra space behind for tent: $375 (limited to 15) - grassy area\nPremier Corner: $400 (Only three available) - (Must be approved)\nDouble booth fee: $600 (limited availability)\nCorner upgrade: $100 (limited availability)",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 125,
@@ -2040,6 +2204,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14172",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $350"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14172",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14172",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -2128,6 +2302,7 @@
    "facts": {
     "boothFee": 2675.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 3075.0,
     "boothFeeDetail": "Standard Booth - approx. 10' x 10' - $2,675 (other configurations may be available)\nStandard Corner Fee - $400 additional\nEmerging Booth - $1,350 (please note, spaces are not full-size booths. Limited quantities)",
     "avgSubmissionsPerYear": 400,
     "avgAccepted": 325,
@@ -2152,6 +2327,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14231",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard Booth - approx. 10' x 10' - $2,675 (other configurations may be available)"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14231",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -2240,6 +2420,7 @@
    "facts": {
     "boothFee": 750.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 950.0,
     "boothFeeDetail": "10' x 10\u2019 - $750\n10' x 15' - $1125 (limited number of booths available in this size)\n10' x 20' - $1450\nCorner fees are $200 (limited number available)\n10'x10\u2019 - $750\n10'x20' - $1450\nCorner fees are an additional $200 (limited number available)",
     "avgSubmissionsPerYear": 425,
     "avgAccepted": 265,
@@ -2263,6 +2444,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14269",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10' x 10\u2019 - $750"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14269",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -2366,7 +2552,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14287",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -2465,7 +2651,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14298",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -2544,6 +2730,7 @@
    "facts": {
     "boothFee": 625.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 840.0,
     "boothFeeDetail": "New Jersey\u2019s top tier of discretionary spending. Median household income is about $212,700,and average household income is\naround $297,000.\nVisitors paid a $12 admission, a comfortable sign that the audience expects and values quality.\n10 x 10 $625.00\n10 x 15 $937.00\n10 x 20 $1250.00\nCorner + $215.00",
     "avgSubmissionsPerYear": 125,
     "avgAccepted": 85,
@@ -2567,6 +2754,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14302",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10 x 10 $625.00"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14302",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -2650,6 +2842,8 @@
    "facts": {
     "boothFee": 400.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 550.0,
     "boothFeeDetail": "Booth Fee: $400\nBooth Fee: Single 10 x10 is $400\nDouble Booth spaces: $800\nCorners are available in limited number for an additional supplemental fee of :$150",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 75,
@@ -2674,6 +2868,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14400",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Booth Fee: Single 10 x10 is $400"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14400",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14400",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -2874,6 +3078,8 @@
    "facts": {
     "boothFee": 100.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 200.0,
+    "boothFeeCorner": 150.0,
     "boothFeeDetail": "Standard space 10\u2019x10\u2019: $100\nDouble Booth 10'x20': $200\nElectricity: $100 (limited availability)\nCorner Booth:$50 (limited availability)",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -2898,6 +3104,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14406",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard space 10\u2019x10\u2019: $100"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14406",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14406",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -2986,6 +3202,8 @@
    "facts": {
     "boothFee": 375.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 725.0,
+    "boothFeeCorner": 450.0,
     "boothFeeDetail": "Standard 10x10 booth - $375.00\nCorner booth - $450.00 (first come basis)\nDouble booth - $725.00\nDouble corner booth - $775.00\nEmerging Artist 10x10 booth - $225.00 (space is very limited. Please see criteria below)",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 75,
@@ -3010,6 +3228,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14412",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard 10x10 booth - $375.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14412",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14412",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -3098,6 +3326,8 @@
    "facts": {
     "boothFee": 300.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 350.0,
     "boothFeeDetail": "Single Booth: $300.00\nCorner Booth: $350.00\nDouble Booth: $600.00\nBooth Fees - Single Booth: $300.00",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 100,
@@ -3122,6 +3352,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14417",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: $300.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14417",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14417",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -3210,6 +3450,8 @@
    "facts": {
     "boothFee": 300.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 350.0,
     "boothFeeDetail": "Single Booth: $300.00\nCorner Booth: $350.00\nDouble Booth: $600.00\nBooth Fees - Single Booth: $300.00",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 100,
@@ -3234,6 +3476,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14418",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: $300.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14418",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14418",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -3342,7 +3594,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14434",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -3421,6 +3673,8 @@
    "facts": {
     "boothFee": 475.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 900.0,
+    "boothFeeCorner": 625.0,
     "boothFeeDetail": "Judges Choice 2D - $1500\nJudges Choice 3D - $1500\n5 Awards of Excellence in 2D - $500 each\n5 Awards of Excellence in 3D - $500 each\nSINGLE BOOTH (10X10) - $475.00\nDOUBLE BOOTH (10X20) - $900.00\nCORNER/ENDCAPS - $150.00 in addition\nELECTRIC - $100.00 in addition\nDRY RV/CAMPER PARKING - $75 in addition IF available\nARTIST LINK ON WEBSITE - $50 in addition",
     "avgSubmissionsPerYear": 600,
     "avgAccepted": 280,
@@ -3444,6 +3698,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14445",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE BOOTH (10X10) - $475.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14445",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14445",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -3527,6 +3791,8 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: additional $100\nA $50 late fee will be applied to all payments after",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 65,
@@ -3551,6 +3817,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14449",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14449",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14449",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -3765,7 +4041,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14514",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -3844,6 +4120,7 @@
    "facts": {
     "boothFee": 565.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1130.0,
     "boothFeeDetail": "Booth fee is $565.00\nSingle Booth (10' x 10') - $565.00\nDouble Booth (10' x 20') limited and must be approved- $1,130.00",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 200,
@@ -3865,6 +4142,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14522",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $565.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14522",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -3938,6 +4220,7 @@
    "facts": {
     "boothFee": 555.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1110.0,
     "boothFeeDetail": "Booth fee is $555.00\nSingle Booth (10' x 10') - $555.00\nDouble Booth (10' x 20') limited and must be approved- $1,110.00",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -3959,6 +4242,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14523",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $555.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14523",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -4126,6 +4414,7 @@
    "facts": {
     "boothFee": 555.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1110.0,
     "boothFeeDetail": "Booth fee is $555.00\nSingle Booth (10' x 10') - $555.00\nDouble Booth (10' x 20') limited and must be approved- $1,110.00 (10'x20' tents are not permitted at this event)",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -4147,6 +4436,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14525",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $555.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14525",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -4220,6 +4514,7 @@
    "facts": {
     "boothFee": 595.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1190.0,
     "boothFeeDetail": "Booth fee is $595.00\nSingle Booth (10' x 10') - $595.00\nDouble Booth (10' x 20') limited and must be approved- $1,190.00",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -4241,6 +4536,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14526",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $595.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14526",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -4314,6 +4614,7 @@
    "facts": {
     "boothFee": 695.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1390.0,
     "boothFeeDetail": "Booth fee is $695.00\nSingle Booth (10' x 10') - $695.00\nDouble Booth (10' x 20') limited and must be approved- $1,390.00",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -4335,6 +4636,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14527",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $695.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14527",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -4408,6 +4714,7 @@
    "facts": {
     "boothFee": 575.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1150.0,
     "boothFeeDetail": "Booth fee is $575.00 - all booth fee payments are paid directly to Howard Alan Events, not Zapp.\nSingle Booth (10' x 10') - $575.00\nDouble Booth (limited) - $1,150.00",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -4429,6 +4736,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14528",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $575.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14528",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -4718,6 +5030,7 @@
   },
   "zapp-14555": {
    "facts": {
+    "boothFeeDouble": 1350.0,
     "boothFeeDetail": "Total: $15,000.00\nDuring ArtiGras, three judges will select 25 artists in the Fine Art Showcase and give out $15,000 worth of prizes and recognition\n$675 10'd x11'w single\n$800 10'd x 17'w single with corner (The extra 5' must remain open for clear line of sight of the booth) Limited availability.\n$1350 10' d x 22'w double space\n$1500 10'd x 22'w double with open 5' corner\n$400 Emerging Artist Category\n$50 Electric available (limited availability)\n$50 Thursday, Early load in for RV's and oversized rigs with overnight parking- Available 2:30pm-6pm.",
     "avgSubmissionsPerYear": 500,
     "avgAccepted": 250,
@@ -4738,10 +5051,15 @@
     "juryOdds": 8
    },
    "provenance": {
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14555",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14555",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -4931,6 +5249,8 @@
    "facts": {
     "boothFee": 400.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 450.0,
     "boothFeeDetail": "1. Regular booth - $400 per weekend\n2. Double booth - $800 per weekend\n***Corners will be an extra $50 per weekend\nEach artist is required to submit a total of five (5) images (four images of CURRENT work and one booth image) along with a $25 NON-\nSingle Booth Fee: $400\nDouble Booth Fee: $800\n**Corner booths will be an extra $50 per weekend",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 80,
@@ -4954,6 +5274,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14570",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 1. Regular booth - $400 per weekend"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14570",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14570",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -5037,6 +5367,7 @@
    "facts": {
     "boothFee": 500.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 600.0,
     "boothFeeDetail": "10' x 10' = $500\n10' x 10' w/corner = $600\n10' x 15' = $750\n10' x 15' w/corner = $850\n10' x 20' = $990\n10' x 20' w/corner = $1090",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -5060,6 +5391,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14579",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10' x 10' = $500"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14579",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -5143,6 +5479,7 @@
    "facts": {
     "boothFee": 517.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1034.0,
     "boothFeeDetail": "mile radius. The plan is valued at $125,000+ and results in over 7.2 million advertising impressions targeted to art buyers\nchoose and purchase original artwork at a child-friendly price of $5 without the influence of their parents.\nParticipating festival artists are requested to donate a small piece of work, $25 value or less, to stock the Young Art Collector\nwork - we understand that many artists still need to have recent work valued at $25 or less. All donating artists will be presented\n- 1 Sided Single - 10 x 10: $517 (Includes Florida Sales Tax)\n- 2 Sided Single - 10 x 10: $624 (Includes Florida Sales Tax)\n- 1 Sided Double - 10 x 20: $1034(Includes Florida Sales Tax)\n- 2 Sided Double - 10 x 20: $1140 (Includes Florida Sales Tax)\n- 2 Sided Double End Cap-10 x 20- $1,246 (Includes Florida Sales Tax)\nPremium Location Upgrade- $50 (Includes Florida Sales Tax)\nFriday Night Participation- $100 (Includes Florida Sales Tax)\nPremium Friday Night Participation- $150 (Includes Florida Sales Tax)",
     "avgSubmissionsPerYear": 700,
     "avgAccepted": 220,
@@ -5167,6 +5504,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14585",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: - 1 Sided Single - 10 x 10: $517 (Includes Florida Sales Tax)"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14585",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -5255,6 +5597,7 @@
    "facts": {
     "boothFee": 350.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 450.0,
     "boothFeeDetail": "Single Booths 10' wide X 10' deep $350.00\nCorners and premium locations $450.00",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -5279,6 +5622,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14587",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booths 10' wide X 10' deep $350.00"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14587",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -5579,6 +5927,7 @@
    "facts": {
     "boothFee": 595.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 680.0,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $595\n10\u2019 x 15\u2019 = $895\n10\u2019 x 20\u2019 = $1,190\nCorner: Add $85\nAd in event program: $85\nElectric available in park only $75\nParking spot add $65\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475\n$250 Awards\nthe entire weekend. There is $250 in Youth Art awards as students are exposed to the rules and entrepreneurship\nHot Works Tents for Art Shows offers for rent Light Dome tent ($275) + tax; pro-panels are $175) + tax and includes set up; based",
     "avgSubmissionsPerYear": 175,
     "avgAccepted": 15,
@@ -5603,6 +5952,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14609",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $595"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14609",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -5691,6 +6045,7 @@
    "facts": {
     "boothFee": 595.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 680.0,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $595\n10\u2019 x 15\u2019 = $895\n10\u2019 x 20\u2019 = $1,190\nCorner: Add $85\nAd in event program: $85\nElectric available in park only $85 \ud83d\udc4b\nParking spot add $65\nLight Dome Tent $275 includes set up & tear down\nLight Dome Tent & Pro-Panels $475 includes set up & tear down\nElectric available in park only $75\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475 \ud83d\udc4b Hi there! Visit our Help Center or send us a message if you need assistance.\nHot Works Tents for Art Shows offers for rent Light Dome tent ($275) + tax; pro-panels are $175) + tax and includes set up; based",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 125,
@@ -5715,6 +6070,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14610",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $595"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14610",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -5803,6 +6163,7 @@
    "facts": {
     "boothFee": 595.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 680.0,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $595\n10\u2019 x 15\u2019 = $895\n10\u2019 x 20\u2019 = $1,190\nCorner: Add $85\nAd in event program: $85\nElectric available in park only $85\nParking spot add $65\nLight Dome Tent $275 includes set up / tear down\nLight Dome Tent & Pro-Panels $475 includes set up / tear down\n$250 Awards\nshow the entire weekend. There is $250 in Youth Art awards as students are exposed to the rules and entrepreneurship\nElectric available in park only $75\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475\nHot Works Tents for Art Shows offers for rent Light Dome tent ($275) + tax; pro-panels are $175) + tax and includes set up; based",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 150,
@@ -5827,6 +6188,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14611",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $595"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14611",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -5913,6 +6279,7 @@
   },
   "zapp-14613": {
    "facts": {
+    "boothFeeCorner": 475.0,
     "boothFeeDetail": "Cash awards over $20,000 across 10 categories: Ceramics, Works on Paper, Jewelry, 2D Mixed Media, Abstract or\nart for the Museum. Art must be original, no prints or reproductions and must have a retail value of at least $100. You may drop off\nBooth fees: $475. Standard and $625. Corner. Prices include applicable Florida sales tax.\nDonation of one original work of art with a minimum value of $100 required for participation in category-based artist prizes.",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 200,
@@ -5933,10 +6300,15 @@
     "juryOdds": 9
    },
    "provenance": {
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14613",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14613",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -6020,6 +6392,7 @@
    "facts": {
     "boothFee": 475.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 560.0,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $475\n10\u2019 x 15\u2019 = $715\n10\u2019 x 20\u2019 = $950\nCorner: Add $85\nAd in Event Program: Add $75\nLight Dome Tent $295\nLight Dome Tent & Pro-Panels $495\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475",
     "avgSubmissionsPerYear": 125,
     "avgAccepted": 90,
@@ -6043,6 +6416,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14618",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $475"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14618",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -6147,7 +6525,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14620",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -6252,7 +6630,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14621",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -6357,7 +6735,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14622",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -6462,7 +6840,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14625",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -6546,6 +6924,8 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "boothFeeDetail": "Single Booth: $495.00\nDouble Booth: $990.00\nCorner Fee (Additional): $100.00\nLate Payment Fee: An additional $50 will be applied to all booth fees received after October 15, 2025.",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 70,
@@ -6570,6 +6950,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14626",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14626",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14626",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -6656,6 +7046,7 @@
   },
   "zapp-14628": {
    "facts": {
+    "boothFeeDouble": 350.0,
     "boothFeeDetail": "$350/ Double $675 / Corners $100 limited available/ $50 Electric\nBest in Show $5000\n2 ACA Volunteer League Choice Awards (1 in 2D $500/ 1 in 3D $500)\n28 Awards of Merit (14 in 2D / 14 in 3D) @ $400 each\nSingle $350/ Double $675 / Corners $150 First come, limited available/ $50 Electric",
     "avgSubmissionsPerYear": 500,
     "avgAccepted": 225,
@@ -6676,10 +7067,15 @@
     "juryOdds": 7
    },
    "provenance": {
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14628",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14628",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -6763,6 +7159,8 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: $100",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 60,
@@ -6787,6 +7185,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14629",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14629",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14629",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -6875,6 +7283,8 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: $100\nAll booth payments after November 13 are an additional $50.",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 70,
@@ -6899,6 +7309,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14630",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14630",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14630",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -7008,7 +7428,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14631",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -7092,6 +7512,7 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 580.0,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $495\n10\u2019 x 15\u2019 = $745\n10\u2019 x 20\u2019 = $990\nCorner: Add $85\nAd in Event Program: Add $75\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 110,
@@ -7115,6 +7536,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14637",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $495"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14637",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -7198,6 +7624,7 @@
    "facts": {
     "boothFee": 510.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeCorner": 585.0,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $510\n10\u2019 x 15\u2019 = $775\n10\u2019 x 20\u2019 = $1,020\nCorner: Add $75\nAd in Event Program: Add $75\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475\nCorner add $75\nAd in Event Program add $75",
     "avgSubmissionsPerYear": 125,
     "avgAccepted": 50,
@@ -7222,6 +7649,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14639",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $510"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14639",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -7310,6 +7742,7 @@
    "facts": {
     "boothFee": 570.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1140.0,
     "boothFeeDetail": "2. Booth Fee: $570.00\n3. Double Booth Fee: $1,140.00 Limited availability",
     "avgSubmissionsPerYear": 400,
     "avgAccepted": 210,
@@ -7334,6 +7767,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14654",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 2. Booth Fee: $570.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14654",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -7422,6 +7860,7 @@
    "facts": {
     "boothFee": 570.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1140.0,
     "boothFeeDetail": "2. Booth Fee: $570.00\n3. Double Booth Fee: $1,140.00 MUST REQUEST IN APPLICATION",
     "avgSubmissionsPerYear": 400,
     "avgAccepted": 210,
@@ -7446,6 +7885,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14655",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 2. Booth Fee: $570.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14655",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -7532,8 +7976,6 @@
   },
   "zapp-14657": {
    "facts": {
-    "boothFee": 250.0,
-    "boothFeeNote": "standard single booth",
     "boothFeeDetail": "$50 Artist Application Fee* \u2013 Must accompany this Application. This $50 fee will be applied towards the booth space should\nApplication be approved by the committee. This fee is non-refundable. Confirmation will be emailed. Total booth fee is $250.\n$250 total per 10\u2019 x 10\u2019 Booth Space* \u2013 Maximum of 4 spaces. This is for the booth space only \u2013 Artist/Exhibitor must supply",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 85,
@@ -7554,11 +7996,6 @@
     "juryOdds": 7
    },
    "provenance": {
-    "boothFee": {
-     "status": "verified",
-     "source": "https://www.zapplication.org/event-info.php?ID=14657",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: $250 total per 10\u2019 x 10\u2019 Booth Space* \u2013 Maximum of 4 spaces. This is for the booth space only \u2013 Artist/Exhibitor must supply"
-    },
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14657",
@@ -8304,6 +8741,7 @@
    "facts": {
     "boothFee": 450.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 900.0,
     "boothFeeDetail": "10' x 11' Single Regular and 10' x 13' Premier Area Booth Fee: $450.00\n10' x 16.5' Regular Booth and a Half and 10' x 19.5' Premier Area Booth and a Half Fee $675.00\n10' x 22' Double Regular or 10' x 26' Premier Area Double Booth Fee: $900.00\n$11,200 in cash awards;\nBest in EACH Category: $500\nCape Coral Rotary Foundation, Inc. as additional liability insureds in the amount of $1,000,000.00. If you do not have an adequate\nSingle 10' x11' or 10'x 13' Premier Area Booth Fee: $450\nBooth and a Half 10' x 16.5' or Premier 10' x 19.5' Fee: $675\nDouble 10' x 22' or Premier Double 10' x 26' Booth Fee: $900.00",
     "avgSubmissionsPerYear": 350,
     "avgAccepted": 200,
@@ -8328,6 +8766,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14677",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10' x 11' Single Regular and 10' x 13' Premier Area Booth Fee: $450.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14677",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -8416,6 +8859,7 @@
    "facts": {
     "boothFee": 595.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 1190.0,
     "boothFeeDetail": "Booth fee is $595.00 - all booth fee payments are paid directly to Howard Alan Events, not Zapp.\nSingle Booth (10' x 10') - $595.00\nDouble Booth (limited) - $1,190.00",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 120,
@@ -8437,6 +8881,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14685",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $595.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14685",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -8530,7 +8979,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14693",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -8627,7 +9076,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14694",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -9032,6 +9481,8 @@
    "facts": {
     "boothFee": 450.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 725.0,
+    "boothFeeCorner": 615.0,
     "boothFeeDetail": "$16,600 total awards\nOne Best in Show $4,000\nNine Merit Awards $1,400 each, one per medium minimum.\nOver $40,000 committed to advertising and annual social media accounts.\n$16,600 in awards where excellence is determined, regardless of media category, as follows: nine (9) Merit Awards of $1,400 each and one (1) $4,000 Best-\n2026. Booth fees range from $450 to $1,195. Respond by the deadline to avoid the revocation of the invitation. Booth fees are not\nbooth payment minus a $30 processing fee. No refunds will be processed after this date.\nSingle Booth (10\u2019 x 10\u2019, one opening) = $450\nSingle Corner Booth (10\u2019 x 10\u2019, two openings) = $615\nDouble Booth (10\u2019 x 20\u2019, one opening) = $725\nSingle End Cap (10\u2019 x 10\u2019, three openings) = $825\nDouble End Cap (10\u2019 x 20\u2019, three openings) = $1,095\nOpen Air (10\u2019 x 20\u2019 minimum, open on all sides) = $1,195",
     "avgSubmissionsPerYear": 45,
     "avgAccepted": 170,
@@ -9056,6 +9507,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14711",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10\u2019 x 10\u2019, one opening) = $450"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14711",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14711",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -9256,6 +9717,8 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: $100\nAll booth payments made after December 25 are an additional $50.",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 70,
@@ -9280,6 +9743,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14727",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14727",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14727",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -9368,6 +9841,8 @@
    "facts": {
     "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: $100",
     "avgSubmissionsPerYear": 320,
     "avgAccepted": 130,
@@ -9392,6 +9867,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14729",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14729",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14729",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -9499,7 +9984,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14743",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -9573,6 +10058,8 @@
    "facts": {
     "boothFee": 400.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 500.0,
     "boothFeeDetail": "(First time attendees) City of Savannah Business License required ($85, good for 1 calendar year). Artists living in a county that\nIs $2.50 per hour 8am-8pm available in city owned spaces in a nearby lot. There is $5 daily parking available at the Savannah\nStandard booth fee: $400\nDouble booth fee: $800 (limited availability)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -9597,6 +10084,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14745",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $400"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14745",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14745",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -9685,6 +10182,8 @@
    "facts": {
     "boothFee": 400.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 500.0,
     "boothFeeDetail": "(First time attendees) City of Savannah Business License required ($85, good for 1 calendar year). Artists living in a county that\nIs $2.50 per hour 8am-8pm available in city owned spaces in a nearby lot. There is $5 daily parking available at the Savannah\nStandard booth fee: $400\nDouble booth fee: $800 (limited availability)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -9709,6 +10208,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14746",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $400"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14746",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14746",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -9797,6 +10306,8 @@
    "facts": {
     "boothFee": 400.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 500.0,
     "boothFeeDetail": "(First time attendees) City of Savannah Business License required ($85, good for 1 calendar year). Artists living in a county that\nIs $2.50 per hour 8am-8pm available in city owned spaces in a nearby lot. There is $5 daily parking available at the Savannah\nStandard booth fee: $400\nDouble booth fee: $800 (limited availability)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -9821,6 +10332,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14747",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $400"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14747",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14747",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -9909,6 +10430,7 @@
    "facts": {
     "boothFee": 225.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 495.0,
     "boothFeeDetail": "Booth Sizes: Single 5x8 ($225) | Double 8x16 ($495)",
     "avgSubmissionsPerYear": 235,
     "avgAccepted": 175,
@@ -9933,6 +10455,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14772",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Booth Sizes: Single 5x8 ($225)"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14772",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -10019,8 +10546,6 @@
   },
   "zapp-14785": {
    "facts": {
-    "boothFee": 180.0,
-    "boothFeeNote": "standard single booth",
     "boothFeeDetail": "Jury Fee - $25 Standard Booth Fee - $180",
     "avgSubmissionsPerYear": 105,
     "avgAccepted": 60,
@@ -10040,11 +10565,6 @@
     "juryOdds": 8
    },
    "provenance": {
-    "boothFee": {
-     "status": "verified",
-     "source": "https://www.zapplication.org/event-info.php?ID=14785",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Jury Fee - $25 Standard Booth Fee - $180"
-    },
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14785",
@@ -10253,7 +10773,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14863",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -10332,6 +10852,7 @@
    "facts": {
     "boothFee": 235.0,
     "boothFeeNote": "standard single booth",
+    "boothFeeDouble": 470.0,
     "boothFeeDetail": "Single Booth: 10'x10': $235\nDouble Booth: 10'x20': $470\nPower: optional: $50",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 250,
@@ -10354,6 +10875,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14864",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: 10'x10': $235"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14864",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
