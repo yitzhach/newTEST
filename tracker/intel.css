@@ -421,3 +421,10 @@ body.idr-open { overflow:hidden; }
   font-family:inherit; font-size:12px; line-height:1.6;
   white-space:pre-wrap; overflow-x:auto;
 }
+
+/* Booth fees: three numbers, one decision. "n/a" is a first-class rendering
+   here — most fee schedules do not quote all three, and a blank would read
+   as though the box were broken. */
+.fee-stats { margin-bottom:10px; }
+.fee-stats .fee-na { color:var(--muted); font-weight:400; }
+.fee-note { margin-top:0 !important; }

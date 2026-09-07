@@ -76,6 +76,8 @@
     "lat": 35.0414,
     "lng": -85.2835,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -254,6 +256,8 @@
     "lat": 38.8003,
     "lng": -77.09,
     "boothFeeDetail": "Booth fee is $625.00 - all booth fee payments are paid directly to Howard Alan Events, not Zapp.\nSingle Booth (10' x 10') - $625.00\nDouble Booth (limited) - $1,250.00",
+    "boothFeeDouble": 1250.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 120,
@@ -324,6 +328,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14106",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $625.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14106",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -462,6 +471,8 @@
     "lat": 42.2655,
     "lng": -83.7714,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -645,6 +656,8 @@
     "lat": 34.7055,
     "lng": -112.0091,
     "boothFeeDetail": "10\u2019x10\u2019 $300\n10\u2019 x 15\u2019 $450\n10\u2019 x 20\u2019 $600\n$75 processing fee. No refunds will be given for cancellations made after 5:00 p.m. Mountain Standard Time on September 14,",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 50,
     "avgAccepted": 35,
@@ -863,6 +876,8 @@
     "lat": 34.7055,
     "lng": -112.0091,
     "boothFeeDetail": "10\u2019x10\u2019 $300\n10\u2019 x 15\u2019 $450\n10\u2019 x 20\u2019 $600\n5:00 p.m. Mountain Standard Time on October 31, 2026, will receive a full refund less credit card fees when applicable and a $75",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 50,
     "avgAccepted": 35,
@@ -1081,6 +1096,8 @@
     "lat": 41.136,
     "lng": -73.7009,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -1252,6 +1269,8 @@
     "lat": 43.0724,
     "lng": -89.4023,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -1386,6 +1405,8 @@
     "lat": 44.0277,
     "lng": -121.3677,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -1564,6 +1585,8 @@
     "lat": 32.9485,
     "lng": -97.1524,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -1750,6 +1773,8 @@
     "lat": 42.1729,
     "lng": -88.3184,
     "boothFeeDetail": "April 1, 2026: Last day for refunds (less $50)\n12\u2019 Wide by 10\u2019 Deep Late Exhibit Space Fee: $495\n20' Wide by 10' Deep Late Exhibit Space Fee: $990\nCorner Fee Upgrade: Additional $100",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 65,
@@ -1820,6 +1845,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13982",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 12\u2019 Wide by 10\u2019 Deep Late Exhibit Space Fee: $495"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13982",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13982",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -1968,6 +2003,8 @@
     "lat": 45.608,
     "lng": -84.4867,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -2106,6 +2143,8 @@
     "lat": 40.6568,
     "lng": -74.3224,
     "boothFeeDetail": "New Jersey\u2019s top tier of discretionary spending. Median household income is about $212,700,and average household income is\naround $297,000.\nVisitors paid a $12 admission, a comfortable sign that the audience expects and values quality.\n10 x 10 $625.00\n10 x 15 $937.00\n10 x 20 $1250.00\nCorner + $215.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 840.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 125,
     "avgAccepted": 85,
@@ -2176,6 +2215,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14302",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10 x 10 $625.00"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14302",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -2324,6 +2368,8 @@
     "lat": 26.9388,
     "lng": -80.1227,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -2462,6 +2508,8 @@
     "lat": 26.5911,
     "lng": -81.8646,
     "boothFeeDetail": "mile radius. The plan is valued at $125,000+ and results in over 7.2 million advertising impressions targeted to art buyers\nchoose and purchase original artwork at a child-friendly price of $5 without the influence of their parents.\nParticipating festival artists are requested to donate a small piece of work, $25 value or less, to stock the Young Art Collector\nwork - we understand that many artists still need to have recent work valued at $25 or less. All donating artists will be presented\n- 1 Sided Single - 10 x 10: $517 (Includes Florida Sales Tax)\n- 2 Sided Single - 10 x 10: $624 (Includes Florida Sales Tax)\n- 1 Sided Double - 10 x 20: $1034(Includes Florida Sales Tax)\n- 2 Sided Double - 10 x 20: $1140 (Includes Florida Sales Tax)\n- 2 Sided Double End Cap-10 x 20- $1,246 (Includes Florida Sales Tax)\nPremium Location Upgrade- $50 (Includes Florida Sales Tax)\nFriday Night Participation- $100 (Includes Florida Sales Tax)\nPremium Friday Night Participation- $150 (Includes Florida Sales Tax)",
+    "boothFeeDouble": 1034.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 700,
     "avgAccepted": 220,
@@ -2536,6 +2584,11 @@
      "checked": "2026-09-05",
      "source": "https://www.artfestfortmyers.com/",
      "status": "search"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14585",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -2719,6 +2772,8 @@
     "lat": 26.8,
     "lng": -80.1191,
     "boothFeeDetail": "Total: $15,000.00\nDuring ArtiGras, three judges will select 25 artists in the Fine Art Showcase and give out $15,000 worth of prizes and recognition\n$675 10'd x11'w single\n$800 10'd x 17'w single with corner (The extra 5' must remain open for clear line of sight of the booth) Limited availability.\n$1350 10' d x 22'w double space\n$1500 10'd x 22'w double with open 5' corner\n$400 Emerging Artist Category\n$50 Electric available (limited availability)\n$50 Thursday, Early load in for RV's and oversized rigs with overnight parking- Available 2:30pm-6pm.",
+    "boothFeeDouble": 1350.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 500,
     "avgAccepted": 250,
@@ -2788,10 +2843,15 @@
      "source": "https://www.artigras.org/artist-applications/",
      "status": "search"
     },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14555",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14555",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -2969,6 +3029,8 @@
     "lat": 33.9315,
     "lng": -112.795,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -3107,6 +3169,8 @@
     "lat": 34.8581,
     "lng": -82.3946,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -3289,6 +3353,8 @@
     "lat": 37.6356,
     "lng": -76.5918,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -3427,6 +3493,8 @@
     "lat": 32.7894,
     "lng": -96.7896,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -3565,6 +3633,8 @@
     "lat": 27.1762,
     "lng": -80.2311,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -3703,6 +3773,8 @@
     "lat": 35.9682,
     "lng": -83.9694,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -3841,6 +3913,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -3979,6 +4053,8 @@
     "lat": 26.8407,
     "lng": -81.7948,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -4117,6 +4193,8 @@
     "lat": 47.6059,
     "lng": -122.1698,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -4251,6 +4329,8 @@
     "lat": 44.3738,
     "lng": -68.2448,
     "boothFeeDetail": "Outdoor booth fees are $405 and a limited number of outdoor spaces with electricity are $430. Double spaces, corner and over-size valet area spaces are also\n10' x 10' Booth space with electricity (on grass, stakes allowed) $430.00\n10' x 10' Regular booth space (on pavement, weights only, no stakes allowed) $405.00\n12' x 16' Valet booth space (on pavement, weights only, no stakes allowed. These spaces are much deeper than regular booth spaces) $405.00\n10' x 10' Corner space (on pavement, weights only, no stakes allowed) $420.00\n10' x 20' Double booth space on pavement (no stakes allowed) $670.00",
+    "boothFeeDouble": 670.0,
+    "boothFeeCorner": 420.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 65,
     "avgAccepted": 30,
@@ -4321,6 +4401,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13837",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10' x 10' Regular booth space (on pavement, weights only, no stakes allowed) $405.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13837",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13837",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -4459,6 +4549,8 @@
     "lat": 29.7934,
     "lng": -95.4165,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -4597,6 +4689,8 @@
     "lat": 29.7934,
     "lng": -95.4165,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -4731,6 +4825,8 @@
     "lat": 25.7291,
     "lng": -80.2612,
     "boothFeeDetail": "Cash awards over $20,000 across 10 categories: Ceramics, Works on Paper, Jewelry, 2D Mixed Media, Abstract or\nart for the Museum. Art must be original, no prints or reproductions and must have a retail value of at least $100. You may drop off\nBooth fees: $475. Standard and $625. Corner. Prices include applicable Florida sales tax.\nDonation of one original work of art with a minimum value of $100 required for participation in category-based artist prizes.",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 475.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 200,
@@ -4801,10 +4897,15 @@
      "source": "https://beauxartsmiami.org/pages/2027-festival-of-art",
      "status": "search"
     },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14613",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14613",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -4988,6 +5089,8 @@
     "lat": 39.6313,
     "lng": -106.5108,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -5122,6 +5225,8 @@
     "lat": 42.3457,
     "lng": -83.1001,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -5260,6 +5365,8 @@
     "lat": 26.7545,
     "lng": -82.2611,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -5398,6 +5505,8 @@
     "lat": 26.3677,
     "lng": -80.1207,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $595\n10\u2019 x 15\u2019 = $895\n10\u2019 x 20\u2019 = $1,190\nCorner: Add $85\nAd in event program: $85\nElectric available in park only $85 \ud83d\udc4b\nParking spot add $65\nLight Dome Tent $275 includes set up & tear down\nLight Dome Tent & Pro-Panels $475 includes set up & tear down\nElectric available in park only $75\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475 \ud83d\udc4b Hi there! Visit our Help Center or send us a message if you need assistance.\nHot Works Tents for Art Shows offers for rent Light Dome tent ($275) + tax; pro-panels are $175) + tax and includes set up; based",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 680.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 125,
@@ -5468,6 +5577,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14610",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $595"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14610",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -5621,6 +5735,8 @@
     "lat": 26.3677,
     "lng": -80.1207,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $595\n10\u2019 x 15\u2019 = $895\n10\u2019 x 20\u2019 = $1,190\nCorner: Add $85\nAd in event program: $85\nElectric available in park only $75\nParking spot add $65\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475\n$250 Awards\nthe entire weekend. There is $250 in Youth Art awards as students are exposed to the rules and entrepreneurship\nHot Works Tents for Art Shows offers for rent Light Dome tent ($275) + tax; pro-panels are $175) + tax and includes set up; based",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 680.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 175,
     "avgAccepted": 15,
@@ -5691,6 +5807,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14609",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $595"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14609",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -5844,6 +5965,8 @@
     "lat": 26.3677,
     "lng": -80.1207,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $595\n10\u2019 x 15\u2019 = $895\n10\u2019 x 20\u2019 = $1,190\nCorner: Add $85\nAd in event program: $85\nElectric available in park only $85\nParking spot add $65\nLight Dome Tent $275 includes set up / tear down\nLight Dome Tent & Pro-Panels $475 includes set up / tear down\n$250 Awards\nshow the entire weekend. There is $250 in Youth Art awards as students are exposed to the rules and entrepreneurship\nElectric available in park only $75\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475\nHot Works Tents for Art Shows offers for rent Light Dome tent ($275) + tax; pro-panels are $175) + tax and includes set up; based",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 680.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 150,
@@ -5914,6 +6037,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14611",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $595"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14611",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -6077,6 +6205,8 @@
     "lat": 26.3677,
     "lng": -80.1207,
     "boothFeeDetail": "$16,600 total awards\nOne Best in Show $4,000\nNine Merit Awards $1,400 each, one per medium minimum.\nOver $40,000 committed to advertising and annual social media accounts.\n$16,600 in awards where excellence is determined, regardless of media category, as follows: nine (9) Merit Awards of $1,400 each and one (1) $4,000 Best-\n2026. Booth fees range from $450 to $1,195. Respond by the deadline to avoid the revocation of the invitation. Booth fees are not\nbooth payment minus a $30 processing fee. No refunds will be processed after this date.\nSingle Booth (10\u2019 x 10\u2019, one opening) = $450\nSingle Corner Booth (10\u2019 x 10\u2019, two openings) = $615\nDouble Booth (10\u2019 x 20\u2019, one opening) = $725\nSingle End Cap (10\u2019 x 10\u2019, three openings) = $825\nDouble End Cap (10\u2019 x 20\u2019, three openings) = $1,095\nOpen Air (10\u2019 x 20\u2019 minimum, open on all sides) = $1,195",
+    "boothFeeDouble": 725.0,
+    "boothFeeCorner": 615.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 45,
     "avgAccepted": 170,
@@ -6149,6 +6279,16 @@
      "checked": "2026-09-05",
      "source": "https://bocamuseum.org/visit/events/39th-annual-art-festival",
      "status": "search"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14711",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14711",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -6337,6 +6477,8 @@
     "lat": 26.3677,
     "lng": -80.1207,
     "boothFeeDetail": "Booth fee is $625\n$625.00\n$1,250.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -6545,6 +6687,8 @@
     "lat": 26.3744,
     "lng": -81.8118,
     "boothFeeDetail": "2. Booth Fee: $570.00\n3. Double Booth Fee: $1,140.00 Limited availability",
+    "boothFeeDouble": 1140.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 400,
     "avgAccepted": 210,
@@ -6619,6 +6763,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14654",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 2. Booth Fee: $570.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14654",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -6785,6 +6934,8 @@
     "lat": 26.3744,
     "lng": -81.8118,
     "boothFeeDetail": "2. Booth Fee: $570.00\n3. Double Booth Fee: $1,140.00 MUST REQUEST IN APPLICATION",
+    "boothFeeDouble": 1140.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 400,
     "avgAccepted": 210,
@@ -6858,6 +7009,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14655",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 2. Booth Fee: $570.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14655",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -7024,6 +7180,8 @@
     "lat": 26.3744,
     "lng": -81.8118,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -7188,6 +7346,8 @@
     "lat": 41.2256,
     "lng": -81.54,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -7322,6 +7482,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $600\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 400.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 175,
     "avgAccepted": 100,
@@ -7392,6 +7554,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13879",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13879",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13879",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -7545,6 +7717,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $600\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 400.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 100,
@@ -7615,6 +7789,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13825",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13825",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13825",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -7763,6 +7947,8 @@
     "lat": 41.5181,
     "lng": -81.5663,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -7897,6 +8083,8 @@
     "lat": 26.6253,
     "lng": -81.9712,
     "boothFeeDetail": "10' x 11' Single Regular and 10' x 13' Premier Area Booth Fee: $450.00\n10' x 16.5' Regular Booth and a Half and 10' x 19.5' Premier Area Booth and a Half Fee $675.00\n10' x 22' Double Regular or 10' x 26' Premier Area Double Booth Fee: $900.00\n$11,200 in cash awards;\nBest in EACH Category: $500\nCape Coral Rotary Foundation, Inc. as additional liability insureds in the amount of $1,000,000.00. If you do not have an adequate\nSingle 10' x11' or 10'x 13' Premier Area Booth Fee: $450\nBooth and a Half 10' x 16.5' or Premier 10' x 19.5' Fee: $675\nDouble 10' x 22' or Premier Double 10' x 26' Booth Fee: $900.00",
+    "boothFeeDouble": 900.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 350,
     "avgAccepted": 200,
@@ -7967,6 +8155,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14677",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10' x 11' Single Regular and 10' x 13' Premier Area Booth Fee: $450.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14677",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -8120,6 +8313,8 @@
     "lat": 38.9902,
     "lng": -77.3916,
     "boothFeeDetail": "10' x 10\u2019 - $750\n10' x 15' - $1125 (limited number of booths available in this size)\n10' x 20' - $1450\nCorner fees are $200 (limited number available)\n10'x10\u2019 - $750\n10'x20' - $1450\nCorner fees are an additional $200 (limited number available)",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 950.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 425,
     "avgAccepted": 265,
@@ -8190,6 +8385,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14269",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10' x 10\u2019 - $750"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14269",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -8338,6 +8538,8 @@
     "lat": 33.824,
     "lng": -111.913,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -8476,6 +8678,8 @@
     "lat": 33.8592,
     "lng": -111.9428,
     "boothFeeDetail": "10' x 10' = $400.00\n10' x 15' = $500.00\n10 X 20' = $750.00\n10' x 10' = $300\n10 X 20' = $450.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 100,
@@ -8694,6 +8898,8 @@
     "lat": 39.9949,
     "lng": -82.9874,
     "boothFeeDetail": "Booth Fee: $25 students / $75 for alumni - due November 1st at midnight OR within 3 business days of notification if invited after\nNovember 1st. NOTE: Students must use a coupon code StudentBooth to pay the reduced $25 booth fee. This will be supplied to",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 160,
     "avgAccepted": 110,
@@ -8763,7 +8969,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14863",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -8907,6 +9113,8 @@
     "lat": 30.4548,
     "lng": -84.2802,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -9088,6 +9296,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": "Standard booth fee: $350\nDouble booth fee: $700 (limited availability) (10x20)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)\nDouble deep booth: $500 (10x20 deep) *Space 5,6,7,8,9,14,18,19,20 (Limited)",
+    "boothFeeDouble": 500.0,
+    "boothFeeCorner": 450.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 315,
     "avgAccepted": 200,
@@ -9158,6 +9368,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14077",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $350"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14077",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14077",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -9311,6 +9531,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -9449,6 +9671,8 @@
     "lat": 39.7379,
     "lng": -104.9775,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -9593,8 +9817,8 @@
     "juryFeeLabel": "Jury Fee - Non Refundable",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14785",
     "officialUrl": null,
-    "boothFee": 180.0,
-    "boothFeeNote": "standard single booth",
+    "boothFee": null,
+    "boothFeeNote": null,
     "commissionPct": null,
     "boothCount": null,
     "attendance": null,
@@ -9608,6 +9832,8 @@
     "lat": 34.7245,
     "lng": -86.5788,
     "boothFeeDetail": "Jury Fee - $25 Standard Booth Fee - $180",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 105,
     "avgAccepted": 60,
@@ -9673,11 +9899,6 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
-    },
-    "boothFee": {
-     "status": "verified",
-     "source": "https://www.zapplication.org/event-info.php?ID=14785",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Jury Fee - $25 Standard Booth Fee - $180"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -9826,6 +10047,8 @@
     "lat": 33.2386,
     "lng": -116.3514,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -9964,6 +10187,8 @@
     "lat": 28.3898,
     "lng": -80.7693,
     "boothFeeDetail": "Single Booth: 10'x10': $235\nDouble Booth: 10'x20': $470\nPower: optional: $50",
+    "boothFeeDouble": 470.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 250,
@@ -10034,6 +10259,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14864",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: 10'x10': $235"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14864",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -10177,6 +10407,8 @@
     "lat": 28.3898,
     "lng": -80.7693,
     "boothFeeDetail": "Single Booth: 10'x10': $235\nDouble Booth: 10'x20': $470\nPower: optional: $50",
+    "boothFeeDouble": 470.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 250,
@@ -10247,6 +10479,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13856",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: 10'x10': $235"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13856",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -10400,6 +10637,8 @@
     "lat": 25.771,
     "lng": -80.2516,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -10586,6 +10825,8 @@
     "lat": 26.417,
     "lng": -81.7962,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -10724,6 +10965,8 @@
     "lat": 26.417,
     "lng": -81.7962,
     "boothFeeDetail": "Booth fee is $595.00\nSingle Booth (10' x 10') - $595.00\nDouble Booth (10' x 20') limited and must be approved- $1,190.00",
+    "boothFeeDouble": 1190.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -10794,6 +11037,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14526",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $595.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14526",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -10932,6 +11180,8 @@
     "lat": 39.9949,
     "lng": -82.9874,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -11066,6 +11316,8 @@
     "lat": 27.8273,
     "lng": -82.7001,
     "boothFeeDetail": "Supplemental electricity is available for an additional charge of $60. LED battery operated lighting is also permitted. No\nmembership, ($60 value) for 1 full year (Dec - Dec).\nAlcove Booths: $295\nAll Main Floor Booths: $270\nAlcove Booths: $355\nAll Main Floor Booths: $330\nOptiontal electricity: $60 (must be purchased in advance)",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 125,
     "avgAccepted": 67,
@@ -11284,6 +11536,8 @@
     "lat": 32.8867,
     "lng": -96.7384,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -11460,6 +11714,8 @@
     "lat": 38.8849,
     "lng": -106.9625,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -11637,6 +11893,8 @@
     "lat": 40.9835,
     "lng": -92.1104,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -11825,6 +12083,8 @@
     "lat": 33.7643,
     "lng": -116.4225,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -11963,6 +12223,8 @@
     "lat": 33.7643,
     "lng": -116.4225,
     "boothFeeDetail": "NOT LISTED on ZAPP page - likely set post-acceptance; contact organizer",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 140,
     "avgAccepted": 80,
@@ -12032,7 +12294,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14625",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -12181,6 +12443,8 @@
     "lat": 26.457,
     "lng": -80.0948,
     "boothFeeDetail": "Booth fee is $695.00\nSingle Booth (10' x 10') - $695.00\nDouble Booth (10' x 20') limited and must be approved- $1,390.00",
+    "boothFeeDouble": 1390.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -12251,6 +12515,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14527",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $695.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14527",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -12389,6 +12658,8 @@
     "lat": 26.457,
     "lng": -80.0948,
     "boothFeeDetail": "Booth fee is $635\n$635.00\n$1,270.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 200,
@@ -12597,6 +12868,8 @@
     "lat": 25.785,
     "lng": -80.2852,
     "boothFeeDetail": "Booth Fee: $400\nBooth Fee: Single 10 x10 is $400\nDouble Booth spaces: $800\nCorners are available in limited number for an additional supplemental fee of :$150",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 550.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 75,
@@ -12667,6 +12940,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14400",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Booth Fee: Single 10 x10 is $400"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14400",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14400",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -12820,6 +13103,8 @@
     "lat": null,
     "lng": null,
     "boothFeeDetail": "Booth fee is $525\n$525.00\n$1,050.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -13023,6 +13308,8 @@
     "lat": 26.8,
     "lng": -80.1191,
     "boothFeeDetail": "Booth fee is $555.00\nSingle Booth (10' x 10') - $555.00\nDouble Booth (10' x 20') limited and must be approved- $1,110.00 (10'x20' tents are not permitted at this event)",
+    "boothFeeDouble": 1110.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -13093,6 +13380,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14525",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $555.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14525",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -13231,6 +13523,8 @@
     "lat": 26.8,
     "lng": -80.1191,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -13369,6 +13663,8 @@
     "lat": 26.8,
     "lng": -80.1191,
     "boothFeeDetail": "Booth fee is $595.00 - all booth fee payments are paid directly to Howard Alan Events, not Zapp.\nSingle Booth (10' x 10') - $595.00\nDouble Booth (limited) - $1,190.00",
+    "boothFeeDouble": 1190.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 120,
@@ -13439,6 +13735,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14685",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $595.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14685",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -13577,6 +13878,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -13715,6 +14018,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -13853,6 +14158,8 @@
     "lat": 27.1762,
     "lng": -80.2311,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -13991,6 +14298,8 @@
     "lat": 27.0849,
     "lng": -82.3036,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -14129,6 +14438,8 @@
     "lat": 27.0849,
     "lng": -82.3036,
     "boothFeeDetail": "Booth fee is $555.00\nSingle Booth (10' x 10') - $555.00\nDouble Booth (10' x 20') limited and must be approved- $1,110.00",
+    "boothFeeDouble": 1110.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -14199,6 +14510,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14523",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $555.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14523",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -14337,6 +14653,8 @@
     "lat": 33.9911,
     "lng": -84.1257,
     "boothFeeDetail": "Standard space 10\u2019x10\u2019: $100\nDouble Booth 10'x20': $200\nElectricity: $100 (limited availability)\nCorner Booth:$50 (limited availability)",
+    "boothFeeDouble": 200.0,
+    "boothFeeCorner": 150.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -14407,6 +14725,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14406",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard space 10\u2019x10\u2019: $100"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14406",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14406",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -14560,6 +14888,8 @@
     "lat": 33.9911,
     "lng": -84.1257,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -14698,6 +15028,8 @@
     "lat": 42.732,
     "lng": -84.4783,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -14836,6 +15168,8 @@
     "lat": 47.8207,
     "lng": -122.3497,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -14970,6 +15304,8 @@
     "lat": 26.9909,
     "lng": -82.3679,
     "boothFeeDetail": "Single Booth: $300.00\nCorner Booth: $350.00\nDouble Booth: $600.00\nBooth Fees - Single Booth: $300.00",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 350.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 100,
@@ -15040,6 +15376,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14417",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: $300.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14417",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14417",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -15193,6 +15539,8 @@
     "lat": 26.9909,
     "lng": -82.3679,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -15331,6 +15679,8 @@
     "lat": 26.9909,
     "lng": -82.3679,
     "boothFeeDetail": "Single Booth: $300.00\nCorner Booth: $350.00\nDouble Booth: $600.00\nBooth Fees - Single Booth: $300.00",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 350.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 100,
@@ -15401,6 +15751,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14418",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: $300.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14418",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14418",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -15554,6 +15914,8 @@
     "lat": 30.4927,
     "lng": -87.8721,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -15692,6 +16054,8 @@
     "lat": 42.0471,
     "lng": -87.6921,
     "boothFeeDetail": "- 20 items. Small prints can have up to 50 pieces. We encourage each selected artist to price items from $20 to $400, with a greater\nquantity priced below $100 to encourage holiday gift purchases. Artists must drop off and pick up work in person unless special",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 220,
     "avgAccepted": 150,
@@ -15761,7 +16125,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14298",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -15905,6 +16269,8 @@
     "lat": 30.4927,
     "lng": -87.8721,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -16043,6 +16409,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": "Booth fee - $300 March 25-May 31\n$350 June 1-September 10\nNon-Profit Booth $100",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -16261,6 +16629,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $600 (limited availability)\nCorner upgrade: $75 (limited availability)\nElectricity: $100 (limited availability)",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 375.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 175,
     "avgAccepted": 2,
@@ -16331,6 +16701,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13943",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13943",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13943",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -16484,6 +16864,8 @@
     "lat": 29.4632,
     "lng": -98.4982,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -16622,6 +17004,8 @@
     "lat": 41.4748,
     "lng": -84.5629,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -16760,6 +17144,8 @@
     "lat": 32.2281,
     "lng": -110.9436,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -16898,6 +17284,8 @@
     "lat": 27.9426,
     "lng": -82.4636,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -17081,6 +17469,8 @@
     "lat": 33.3595,
     "lng": -111.421,
     "boothFeeDetail": "\u200b$30.00\nBoth Fee is $150.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 85,
@@ -17150,7 +17540,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14514",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -17294,6 +17684,8 @@
     "lat": 30.4356,
     "lng": -87.2459,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -17428,6 +17820,8 @@
     "lat": 27.7507,
     "lng": -82.7053,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -17566,6 +17960,8 @@
     "lat": 29.1917,
     "lng": -81.0299,
     "boothFeeDetail": "$350 \u2013 Competitive Fine Art Booth Space\n$225 \u2013 Non-Competitive / Juried Craft Booth Space",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 200,
@@ -17789,6 +18185,8 @@
     "lat": 32.4369,
     "lng": -97.7514,
     "boothFeeDetail": "Single Booths 10' wide X 10' deep $350.00\nCorners and premium locations $450.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 450.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -17859,6 +18257,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14587",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booths 10' wide X 10' deep $350.00"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14587",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -18012,6 +18415,8 @@
     "lat": 27.0704,
     "lng": -80.1436,
     "boothFeeDetail": "Booth fee is $450\n$450.00\n$900.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 150,
@@ -18220,6 +18625,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $495\n10\u2019 x 15\u2019 = $745\n10\u2019 x 20\u2019 = $990\nCorner: Add $85\nAd in Event Program: Add $75\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 580.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 110,
@@ -18290,6 +18697,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14637",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $495"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14637",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -18438,6 +18850,8 @@
     "lat": 29.0226,
     "lng": -80.9246,
     "boothFeeDetail": "$350/ Double $675 / Corners $100 limited available/ $50 Electric\nBest in Show $5000\n2 ACA Volunteer League Choice Awards (1 in 2D $500/ 1 in 3D $500)\n28 Awards of Merit (14 in 2D / 14 in 3D) @ $400 each\nSingle $350/ Double $675 / Corners $150 First come, limited available/ $50 Electric",
+    "boothFeeDouble": 350.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 500,
     "avgAccepted": 225,
@@ -18504,10 +18918,15 @@
      "status": "verified",
      "basis": "ZAPPlication export"
     },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14628",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14628",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -18656,6 +19075,8 @@
     "lat": 43.4664,
     "lng": -110.7508,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -18790,6 +19211,8 @@
     "lat": 24.5552,
     "lng": -81.7816,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -18928,6 +19351,8 @@
     "lat": 33.5854,
     "lng": -111.8536,
     "boothFeeDetail": "10' X 10' = $450.00\n10' X 15\" = $550.00\n10' X 20' = $850.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 138,
@@ -19151,6 +19576,8 @@
     "lat": 29.4632,
     "lng": -98.4982,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -19289,6 +19716,8 @@
     "lat": 37.4446,
     "lng": -122.2632,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -19475,6 +19904,8 @@
     "lat": 42.064,
     "lng": -86.4783,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -19646,6 +20077,8 @@
     "lat": 32.8469,
     "lng": -117.2698,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -19780,6 +20213,8 @@
     "lat": 33.6719,
     "lng": -116.2994,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -19969,6 +20404,8 @@
     "lat": 28.7512,
     "lng": -81.287,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -20107,6 +20544,8 @@
     "lat": 27.8615,
     "lng": -81.4943,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -20245,6 +20684,8 @@
     "lat": 27.4234,
     "lng": -82.3812,
     "boothFeeDetail": "Booth fee is $575.00 - all booth fee payments are paid directly to Howard Alan Events, not Zapp.\nSingle Booth (10' x 10') - $575.00\nDouble Booth (limited) - $1,150.00",
+    "boothFeeDouble": 1150.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -20315,6 +20756,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14528",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $575.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14528",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -20453,6 +20899,8 @@
     "lat": 27.4234,
     "lng": -82.3812,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -20591,6 +21039,8 @@
     "lat": 27.4234,
     "lng": -82.3812,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: $100\nAll booth payments made after December 25 are an additional $50.",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 70,
@@ -20661,6 +21111,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14727",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14727",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14727",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -20814,6 +21274,8 @@
     "lat": 27.4234,
     "lng": -82.3812,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: $100",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 60,
@@ -20884,6 +21346,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14629",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14629",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14629",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -21037,6 +21509,8 @@
     "lat": 26.1277,
     "lng": -80.2126,
     "boothFeeDetail": "Booth fee is $610\n$610.00\n$1,220.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 120,
@@ -21245,6 +21719,8 @@
     "lat": 26.1277,
     "lng": -80.2126,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -21383,6 +21859,8 @@
     "lat": 26.1277,
     "lng": -80.2126,
     "boothFeeDetail": "Booth fee is $565.00\nSingle Booth (10' x 10') - $565.00\nDouble Booth (10' x 20') limited and must be approved- $1,130.00",
+    "boothFeeDouble": 1130.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 200,
@@ -21453,6 +21931,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14522",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $565.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14522",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -21591,6 +22074,8 @@
     "lat": 41.808,
     "lng": -87.8714,
     "boothFeeDetail": "Standard 10x10 booth - $375.00\nCorner booth - $450.00 (first come basis)\nDouble booth - $725.00\nDouble corner booth - $775.00\nEmerging Artist 10x10 booth - $225.00 (space is very limited. Please see criteria below)",
+    "boothFeeDouble": 725.0,
+    "boothFeeCorner": 450.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 75,
@@ -21661,6 +22146,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14412",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard 10x10 booth - $375.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14412",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14412",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -21814,6 +22309,8 @@
     "lat": 38.639,
     "lng": -90.2811,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -21995,6 +22492,8 @@
     "lat": 34.0284,
     "lng": -84.3526,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -22133,6 +22632,8 @@
     "lat": 28.8296,
     "lng": -81.8561,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -22271,6 +22772,8 @@
     "lat": 40.0395,
     "lng": -76.2974,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -22434,6 +22937,8 @@
     "lat": 27.4125,
     "lng": -82.659,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -22572,6 +23077,8 @@
     "lat": 27.4125,
     "lng": -82.659,
     "boothFeeDetail": "Booth fee is $595.00 - all booth fee payments are paid directly to Howard Alan Events, not Zapp.\n$595.00\n$1,190.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 120,
     "avgAccepted": 100,
@@ -22780,6 +23287,8 @@
     "lat": 33.5741,
     "lng": -101.87,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -22918,6 +23427,8 @@
     "lat": 33.062,
     "lng": -85.6778,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -23056,6 +23567,8 @@
     "lat": 32.7683,
     "lng": -97.312,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -23225,6 +23738,8 @@
     "lat": 30.4548,
     "lng": -84.2802,
     "boothFeeDetail": "$35 per night. This fee is whether or not you are connected to electricity and water. There is a dump station on site. If you need a\n220V connection, the rate is $85 per night.\nAccess Fee of $30. This cost will be in addition to the regular camping fee ($35 or $85 per night, depending on the type of site\nDeposit of $100 (refundable before October 15, 2026)\nInside Building - 18 ft. x 8 ft. $365 (outside walls only in Buildings 3 & 7)\nInside Building - 14 ft. x 10 ft. $365\nInside Building - 18 ft. x 10 ft. $470\nInside Building - 28 ft. x 10 ft. $725\nInside Building - 2 ft. extra $50\nOutside Buildng - 10 ft. x 10 ft. $290\nOutside Buildng - 20 ft. x 10 ft. $500\nOutside Buildng - 30 ft. x 10 ft. $700\nOutside Buildng - 40 ft. x 10 ft. $1,160",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 325,
     "avgAccepted": 280,
@@ -23294,7 +23809,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14287",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -23438,6 +23953,8 @@
     "lat": 37.9009,
     "lng": -122.5395,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -23572,6 +24089,8 @@
     "lat": 43.0455,
     "lng": -87.95,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -23735,6 +24254,8 @@
     "lat": 44.9609,
     "lng": -93.1064,
     "boothFeeDetail": "1. Regular booth - $400 per weekend\n2. Double booth - $800 per weekend\n***Corners will be an extra $50 per weekend\nEach artist is required to submit a total of five (5) images (four images of CURRENT work and one booth image) along with a $25 NON-\nSingle Booth Fee: $400\nDouble Booth Fee: $800\n**Corner booths will be an extra $50 per weekend",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 450.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 80,
@@ -23805,6 +24326,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14570",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 1. Regular booth - $400 per weekend"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14570",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14570",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -23953,6 +24484,8 @@
     "lat": 28.7925,
     "lng": -81.6488,
     "boothFeeDetail": "Judges Choice 2D - $1500\nJudges Choice 3D - $1500\n5 Awards of Excellence in 2D - $500 each\n5 Awards of Excellence in 3D - $500 each\nSINGLE BOOTH (10X10) - $475.00\nDOUBLE BOOTH (10X20) - $900.00\nCORNER/ENDCAPS - $150.00 in addition\nELECTRIC - $100.00 in addition\nDRY RV/CAMPER PARKING - $75 in addition IF available\nARTIST LINK ON WEBSITE - $50 in addition",
+    "boothFeeDouble": 900.0,
+    "boothFeeCorner": 625.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 600,
     "avgAccepted": 280,
@@ -24023,6 +24556,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14445",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE BOOTH (10X10) - $475.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14445",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14445",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -24171,6 +24714,8 @@
     "lat": 39.322,
     "lng": -77.9588,
     "boothFeeDetail": "Booth Fees: Based on size and location $400+\n$700, 15\u2019x15 $1,000 or 20\u2019x20\u2019 $1400. Or bring your own logo covered tent $450 (this only applies to Spirits and Wineries).\nFood Concessions are in various locations throughout the grounds and are all $400 for reservation.\nSales/Demonstration spaces are available indoors or outdoors. Outdoor covered pavilion spaces have two options of 10\u2019x12\u2019 $400\nor 10\u2019x24\u2019 $800. Indoor building spaces have two options of 12\u2019x12\u2019 $500 or 12\u2019x24\u2019 $1,000. We also offer tents that have flaps on\nall four sides that we provide in the following sizes; 15\u2019x15\u2019 $1,000, 20\u2019x20\u2019 $1,400 or 30\u2019x30\u2019 $1,800",
+    "boothFeeDouble": 1000.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 180,
@@ -24241,6 +24786,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14115",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Booth Fees: Based on size and location $400+"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14115",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -24389,6 +24939,8 @@
     "lat": 42.732,
     "lng": -84.4783,
     "boothFeeDetail": "Booth Sizes: Single 5x8 ($225) | Double 8x16 ($495)",
+    "boothFeeDouble": 495.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 235,
     "avgAccepted": 175,
@@ -24459,6 +25011,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14772",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Booth Sizes: Single 5x8 ($225)"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14772",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -24612,6 +25169,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": "$225 Single Booth Space Fee",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 60,
     "avgAccepted": 40,
@@ -24835,6 +25394,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -24973,6 +25534,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": "$225 Single Booth Space Fee",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 90,
     "avgAccepted": 40,
@@ -25196,6 +25759,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -25334,6 +25899,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -25472,6 +26039,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": "NOT LISTED on ZAPP page - likely set post-acceptance; contact organizer",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 50,
     "avgAccepted": 40,
@@ -25541,7 +26110,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14694",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -25675,6 +26244,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": "NOT LISTED on ZAPP page - likely set post-acceptance; contact organizer",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 50,
     "avgAccepted": 40,
@@ -25744,7 +26315,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14693",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -25888,6 +26459,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -26026,6 +26599,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -26170,6 +26745,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -26351,6 +26928,8 @@
     "lat": 26.1736,
     "lng": -81.7293,
     "boothFeeDetail": "$720 Single Booth Space Fee (Subject to refund policy)\n$80 Parking Fee (Optional for artist parking near event, no trailers, limited availability, non-refundable)",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 600,
     "avgAccepted": 200,
@@ -26574,6 +27153,8 @@
     "lat": 38.8978,
     "lng": -77.3151,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -26750,6 +27331,8 @@
     "lat": 35.4937,
     "lng": -97.4903,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -26888,6 +27471,8 @@
     "lat": 29.171,
     "lng": -83.0168,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -27026,6 +27611,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $600 (limited availability)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)\nLate Application: $50 (Non-refundable processing fee)",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 400.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -27096,6 +27683,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13892",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13892",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13892",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -27249,6 +27846,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -27387,6 +27986,8 @@
     "lat": 41.8507,
     "lng": -87.6792,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -27570,6 +28171,8 @@
     "lat": 29.9064,
     "lng": -81.3855,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -27708,6 +28311,8 @@
     "lat": 41.8507,
     "lng": -87.6792,
     "boothFeeDetail": "Standard Booth - approx. 10' x 10' - $2,675 (other configurations may be available)\nStandard Corner Fee - $400 additional\nEmerging Booth - $1,350 (please note, spaces are not full-size booths. Limited quantities)",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 3075.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 400,
     "avgAccepted": 325,
@@ -27778,6 +28383,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14231",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard Booth - approx. 10' x 10' - $2,675 (other configurations may be available)"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14231",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -27931,6 +28541,8 @@
     "lat": 41.8507,
     "lng": -87.6792,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -28069,6 +28681,8 @@
     "lat": 30.281,
     "lng": -87.5815,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -28207,6 +28821,8 @@
     "lat": 42.5917,
     "lng": -83.382,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -28345,6 +28961,8 @@
     "lat": 33.8086,
     "lng": -116.5319,
     "boothFeeDetail": "NOT LISTED on ZAPP page - likely set post-acceptance; contact organizer",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 140,
     "avgAccepted": 50,
@@ -28414,7 +29032,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14622",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -28563,6 +29181,8 @@
     "lat": 33.8086,
     "lng": -116.5319,
     "boothFeeDetail": "NOT LISTED on ZAPP page - likely set post-acceptance; contact organizer",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 140,
     "avgAccepted": 50,
@@ -28632,7 +29252,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14621",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -28781,6 +29401,8 @@
     "lat": 33.8086,
     "lng": -116.5319,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -28919,6 +29541,8 @@
     "lat": 33.8086,
     "lng": -116.5319,
     "boothFeeDetail": "NOT LISTED on ZAPP page - likely set post-acceptance; contact organizer",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 140,
     "avgAccepted": 70,
@@ -28988,7 +29612,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14620",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -29137,6 +29761,8 @@
     "lat": 42.3457,
     "lng": -83.1001,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -29275,6 +29901,8 @@
     "lat": 37.4386,
     "lng": -122.1497,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -29409,6 +30037,8 @@
     "lat": 33.5494,
     "lng": -111.9565,
     "boothFeeDetail": "10' x 10' = $500\n10' x 10' w/corner = $600\n10' x 15' = $750\n10' x 15' w/corner = $850\n10' x 20' = $990\n10' x 20' w/corner = $1090",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 600.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -29479,6 +30109,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14579",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10' x 10' = $500"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14579",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -29627,6 +30262,8 @@
     "lat": 40.6744,
     "lng": -111.5184,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -29817,6 +30454,8 @@
     "lat": 30.32,
     "lng": -97.9269,
     "boothFeeDetail": "10 X 10' Regular Booth: $600\n10 X 10' Corner Booth: $700\n10 X 20' Double Booth: $1200\n10 X 20' Double Corner Booth: $1300\n10 X 10' Food Concession Booth: $1885\n10 X 20' Food Concession Booth: $3035\nstandard 20amp plug ($100)\n30amp RV plug ($150)\nL530 ($150)\nL1430 plug ($300)\n50amp blade plug ($500)\n50amp twist plug ($300)\nCam Lock 1ph 100amp ($800)",
+    "boothFeeDouble": 1200.0,
+    "boothFeeCorner": 700.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 180,
@@ -29887,6 +30526,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13866",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10 X 10' Regular Booth: $600"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13866",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13866",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -30030,6 +30679,8 @@
     "lat": 34.6369,
     "lng": -82.7406,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -30168,6 +30819,8 @@
     "lat": 40.7793,
     "lng": -77.7822,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -30306,6 +30959,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -30444,6 +31099,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": "Standard booth fee: $350\nPremier Booth with extra space behind for tent: $375 (limited to 15) - grassy area\nPremier Corner: $400 (Only three available) - (Must be approved)\nDouble booth fee: $600 (limited availability)\nCorner upgrade: $100 (limited availability)",
+    "boothFeeDouble": 600.0,
+    "boothFeeCorner": 450.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 125,
@@ -30514,6 +31171,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14172",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $350"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14172",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14172",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -30667,6 +31334,8 @@
     "lat": 25.7212,
     "lng": -80.2455,
     "boothFeeDetail": "Cash awards totaling $10,000 will be presented to juried artists across five categories.\nBooth fees are as follows: Single Booth: $350 + application platform processing fee. Double Booth: $700 + application",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 125,
     "avgAccepted": 75,
@@ -30736,7 +31405,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14743",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -30875,6 +31544,8 @@
     "lat": 39.1096,
     "lng": -94.5705,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -31052,6 +31723,8 @@
     "lat": 34.0534,
     "lng": -117.1767,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -31190,6 +31863,8 @@
     "lat": 38.1381,
     "lng": -107.7533,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -31328,6 +32003,8 @@
     "lat": 40.843,
     "lng": -74.2011,
     "boothFeeDetail": "10'x10' Booth March 15th Deadline $495 | $545 (3/16-6/1) | $595 (6/2 - Full)\n10'x15' Booth March 15th Deadline $645 | $695 (3/16-6/1) | $745 (6/2 - Full)\n10'x20' Booth March 15th Deadline $895 | $945 (3/16-6/1) | $995 (6/2 - Full)\nCorners $125 extra",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 620.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 140,
@@ -31398,6 +32075,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13875",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10'x10' Booth March 15th Deadline $495"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13875",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -31546,6 +32228,8 @@
     "lat": 40.8035,
     "lng": -74.1891,
     "boothFeeDetail": "10'x10' Booth March 15th Deadline $495 | $545 (3/16-6/1) | $595 (6/2 - Full)\n10'x15' Booth March 15th Deadline $645 | $695 (3/16-6/1) | $745 (6/2 - Full)\n10'x20' Booth March 15th Deadline $895 | $945 (3/16-6/1) | $995 (6/2- Full)\nCorners $125 extra",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 620.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 300,
     "avgAccepted": 175,
@@ -31616,6 +32300,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13979",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10'x10' Booth March 15th Deadline $495"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13979",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -31764,6 +32453,8 @@
     "lat": 40.8035,
     "lng": -74.1891,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -31902,6 +32593,8 @@
     "lat": 40.8319,
     "lng": -74.2428,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -32040,6 +32733,8 @@
     "lat": 39.9908,
     "lng": -75.1426,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -32178,6 +32873,8 @@
     "lat": 34.0284,
     "lng": -84.3526,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -32316,6 +33013,8 @@
     "lat": 30.0532,
     "lng": -96.7151,
     "boothFeeDetail": "further their understanding and appreciation of the arts. Our goal is to provide over $20,000 in scholarships and grants each year.\nPeck Barn 10x10 $450. 8x15 $700 no canopy frames in the Peck\nNeal Barn 10x10 $400\nStables 10x10 $400, 15x20 $800, 20x30 $1500\nCarriage House 12x14 $600\nOutdoor Tent Area $350 (only 9 available)\nFarmstead Gallery $2000 Featured Artist",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -32539,6 +33238,8 @@
     "lat": 38.6373,
     "lng": -90.3454,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -32716,6 +33417,8 @@
     "lat": 40.0108,
     "lng": -81.5413,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -32850,6 +33553,8 @@
     "lat": 33.8817,
     "lng": -84.3973,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -32988,6 +33693,8 @@
     "lat": 33.8817,
     "lng": -84.3973,
     "boothFeeDetail": "Standard booth fee: $300\nDouble booth fee: $550 (limited availability)\nCorner upgrade: $75 (limited availability)\nElectricity: $100 (limited availability)",
+    "boothFeeDouble": 550.0,
+    "boothFeeCorner": 375.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 125,
@@ -33058,6 +33765,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=13857",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $300"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13857",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=13857",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -33211,6 +33928,8 @@
     "lat": 33.316,
     "lng": -111.7541,
     "boothFeeDetail": "10'x10' = $400.00\n10' x15' = $475.00\n10 X 20\" = $750.00\nFood Vendor 10' x 15' = $400.00 Set-up times - Friday from 12:00pm to 7:00pm, or Sat. from 7:00am-10:00am. All participants must",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 100,
@@ -33424,6 +34143,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": "Single Booth: $495.00\nDouble Booth: $990.00\nCorner Fee (Additional): $100.00\nLate Payment Fee: An additional $50 will be applied to all booth fees received after October 15, 2025.",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 70,
@@ -33494,6 +34215,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14626",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14626",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14626",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -33647,6 +34378,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -33785,6 +34518,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $475\n10\u2019 x 15\u2019 = $715\n10\u2019 x 20\u2019 = $950\nCorner: Add $85\nAd in Event Program: Add $75\nLight Dome Tent $295\nLight Dome Tent & Pro-Panels $495\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 560.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 125,
     "avgAccepted": 90,
@@ -33855,6 +34590,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14618",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $475"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14618",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -34003,6 +34743,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": "10\u2019 x 10\u2019 = $510\n10\u2019 x 15\u2019 = $775\n10\u2019 x 20\u2019 = $1,020\nCorner: Add $75\nAd in Event Program: Add $75\nLight Dome Tent $275\nLight Dome Tent & Pro-Panels $475\nCorner add $75\nAd in Event Program add $75",
+    "boothFeeDouble": null,
+    "boothFeeCorner": 585.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 125,
     "avgAccepted": 50,
@@ -34073,6 +34815,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14639",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 10\u2019 x 10\u2019 = $510"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14639",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -34226,6 +34973,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -34364,6 +35113,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": "Thereafter, if a space becomes available, there will be a $50 late fee applied.\nCORNER fee: Additional $100",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 80,
@@ -34433,7 +35184,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14631",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -34582,6 +35333,8 @@
     "lat": 37.8596,
     "lng": -122.4899,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -34757,6 +35510,8 @@
     "lat": 32.0247,
     "lng": -81.0979,
     "boothFeeDetail": "(First time attendees) City of Savannah Business License required ($85, good for 1 calendar year). Artists living in a county that\nIs $2.50 per hour 8am-8pm available in city owned spaces in a nearby lot. There is $5 daily parking available at the Savannah\nStandard booth fee: $400\nDouble booth fee: $800 (limited availability)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 500.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -34827,6 +35582,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14747",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $400"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14747",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14747",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -34980,6 +35745,8 @@
     "lat": 32.0247,
     "lng": -81.0979,
     "boothFeeDetail": "(First time attendees) City of Savannah Business License required ($85, good for 1 calendar year). Artists living in a county that\nIs $2.50 per hour 8am-8pm available in city owned spaces in a nearby lot. There is $5 daily parking available at the Savannah\nStandard booth fee: $400\nDouble booth fee: $800 (limited availability)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 500.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -35050,6 +35817,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14746",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $400"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14746",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14746",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -35203,6 +35980,8 @@
     "lat": 32.0247,
     "lng": -81.0979,
     "boothFeeDetail": "(First time attendees) City of Savannah Business License required ($85, good for 1 calendar year). Artists living in a county that\nIs $2.50 per hour 8am-8pm available in city owned spaces in a nearby lot. There is $5 daily parking available at the Savannah\nStandard booth fee: $400\nDouble booth fee: $800 (limited availability)\nCorner upgrade: $100 (limited availability)\nElectricity: $100 (limited availability)",
+    "boothFeeDouble": 800.0,
+    "boothFeeCorner": 500.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -35273,6 +36052,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14745",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Standard booth fee: $400"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14745",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14745",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -35426,6 +36215,8 @@
     "lat": 27.789,
     "lng": -80.5309,
     "boothFeeDetail": "Booth Fee $200.00\nBest in Show $400.00\nThere are approximately 99 single booth spaces and 3 double booths. The single booth fee is $200.00. Doubles\nare $400.00. SIngle booth spaces are 10\u2019 x 10' with 4 feet in between each booth. Double booth spaces are",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 160,
     "avgAccepted": 102,
@@ -35644,6 +36435,8 @@
     "lat": 34.8407,
     "lng": -111.7696,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -35778,6 +36571,8 @@
     "lat": 33.4947,
     "lng": -112.076,
     "boothFeeDetail": "10\u2019 x 10\u2019: $350\n10\u2019 x 20\u2019: $700\napplicable and a $75 processing fee. Application fees and business license fees are non\u2011refundable.\nArtist Marketing/Space Fee: 10' x 10' \u2014 $350",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 75,
     "avgAccepted": 50,
@@ -35991,6 +36786,8 @@
     "lat": 38.832,
     "lng": -97.6268,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -36129,6 +36926,8 @@
     "lat": 25.7323,
     "lng": -80.2548,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -36267,6 +37066,8 @@
     "lat": null,
     "lng": null,
     "boothFeeDetail": "fee of $25.00 must accompany your application.",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 20,
@@ -36336,7 +37137,7 @@
     "boothFeeDetail": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14434",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim. No single standard rate could be read out of it, so no booth fee is claimed"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 the show's full fee schedule, verbatim"
     },
     "avgSubmissionsPerYear": {
      "status": "verified",
@@ -36475,6 +37276,8 @@
     "lat": 33.8012,
     "lng": -84.4058,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -36613,6 +37416,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": "Booth fee is $630.00\nSingle Booth (10' x 10') - $630.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 150,
@@ -36821,6 +37626,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": "Booth fee is $535.00- all booth fee payments are paid directly to Howard Alan Events, not Zapp.\nSingle Booth (10' x 10') - $535.00\nDouble Booth (10' x 20') limited and must be approved- $1,070.00",
+    "boothFeeDouble": 1070.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 100,
@@ -36891,6 +37698,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14158",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Single Booth (10' x 10') - $535.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14158",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -37029,6 +37841,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": "Booth fee is $650\n$650.00",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 250,
     "avgAccepted": 200,
@@ -37237,6 +38051,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: additional $100\nA $50 late fee will be applied to all payments after",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 65,
@@ -37307,6 +38123,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14449",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14449",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14449",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -37460,6 +38286,8 @@
     "lat": 27.3237,
     "lng": -82.4954,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -37598,6 +38426,8 @@
     "lat": 37.0989,
     "lng": -113.5776,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -37736,6 +38566,8 @@
     "lat": 28.791,
     "lng": -81.2724,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -37874,6 +38706,8 @@
     "lat": 27.8273,
     "lng": -82.7001,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: $100",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 320,
     "avgAccepted": 130,
@@ -37944,6 +38778,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14729",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14729",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14729",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -38097,6 +38941,8 @@
     "lat": 25.7292,
     "lng": -80.2488,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -38235,6 +39081,8 @@
     "lat": 43.6692,
     "lng": -114.4858,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -38369,6 +39217,8 @@
     "lat": 27.9426,
     "lng": -82.4636,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -38507,6 +39357,8 @@
     "lat": 28.1667,
     "lng": -82.7274,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -38645,6 +39497,8 @@
     "lat": 33.4947,
     "lng": -112.076,
     "boothFeeDetail": "10\u2019 x 10\u2019: $375\n10\u2019 x 20\u2019: $700\napplicable and a $75 processing fee. Application fees and business license fees are non\u2011refundable.\nA $25 fee will be charged for all returned checks and cancellations.\n10' x 10' -$375",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 50,
     "avgAccepted": 30,
@@ -38868,6 +39722,8 @@
     "lat": 30.43,
     "lng": -86.6245,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -39006,6 +39862,8 @@
     "lat": 41.8507,
     "lng": -87.6792,
     "boothFeeDetail": "March 17, 2026 and Thereafter: Late payments apply, $20 per festival\nApril 1, 2026: Last day for refunds (less $50)\n11\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $975 (includes permit fee)\n20' Wide by 10' Deeep Exhibit Space Fee: $1,925 (includes permit fee)",
+    "boothFeeDouble": 1925.0,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 140,
     "avgAccepted": 60,
@@ -39076,6 +39934,11 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14046",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 11\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $975 (includes permit fee)"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14046",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -39224,6 +40087,8 @@
     "lat": 37.7257,
     "lng": -88.9294,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -39362,6 +40227,8 @@
     "lat": 27.6449,
     "lng": -80.4321,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -39500,6 +40367,8 @@
     "lat": 44.9823,
     "lng": -93.2956,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -39652,6 +40521,8 @@
     "lat": 39.6377,
     "lng": -106.4103,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -39786,6 +40657,8 @@
     "lat": 44.9823,
     "lng": -93.2956,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -39924,6 +40797,8 @@
     "lat": 27.0849,
     "lng": -82.3036,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -40062,6 +40937,8 @@
     "lat": 27.0849,
     "lng": -82.3036,
     "boothFeeDetail": "SINGLE booth fee: $495.00\nDOUBLE booth fee $990.00\nCORNER Fee: $100\nAll booth payments after November 13 are an additional $50.",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 200,
     "avgAccepted": 70,
@@ -40132,6 +41009,16 @@
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14630",
      "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: SINGLE booth fee: $495.00"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14630",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14630",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -40285,6 +41172,8 @@
     "lat": 42.5917,
     "lng": -83.382,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -40423,6 +41312,8 @@
     "lat": 40.8295,
     "lng": -72.6473,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -40561,6 +41452,8 @@
     "lat": 41.1837,
     "lng": -73.3545,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -40699,6 +41592,8 @@
     "lat": 33.5098,
     "lng": -112.4135,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -40837,6 +41732,8 @@
     "lat": 28.5006,
     "lng": -81.5354,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -40960,8 +41857,8 @@
     "juryFeeLabel": "Application Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14657",
     "officialUrl": null,
-    "boothFee": 250.0,
-    "boothFeeNote": "standard single booth",
+    "boothFee": null,
+    "boothFeeNote": null,
     "commissionPct": null,
     "boothCount": null,
     "attendance": null,
@@ -40975,6 +41872,8 @@
     "lat": 28.5006,
     "lng": -81.5354,
     "boothFeeDetail": "$50 Artist Application Fee* \u2013 Must accompany this Application. This $50 fee will be applied towards the booth space should\nApplication be approved by the committee. This fee is non-refundable. Confirmation will be emailed. Total booth fee is $250.\n$250 total per 10\u2019 x 10\u2019 Booth Space* \u2013 Maximum of 4 spaces. This is for the booth space only \u2013 Artist/Exhibitor must supply",
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 150,
     "avgAccepted": 85,
@@ -41040,11 +41939,6 @@
     "juryFee": {
      "status": "verified",
      "basis": "ZAPPlication export"
-    },
-    "boothFee": {
-     "status": "verified",
-     "source": "https://www.zapplication.org/event-info.php?ID=14657",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: $250 total per 10\u2019 x 10\u2019 Booth Space* \u2013 Maximum of 4 spaces. This is for the booth space only \u2013 Artist/Exhibitor must supply"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -41198,6 +42092,8 @@
     "lat": 28.5819,
     "lng": -81.2947,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -41384,6 +42280,8 @@
     "lat": 30.1754,
     "lng": -95.4913,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,
@@ -41540,7 +42438,7 @@
     "juryFeeLabel": "Woodstock Art Fair on the Square 2026 Late App Fee",
     "applicationUrl": "https://www.zapplication.org/event-info.php?ID=14003",
     "officialUrl": null,
-    "boothFee": 250.0,
+    "boothFee": 495.0,
     "boothFeeNote": "standard single booth",
     "commissionPct": null,
     "boothCount": null,
@@ -41555,6 +42453,8 @@
     "lat": 42.3198,
     "lng": -88.4477,
     "boothFeeDetail": "March 17, 2026 and Thereafter: Late payments apply, $20 per festival\nApril 1, 2026: Last day for refunds (less $50)\n12\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $495\nWoodstock Resident 12\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $250\n20' Wide by 10' Deep Exhibit Space Fee: $990\nCorner Fee Upgrade: Additional $100",
+    "boothFeeDouble": 990.0,
+    "boothFeeCorner": 595.0,
     "commissionNote": "No commission mentioned - booth-fee model",
     "avgSubmissionsPerYear": 100,
     "avgAccepted": 75,
@@ -41624,7 +42524,17 @@
     "boothFee": {
      "status": "verified",
      "source": "https://www.zapplication.org/event-info.php?ID=14003",
-     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: Woodstock Resident 12\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $250"
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 read from the fee schedule line: 12\u2019 Wide by 10\u2019 Deep Exhibit Space Fee: $495"
+    },
+    "boothFeeDouble": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14003",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
+    },
+    "boothFeeCorner": {
+     "status": "verified",
+     "source": "https://www.zapplication.org/event-info.php?ID=14003",
+     "basis": "ZAPPlication event page research pass (show-research-source.xlsx) \u2014 from the fee schedule"
     },
     "boothFeeDetail": {
      "status": "verified",
@@ -41773,6 +42683,8 @@
     "lat": 26.7545,
     "lng": -82.2611,
     "boothFeeDetail": null,
+    "boothFeeDouble": null,
+    "boothFeeCorner": null,
     "commissionNote": null,
     "avgSubmissionsPerYear": null,
     "avgAccepted": null,

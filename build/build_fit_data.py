@@ -494,6 +494,10 @@ def build_record(fit, cat):
         "lng": None,
         # Filled by the ZAPPlication research pass. See import_show_research.py.
         "boothFeeDetail": None,        # the fee schedule verbatim
+        "boothFeeDouble": None,        # twice the frontage
+        "boothFeeCorner": None,        # a corner, as a total — a schedule that
+                                       # quotes it as a surcharge is added to
+                                       # the single before it lands here
         "commissionNote": None,        # what the page says, which is not the same
                                        # as a percentage — see the importer
         "avgSubmissionsPerYear": None,

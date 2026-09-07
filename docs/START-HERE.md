@@ -99,7 +99,9 @@ What it moved:
 
 | | before | after |
 |---|---|---|
-| booth fee | 24/236 | **106/236** |
+| booth fee (single) | 24/236 | **104/236** |
+| booth fee (double) | 0/236 | **48/236** |
+| booth fee (corner) | 0/236 | **42/236** |
 | jury odds scored | 37/236 | **131/236** |
 | jury statistics | 0/236 | **100/236** |
 
@@ -113,6 +115,13 @@ overclaiming:
   mentioned — booth-fee model", and *not mentioned* is not *zero*. The wording
   is passed through as `commissionNote` instead. An artist who reads "0%" and
   then loses 15% at the door has been misled by this repository.
+- **A corner quoted as a surcharge becomes a total.** Shows write corners two
+  ways — `Corner Booth: $700` and `Corner upgrade: $100` — and they differ by a
+  factor of seven. The importer tells them apart and adds a surcharge to the
+  single, because the number an artist compares between shows is what leaves
+  their bank account. A corner that comes out cheaper than a plain booth is
+  treated as a surcharge whatever the wording said; that arithmetic backstop
+  catches phrasings nobody anticipated.
 - **A booth fee cites the line it came from.** The raw field is a whole fee
   schedule — singles, corners, doubles, food stalls, electrical hookups, late
   penalties — so picking "the" fee is an interpretation. The parser records the
@@ -257,7 +266,7 @@ Then:
 
 ```bash
 python3 -m http.server 8765          # from the repo root, leave running
-node build/browser-tests.cjs         # 63 checks — the model, the drawer, provenance,
+node build/browser-tests.cjs         # 68 checks — the model, the drawer, provenance,
                                      #   date hygiene, geocode coverage, tax guard
                                      #   rails, the research import
 node build/ledger-view-tests.cjs     # 21 checks — details/link split, badges, lenses
@@ -265,7 +274,7 @@ cd worker && npm test                # 45 API checks — manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 checks — the date rules themselves
 ```
 
-All pass as of the Phase 1 session: 63/63, 21/21, 45/45, 11/11.
+All pass as of the Phase 1 session: 68/68, 21/21, 45/45, 11/11.
 
 `browser-tests.cjs` deliberately asserts that the weather panel degrades to
 "not known": this sandbox blocks the weather API, which makes it the ideal

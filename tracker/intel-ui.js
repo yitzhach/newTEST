@@ -312,8 +312,6 @@ window.ASTIntelUI = (function () {
          a date that has already passed. */
       ['Jury notification', f.notifyDate ? A.fmtDay(f.notifyDate) : null, 'notifyDate'],
       ['Jury fee', f.juryFee == null ? null : money(f.juryFee), 'juryFee'],
-      ['Booth fee', f.boothFee == null ? null : money(f.boothFee) +
-        (f.boothFeeNote ? ' <span class="muted-inline">' + esc(f.boothFeeNote) + '</span>' : ''), 'boothFee'],
       ['Artists accepted', f.boothCount, 'boothCount'],
       ['Acceptance rate', f.acceptanceRatePct == null ? null : f.acceptanceRatePct + '%', 'acceptanceRatePct'],
       ['Attendance', f.attendance == null ? null : Number(f.attendance).toLocaleString('en-US'), 'attendance'],
@@ -361,10 +359,7 @@ window.ASTIntelUI = (function () {
       '<table class="factable"><tbody>' + bars + '</tbody></table>' +
       '<h3 class="sd-h">The facts</h3>' +
       '<table class="facttable"><tbody>' + factRows + '</tbody></table>' +
-      (f.boothFeeDetail
-        ? '<details class="fee-detail"><summary>The show\'s full fee schedule</summary>' +
-          '<pre>' + esc(f.boothFeeDetail) + '</pre></details>'
-        : '') +
+      boothFeeSection(show) +
       (links.length ? '<p class="sd-links">' + links.join(' ') + '</p>' : '') +
       gettingInSection(show) + weatherSection(show) + taxSection(show) +
       intel;
@@ -420,6 +415,51 @@ window.ASTIntelUI = (function () {
                  (show.provenance || {}).imagesRequired) + '</p>' : '') +
       (f.emergingArtistProgram
         ? '<p class="gi-note">' + esc(f.emergingArtistProgram) + '</p>' : '');
+  }
+
+  /* ---- 2a. BOOTH FEES -----------------------------------------------------
+     The three numbers an artist actually chooses between: the cheap space,
+     twice the frontage, or the corner. They live together in one box because
+     they are one decision, and a single figure in a table of facts does not
+     let anybody make it.
+
+     Anything the fee schedule did not clearly say reads "n/a" rather than
+     being inferred. Shows quote corners either as a total or as a surcharge
+     on the single; build/import_show_research.py resolves that to a total, so
+     every number here is what actually leaves your bank account.            */
+  function boothFeeSection(show) {
+    var f = show.facts || {};
+    if (f.boothFee == null && f.boothFeeDetail == null) {
+      return '<h3 class="sd-h">Booth fees</h3>' +
+             '<p class="wx-none"><span class="unknown">not known</span> ' +
+             'No fee schedule has been captured for this show yet.</p>';
+    }
+
+    var cell = function (value, label) {
+      return '<li>' + (value == null
+          ? '<strong class="fee-na">n/a</strong>'
+          : '<strong>' + esc(money(value)) + '</strong>') +
+        '<span>' + esc(label) + '</span></li>';
+    };
+
+    return '<h3 class="sd-h">Booth fees</h3>' +
+      '<ul class="wx-stats fee-stats">' +
+        cell(f.boothFee, 'single') +
+        cell(f.boothFeeDouble, 'double') +
+        cell(f.boothFeeCorner, 'corner') +
+      '</ul>' +
+      '<p class="fine fee-note">' +
+        (f.boothFee != null
+          ? 'On top of the jury fee, and before travel. '
+          : 'No standard single rate could be read out of this show\'s schedule. ') +
+        'A corner quoted as a surcharge is shown here as the total. ' +
+        provChip((show.provenance || {}).boothFee ||
+                 (show.provenance || {}).boothFeeDetail) +
+      '</p>' +
+      (f.boothFeeDetail
+        ? '<details class="fee-detail"><summary>The show\'s full fee schedule</summary>' +
+          '<pre>' + esc(f.boothFeeDetail) + '</pre></details>'
+        : '');
   }
 
   /* ---- 2b. WHAT THE PLACE IS LIKE ----------------------------------------
