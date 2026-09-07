@@ -336,7 +336,7 @@ def main():
 
     reject_free_booths(out)
     report_hygiene(cat_repairs + rec_repairs, cat_fatals + rec_fatals, expired)
-    stamp_assets()
+    write_version(stamp_assets(), len(out))
 
     payload = {
         "schemaVersion": SCHEMA_VERSION,
@@ -578,6 +578,44 @@ def build_record(fit, cat):
 
 ASSET_TAG = re.compile(
     r'(?P<attr>src|href)="(?P<file>[^"?#:]+\.(?:js|css))(?:\?[^"]*)?"')
+
+
+def write_version(asset_tag, show_count):
+    """Write tracker/version.json — what this build is, in one small file.
+
+    The recurring question all through this project has been "am I looking at
+    the new one?", and the honest answer needs two halves. This is the first:
+    when the site was built and what went into it. The second is added by the
+    Pages workflow at deploy time, which stamps the commit it actually
+    published — see .github/workflows/static.yml. Only that half can speak for
+    what is live, because only the deploy knows.
+
+    It is a plain file at a stable URL on purpose. Checking a version should
+    not require opening the app, loading its scripts and hoping they are the
+    new ones — that is the thing being tested.
+    """
+    import datetime
+
+    now = datetime.datetime.now(datetime.timezone.utc)
+    payload = {
+        # Sortable, readable, and it is the thing a person quotes back at you.
+        "version": now.strftime("%Y.%m.%d-%H%M"),
+        "builtAt": now.replace(microsecond=0).isoformat(),
+        "assetVersion": asset_tag,
+        "shows": show_count,
+        # Filled in by the deploy. Present and null here means "built but not
+        # published", which is a real and worth-distinguishing state.
+        "commit": None,
+        "deployedAt": None,
+        "note": "commit and deployedAt are written by the GitHub Pages "
+                "workflow when this is published. Null means this copy was "
+                "built but has not been deployed.",
+    }
+    with open(os.path.join(ROOT, "tracker", "version.json"), "w") as fh:
+        json.dump(payload, fh, indent=1)
+        fh.write("\n")
+    print("  version %s (assets %s)" % (payload["version"], asset_tag))
+    return payload
 
 
 def stamp_assets():

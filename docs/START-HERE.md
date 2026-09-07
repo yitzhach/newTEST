@@ -1,315 +1,212 @@
 # START HERE
 
-Read `docs/handoff.md` first — it is authoritative for the model, the three
-data layers, the honesty constraints, the file map and the open threads. This
-file is the shorter thing: what is done, what to do next, and what the
-environment will get wrong if nobody warns it.
+**Live:** https://yitzhach.github.io/newTEST/tracker/browse.html
+**Repo:** `yitzhach/newTEST` · deploys from `main` · **Phase 1 is done and shipped.**
 
-Live: https://yitzhach.github.io/newTEST/tracker/browse.html
+Read this file and nothing else to get going. `docs/handoff.md` is the deep
+reference (the model, the three data layers, the honesty constraints, the file
+map); `docs/build-phases.md` is the roadmap and the 26-idea numbering. Open
+either only when you need it.
 
 ---
 
-## Fresh-chat prompt
+## Paste this into a new chat
 
-Paste this at the top of a new session, then say what you want:
-
-> Working on the members' intel network in `yitzhach/newTEST`.
+> Working on the art show tracker in `yitzhach/newTEST`.
 >
-> Read `docs/handoff.md` first and treat it as authoritative — it covers the
-> model, the three data layers, the honesty constraints, the file map and the
-> open threads. Don't re-derive any of it, and don't re-read the whole
-> codebase; open only the files you need to change. Then read
-> `docs/START-HERE.md` for what's done, what's next, and the environment
-> gotchas.
+> Read `docs/START-HERE.md` — it is current and self-contained. Only open
+> `docs/handoff.md` (the model and honesty rules) or `docs/build-phases.md`
+> (the roadmap) if the task actually needs them. Don't re-read the codebase;
+> open only the files you're changing.
 >
-> For buildout work, `docs/build-phases.md` has the phase map and the
-> per-phase prompt.
+> Deploys: push to `main` → GitHub Pages rebuilds → refresh. Nothing else.
+> Check what's live at https://yitzhach.github.io/newTEST/tracker/version.json
 >
-> Live site: https://yitzhach.github.io/newTEST/tracker/browse.html
->
-> Run the three test suites before you finish, and push.
+> Before finishing: run the four suites listed in START-HERE, then commit,
+> push, and merge to `main` so it deploys.
 >
 > What I want to work on: …
 
-That points a cold session at two files instead of forty.
+---
+
+## How to tell what is live — read this before debugging anything
+
+A huge amount of time went into "is the site updated?" during Phase 1, and the
+answer was almost always **a cached script**, not a broken feature. Two things
+now make that unmissable:
+
+**1. The version stamp.** Every page shows a line at the bottom of its list:
+
+```
+v2026.09.07-1456 · bac2d25 · published Sep 7, 2026, 2:58 PM · details
+```
+
+The same thing lives at a stable URL, so you can check without loading the app
+(which is the thing under suspicion):
+
+**https://yitzhach.github.io/newTEST/tracker/version.json**
+
+| field | meaning |
+|---|---|
+| `version` | the build, `YYYY.MM.DD-HHMM` |
+| `builtAt` | when `build_fit_data.py` ran |
+| `commit` / `deployedAt` | written **by the deploy**. Null means built but never published |
+| `assetVersion` | the content hash on every script tag |
+
+`commit` is the authoritative answer to "what is on GitHub right now".
+
+**2. Cache busting.** `build_fit_data.py` stamps `?v=<hash>` onto every local
+script and stylesheet, where the hash is derived from those files' contents.
+Change one, the token changes, browsers refetch. Nobody bumps anything by hand.
+
+If a change still seems missing, compare `version.json`'s `commit` against
+`main`. If they match, it is deployed and the problem is elsewhere.
 
 ---
 
-## What is done
+## Deploying
 
-Merged to `main` and live:
+Push to `main`. `.github/workflows/static.yml` uploads the repo and deploys it
+through the Pages **Actions** source. ~1 minute, then refresh.
 
-- **PR #1** — members' intel network: fit ranking by discipline, artist
-  reports, the Cloudflare backend.
-- **PR #2** — ledger view: details on the name, three scoring lenses, report
-  badges.
+> **Do not switch Pages to a branch source.** It was tried in order to give
+> every PR a preview URL at `/pr-preview/pr-<n>/`, and it worked — but a Pages
+> site has exactly one source, so it silently stopped `main` from publishing
+> until the repo owner changed a setting by hand. Reverted. The machinery is in
+> git history at `2a7e6bf` if it is ever wanted, and it needs that settings
+> change made deliberately first.
 
-So: ten factors, ten disciplines, four price bands, five season strategies,
-three scoring lenses, 236 shows, member reports with three privacy tiers and a
-tone check, and a complete Worker + D1 backend.
+---
 
-The site runs in **solo mode**. Everything works, nothing is shared — every
-report stays in the browser and behaves as private.
+## What exists
 
-### The practice show
+**Two pages, and the difference matters.**
 
-`build/test-show.json` is one fictitious record — Seattle "This is a Test"
-Festival — so an artist can file a report, try the lenses and open every panel
-without touching notes on a show they might really apply to. It is kept in its
-own input file so it can never be confused with a real one and can be deleted
-in a single step, and every field on it carries a `fixture` provenance status
-that renders as a loud TEST DATA chip. It is tagged in the list and banners
-itself at the top of its drawer. A fabricated row in a database whose whole
-premise is "never let an estimate pass as a fact" has to be unmistakable.
+- **`tracker/browse.html`** — the catalogue. 237 shows, fit scores, and the
+  intel drawer with everything below.
+- **`tracker/index.html`** — the ledger: your own shows, the map, the route,
+  the Edit Show pane. Clicking a show's **name** (or the `i` button) opens the
+  same drawer the catalogue shows; clicking anywhere else on the row opens the
+  edit pane.
 
-### The ledger opens the same drawer
+**The drawer**, in order: the fit breakdown · The facts · Booth fees ·
+Getting in · Weather · Sales tax and permits · Reports.
 
-Clicking a show's **name** in the ledger (or the `i` button beside the eye)
-opens the fit/intel breakdown the catalogue shows; clicking anywhere else on
-the row still opens the edit pane, which is where the personal fields live. A
-show typed in by hand has no catalogue record, and says so rather than
-guessing from the name.
+| Feature | What it is |
+|---|---|
+| **Booth fees** | Single / double / corner in one box, `n/a` where unknown. A corner quoted as a surcharge is resolved to a total. Full schedule one click away |
+| **Getting in** | Applicants · accepted · how many skipped the jury · **your odds applying cold**. A show taking 65 of 100 with 20 exempt is a 45% show |
+| **Weather** | One card per show day: high, low, wind, sky, glyph. **Inside a fortnight it is the real forecast**; beyond that, what those calendar dates did over 10 years, each day averaged against the same date each year. The panel says which |
+| **Sales tax** | State rate only, and it says so. Local surtaxes named but never added. Links to the state's own address lookup and permit page. Not tax advice |
+| **Closed deadlines** | `gates()` has a `closed` level; closed shows sink in the ranking instead of reading as live opportunities |
 
-### Phase 1 of the buildout — done, on `claude/phase-1-build-134uv0`
+**Data coverage** (of 237):
 
-**Data hygiene.** 12 shows carried a jury notification date earlier than their
-own application deadline, which is impossible — a previous edition's date
-carried forward. The build now drops those to "not known" rather than guessing
-a year forward, and stops outright on anything it cannot repair honestly (a
-date it cannot parse, a show that ends before it starts, a deadline after the
-show is over). A deadline that has merely *passed* is not a build error — the
-calendar moves on its own — so it is reported at build time and raised at
-runtime instead: `fit.js gates()` has a new `closed` level, and closed shows
-sink in the fit ranking rather than being offered as live opportunities.
+| | |
+|---|---|
+| coordinates | 235 |
+| booth fee — single / double / corner | 179 / 87 / 88 |
+| jury statistics | 203 |
+| jury odds scored | 220 |
 
-**Geocoding.** 234 of 236 shows now carry coordinates, up from 0. The two
-without are rows whose city column holds a region rather than a city, and are
-left null. `geonamescache` turned out to be the wrong tool — it floors at
-population 15,001 and missed 28% of these shows, because art fairs happen in
-small resort towns — so the gazetteer is the `zipcodes` package instead. The
-lookup runs in `build/geocode_shows.py` and its output is committed as
-`build/geocode.json`, so the build has no geocoding dependency. Coordinates
-reach `catalogue.json` too, which means a show added to the ledger now arrives
-pinned on the map.
+**The practice show.** `Seattle "This is a Test" Festival` — fictitious,
+downtown Seattle, Jan 1–2. Every field carries a `fixture` provenance status
+rendering as a loud TEST DATA chip; it is tagged in the list and banners itself
+above its own score. Lives in `build/test-show.json`, deletable in one step.
 
-**Weather.** A drawer panel with one card per show day: high, low, wind, and
-what the sky was doing. Which question it answers depends on how far away the
-show is — inside a fortnight it is the **real forecast**, and beyond that it is
-**what these same calendar dates have done over ten years**, each day averaged
-against the same date in every year. The panel says which of the two it got,
-because "76 on Saturday" and "76 on an average Saturday in early March" are
-different claims and only one is about this year. Fetched at runtime from the
-visitor's browser — the container has no egress and the deployed site does —
-cached per show, and it fails closed to "not known".
+---
 
-**Sales tax and permits.** A drawer panel per state: the state rate, what
-local jurisdictions add on top, the state's own address lookup, how a visiting
-artist registers, and the trap specific to that state. It **never publishes a
-combined rate** — see the note below.
+## Rebuilding after a data edit
 
-New provenance grade: `dataset`, for a value looked up in a reference dataset
-rather than read off a show's page. Coordinates and weather carry it.
+```bash
+python3 build/build_fit_data.py     # rewrites fit-data.json + catalogue.json + version.json,
+                                    # runs the date rules, stamps asset versions
+```
 
-### The ZAPPlication research pass — 100 shows deep
+Occasional, only when their sources change:
 
-`build/show-research-source.xlsx` is a research spreadsheet: 236 rows, 34
-columns, 213 of them carrying research with things that exist only on a show's
-own event page. Every enriched row carries its ZAPP URL, and the event id in
-that URL is the id the catalogue already uses — so the join is exact, 100 of
-100. `build/import_show_research.py` parses it into `build/show-research.json`,
-which the build folds in.
+```bash
+pip install openpyxl && python3 build/import_show_research.py   # the research spreadsheet
+pip install zipcodes && python3 build/geocode_shows.py          # the gazetteer
+```
 
-What it moved:
+`build/catalogue-source.json` is the pristine ZAPP export — read-only, never
+written.
 
-| | before | after |
-|---|---|---|
-| booth fee (single) | 24/236 | **179/237** |
-| booth fee (double) | 0/236 | **87/237** |
-| booth fee (corner) | 0/236 | **88/237** |
-| jury odds scored | 37/236 | **220/237** |
-| jury statistics | 0/236 | **203/237** |
+---
 
-Booth fee coverage was what blocked Phase 2 costing. It is no longer the
-blocker.
+## The four suites — run all of them before pushing
 
-Two decisions inside the importer worth knowing about, both about not
-overclaiming:
+```bash
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --no-save playwright   # once
+cd worker && npm install && cd ..                                     # once
 
-- **It leaves `commissionPct` null.** All 100 enriched rows say "No commission
-  mentioned — booth-fee model", and *not mentioned* is not *zero*. The wording
-  is passed through as `commissionNote` instead. An artist who reads "0%" and
-  then loses 15% at the door has been misled by this repository.
-- **A corner quoted as a surcharge becomes a total.** Shows write corners two
-  ways — `Corner Booth: $700` and `Corner upgrade: $100` — and they differ by a
-  factor of seven. The importer tells them apart and adds a surcharge to the
-  single, because the number an artist compares between shows is what leaves
-  their bank account. A corner that comes out cheaper than a plain booth is
-  treated as a surcharge whatever the wording said; that arithmetic backstop
-  catches phrasings nobody anticipated.
-- **A booth fee cites the line it came from.** The raw field is a whole fee
-  schedule — singles, corners, doubles, food stalls, electrical hookups, late
-  penalties — so picking "the" fee is an interpretation. The parser records the
-  number, the schedule line it read it from, and the full schedule, and the
-  drawer shows all three. 84 of 100 schedules yielded a confident standard
-  rate; the rest keep the text and claim no number. An audit pass while writing
-  it caught the parser reading "Ad in Event Program: Add $75" and a $60
-  membership as booth fees, which is why the tests assert the coverage numbers.
+python3 -m http.server 8765          # leave running
+node build/browser-tests.cjs         # 79 — model, drawer, provenance, data hygiene,
+                                     #      geocode, tax guard rails, fees, weather, version
+node build/ledger-view-tests.cjs     # 21 — details/link split, badges, lenses
+cd worker && npm test                # 45 — API; manages its own worker
+python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
+```
 
-**Getting in**, a new drawer section, is the payoff: how many apply, how many
-are accepted, how many of those places never faced the jury, and what that
-leaves. A show that accepts 65 of 100 looks generous until you learn 20 of
-those places went to exempt artists — applying cold you are competing for 45,
-not 65. `effectiveAcceptanceRatePct` is what feeds the jury-odds factor.
+All green as of this handoff: **79 / 21 / 45 / 11**.
 
-### The one thing to know about the sales tax panel
+Two things worth knowing about the tests:
 
-It carries the **state rate only** and says so in those words, because the
-number an artist actually collects is state + county + city + special district
-and the local part cannot be sourced honestly from here. There is no keyless,
-CORS-permitting national rate API, and no offline dataset of local rates that
-would still be right next quarter. So the panel leads with the caveat, links
-to the state's own address lookup, and says plainly that it is not tax advice.
+- The sandbox has **no web egress**, so the weather checks assert the *failure*
+  path (degrades to "not known") and a second set **stubs Open-Meteo** with its
+  real response shape to test rendering. Both browser suites filter open-meteo
+  and font hosts out of their request-failure check so a genuine error stands out.
+- If the worker suite fails with `Something went wrong`, a stale `wrangler dev`
+  is holding the local D1. `pkill -f "wrangler dev"; pkill -f workerd` and re-run.
 
-Three states — **Ohio, Utah and Wyoming** — ship with a null rate. Utah is the
-instructive one: the search summary blended the reduced grocery rate into the
-general rate. That is exactly the failure the honesty rules exist to catch, and
-null was the right answer.
+---
+
+## The rules that must not erode
+
+From `docs/handoff.md`, and Phase 1 held to all of them:
+
+- `verified` means a page was **actually opened**. WebSearch never earns it.
+- A fact with no source is **null** and renders "not known" — never a number.
+- A factor nobody scored **drops out of the weighted average**; never defaults to 5.
+- 10 is always good for the artist.
+- **Sales tax is the one feature that can cost somebody money.** State rate
+  only, labelled as such, never a combined figure. Ohio, Utah and Wyoming ship
+  with a null rate rather than a guessed one.
+- **"Not mentioned" is not "zero".** All the research rows say "No commission
+  mentioned"; `commissionPct` stays null and the wording is passed through.
+
+### Provenance grades
+
+`verified` · `corroborated` · `search` (renders "unconfirmed") · `dataset`
+(a reference dataset, nobody opened the show's page) · `editorial` ·
+`member` · `fixture` (the practice show — the absence of evidence, not a weak
+grade of it).
+
+---
 
 ## What is next
 
-**Phase 3** — see `docs/build-phases.md`. Phase 2 is blocked on booth fee
-coverage; Phase 3 is not blocked and is the commercial keystone (the
-application pipeline is the first thing that earns a weekly open). Phase 5's
-route planner is now unblocked too, since the geocode landed.
+**Phase 3** — see `docs/build-phases.md`. The application pipeline is the
+commercial keystone: the first thing that earns a weekly open. Phase 2 is
+*no longer blocked* — booth fee coverage went 24 → 179, which was the blocker.
+Phase 5's route planner is unblocked too, since the geocode landed.
 
-The Worker deploy is separate and blocks only Phase 6. **Deploy it when the
-network layer matters.** Nothing is shared between artists yet, and that is the
-whole premise. `worker/README.md` has the full sequence: create D1 + KV + R2,
-paste the two ids into `wrangler.toml`, set `SESSION_SECRET`, `IP_SALT` and
-`BOOTSTRAP_CODE` as secrets, apply migrations, set `ALLOWED_ORIGINS`, deploy,
-then paste the Worker URL into **Network** on the site. The first steward gets
-in through `BOOTSTRAP_CODE`, which stops working the moment one member exists.
+Smaller things left over:
 
-After that, `docs/handoff.md` §10 has the rest: finishing the research pass,
-confirming the 33 estimated dates, per-discipline factor scores, route
-planning, images on reports, ranking a lens on reported net.
+- **136 → 23 shows still lack booth fee text** in the research spreadsheet.
+  No parser reaches those; they need another enrichment pass on the source.
+- **Per-discipline factor scores** are structurally present and empty.
+- **The Worker is complete and undeployed.** It blocks only Phase 6.
+  `worker/README.md` has the sequence.
 
----
+### A note on the booth fee parser
 
-## Environment gotchas
-
-**The sandbox blocks every art-show domain.** `zapplication.org`,
-`cherryarts.org`, `naplesart.org` and the rest are refused by the egress
-policy. Research runs through web search, which synthesises from results
-rather than reading pages. So: **never upgrade a provenance grade to
-`verified` without opening the actual page.** `verified` is reserved for
-prospectus and application pages read directly, and only the ZAPPlication
-export fields have earned it. Search-derived facts are `search`, and render as
-*"unconfirmed"*. `record_research.py` rejects any batch missing provenance —
-do not route around it.
-
-**Pages deploys from `main` only.** `.github/workflows/static.yml` triggers on
-push to `main` (or manual dispatch), uploads the whole repo, and deploys it
-through the Pages Actions source. Work lands on the live site when it merges —
-push to `main`, wait about a minute, refresh. No repository settings involved.
-
-*A note for the next session, so nobody repeats it:* this was briefly replaced
-with a `gh-pages` branch deploy in order to give every pull request its own
-preview URL under `/pr-preview/pr-<n>/`. It worked, and the cost was not worth
-paying: a Pages site has exactly one source, so switching to branch-based
-previews meant the live site stopped updating until somebody changed
-**Settings → Pages** by hand. Reverted. The preview machinery is in git
-history at `2a7e6bf` if it is ever wanted — but it needs that settings change,
-and it should not be reintroduced without the repo owner making it first.
-
-**No build step, deliberately.** `tracker/` is plain HTML, CSS and JS served
-as-is; the Worker is plain modules. The Vite/React app at the repo root
-(`App.tsx`, `index.tsx`, `vite.config.ts`) is the separate artist site and is
-not part of the tracker — do not wire the two together.
-
-**One build script, and it writes two files.** After any data edit:
-
-```bash
-python3 build/build_fit_data.py     # rewrites tracker/fit-data.json AND tracker/catalogue.json
-```
-
-`build/catalogue-source.json` is the pristine ZAPP export. Read-only input,
-never written to.
-
-The build also runs the date rules on every row, prints what it repaired, and
-exits non-zero on anything it cannot repair. `python3 build/build_fit_data.py
---selftest` exercises those rules against constructed inputs without touching
-the data.
-
-**The research import is a separate, occasional step**, like the geocode.
-`build/show-research.json` is committed and the build just reads it. Re-run it
-only when the spreadsheet changes:
-
-```bash
-pip install openpyxl
-python3 build/import_show_research.py    # rewrites build/show-research.json
-python3 build/build_fit_data.py          # folds it in
-```
-
-**Geocoding is a separate, occasional step.** `build/geocode.json` is committed
-and the build just reads it, so an ordinary data edit needs nothing extra. Only
-when the *show list itself* changes:
-
-```bash
-pip install zipcodes
-python3 build/build_fit_data.py     # so fit-data.json is current
-python3 build/geocode_shows.py      # rewrites build/geocode.json
-python3 build/build_fit_data.py     # folds the coordinates in
-```
-
-**The weather panel is verified working** on the deployed site — Open-Meteo
-needs no key and permits cross-origin requests, confirmed from a browser. The
-note below is kept because the reasoning still applies to anything similar.
-
-**The weather API cannot be verified from a container.** `tracker/weather.js`
-calls Open-Meteo's historical archive, chosen because it needs no key, permits
-cross-origin browser requests and serves daily data back to 1940. None of those
-three could be confirmed here, because this environment cannot reach it. The
-first person to open the live site should check the panel shows numbers rather
-than "not known". If the service turns out to need a key or to refuse the
-origin, every call fails closed and swapping providers means changing
-`ENDPOINT` and `readDaily()` and nothing else.
-
----
-
-## The three test suites
-
-Run all three before pushing.
-
-A fresh container has no `node_modules`, so install first. Keep Playwright out
-of `package.json` — it is a test-only dependency and the repo has no build step
-to justify carrying it:
-
-```bash
-PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --no-save playwright
-cd worker && npm install && cd ..
-```
-
-Then:
-
-```bash
-python3 -m http.server 8765          # from the repo root, leave running
-node build/browser-tests.cjs         # 74 checks — the model, the drawer, provenance,
-                                     #   date hygiene, geocode coverage, tax guard
-                                     #   rails, the research import
-node build/ledger-view-tests.cjs     # 21 checks — details/link split, badges, lenses
-cd worker && npm test                # 45 API checks — manages its own worker
-python3 build/build_fit_data.py --selftest   # 11 checks — the date rules themselves
-```
-
-All pass as of the Phase 1 session: 74/74, 21/21, 45/45, 11/11.
-
-`browser-tests.cjs` deliberately asserts that the weather panel degrades to
-"not known": this sandbox blocks the weather API, which makes it the ideal
-place to prove the failure path. Both browser suites filter that host out of
-their request-failure check so a genuine error still stands out.
-
-`ledger-view-tests.cjs` files a report, so it clears `localStorage` first and
-runs standalone. The worker suite starts and stops its own `wrangler dev`.
-Chromium is preinstalled at `/opt/pw-browsers` — do not run
-`playwright install`.
+`build/import_show_research.py` reads free-text fee schedules, and every bug in
+it was found by **auditing its output against the raw text**, never by reading
+the code. It has misread a resident discount, an advertising rate, a
+membership, a late fee, a saving, a corner surcharge, and a sentence about
+pricing artwork. If you change it, re-run the audit: no corner below its
+single, no double at or below it, no fee of zero, and eyeball anything under
+$150. Three tests assert those invariants but they cannot catch a plausible
+wrong number.

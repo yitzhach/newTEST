@@ -9,11 +9,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
       referrerpolicy="no-referrer">
-<link rel="stylesheet" href="app.css?v=51812322">
+<link rel="stylesheet" href="app.css?v=a63d5b4a">
 <!-- The ledger shows the same fit/intel drawer the catalogue does, so it needs
      the same styles. Scoped to .idr/.fitchip/.prov and its own tokens; it adds
      to app.css rather than competing with it. -->
-<link rel="stylesheet" href="intel.css?v=51812322">
+<link rel="stylesheet" href="intel.css?v=a63d5b4a">
 </head>
 <body>
 <!-- ==========================================================================
@@ -81,6 +81,7 @@
 
     <div id="showList"></div>
     <p class="list-note" id="listNote"></p>
+    <p class="build-stamp" id="buildStamp"></p>
   </main>
 
   <!-- Draggable divider: grab it to trade list width for map width. -->
@@ -594,23 +595,24 @@
      sandbox and an unverified hash would break the map outright. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
         referrerpolicy="no-referrer"></script>
-<script src="core.js?v=51812322"></script>
-<script src="map.js?v=51812322"></script>
+<script src="core.js?v=a63d5b4a"></script>
+<script src="version.js?v=a63d5b4a"></script>
+<script src="map.js?v=a63d5b4a"></script>
 <!-- The fit/intel layer, so a show in the ledger opens the same breakdown
      it does in the catalogue. weather.js and salestax.js are optional to
      intel-ui.js, but without them the drawer silently loses two panels,
      which is worse than carrying two small files. -->
-<script src="fit.js?v=51812322"></script>
-<script src="intel.js?v=51812322"></script>
-<script src="members.js?v=51812322"></script>
-<script src="weather.js?v=51812322"></script>
-<script src="salestax.js?v=51812322"></script>
-<script src="intel-ui.js?v=51812322"></script>
-<script src="store-supabase.js?v=51812322"></script>
-<script src="import.js?v=51812322"></script>
-<script src="import-ui.js?v=51812322"></script>
-<script src="share.js?v=51812322"></script>
-<script src="share-ui.js?v=51812322"></script>
+<script src="fit.js?v=a63d5b4a"></script>
+<script src="intel.js?v=a63d5b4a"></script>
+<script src="members.js?v=a63d5b4a"></script>
+<script src="weather.js?v=a63d5b4a"></script>
+<script src="salestax.js?v=a63d5b4a"></script>
+<script src="intel-ui.js?v=a63d5b4a"></script>
+<script src="store-supabase.js?v=a63d5b4a"></script>
+<script src="import.js?v=a63d5b4a"></script>
+<script src="import-ui.js?v=a63d5b4a"></script>
+<script src="share.js?v=a63d5b4a"></script>
+<script src="share-ui.js?v=a63d5b4a"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE
@@ -1547,5 +1549,6 @@ refresh().catch(err => {
   toast('Could not load saved shows.');
 });
 </script>
+<script>window.ASTVersion.mount(document.getElementById('buildStamp'));</script>
 </body>
 </html>

@@ -844,3 +844,12 @@ body.is-splitting-v .leaflet-container { pointer-events:none; }
   font-size:12px; font-style:italic; font-family:Georgia, serif; line-height:1;
 }
 .row-info:hover { color:var(--ink); border-color:var(--ink); }
+
+/* Which build is this? Deliberately quiet but always present — the answer to
+   "am I looking at the new one" should never require opening dev tools. */
+.build-stamp {
+  margin:18px 0 0; font-size:11px; color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.build-stamp .ver-tag { font-weight:600; }
+.build-stamp a { color:inherit; }
