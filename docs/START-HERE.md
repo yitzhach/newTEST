@@ -87,11 +87,13 @@ through the Pages **Actions** source. ~1 minute, then refresh.
 - **`tracker/browse.html`** — the catalogue. 237 shows, fit scores, and the
   intel drawer with everything below.
 - **`tracker/calendar.html`** — the calendar. Year, month and an iOS-style day
-  view over three switchable layers: your ledger, the whole catalogue (off by
-  default — 237 shows over your nine is a wall, not a calendar) and your own
-  events. Multi-day shows draw as one bar, not a chip per day; two shows you
-  are committed to on one weekend raise a clash banner. `+` composes an event,
-  a bar opens the same drawer, `#2027-01-09/day` deep-links a date, and
+  view over four switchable layers: your ledger, your **hearted** shortlist,
+  the whole catalogue (off by default — 237 shows over your nine is a wall,
+  not a calendar) and your own events. Multi-day shows draw as one bar, not a
+  chip per day; two shows you are committed to on one weekend raise a clash
+  banner. Clicking a day drops into it, an hour there opens an event already
+  set to that time, and double-clicking blank space adds one outright.
+  A bar opens the same drawer, `#2027-01-09/day` deep-links a date, and
   **Export .ics** is the working half of "connect your calendar" — the Google /
   Apple / Outlook and email / text buttons are present and visibly disabled,
   because a control that does nothing must look like it does nothing.
@@ -99,6 +101,20 @@ through the Pages **Actions** source. ~1 minute, then refresh.
   the Edit Show pane. Clicking a show's **name** (or the `i` button) opens the
   same drawer the catalogue shows; clicking anywhere else on the row opens the
   edit pane.
+
+**The heart is one shortlist, in three places.** Heart a show in All shows or
+from the calendar's quick look; it lands under the **Hearted** quick filter in
+`browse.html` (which carries a live count, and which the calendar links
+straight to with `browse.html#hearted`), and it draws on the calendar's own
+Hearted layer without needing the whole catalogue switched on. Hearts are
+stored per catalogue record in `artShowTracker.catalogue`, so a show added to
+the ledger stays hearted and a re-import never costs you your picks. A
+hand-added show has no catalogue record and therefore cannot be hearted.
+
+**Times are picked, not typed.** Fifteen-minute menus labelled the way people
+say them, duration chips, and a start that drags the end along keeping the gap.
+`<input type="time">` was the wrong control: a format to get wrong, half-typed
+values that look valid, and a keyboard on a phone.
 
 **The drawer**, in order: the fit breakdown · The facts · Booth fees ·
 Getting in · Weather · Sales tax and permits · Reports.
@@ -156,13 +172,14 @@ python3 -m http.server 8765          # leave running
 node build/browser-tests.cjs         # 79 — model, drawer, provenance, data hygiene,
                                      #      geocode, tax guard rails, fees, weather, version
 node build/ledger-view-tests.cjs     # 31 — details/link split, badges, lenses
-node build/calendar-tests.cjs        # 50 — grid, lane packing, clashes, day
-                                     #      layout, ics, layers, the stub rules
+node build/calendar-tests.cjs        # 77 — grid, lane packing, clashes, day
+                                     #      layout, ics, layers, hearts, the
+                                     #      time picker, the stub rules
 cd worker && npm test                # 45 — API; manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
 ```
 
-All green as of this handoff: **79 / 31 / 50 / 45 / 11**.
+All green as of this handoff: **79 / 31 / 77 / 45 / 11**.
 
 Two things worth knowing about the tests:
 

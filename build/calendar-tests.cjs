@@ -238,8 +238,9 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
   // ---- layer switches ----------------------------------------------------
   const layerBoxes = await p.$$eval('.cal-layer input', els =>
     els.map(e => [e.dataset.layer, e.checked]));
-  check('three layers, catalogue off by default',
-        JSON.stringify(layerBoxes) === '[["ledger",true],["catalogue",false],["personal",true]]',
+  check('four layers, All shows off by default but the shortlist on',
+        JSON.stringify(layerBoxes) ===
+          '[["ledger",true],["hearted",true],["catalogue",false],["personal",true]]',
         JSON.stringify(layerBoxes));
 
   // The checkbox itself is visually hidden behind a custom switch, so drive
@@ -264,8 +265,9 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
   await p.fill('#evStart', '2027-01-09');
   await p.fill('#evEnd', '2027-01-09');
   await p.uncheck('#evAllDay');
-  await p.fill('#evFrom', '06:30');
-  await p.fill('#evTo', '08:00');
+  // Times are menus of real choices now, not fields you type into.
+  await p.selectOption('#evFrom', '06:30');
+  await p.selectOption('#evTo', '08:00');
   await p.selectOption('#evRemind', '1440');
   await p.click('[data-sheet="save"]');
   await p.waitForTimeout(400);
@@ -319,10 +321,160 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
     check('clicking a bar opens the quick look', false, 'no bar rendered to click');
   }
 
+  /* ---- the time picker -------------------------------------------------- */
+  const timeModel = await p.evaluate(() => {
+    const C = window.ASTCalendar;
+    const opts = C.timeOptions();
+    return {
+      count: opts.length, step: C.TIME_STEP,
+      first: opts[0], noon: opts.filter(o => o.value === '12:00')[0],
+      lateShift: C.shiftTime('23:30', 120),      // must not roll into tomorrow
+      earlyShift: C.shiftTime('00:15', -120),
+      keepsGap: C.retime('09:00', '11:00', '14:00'),
+      badGap: C.retime('09:00', '08:00', '14:00'),
+      dur: C.fmtDuration(90)
+    };
+  });
+  check('a day of times at 15-minute steps',
+        timeModel.count === 96 && timeModel.step === 15, String(timeModel.count));
+  check('times are labelled the way people say them',
+        timeModel.first.label === '12 AM' && timeModel.noon.label === '12 PM',
+        timeModel.first.label + ' / ' + timeModel.noon.label);
+  check('a time cannot be pushed out of its own day',
+        timeModel.lateShift === '23:45' && timeModel.earlyShift === '00:00',
+        timeModel.lateShift + ' / ' + timeModel.earlyShift);
+  check('moving the start carries the end with it, keeping the gap',
+        JSON.stringify(timeModel.keepsGap) === '{"startTime":"14:00","endTime":"16:00"}',
+        JSON.stringify(timeModel.keepsGap));
+  check('a backwards range falls back to an hour rather than staying negative',
+        timeModel.badGap.endTime === '15:00', JSON.stringify(timeModel.badGap));
+  check('a duration reads as a person would say it', timeModel.dur === '1h 30m', timeModel.dur);
+
+  await p.click('#btnNew');
+  await p.waitForTimeout(250);
+  const isSelect = await p.$eval('#evFrom', el => el.tagName);
+  check('the time control is a menu, not a field to type into', isSelect === 'SELECT', isSelect);
+  await p.uncheck('#evAllDay');
+  await p.selectOption('#evFrom', '09:00');
+  await p.selectOption('#evTo', '10:00');
+  await p.click('[data-dur="120"]');
+  await p.waitForTimeout(150);
+  check('a duration chip sets the end time',
+        await p.$eval('#evTo', el => el.value) === '11:00',
+        await p.$eval('#evTo', el => el.value));
+  check('the chosen duration is the one shown as pressed',
+        await p.$eval('[data-dur="120"]', el => el.getAttribute('aria-pressed')) === 'true');
+  await p.selectOption('#evFrom', '13:00');
+  await p.waitForTimeout(150);
+  check('moving the start in the sheet drags the end along',
+        await p.$eval('#evTo', el => el.value) === '15:00',
+        await p.$eval('#evTo', el => el.value));
+  check('the sheet says how long the event is',
+        /2h long/.test(await p.textContent('#evDurRead')),
+        await p.textContent('#evDurRead'));
+  check('every event sheet carries the alerts-and-sharing row',
+        (await p.$$('.cal-sheet .cal-stubrow .btn[disabled]')).length === 3);
+  await p.keyboard.press('Escape');
+  await p.waitForTimeout(150);
+
+  /* ---- hearting ---------------------------------------------------------- */
+  const heartModel = await p.evaluate(() => {
+    const C = window.ASTCalendar;
+    const recs = [{ id:'z1', name:'Hearted one', startDate:'2027-01-09', endDate:'2027-01-09', liked:true },
+                  { id:'z2', name:'Plain one',   startDate:'2027-01-09', endDate:'2027-01-09', liked:false }];
+    const shortlistOnly = C.build({ shows:[], catalogue:recs, events:[],
+      layers:{ ledger:false, hearted:true, catalogue:false, personal:false } });
+    const both = C.build({ shows:[], catalogue:recs, events:[],
+      layers:{ ledger:false, hearted:true, catalogue:true, personal:false } });
+    return { only: shortlistOnly.map(i => i.id),
+             both: both.map(i => i.id).sort() };
+  });
+  check('the shortlist can be seen without the whole catalogue',
+        JSON.stringify(heartModel.only) === '["hearted:z1"]', JSON.stringify(heartModel.only));
+  check('a hearted show is never drawn twice when both layers are on',
+        JSON.stringify(heartModel.both) === '["catalogue:z2","hearted:z1"]',
+        JSON.stringify(heartModel.both));
+
+  // Heart a catalogue show from the calendar, and find it under Hearted.
+  await p.evaluate(() => { window.ASTCatalogue.like('zapp-13866', false); });
+  await p.click('[data-layer-row="catalogue"]');
+  await p.waitForTimeout(1400);
+  const firstCat = await p.$('.cal-bar.l-catalogue');
+  await firstCat.click();
+  await p.waitForTimeout(250);
+  check('a catalogue show offers a heart in the quick look',
+        await p.isVisible('.cal-heart'));
+  const heartedId = await p.evaluate(() => {
+    const el = document.querySelector('.cal-pop [data-pop="heart"]');
+    return el ? el.getAttribute('aria-pressed') : null;
+  });
+  check('it starts unhearted', heartedId === 'false', String(heartedId));
+  await p.click('.cal-pop [data-pop="heart"]');
+  await p.waitForTimeout(400);
+  const hearts = await p.evaluate(() =>
+    window.ASTCatalogue.all().filter(r => r.liked).map(r => r.id));
+  check('hearting on the calendar writes to the shared shortlist',
+        hearts.length === 1, JSON.stringify(hearts));
+  await p.click('[data-layer-row="catalogue"]');
+  await p.waitForTimeout(400);
+  check('with All shows off, the hearted show still shows on its own layer',
+        (await p.$$('.cal-bar.l-hearted')).length > 0,
+        String((await p.$$('.cal-bar.l-hearted')).length));
+
+  // ---- and it is waiting in All shows -----------------------------------
+  const browsed = await p.evaluate(async id => {
+    const res = await fetch('browse.html');
+    return res.ok;
+  });
+  check('browse.html is reachable for the shortlist hand-off', browsed === true);
+
+  /* ---- double-click blank space ------------------------------------------ */
+  await p.click('.cal-views [data-view="month"]');
+  await p.waitForTimeout(300);
+  await p.dblclick('.cal-cell.out', { position: { x: 40, y: 70 } });
+  await p.waitForTimeout(500);
+  check('double-clicking blank space in a cell opens a new event',
+        await p.isVisible('.cal-sheet'));
+  check('the double click did not also change the view',
+        await p.$eval('.cal-views [data-view="month"]',
+          el => el.getAttribute('aria-pressed')) === 'true');
+  await p.keyboard.press('Escape');
+  await p.waitForTimeout(200);
+
+  /* ---- click a day, land in it, add at the right hour ------------------- */
+  await p.goto(BASE + '#2027-02-01/month', { waitUntil: 'networkidle' });
+  await p.reload({ waitUntil: 'networkidle' });
+  await p.waitForTimeout(700);
+  // Click the 8th anywhere in the cell, not on its number.
+  await p.click('[data-day="2027-02-08"]', { position: { x: 60, y: 80 } });
+  await p.waitForTimeout(600);
+  check('a single click on a day opens that day',
+        await p.$eval('.cal-views [data-view="day"]',
+          el => el.getAttribute('aria-pressed')) === 'true');
+  check('and it is the day you clicked',
+        /February 8/.test(await p.textContent('#calTitle')),
+        await p.textContent('#calTitle'));
+
+  await p.click('[data-add-at="2027-02-08T14:00"]');
+  await p.waitForTimeout(400);
+  check('clicking an hour opens a new event already set to that hour',
+        await p.$eval('#evFrom', el => el.value) === '14:00',
+        await p.$eval('#evFrom', el => el.value));
+  check('and it is already an hour long, not zero',
+        await p.$eval('#evTo', el => el.value) === '15:00',
+        await p.$eval('#evTo', el => el.value));
+  check('the all-day box is off, so the times are the ones that count',
+        await p.$eval('#evAllDay', el => el.checked) === false);
+  check('the date is the day you were on',
+        await p.$eval('#evStart', el => el.value) === '2027-02-08',
+        await p.$eval('#evStart', el => el.value));
+  await p.keyboard.press('Escape');
+  await p.waitForTimeout(150);
+
   // ---- the honesty rules -------------------------------------------------
   await p.click('#btnConnect');
   await p.waitForTimeout(250);
-  const stubs = await p.$$eval('.cal-stub .btn', els =>
+  const stubs = await p.$$eval('.cal-sheet .cal-stub .btn', els =>
     els.map(e => [e.textContent.trim(), e.disabled]));
   check('every connect control is visibly disabled, and the export is not',
         stubs.filter(s => s[1]).length === 7 && stubs.filter(s => !s[1]).length === 1,

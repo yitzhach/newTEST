@@ -29,8 +29,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=47a16f1c">
-<link rel="stylesheet" href="intel.css?v=47a16f1c">
+<link rel="stylesheet" href="app.css?v=816a4837">
+<link rel="stylesheet" href="intel.css?v=816a4837">
 </head>
 <body>
 <header class="app-header">
@@ -78,7 +78,9 @@
     <div class="f-block">
       <div class="chips" id="fQuick" role="group" aria-label="Quick filters">
         <button class="chip" type="button" data-quick="all" aria-pressed="true">All</button>
-        <button class="chip" type="button" data-quick="liked" aria-pressed="false">Liked</button>
+        <button class="chip chip-heart" type="button" data-quick="liked" aria-pressed="false"
+                title="Your shortlist — hearted here or on the calendar">Hearted
+          <span class="chip-n" id="chipHeartN" hidden></span></button>
         <button class="chip" type="button" data-quick="added" aria-pressed="false">In ledger</button>
         <button class="chip" type="button" data-quick="reported" aria-pressed="false"
                 title="Shows the network has reported on">Reported</button>
@@ -208,19 +210,19 @@
   <button class="t-act" id="toastAct" type="button" hidden></button>
 </div>
 
-<script src="core.js?v=47a16f1c"></script>
-<script src="version.js?v=47a16f1c"></script>
-<script src="fit.js?v=47a16f1c"></script>
-<script src="intel.js?v=47a16f1c"></script>
-<script src="members.js?v=47a16f1c"></script>
+<script src="core.js?v=816a4837"></script>
+<script src="version.js?v=816a4837"></script>
+<script src="fit.js?v=816a4837"></script>
+<script src="intel.js?v=816a4837"></script>
+<script src="members.js?v=816a4837"></script>
 <!-- Weather fetches at runtime from the visitor's browser; sales tax is a
      static table. Both are optional: intel-ui.js renders without either. -->
-<script src="weather.js?v=47a16f1c"></script>
-<script src="salestax.js?v=47a16f1c"></script>
-<script src="intel-ui.js?v=47a16f1c"></script>
-<script src="catalogue.js?v=47a16f1c"></script>
-<script src="store-supabase.js?v=47a16f1c"></script>
-<script src="import.js?v=47a16f1c"></script>
+<script src="weather.js?v=816a4837"></script>
+<script src="salestax.js?v=816a4837"></script>
+<script src="intel-ui.js?v=816a4837"></script>
+<script src="catalogue.js?v=816a4837"></script>
+<script src="store-supabase.js?v=816a4837"></script>
+<script src="import.js?v=816a4837"></script>
 <script type="module">
 /* ==========================================================================
    ALL SHOWS
@@ -421,7 +423,7 @@ function cardHtml(r) {
         'aria-pressed="' + (r.liked ? 'true' : 'false') + '" ' +
         'style="--fill:' + (r.liked ? 'currentColor' : 'none') + '" ' +
         'title="' + (r.liked ? 'Remove from your shortlist' : 'Add to your shortlist') + '" ' +
-        'aria-label="' + (r.liked ? 'Unlike ' : 'Like ') + esc(r.name) + '">' + HEART + '</button>' +
+        'aria-label="' + (r.liked ? 'Unheart ' : 'Heart ') + esc(r.name) + '">' + HEART + '</button>' +
     '</div>' +
     '<p class="card-place">' + esc([r.city, r.state].filter(Boolean).join(', ')) + '</p>' +
     '<p class="meta card-dates">' + esc(fmtRange(r.startDate, r.endDate)) + '</p>' +
@@ -468,7 +470,7 @@ function rowHtml(r) {
         'aria-pressed="' + (r.liked ? 'true' : 'false') + '" ' +
         'style="--fill:' + (r.liked ? 'currentColor' : 'none') + '" ' +
         'title="' + (r.liked ? 'Remove from your shortlist' : 'Add to your shortlist') + '" ' +
-        'aria-label="' + (r.liked ? 'Unlike ' : 'Like ') + esc(r.name) + '">' + HEART + '</button>' +
+        'aria-label="' + (r.liked ? 'Unheart ' : 'Heart ') + esc(r.name) + '">' + HEART + '</button>' +
       '<button type="button" class="namebtn" data-detail="' + esc(r.id) + '" ' +
         'title="Open the full breakdown">' + esc(r.name) + '</button>' +
       siteLink(r) + testTag(r) + reportBadge(r) +
@@ -516,13 +518,20 @@ function render() {
   host.innerHTML = rows.length
     ? rows.map(list ? rowHtml : cardHtml).join('')
     : '<p class="empty">Nothing matches those filters.</p>';
+  /* Two different numbers: how many you have hearted at all, and how many of
+     those are not yet in the ledger. The chip carries the shortlist size; the
+     button below only offers the ones there is still something to do about. */
+  const hearted = state.rows.filter(r => r.liked).length;
+  const chipN = $('#chipHeartN');
+  chipN.hidden = !hearted;
+  chipN.textContent = hearted;
   const liked = state.rows.filter(r => r.liked && !r.addedShowId).length;
   $('#resCount').textContent =
     rows.length + ' of ' + state.rows.length + ' shows' +
-    (liked ? ' · ' + liked + ' liked and not yet in the ledger' : '');
+    (liked ? ' · ' + liked + ' hearted and not yet in the ledger' : '');
   const btn = $('#btnAddLiked');
   btn.hidden = !liked;
-  btn.textContent = 'Add ' + liked + ' liked ' + (liked === 1 ? 'show' : 'shows') + ' to the ledger';
+  btn.textContent = 'Add ' + liked + ' hearted ' + (liked === 1 ? 'show' : 'shows') + ' to the ledger';
 }
 
 function renderStates() {
@@ -722,14 +731,24 @@ $('#fStates').addEventListener('change', () => {
 $('#fStatesClear').addEventListener('click', () => {
   state.q.states = []; renderStates(); render();
 });
+function selectQuick(which) {
+  state.quick = which;
+  $('#fQuick').querySelectorAll('.chip').forEach(c =>
+    c.setAttribute('aria-pressed', String(c.dataset.quick === which)));
+  render();
+}
 $('#fQuick').addEventListener('click', e => {
   const chip = e.target.closest('.chip');
-  if (!chip) return;
-  state.quick = chip.dataset.quick;
-  $('#fQuick').querySelectorAll('.chip').forEach(c =>
-    c.setAttribute('aria-pressed', String(c === chip)));
-  render();
+  if (chip) selectQuick(chip.dataset.quick);
 });
+
+/* The calendar's "Organise shortlist" link lands here. Opening straight onto
+   the shortlist is the point of the link — arriving at all 237 and making the
+   user find the filter would waste the trip. */
+function applyHash() {
+  if (location.hash === '#hearted') selectQuick('liked');
+}
+window.addEventListener('hashchange', applyHash);
 
 $('#cards').addEventListener('click', e => {
   const btn = e.target.closest('[data-detail]');
@@ -885,6 +904,7 @@ $('#btnTheme').addEventListener('click', () => {
   await refresh();
   renderStates();
   render();
+  applyHash();
 })();
 </script>
 <script>window.ASTVersion.mount(document.getElementById('buildStamp'));</script>

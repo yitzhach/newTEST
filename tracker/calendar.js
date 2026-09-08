@@ -75,6 +75,10 @@ window.ASTCalendar = (function () {
 
   var LAYERS = [
     { value:'ledger',    label:'My schedule', hint:'shows in your ledger' },
+    /* Hearted is its own layer, not a filter on the catalogue one. The point
+       of a shortlist is to see it WITHOUT the other 237 — turning the whole
+       catalogue on to find the six you starred defeats the shortlist. */
+    { value:'hearted',   label:'Hearted',     hint:'your shortlist from All shows' },
     { value:'catalogue', label:'All shows',   hint:'the full catalogue, for clashes' },
     { value:'personal',  label:'Personal',    hint:'travel, deadlines, reminders' }
   ];
@@ -87,6 +91,8 @@ window.ASTCalendar = (function () {
   function showItem(show, layer) {
     return {
       id: layer + ':' + show.id,
+      catalogueId: show.catalogueId || '',
+      liked: !!show.liked,
       layer: layer,
       kind: 'show',
       title: show.name,
@@ -102,10 +108,12 @@ window.ASTCalendar = (function () {
     };
   }
 
-  function catalogueItem(rec) {
+  function catalogueItem(rec, layer) {
     return {
-      id: 'catalogue:' + rec.id,
-      layer: 'catalogue',
+      id: layer + ':' + rec.id,
+      layer: layer,
+      catalogueId: rec.id,
+      liked: !!rec.liked,
       kind: 'show',
       title: rec.name,
       start: rec.startDate,
@@ -124,6 +132,8 @@ window.ASTCalendar = (function () {
     return {
       id: 'personal:' + evt.id,
       layer: 'personal',
+      catalogueId: '',
+      liked: false,
       kind: evt.kind,
       title: evt.title || '(untitled)',
       start: evt.startDate,
@@ -150,7 +160,7 @@ window.ASTCalendar = (function () {
   function build(o) {
     o = o || {};
     var shows = o.shows || [], records = o.catalogue || [], events = o.events || [];
-    var layers = o.layers || { ledger: true, catalogue: false, personal: true };
+    var layers = o.layers || { ledger: true, hearted: true, catalogue: false, personal: true };
 
     var items = [];
     var mine = {};
@@ -163,11 +173,21 @@ window.ASTCalendar = (function () {
         items.push(showItem(s, 'ledger'));
       });
     }
+    /* Hearted first, so a shortlisted show is drawn as YOUR shortlist even
+       when the full catalogue is also on — it is never duplicated. */
+    var drawn = {};
+    if (layers.hearted) {
+      records.forEach(function (r) {
+        if (!r.startDate || !r.liked || mine[r.id]) return;
+        drawn[r.id] = true;
+        items.push(catalogueItem(r, 'hearted'));
+      });
+    }
     if (layers.catalogue) {
       records.forEach(function (r) {
         if (!r.startDate) return;
-        if (mine[r.id]) return;              // already on the calendar as yours
-        items.push(catalogueItem(r));
+        if (mine[r.id] || drawn[r.id]) return;   // already on the calendar
+        items.push(catalogueItem(r, 'catalogue'));
       });
     }
     if (layers.personal) {
@@ -222,7 +242,7 @@ window.ASTCalendar = (function () {
      the week being drawn and then packing the clipped segments into lanes so
      none of them overlap horizontally.                                     */
 
-  var LAYER_LANE_ORDER = { ledger: 0, personal: 1, catalogue: 2 };
+  var LAYER_LANE_ORDER = { ledger: 0, hearted: 1, personal: 2, catalogue: 3 };
 
   /**
    * @param items  as built above
@@ -333,6 +353,66 @@ window.ASTCalendar = (function () {
       i = j;
     }
     return { allDay: allDay, timed: timed };
+  }
+
+  /* ---- 5b. TIME PICKING --------------------------------------------------
+     Typing into a bare <input type="time"> is the worst part of every web
+     calendar: the format fights you, a half-typed value reads as valid, and
+     on a phone it is a keyboard. iOS gives you a wheel of real choices and
+     moves the end time when you move the start. This is that, in the parts
+     that are arithmetic — the page renders it as two menus and a row of
+     duration chips.                                                        */
+
+  var TIME_STEP = 15;   // minutes. Small enough for a load-in, big enough to scan.
+
+  /** Every selectable time in a day, as { value:'HH:MM', label:'9:30 AM' }. */
+  function timeOptions(step) {
+    step = step || TIME_STEP;
+    var out = [];
+    for (var m = 0; m < 24 * 60; m += step) {
+      var v = pad(Math.floor(m / 60)) + ':' + pad(m % 60);
+      out.push({ value: v, label: fmtTime(v), minutes: m });
+    }
+    return out;
+  }
+
+  /** Clamped to the day: an event does not roll into tomorrow by accident. */
+  function shiftTime(hhmm, byMinutes) {
+    var m = minutesOf(hhmm);
+    if (m === null) return hhmm;
+    var next = Math.max(0, Math.min(24 * 60 - TIME_STEP, m + byMinutes));
+    return pad(Math.floor(next / 60)) + ':' + pad(next % 60);
+  }
+
+  var DURATIONS = [
+    { minutes: 30,  label:'30m' },
+    { minutes: 60,  label:'1h' },
+    { minutes: 90,  label:'1h 30m' },
+    { minutes: 120, label:'2h' },
+    { minutes: 240, label:'4h' },
+    { minutes: 480, label:'All day-ish (8h)' }
+  ];
+
+  function duration(startHHMM, endHHMM) {
+    var a = minutesOf(startHHMM), b = minutesOf(endHHMM);
+    if (a === null || b === null) return null;
+    return b - a;
+  }
+  function fmtDuration(mins) {
+    if (mins == null || mins <= 0) return '';
+    var h = Math.floor(mins / 60), m = mins % 60;
+    return (h ? h + 'h' : '') + (h && m ? ' ' : '') + (m ? m + 'm' : '');
+  }
+
+  /**
+   * Moving the start moves the end with it, keeping the gap — the single
+   * behaviour that makes a time picker feel finished. A start pushed past the
+   * old end takes the default hour instead of producing a negative event.
+   */
+  function retime(startHHMM, endHHMM, nextStart) {
+    var gap = duration(startHHMM, endHHMM);
+    if (gap === null || gap <= 0) gap = 60;
+    return { startTime: nextStart, endTime: shiftTime(nextStart, gap) };
   }
 
   /* ---- 6. YEAR ROLL-UP ---------------------------------------------------
@@ -447,6 +527,7 @@ window.ASTCalendar = (function () {
       var desc = [];
       if (i.layer === 'ledger' && i.status) desc.push('Status: ' + (A.STATUS_LABEL[i.status] || i.status));
       if (i.layer === 'catalogue') desc.push('From the catalogue — not in your ledger.');
+      if (i.layer === 'hearted') desc.push('On your shortlist — not in your ledger.');
       if (i.ref && i.ref.notes) desc.push(i.ref.notes);
       if (desc.length) lines.push('DESCRIPTION:' + icsEscape(desc.join('\n')));
       /* VALARM is written from the stored reminder so an importing calendar
@@ -471,6 +552,8 @@ window.ASTCalendar = (function () {
     todayISO: todayISO, monthKey: monthKey, monthGrid: monthGrid, overlaps: overlaps,
     build: build, clashes: clashes, clashDays: clashDays,
     packWeek: packWeek, onDay: onDay, dayLayout: dayLayout, yearSummary: yearSummary,
-    minutesOf: minutesOf, fmtTime: fmtTime, toICS: toICS
+    minutesOf: minutesOf, fmtTime: fmtTime, toICS: toICS,
+    TIME_STEP: TIME_STEP, DURATIONS: DURATIONS, timeOptions: timeOptions,
+    shiftTime: shiftTime, duration: duration, fmtDuration: fmtDuration, retime: retime
   };
 })();

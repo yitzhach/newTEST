@@ -23,9 +23,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=47a16f1c">
-<link rel="stylesheet" href="intel.css?v=47a16f1c">
-<link rel="stylesheet" href="calendar.css?v=47a16f1c">
+<link rel="stylesheet" href="app.css?v=816a4837">
+<link rel="stylesheet" href="intel.css?v=816a4837">
+<link rel="stylesheet" href="calendar.css?v=816a4837">
 </head>
 <body>
 <header class="app-header">
@@ -82,17 +82,17 @@
   <p class="build-stamp" id="buildStamp"></p>
 </div>
 
-<script src="core.js?v=47a16f1c"></script>
-<script src="version.js?v=47a16f1c"></script>
-<script src="fit.js?v=47a16f1c"></script>
-<script src="intel.js?v=47a16f1c"></script>
-<script src="members.js?v=47a16f1c"></script>
-<script src="weather.js?v=47a16f1c"></script>
-<script src="salestax.js?v=47a16f1c"></script>
-<script src="intel-ui.js?v=47a16f1c"></script>
-<script src="catalogue.js?v=47a16f1c"></script>
-<script src="calendar.js?v=47a16f1c"></script>
-<script src="store-supabase.js?v=47a16f1c"></script>
+<script src="core.js?v=816a4837"></script>
+<script src="version.js?v=816a4837"></script>
+<script src="fit.js?v=816a4837"></script>
+<script src="intel.js?v=816a4837"></script>
+<script src="members.js?v=816a4837"></script>
+<script src="weather.js?v=816a4837"></script>
+<script src="salestax.js?v=816a4837"></script>
+<script src="intel-ui.js?v=816a4837"></script>
+<script src="catalogue.js?v=816a4837"></script>
+<script src="calendar.js?v=816a4837"></script>
+<script src="store-supabase.js?v=816a4837"></script>
 <script type="module">
 /* ==========================================================================
    CALENDAR — the page
@@ -109,6 +109,13 @@ const { esc, fmtRange, Store, Settings, Theme } = A;
 const $ = sel => document.querySelector(sel);
 
 const LAYER_KEY = 'artShowTracker.calLayers';
+
+/* The same heart browse.html draws, so a shortlist looks like one thing in
+   both places. --fill switches between outline and solid. */
+const HEART =
+  '<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">' +
+  '<path d="M10 16.4S3.3 12.2 3.3 7.8a3.4 3.4 0 0 1 6.7-1 3.4 3.4 0 0 1 6.7 1c0 4.4-6.7 8.6-6.7 8.6z" ' +
+  'fill="var(--fill,none)" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
 
 /* The URL carries where you are looking: '#2027-01-09' or '#2027-01-09/day'.
    That makes a day linkable — you can send someone a date, come back to one
@@ -137,7 +144,8 @@ function readLayers() {
   /* The catalogue is OFF by default. 237 shows over your own nine is not a
      calendar, it is a wall — you turn it on when you are asking "what else is
      that weekend?", which is a question, not a default. */
-  return Object.assign({ ledger: true, catalogue: false, personal: true }, saved || {});
+  return Object.assign({ ledger: true, hearted: true, catalogue: false, personal: true },
+                       saved || {});
 }
 function saveLayers() {
   try { localStorage.setItem(LAYER_KEY, JSON.stringify(state.layers)); } catch (_) {}
@@ -147,7 +155,11 @@ function saveLayers() {
 async function loadAll() {
   state.shows = await Store.list();
   state.events = await Store.listEvents();
-  if (state.layers.catalogue && !state.catalogueReady) await loadCatalogue();
+  /* Hearts live on catalogue records, so the catalogue has to be loaded for
+     the shortlist layer too — not only when All shows is switched on. */
+  if ((state.layers.catalogue || state.layers.hearted) && !state.catalogueReady) {
+    await loadCatalogue();
+  }
   rebuild();
 }
 async function loadCatalogue() {
@@ -166,8 +178,14 @@ async function loadFit() {
 }
 
 function rebuild() {
+  /* A heart lives on the catalogue record, not on the ledger row, so a show
+     you added still shows as hearted. A hand-added show has no catalogue id
+     and therefore cannot be hearted — there is nothing to heart. */
+  const shows = state.shows.map(sh => state.catalogueReady && sh.catalogueId
+    ? Object.assign({}, sh, { liked: C.pick(sh.catalogueId).liked })
+    : sh);
   state.items = CAL.build({
-    shows: state.shows,
+    shows: shows,
     catalogue: state.catalogueReady ? C.all() : [],
     events: state.events,
     layers: state.layers
@@ -179,10 +197,12 @@ function rebuild() {
 function renderLayers() {
   const counts = {
     ledger: state.items.filter(i => i.layer === 'ledger').length,
+    hearted: state.items.filter(i => i.layer === 'hearted').length,
     catalogue: state.items.filter(i => i.layer === 'catalogue').length,
     personal: state.items.filter(i => i.layer === 'personal').length
   };
-  const tone = { ledger:'var(--s-accepted)', catalogue:'var(--muted)', personal:'var(--accent)' };
+  const tone = { ledger:'var(--s-accepted)', hearted:'var(--danger)',
+                 catalogue:'var(--muted)', personal:'var(--accent)' };
   $('#calLayers').innerHTML = CAL.LAYERS.map(l => `
     <label class="cal-layer" data-layer-row="${l.value}" style="--layer:${tone[l.value]}">
       <input type="checkbox" data-layer="${l.value}" ${state.layers[l.value] ? 'checked' : ''}>
@@ -353,6 +373,31 @@ function renderYear() {
     </button>`).join('') + '</div>';
 }
 
+/* ---- the not-yet controls -----------------------------------------------
+   Text alert, email alert, share and export, wherever they belong. Three of
+   the four are dead and every one of them says so on hover and to a screen
+   reader; Export is real and downloads an .ics. They live here rather than
+   being written out three times, so they cannot drift apart — and so the day
+   they become live, one function changes.
+
+   The share case worth designing for: sending a client the window you will be
+   at their house after a show, without handing them your whole season. That
+   needs a server to host the link, which is why it is off. */
+const STUBS = [
+  { key:'sms',   label:'Text alert',  why:'No text channel connected yet' },
+  { key:'email', label:'Email alert', why:'No email channel connected yet' },
+  { key:'share', label:'Share',       why:'Sharing needs the sync worker deployed' }
+];
+
+function stubRow(what) {
+  return `<div class="cal-stubrow" role="group" aria-label="Alerts and sharing for ${esc(what)}">
+    ${STUBS.map(b => `<button class="btn btn-quiet" type="button" disabled
+        title="${esc(b.why)}">${esc(b.label)}</button>`).join('')}
+    <button class="btn btn-quiet" type="button" data-stub="export"
+            title="Download an .ics you can import anywhere">Export</button>
+  </div>`;
+}
+
 /* ---- popover ------------------------------------------------------------ */
 function closePop() { const p = $('.cal-pop'); if (p) p.remove(); }
 
@@ -363,7 +408,8 @@ function openPop(anchor, item) {
   const pop = document.createElement('div');
   pop.className = 'cal-pop';
 
-  const layerName = { ledger:'My schedule', catalogue:'Catalogue', personal:'Personal' }[item.layer];
+  const layerName = { ledger:'My schedule', hearted:'Hearted', catalogue:'Catalogue',
+                      personal:'Personal' }[item.layer];
   const rows = [];
   rows.push(['When', esc(fmtRange(item.start, item.end)) +
     (!item.allDay && item.startTime ? ' · ' + esc(CAL.fmtTime(item.startTime)) : '')]);
@@ -380,12 +426,28 @@ function openPop(anchor, item) {
       : '<span class="muted-inline">none</span>']);
   }
 
-  const catId = item.layer === 'catalogue' ? item.ref.id
-              : (item.ref && item.ref.catalogueId) || '';
+  /* Every show item carries its catalogue id, whichever layer drew it — a
+     ledger row through `catalogueId`, a catalogue or hearted row through its
+     own id. That id is the key for the heart, the drawer and the ledger add. */
+  const catId = item.catalogueId || '';
   const hasFit = catId && state.fit[catId];
 
+  /* Hearting is the shortlist, and the shortlist is shared with All shows:
+     heart it here and it is waiting under the Hearted filter over there. Only
+     a show with a catalogue record can be hearted — that is where the heart
+     is stored, and a hand-added show has none. */
+  const canHeart = item.kind === 'show' && catId;
+  const inLedger = item.layer === 'ledger';
+
   pop.innerHTML = `
-    <span class="layer-tag">${esc(layerName)}</span>
+    <div class="pop-top">
+      <span class="layer-tag">${esc(layerName)}</span>
+      ${canHeart ? `<button class="cal-heart" type="button" data-pop="heart"
+          aria-pressed="${item.liked ? 'true' : 'false'}"
+          style="--fill:${item.liked ? 'currentColor' : 'none'}"
+          title="${item.liked ? 'Remove from your shortlist' : 'Add to your shortlist'}"
+          aria-label="${item.liked ? 'Unheart ' : 'Heart '}${esc(item.title)}">${HEART}</button>` : ''}
+    </div>
     <h4>${esc(item.title)}</h4>
     ${item.ref && item.ref.notes ? `<p class="meta">${esc(item.ref.notes)}</p>` : ''}
     <dl>${rows.map(r => `<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl>
@@ -393,9 +455,12 @@ function openPop(anchor, item) {
       ${hasFit ? '<button class="btn btn-primary" data-pop="detail">Show details</button>' : ''}
       ${item.layer === 'personal' ? '<button class="btn" data-pop="edit">Edit</button>' +
         '<button class="btn btn-danger" data-pop="delete">Delete</button>' : ''}
-      ${item.layer === 'ledger' ? '<a class="btn" href="index.html">Open ledger</a>' : ''}
+      ${canHeart && !inLedger ? '<button class="btn" data-pop="toLedger">Add to ledger</button>' : ''}
+      ${inLedger ? '<a class="btn" href="index.html">Open ledger</a>' : ''}
+      ${canHeart ? '<a class="btn btn-quiet" href="browse.html#hearted">Organise shortlist</a>' : ''}
       <button class="btn btn-quiet" data-pop="close">Close</button>
-    </div>`;
+    </div>
+    ${stubRow('this ' + (item.kind === 'show' ? 'show' : 'event'))}`;
 
   document.body.appendChild(pop);
   const r = anchor.getBoundingClientRect();
@@ -407,12 +472,29 @@ function openPop(anchor, item) {
                             window.scrollX + window.innerWidth - pop.offsetWidth - 8)) + 'px';
 
   pop.addEventListener('click', async e => {
+    if (e.target.closest('[data-stub="export"]')) { exportICS(); return; }
     const act = e.target.closest('[data-pop]');
     if (!act) return;
     const what = act.dataset.pop;
     if (what === 'close') return closePop();
     if (what === 'detail') { closePop(); UI.openShow(state.fit[catId]); return; }
     if (what === 'edit') { closePop(); openSheet(item.ref); return; }
+    if (what === 'heart') {
+      C.like(catId, !C.pick(catId).liked);
+      closePop();
+      rebuild();
+      return;
+    }
+    if (what === 'toLedger') {
+      const rec = C.get(catId);
+      if (rec) {
+        const show = await Store.upsert(C.toShow(rec));
+        C.markAdded(catId, show.id);
+      }
+      closePop();
+      await loadAll();
+      return;
+    }
     if (what === 'delete') {
       closePop();
       await Store.removeEvent(item.ref.id);
@@ -425,6 +507,57 @@ function openPop(anchor, item) {
 function closeSheet() {
   const s = $('.cal-sheet'), sc = $('.cal-scrim');
   if (s) s.remove(); if (sc) sc.remove();
+}
+
+/* A menu of real times rather than a field you type into. Fifteen-minute
+   steps, labelled the way a person says them ("9:30 AM"), which is what the
+   iOS wheel gives you and what <input type="time"> never does: no format to
+   get wrong, no half-typed value that looks valid, and a real control on a
+   phone instead of a keyboard. */
+function timeSelect(id, value) {
+  const opts = CAL.timeOptions();
+  const has = opts.some(o => o.value === value);
+  return `<select id="${id}" class="cal-time">` +
+    /* A time already saved off the 15-minute grid keeps its own entry rather
+       than being silently rounded to something the user did not choose. */
+    (has ? '' : `<option value="${esc(value)}" selected>${esc(CAL.fmtTime(value))}</option>`) +
+    opts.map(o => `<option value="${o.value}"${o.value === value ? ' selected' : ''}>` +
+                  `${esc(o.label)}</option>`).join('') + '</select>';
+}
+
+/* Start, end and the duration chips are three views of one thing, so every
+   one of them writes back to the other two. */
+function wireTimes(sheet) {
+  const from = sheet.querySelector('#evFrom');
+  const to = sheet.querySelector('#evTo');
+  const read = sheet.querySelector('#evDurRead');
+  if (!from || !to) return;
+
+  function paint() {
+    const mins = CAL.duration(from.value, to.value);
+    read.textContent = mins > 0
+      ? CAL.fmtDuration(mins) + ' long'
+      : 'The end is not after the start.';
+    read.classList.toggle('is-bad', !(mins > 0));
+    sheet.querySelectorAll('[data-dur]').forEach(c =>
+      c.setAttribute('aria-pressed', String(Number(c.dataset.dur) === mins)));
+  }
+  // Moving the start carries the end with it, keeping the gap.
+  from.addEventListener('change', () => {
+    const next = CAL.retime(from.dataset.prev || from.value, to.value, from.value);
+    to.value = next.endTime;
+    from.dataset.prev = from.value;
+    paint();
+  });
+  from.dataset.prev = from.value;
+  to.addEventListener('change', paint);
+  sheet.querySelector('#evDurs').addEventListener('click', ev => {
+    const chip = ev.target.closest('[data-dur]');
+    if (!chip) return;
+    to.value = CAL.shiftTime(from.value, Number(chip.dataset.dur));
+    paint();
+  });
+  paint();
 }
 
 function openSheet(evt) {
@@ -459,11 +592,18 @@ function openSheet(evt) {
       </div>
       <label class="cal-check"><input type="checkbox" id="evAllDay" ${e.allDay ? 'checked' : ''}>
         All day</label>
-      <div class="cal-row2 cal-field" id="evTimes" ${e.allDay ? 'hidden' : ''}>
-        <div><label class="label" for="evFrom">From</label>
-          <input type="time" id="evFrom" value="${esc(e.startTime)}"></div>
-        <div><label class="label" for="evTo">To</label>
-          <input type="time" id="evTo" value="${esc(e.endTime)}"></div>
+      <div class="cal-field" id="evTimes" ${e.allDay ? 'hidden' : ''}>
+        <div class="cal-row2">
+          <div><label class="label" for="evFrom">From</label>
+            ${timeSelect('evFrom', e.startTime || '09:00')}</div>
+          <div><label class="label" for="evTo">To</label>
+            ${timeSelect('evTo', e.endTime || CAL.shiftTime(e.startTime || '09:00', 60))}</div>
+        </div>
+        <div class="cal-durs" id="evDurs">
+          ${CAL.DURATIONS.map(d => `<button class="chip-dur" type="button"
+             data-dur="${d.minutes}">${esc(d.label)}</button>`).join('')}
+        </div>
+        <p class="cal-dur-read" id="evDurRead"></p>
       </div>
       <div class="cal-field">
         <label class="label" for="evWhere">Where</label>
@@ -487,6 +627,12 @@ function openSheet(evt) {
         <label class="label" for="evNotes">Notes</label>
         <textarea id="evNotes">${esc(e.notes)}</textarea>
       </div>
+      <p class="label cal-sec">Alerts and sharing</p>
+      ${stubRow('this event')}
+      <p class="cal-note" style="margin-top:10px">
+        Text, email and share are not connected yet. Export downloads an .ics of
+        everything on screen, which any calendar will import.
+      </p>
     </div>
     <footer>
       <button class="btn btn-primary" data-sheet="save">Save</button>
@@ -501,8 +647,12 @@ function openSheet(evt) {
   sheet.querySelector('#evAllDay').addEventListener('change', ev => {
     sheet.querySelector('#evTimes').hidden = ev.target.checked;
   });
+  wireTimes(sheet);
   scrim.addEventListener('click', closeSheet);
 
+  sheet.addEventListener('click', ev => {
+    if (ev.target.closest('[data-stub="export"]')) exportICS();
+  });
   sheet.addEventListener('click', async ev => {
     const act = ev.target.closest('[data-sheet]');
     if (!act) return;
@@ -641,7 +791,8 @@ $('#calLayers').addEventListener('change', async e => {
   if (!box) return;
   state.layers[box.dataset.layer] = box.checked;
   saveLayers();
-  if (box.dataset.layer === 'catalogue' && box.checked && !state.catalogueReady) {
+  if (box.checked && !state.catalogueReady &&
+      (box.dataset.layer === 'catalogue' || box.dataset.layer === 'hearted')) {
     await loadCatalogue();
   }
   rebuild();
@@ -661,14 +812,26 @@ $('#calView').addEventListener('click', e => {
   if (add) { state.cursor = add.dataset.add; openSheet(null); return; }
 
   const slot = e.target.closest('[data-add-at]');
-  if (slot) {
-    const [iso, time] = slot.dataset.addAt.split('T');
-    openSheet(A.makeEvent({ startDate: iso, endDate: iso, allDay: false, startTime: time }));
-    return;
-  }
+  if (slot) { openAtSlot(slot); return; }
 
   const day = e.target.closest('[data-open-day]');
   if (day) { state.cursor = day.dataset.openDay; setView('day'); return; }
+
+  /* Clicking the day itself — anywhere in it, not only the number — drops
+     into that day, which is how you get from "Feb 8" to an hourly view and a
+     new event at the right time in three clicks. Deferred so a double-click
+     can cancel it and add an event instead. */
+  const cell = e.target.closest('[data-day]');
+  if (cell && state.view === 'month') {
+    const iso = cell.dataset.day;
+    clearTimeout(pendingDay);
+    pendingDay = setTimeout(() => {
+      pendingDay = 0;
+      state.cursor = iso;
+      setView('day');
+    }, DBL_MS);
+    return;
+  }
 
   const mon = e.target.closest('[data-month]');
   if (mon) {
@@ -677,6 +840,35 @@ $('#calView').addEventListener('click', e => {
     setView('month');
   }
 });
+
+/* Double-click blank space to add — the gesture every desktop calendar has.
+   The single-click + button stays for touch and for anyone who would rather
+   see the control than know the gesture; a double-click ON a show is not a
+   request for a new event, so bars and buttons are excluded. */
+/* Blank space in a month cell answers to both a single and a double click,
+   so they have to be told apart: a single click drops into that day, a double
+   click adds an event on it. The single action waits out the double-click
+   window rather than firing first and yanking the view out from under the
+   second click. Bars and buttons are excluded — a double-click ON a show is
+   not a request for a new event. */
+const DBL_MS = 260;
+let pendingDay = 0;
+
+$('#calView').addEventListener('dblclick', e => {
+  if (e.target.closest('[data-item]') || e.target.closest('button')) return;
+  clearTimeout(pendingDay); pendingDay = 0;
+  const cell = e.target.closest('[data-day]');
+  if (cell) { state.cursor = cell.dataset.day; openSheet(null); return; }
+  const slot = e.target.closest('[data-add-at]');
+  if (slot) openAtSlot(slot);
+});
+
+/** An hour in the day view, opened with that hour already filled in. */
+function openAtSlot(slot) {
+  const [iso, time] = slot.dataset.addAt.split('T');
+  openSheet(A.makeEvent({ startDate: iso, endDate: iso, allDay: false,
+                          startTime: time, endTime: CAL.shiftTime(time, 60) }));
+}
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.cal-pop') && !e.target.closest('[data-item]')) closePop();
