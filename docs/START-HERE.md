@@ -24,7 +24,7 @@ commands or the rules. Keep it this short:
 > Don't re-read the codebase — open only the files you're changing, and only
 > open `docs/build-phases.md` or `docs/handoff.md` if the task needs them.
 >
-> Before finishing: run the eight suites, then commit, push and merge to `main`.
+> Before finishing: run the nine suites, then commit, push and merge to `main`.
 
 Add a line naming a file or feature if you already know where the work lives —
 that saves a search. Everything else is already loaded.
@@ -203,6 +203,34 @@ price, plan name, trial or sign-up, because quoting a price for something that
 cannot be bought is a false offer. Currently previewed: accountant export,
 negotiating help, art representative, shared logistics, mock jury review.
 
+**Mock jury — `tracker/jury.html`.** An artist assembles a submission (five
+works and a booth shot by default, plus what they want looked at), a juror
+scores it out of 10 and writes back. **The scaffolding is built; none of the
+plumbing exists**, and the page says so in a banner before anybody spends time
+on it:
+
+- **No image storage.** The Worker holding R2 is undeployed, so an image is
+  *described*, never uploaded. `makeReviewImage` forces `stored: false` even if
+  handed `true`, so no record can claim a file exists.
+- **No transport.** A request cannot reach a juror. "Send to a juror" is
+  disabled and submissions stay drafts. Nothing claims to have been sent — the
+  same rule the calendar's reminders follow.
+- **No billing.** `chargeableAt()` returns null until `claimedAt` is set, so
+  **nothing is owed until a juror has claimed the request**. That was a
+  deliberate choice: an artist is never charged for work that has not started.
+
+Two rules that outlive the plumbing:
+
+- **A juror's score is not a show's jury odds.** One is an opinion about your
+  images, the other is the show's published data. `SCORE_IS_NOT_ODDS` is the
+  sentence the UI uses, `fit.js` is not even loaded on the page, and a review
+  score never enters the ranking.
+- **An unscored review is null, not 0 and not 5.** A review that came back
+  without a number is left out of the average rather than dragging it down.
+
+`canUpload()` and `canSubmit()` are functions, not constants, so deploying the
+Worker is a one-line change rather than a hunt.
+
 **Times are picked, not typed.** Fifteen-minute menus labelled the way people
 say them, duration chips, and a start that drags the end along keeping the gap.
 `<input type="time">` was the wrong control: a format to get wrong, half-typed
@@ -254,7 +282,7 @@ written.
 
 ---
 
-## The eight suites — run all of them before pushing
+## The nine suites — run all of them before pushing
 
 ```bash
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --no-save playwright   # once
@@ -274,11 +302,13 @@ node build/ranker-tests.cjs           # 32 — saved rankings, the weight editor
                                      #      export, and refusing a bad import
 node build/expense-tests.cjs          # 30 — the expense log, mileage, landed
                                      #      cost, lodging finds, Pro previews
+node build/jury-tests.cjs             # 33 — mock jury: the money rule, the
+                                     #      missing plumbing, score-is-not-odds
 cd worker && npm test                # 45 — API; manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
 ```
 
-All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 30 / 45 / 11**.
+All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 30 / 33 / 45 / 11**.
 
 Two things worth knowing about the tests:
 

@@ -27,6 +27,9 @@ numbers cost real money, so unknowns stay unknown.
 - Never say anything is deductible. Categorising a row is bookkeeping.
 - A Pro feature is always disabled and never shows a price, plan or sign-up.
   There is no billing in this project.
+- Mock jury: a juror's score is never shown as a show's acceptance odds and
+  never enters the fit model. Nothing is owed until a juror claims a request.
+  No uploads and no transport exist, and the page says so before you start.
 
 ## How to report back
 Write the summary at the end of a task **80% shorter** than feels natural, and
@@ -66,6 +69,8 @@ adapter both live in `core.js`. Optional sync: Supabase (last-write-wins on
 - `expenses.js` / `expenses.html` — the expense log, landed cost, break-even,
   lodging finds. DOM-free maths, same as `pipeline.js`.
 - `plan.js` — Pro previews. Renders disabled cards only; no billing exists.
+- `jury.js` / `jury.html` — mock jury review. Mostly refusals: no storage, no
+  transport, no billing, and it says so up front.
 - `browse.html` / `index.html` — catalogue / ledger, same drawer.
 - `calendar.html` / `calendar.js` — the calendar. All the date maths, lane
   packing, clash detection and the .ics live in the js, DOM-free, so a phone
@@ -85,6 +90,7 @@ node build/calendar-tests.cjs
 node build/pipeline-tests.cjs
 node build/ranker-tests.cjs
 node build/expense-tests.cjs
+node build/jury-tests.cjs
 cd worker && npm test
 ```
 Deploy: push to `main`; Pages rebuilds in ~1 min.

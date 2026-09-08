@@ -539,3 +539,29 @@ body.idr-open { overflow:hidden; }
   .exp-toolbar { padding:14px 16px; }
   .exp-foot { padding:8px 16px 26px; }
 }
+
+/* ==========================================================================
+   MOCK JURY
+   ========================================================================== */
+/* The feature's state, said once, before anybody invests time in it. */
+.jy-banner {
+  padding:12px 32px; background:var(--surface);
+  border-bottom:1px solid var(--line); font-size:13px; color:var(--muted);
+}
+.jy-steps { margin:0 0 10px; padding-left:20px; font-size:13.5px; }
+.jy-steps li { margin-bottom:7px; }
+.jy-add { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.jy-add .btn-mini[disabled] { opacity:.45; cursor:not-allowed; }
+.jy-img {
+  display:grid; grid-template-columns:auto 1fr 1fr auto; gap:8px;
+  align-items:center; padding:8px 0; border-bottom:1px solid var(--line);
+}
+.jy-img .control { min-height:34px; font-size:13px; }
+.jy-feedback {
+  border-left:3px solid var(--line); padding:8px 12px;
+  font-size:13.5px; white-space:pre-wrap;
+}
+@media (max-width:640px) {
+  .jy-banner { padding:12px 16px; }
+  .jy-img { grid-template-columns:1fr; }
+}

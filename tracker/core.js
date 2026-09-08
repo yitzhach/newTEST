@@ -12,7 +12,7 @@ window.AST = (function () {
   'use strict';
 
   /* ---- 1. MODEL + CONSTANTS --------------------------------------------- */
-  var SCHEMA_VERSION = 7;
+  var SCHEMA_VERSION = 8;
   var DB_KEY = 'artShowTracker.db';
   var THEME_KEY = 'artShowTracker.theme';
   var CONFIG_KEY = 'artShowTracker.supabase';
@@ -157,6 +157,89 @@ window.AST = (function () {
     if (v == null || v === '') return '';
     var m = String(v).match(/^(\d{4})/);
     return m ? m[1] : '';
+  }
+
+  /* ---- mock jury review --------------------------------------------------
+     An artist assembles what they would submit, a juror scores it and writes
+     back. Two things about the shape are deliberate:
+
+     1. THE MONEY RULE IS IN THE STATUSES. Nothing is owed until a juror has
+        claimed the request, so the flow is draft -> requested -> claimed ->
+        returned. There is no billing in this project at all, and when there
+        is, `claimedAt` is the only point at which a charge could be honest.
+
+     2. A JUROR'S SCORE IS NOT A SHOW'S JURY ODDS. One is an opinion about
+        your images; the other is the show's own published data. This app
+        keeps its layers apart everywhere else and does so here: a review
+        score never enters the fit model, and the UI never puts the two
+        numbers side by side. */
+  var REVIEW_STAGES = [
+    { value:'draft',     label:'Putting it together' },
+    { value:'requested', label:'Waiting for a juror' },
+    { value:'claimed',   label:'A juror is looking' },
+    { value:'returned',  label:'Feedback is back' },
+    { value:'withdrawn', label:'Withdrawn' }
+  ];
+  var REVIEW_STAGE_LABEL = Object.fromEntries(
+    REVIEW_STAGES.map(function (r) { return [r.value, r.label]; }));
+
+  /* What a submission is made of. Most shows want five works and a booth
+     shot, which is why the checklist defaults that way — but it is the
+     artist's to change, because shows differ and we have not opened their
+     pages. */
+  var IMAGE_KINDS = [
+    { value:'work',  label:'Work' },
+    { value:'booth', label:'Booth shot' }
+  ];
+  var IMAGE_KIND_LABEL = Object.fromEntries(
+    IMAGE_KINDS.map(function (k) { return [k.value, k.label]; }));
+
+  /**
+   * One image in a submission. There is NO FILE HERE: the Worker that would
+   * hold R2 storage is undeployed, so an image is described but never
+   * uploaded, and `stored` stays false so nothing can claim otherwise.
+   */
+  function makeReviewImage(input) {
+    input = input || {};
+    return {
+      id: input.id || newId(),
+      kind: IMAGE_KIND_LABEL[input.kind] ? input.kind : 'work',
+      title: String(input.title || '').trim(),
+      medium: String(input.medium || '').trim(),
+      notes: input.notes || '',
+      /* False until real storage exists. Nothing sets this to true yet. */
+      stored: false
+    };
+  }
+
+  function makeReview(input) {
+    input = input || {};
+    var now = new Date().toISOString();
+    return {
+      id: input.id || newId(),
+      /* Which show the artist is aiming at. Optional: a portfolio review
+         before choosing a show is a legitimate thing to want. */
+      showId: input.showId || '',
+      stage: REVIEW_STAGE_LABEL[input.stage] ? input.stage : 'draft',
+      images: Array.isArray(input.images) ? input.images.map(makeReviewImage) : [],
+      /* What the artist wants looked at. */
+      askedAbout: input.askedAbout || '',
+
+      /* Timestamps for the money rule. Nothing is owed before claimedAt. */
+      requestedAt: input.requestedAt || null,
+      claimedAt: input.claimedAt || null,
+      returnedAt: input.returnedAt || null,
+
+      /* Filled in by the juror, and null until they do. A review with no
+         score has not been scored — it is never a 5, and never a 0. */
+      jurorName: String(input.jurorName || '').trim(),
+      score: numOrNull(input.score),
+      feedback: input.feedback || '',
+
+      deletedAt: input.deletedAt || null,
+      createdAt: input.createdAt || now,
+      updatedAt: input.updatedAt || now
+    };
   }
 
   /* ---- the expense log ---------------------------------------------------
@@ -376,11 +459,12 @@ window.AST = (function () {
 
   function migrate(db) {
     var d = db;
-    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [] };
+    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [], reviews: [] };
     if (!Array.isArray(d.shows)) d.shows = [];
     if (!Array.isArray(d.applications)) d.applications = [];
     if (!Array.isArray(d.rankers)) d.rankers = [];
     if (!Array.isArray(d.expenses)) d.expenses = [];
+    if (!Array.isArray(d.reviews)) d.reviews = [];
     // v0 (pre-versioning: a bare array or no version) -> v1
     if (!d.schemaVersion) d.schemaVersion = 1;
     // v1 -> v2: soft deletes, so cross-device sync can carry a deletion.
@@ -453,7 +537,14 @@ window.AST = (function () {
       d.schemaVersion = 7;
     }
     d.rankers = (Array.isArray(d.rankers) ? d.rankers : []).map(makeRanker);
+    /* v7 -> v8: mock jury reviews. Nothing seeded and nothing backfilled;
+       a review is something a juror did, and none has. */
+    if (d.schemaVersion < 8) {
+      if (!Array.isArray(d.reviews)) d.reviews = [];
+      d.schemaVersion = 8;
+    }
     d.expenses = (Array.isArray(d.expenses) ? d.expenses : []).map(makeExpense);
+    d.reviews = (Array.isArray(d.reviews) ? d.reviews : []).map(makeReview);
     d.schemaVersion = SCHEMA_VERSION;
     return d;
   }
@@ -462,7 +553,7 @@ window.AST = (function () {
     function read() {
       var raw = null;
       try { raw = localStorage.getItem(DB_KEY); }
-      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [] }; }
+      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [], reviews: [] }; }
       if (raw === null) return null;
       var parsed;
       try { parsed = JSON.parse(raw); } catch (_) { parsed = null; }
@@ -486,7 +577,7 @@ window.AST = (function () {
       // A brand-new device gets the demo season. Flag it: the seed is not the
       // user's data, so on first sign-in it must not be pushed up as if it
       // were — a second device would duplicate the whole season.
-      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], applications: [], rankers: [], expenses: [], pristineSeed: true });
+      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], applications: [], rankers: [], expenses: [], reviews: [], pristineSeed: true });
     }
     /** Any real write means this device's data is no longer the untouched seed. */
     function touch(db) { db.pristineSeed = false; return db; }
@@ -543,7 +634,7 @@ window.AST = (function () {
         var db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow),
                    events: prev.events, applications: prev.applications,
                    rankers: prev.rankers, expenses: prev.expenses,
-                   pristineSeed: false };
+                   reviews: prev.reviews, pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
       },
@@ -555,7 +646,7 @@ window.AST = (function () {
         var db = { schemaVersion: SCHEMA_VERSION, shows: rows.map(makeShow),
                    events: prev.events, applications: prev.applications,
                    rankers: prev.rankers, expenses: prev.expenses,
-                   pristineSeed: false };
+                   reviews: prev.reviews, pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
       },
@@ -679,6 +770,34 @@ window.AST = (function () {
         write(touch(db));
         return Promise.resolve(before);
       },
+      /* ---- jury reviews --------------------------------------------------- */
+      listReviews: function () { return Promise.resolve(live(load().reviews)); },
+      listAllReviews: function () { return Promise.resolve(load().reviews.slice()); },
+      getReview: function (id) {
+        return Promise.resolve(live(load().reviews).filter(function (r) { return r.id === id; })[0] || null);
+      },
+      upsertReview: function (rv) {
+        var db = load();
+        var rec = makeReview(rv);
+        rec.updatedAt = new Date().toISOString();
+        var i = db.reviews.findIndex(function (r) { return r.id === rec.id; });
+        if (i === -1) db.reviews.push(rec);
+        else db.reviews[i] = Object.assign({}, db.reviews[i], rec);
+        write(touch(db));
+        return Promise.resolve(rec);
+      },
+      removeReview: function (id) {
+        var db = load();
+        var i = db.reviews.findIndex(function (r) { return r.id === id; });
+        if (i === -1) return Promise.resolve(null);
+        var before = Object.assign({}, db.reviews[i]);
+        db.reviews[i] = Object.assign({}, db.reviews[i], {
+          deletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        write(touch(db));
+        return Promise.resolve(before);
+      },
       markUsed: function () { var db = load(); write(touch(db)); }
     };
   })();
@@ -772,7 +891,12 @@ window.AST = (function () {
     listExpenses:  function ()   { return (backend.listExpenses  || LocalStore.listExpenses).call(backend); },
     getExpense:    function (id) { return (backend.getExpense    || LocalStore.getExpense).call(backend, id); },
     upsertExpense: function (ex) { return (backend.upsertExpense || LocalStore.upsertExpense).call(backend, ex); },
-    removeExpense: function (id) { return (backend.removeExpense || LocalStore.removeExpense).call(backend, id); }
+    removeExpense: function (id) { return (backend.removeExpense || LocalStore.removeExpense).call(backend, id); },
+    /* Jury reviews, same degrade-to-local fallback. */
+    listReviews:  function ()   { return (backend.listReviews  || LocalStore.listReviews).call(backend); },
+    getReview:    function (id) { return (backend.getReview    || LocalStore.getReview).call(backend, id); },
+    upsertReview: function (rv) { return (backend.upsertReview || LocalStore.upsertReview).call(backend, rv); },
+    removeReview: function (id) { return (backend.removeReview || LocalStore.removeReview).call(backend, id); }
   };
   function useStore(next) { backend = next || LocalStore; return Store; }
   function currentStore() { return backend; }
@@ -1095,7 +1219,9 @@ window.AST = (function () {
     STATUSES: STATUSES, STATUS_LABEL: STATUS_LABEL,
     makeShow: makeShow, makeEvent: makeEvent, makeReminder: makeReminder,
     makeApplication: makeApplication, makeRanker: makeRanker,
-    makeExpense: makeExpense,
+    makeExpense: makeExpense, makeReview: makeReview, makeReviewImage: makeReviewImage,
+    REVIEW_STAGES: REVIEW_STAGES, REVIEW_STAGE_LABEL: REVIEW_STAGE_LABEL,
+    IMAGE_KINDS: IMAGE_KINDS, IMAGE_KIND_LABEL: IMAGE_KIND_LABEL,
     EXPENSE_CATEGORIES: EXPENSE_CATEGORIES, EXPENSE_LABEL: EXPENSE_LABEL,
     LODGING_KINDS: LODGING_KINDS, LODGING_KIND_LABEL: LODGING_KIND_LABEL,
     STAGES: STAGES, STAGE_LABEL: STAGE_LABEL, STAGE_SETTLED: STAGE_SETTLED,
