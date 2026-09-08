@@ -62,7 +62,7 @@ These numbers are referenced across sessions. Do not renumber them; append.
 | Phase | Contains | Blocked on |
 |---|---|---|
 | **1** | ~~Data hygiene, geocode (1), weather (2), sales tax (9)~~ **done** | — |
-| **2** | Landed cost (8), break-even (13), cash flow (16), expense log (18) | booth fees — needs Phase 7 capture |
+| **2** | Landed cost (8), break-even (13), cash flow (16), expense log (18) | ~~booth fees~~ — unblocked, see §7 |
 | **3** | Application pipeline (11), jury fee tracker (12), expected value (14), image sets (21) | nothing |
 | **4** | Square import (15), sell-through (19), debrief (22), collector CRM (20) | nothing |
 | **5** | Route planner (17), demographics (3), tourism (4) | ~~Phase 1 geocode~~ — unblocked |
@@ -230,9 +230,11 @@ Not blocking Phase 1, but they need an answer before the phase that needs them:
   **Still unverified against a live response**, because the container cannot
   reach it. `tracker/weather.js` fails closed and the panel reads "not known",
   so a wrong choice is visible rather than silent. Confirm on the live site.
-- **Where booth fees come from.** Phase 2 costing is blocked until booth fee
-  coverage rises above 24/236. That means saved ZAPP pages (Phase 7) or member
-  reports. Decide which before starting Phase 2.
+- ~~**Where booth fees come from.**~~ Answered: the research spreadsheet plus a
+  hand audit into `research-overrides.json`. Coverage is well past the bar Phase 2
+  needed — current numbers are in `START-HERE.md`, not here, because they move.
+  The shows still lacking a fee state no rate a visiting artist could pay, so
+  they need the organiser rather than a better parser.
 - **What "the network" lens ranks on.** Currently the ten factor ratings.
   Ranking on reported net is the obvious next lens and needs a decision about
   comparing a $900 booth weekend against a $2,400 one fairly.
@@ -246,3 +248,82 @@ Not blocking Phase 1, but they need an answer before the phase that needs them:
   through the Worker so the key stays server-side, or capture rates per show
   once a year by hand. The middle option is the only one that gets an artist a
   number they can collect, and it needs the Worker deployed first.
+
+---
+
+## 7. The accounting suite — mapped, not started
+
+Asked for as "sales detail per show, and ways to follow up with clients". Not new
+territory: it is ideas 8, 12–16, 18–20 and 22 pulled out of Phases 2 and 4 into
+one coherent build. This section is a working document — add to it.
+
+### The structural decision that governs everything else
+
+A show is one flat record (`makeShow` in `core.js`) with `juryFee` and `boothFee`
+as scalars, in one array under one localStorage key, synced last-write-wins on
+`updatedAt`.
+
+A sale is not a property of a show. It is a **child record** — many per show, each
+independently editable, each with its own timestamp. Adding those breaks three
+things that currently work:
+
+1. **Last-write-wins sync becomes lossy.** Two devices each add a different sale
+   to the same show; the second push wins and the first sale is gone. Acceptable
+   for a status change. Not for money.
+2. **localStorage has no eviction story.** A season of shows is a few KB. A season
+   of individual sales, contacts and mileage entries is a different order.
+3. **Migrations stop being cheap.** The existing ones reshape a small flat array.
+   A bad migration over financial records costs someone their tax year, not their
+   preferences.
+
+**Decide before writing any of Stage 2+:** do sales become child records with
+their own ids and `updatedAt`, in sibling collections keyed by `showId`?
+Recommendation: yes — more work up front, and the only shape that survives sync,
+export and an audit.
+
+### Staging — each stage is useful on its own
+
+**Stage 1 — the post-show number.** One field per show: gross sales. Delivers
+landed cost (8) and break-even (13) immediately, since booth and jury fees are
+already in the model. No new record types, no migration risk. The smallest thing
+that answers "did that show pay for itself".
+
+**Stage 2 — the expense log (18).** Mileage, lodging, food, materials. Schedule C
+categories from the start — retrofitting tax categories onto a year of
+uncategorised rows is miserable. First child-record collection, so this is where
+the sync question above has to actually be answered.
+
+**Stage 3 — individual sales (15, 19).** Piece, price, size, medium, date, payment
+method. Sell-through becomes real and feeds back into the fit model. Square/Stripe
+CSV import belongs here; manual entry at a show is a thing nobody does.
+
+**Stage 4 — contacts and follow-up (20, 22).** Name, email, what they looked at,
+what they bought or did not, when to follow up. Deliberately last: a CRM with no
+sales history behind it is an address book.
+
+### Why Stage 3 is the one that matters
+
+Stages 1–2 are bookkeeping a spreadsheet already does. Stage 3 is where the
+artist's own numbers start improving the recommendations — sell-through by price
+band and region beats any editorial fit score at predicting the next show. That
+loop is what earns a weekly open, and it becomes idea 24 once there are members.
+
+### Two constraints specific to this suite
+
+- **The honesty rules invert.** Elsewhere the rule is "never show a number we do
+  not have". Here the numbers are the artist's own and are the most reliable data
+  in the system — but derived figures (break-even, expected value, projected net)
+  are model output wearing a currency sign, and need the same provenance
+  discipline the fit scores get.
+- **Never answer "is this deductible?"** A Schedule C-shaped log invites the
+  question. Categorising a row is not tax advice; telling someone it is deductible
+  is. Draw that line in the UI before writing the log.
+
+### Open questions for this suite
+
+- Child records vs denormalised. Blocks Stages 2–4.
+- Does the expense log need multi-year scoping, or is one season enough?
+- If the Worker is deployed, do contacts sync or stay device-only? Other people's
+  contact details raise a higher bar than show notes.
+- Does Stage 1's gross-sales field belong on the show record or wait for Stage 3
+  so there is only ever one place a sales figure lives?
