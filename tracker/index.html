@@ -31,11 +31,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
       referrerpolicy="no-referrer">
-<link rel="stylesheet" href="app.css?v=1437361d">
+<link rel="stylesheet" href="app.css?v=f894c002">
 <!-- The ledger shows the same fit/intel drawer the catalogue does, so it needs
      the same styles. Scoped to .idr/.fitchip/.prov and its own tokens; it adds
      to app.css rather than competing with it. -->
-<link rel="stylesheet" href="intel.css?v=1437361d">
+<link rel="stylesheet" href="intel.css?v=f894c002">
 </head>
 <body>
 <!-- ==========================================================================
@@ -166,6 +166,7 @@
       <p class="map-note" id="mapNote"></p>
       <div class="map-actions">
         <a class="btn btn-quiet" href="map.html">Open full-page map</a>
+        <a class="btn btn-quiet" href="expenses.html">Money &amp; expenses</a>
       </div>
     </section>
   </aside>
@@ -679,25 +680,25 @@
      sandbox and an unverified hash would break the map outright. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
         referrerpolicy="no-referrer"></script>
-<script src="core.js?v=1437361d"></script>
-<script src="version.js?v=1437361d"></script>
-<script src="map.js?v=1437361d"></script>
+<script src="core.js?v=f894c002"></script>
+<script src="version.js?v=f894c002"></script>
+<script src="map.js?v=f894c002"></script>
 <!-- The fit/intel layer, so a show in the ledger opens the same breakdown
      it does in the catalogue. weather.js and salestax.js are optional to
      intel-ui.js, but without them the drawer silently loses two panels,
      which is worse than carrying two small files. -->
-<script src="fit.js?v=1437361d"></script>
-<script src="pipeline.js?v=1437361d"></script>
-<script src="intel.js?v=1437361d"></script>
-<script src="members.js?v=1437361d"></script>
-<script src="weather.js?v=1437361d"></script>
-<script src="salestax.js?v=1437361d"></script>
-<script src="intel-ui.js?v=1437361d"></script>
-<script src="store-supabase.js?v=1437361d"></script>
-<script src="import.js?v=1437361d"></script>
-<script src="import-ui.js?v=1437361d"></script>
-<script src="share.js?v=1437361d"></script>
-<script src="share-ui.js?v=1437361d"></script>
+<script src="fit.js?v=f894c002"></script>
+<script src="pipeline.js?v=f894c002"></script>
+<script src="intel.js?v=f894c002"></script>
+<script src="members.js?v=f894c002"></script>
+<script src="weather.js?v=f894c002"></script>
+<script src="salestax.js?v=f894c002"></script>
+<script src="intel-ui.js?v=f894c002"></script>
+<script src="store-supabase.js?v=f894c002"></script>
+<script src="import.js?v=f894c002"></script>
+<script src="import-ui.js?v=f894c002"></script>
+<script src="share.js?v=f894c002"></script>
+<script src="share-ui.js?v=f894c002"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE

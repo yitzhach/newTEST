@@ -22,6 +22,11 @@ numbers cost real money, so unknowns stay unknown.
   the show. A partial fee total must say it is partial.
 - A saved ranking is private by default and never carries shows, calendar,
   applications or fees. An imported one stays marked imported.
+- Expenses: an uncosted row is null, never $0, and a total says how many rows
+  it could see. No mileage rate ships with the app — the artist sets it.
+- Never say anything is deductible. Categorising a row is bookkeeping.
+- A Pro feature is always disabled and never shows a price, plan or sign-up.
+  There is no billing in this project.
 
 ## How to report back
 Write the summary at the end of a task **80% shorter** than feels natural, and
@@ -58,6 +63,9 @@ adapter both live in `core.js`. Optional sync: Supabase (last-write-wins on
   DOM-free like `calendar.js`, so a phone app can reuse it.
 - `ranker.js` — saved named rankings; compiles to a fit profile, never scores.
   Owns import validation, which is untrusted input.
+- `expenses.js` / `expenses.html` — the expense log, landed cost, break-even,
+  lodging finds. DOM-free maths, same as `pipeline.js`.
+- `plan.js` — Pro previews. Renders disabled cards only; no billing exists.
 - `browse.html` / `index.html` — catalogue / ledger, same drawer.
 - `calendar.html` / `calendar.js` — the calendar. All the date maths, lane
   packing, clash detection and the .ics live in the js, DOM-free, so a phone
@@ -76,6 +84,7 @@ node build/ledger-view-tests.cjs
 node build/calendar-tests.cjs
 node build/pipeline-tests.cjs
 node build/ranker-tests.cjs
+node build/expense-tests.cjs
 cd worker && npm test
 ```
 Deploy: push to `main`; Pages rebuilds in ~1 min.

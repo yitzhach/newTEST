@@ -322,6 +322,10 @@ export and an audit.
 
 ### Staging — each stage is useful on its own
 
+> **Stage 2 shipped** (`tracker/expenses.html`). The sync question below was
+> answered by the pipeline, not here: child records, local-only, same envelope.
+> Stage 1's gross-sales field is still open and is what trending waits on.
+
 **Stage 1 — the post-show number.** One field per show: gross sales. Delivers
 landed cost (8) and break-even (13) immediately, since booth and jury fees are
 already in the model. No new record types, no migration risk. The smallest thing
