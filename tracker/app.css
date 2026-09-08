@@ -191,7 +191,25 @@ textarea.control { min-height:110px; resize:vertical; line-height:1.6; }
   gap:0 14px; align-items:baseline;
 }
 .list-head { padding:10px 0 8px; border-bottom:1px solid var(--line); }
-.list-head > div { font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.list-head > div,
+.list-head > [data-sort] { font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+/* Four of the ledger's headings are the sort control. Same treatment as the
+   catalogue's .rowhead: they still read as headings, and the affordance is the
+   hover and the arrow rather than a button chrome. */
+.list-head [data-sort] {
+  font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit;
+  background:none; border:none; padding:0; cursor:pointer; text-align:left;
+  display:inline-flex; align-items:center; gap:5px;
+}
+.list-head [data-sort]:hover { color:var(--ink); }
+.list-head [data-sort]:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.list-head [data-sort].is-sorted { color:var(--accent); }
+/* The arrow is reserved on every heading so the columns do not shift when the
+   sorted one changes. */
+.list-head [data-sort]::after { content:'\2191'; font-size:11px; letter-spacing:0; opacity:0; }
+.list-head [data-sort]:hover::after { opacity:.35; }
+.list-head [data-sort].is-sorted::after { opacity:1; }
+.list-head [data-sort].is-sorted[aria-sort="descending"]::after { content:'\2193'; }
 /* The row is a wrapper holding the clickable label and the eye, because a
    button cannot nest inside a button. `.show-row` keeps the data-id and the
    hot/hidden classes so every handler and selector still finds it. */

@@ -3,10 +3,14 @@
 **Live:** https://yitzhach.github.io/newTEST/tracker/browse.html
 **Repo:** `yitzhach/newTEST` · deploys from `main` · **Phase 1 is done and shipped.**
 
-Read this file and nothing else to get going. `docs/handoff.md` is the deep
-reference (the model, the three data layers, the honesty constraints, the file
-map); `docs/build-phases.md` is the roadmap and the 26-idea numbering. Open
-either only when you need it.
+`CLAUDE.md` at the repo root loads automatically every session and carries the
+short version — stack, commands, critical rules, the traps. This file is the
+detail behind it, and the two are split so neither repeats the other: counts and
+coverage live *here*, because they go stale and CLAUDE.md is loaded every time.
+
+`docs/handoff.md` is the deep reference (the model, the three data layers, the
+honesty constraints, the file map); `docs/build-phases.md` is the roadmap and the
+26-idea numbering. Open either only when you need it.
 
 ---
 

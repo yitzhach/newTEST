@@ -168,6 +168,79 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
 
   await p.screenshot({ path: '/tmp/claude-0/-home-user-newTEST/d15e00e5-4a49-5a7f-8c3c-b0ad374c9e94/scratchpad/shot-tabs.png' });
 
+  /* ---- The ledger's own sortable headings --------------------------------
+     Same contract as the catalogue's: one sort state, reachable from the
+     toolbar menu and from the headings, and the two never drift. */
+  const LEDGER = 'http://127.0.0.1:8765/tracker/index.html';
+  await p.goto(LEDGER, { waitUntil: 'networkidle' });
+  await p.waitForTimeout(600);
+
+  const marked = () => p.$eval('#listHead [data-sort].is-sorted',
+                               n => n.dataset.sort + ':' + n.getAttribute('aria-sort'));
+  const dayCells = () => p.$$eval('.show-row',
+    n => n.map(x => (x.textContent.match(/[A-Z][a-z]{2}\s+\d{1,2}/) || [''])[0]));
+
+  const keys = await p.$$eval('#listHead [data-sort]', n => n.map(x => x.dataset.sort));
+  check('the ledger headings sort by date, deadline, status and rating',
+        JSON.stringify(keys) === JSON.stringify(['date','deadline','status','rating']),
+        keys.join(','));
+
+  check('the sorted heading is marked on load', await marked() === 'date:ascending',
+        await marked());
+
+  /* Reversing has to move the list, not just the arrow. */
+  const asc = await dayCells();
+  await p.click('#listHead [data-sort="date"]');
+  const desc = await dayCells();
+  check('clicking the sorted heading reverses the list',
+        await marked() === 'date:descending' && desc[0] === asc[asc.length - 1],
+        asc[0] + ' -> ' + desc[0]);
+
+  /* The direction each key opens in is chosen per key: earliest show first,
+     but highest rating first. Opening rating ascending would put the work you
+     rate worst at the top, which nobody wants to see. */
+  await p.click('#listHead [data-sort="rating"]');
+  check('rating opens highest-first rather than ascending',
+        await marked() === 'rating:descending', await marked());
+  check('the toolbar menu follows the headings',
+        await p.$eval('#sortBy', n => n.value) === 'rating');
+
+  await p.selectOption('#sortBy', 'status');
+  check('and the headings follow the toolbar menu',
+        await marked() === 'status:ascending', await marked());
+
+  /* Alphabetically "accepted" precedes "applied", which is backwards for a
+     pipeline. This asserts the order is the pipeline's, not the alphabet's. */
+  const order = await p.evaluate(() => Array.from(document.querySelectorAll('.show-row'))
+    .map(r => (r.textContent.match(/Interested|Applied|Accepted|Waitlist|Declined|Not applying/) || [''])[0])
+    .filter(Boolean));
+  const rank = { Interested:0, Applied:1, Accepted:2, Waitlist:3, Declined:4, 'Not applying':5 };
+  check('status sorts down the pipeline, not the alphabet',
+        order.length > 1 && order.every((v, i) => i === 0 || rank[order[i-1]] <= rank[v]),
+        order.slice(0, 6).join(' > '));
+
+  /* ---- Dark mode must not flash white between pages ----------------------
+     data-theme is applied by an inline script in <head>. Before that existed
+     Theme.init() ran after the body had painted with the light :root
+     defaults, so every navigation flashed. Sampling from the first
+     millisecond of the document is the only way to catch a regression: by
+     load the attribute is correct either way. */
+  await p.evaluate(() => localStorage.setItem('artShowTracker.theme', 'dark'));
+  await p.addInitScript(() => {
+    window.__themeSamples = [];
+    const t = setInterval(() => {
+      window.__themeSamples.push(document.documentElement.getAttribute('data-theme'));
+      if (window.__themeSamples.length > 30) clearInterval(t);
+    }, 1);
+  });
+  for (const page of ['browse.html', 'index.html', 'map.html']) {
+    await p.goto('http://127.0.0.1:8765/tracker/' + page, { waitUntil: 'domcontentloaded' });
+    const seen = await p.evaluate(() => window.__themeSamples || []);
+    check('no flash of light mode on ' + page,
+          seen.length > 0 && seen.every(v => v === 'dark'),
+          [...new Set(seen)].join(',') + ' over ' + seen.length + ' samples');
+  }
+
   console.log('\nerrors: ' + (errs.length ? errs.join(' | ') : 'none'));
   await b.close();
   console.log('\n' + pass + '/' + (pass + fails.length) + ' checks passed');

@@ -3,17 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Theme, before first paint. Everything else about the theme lives in
+     core.js, but Theme.init() runs after the body has already been painted
+     with the light :root defaults — which flashes white on every navigation
+     for anyone in dark mode. This is the same read, done early enough to
+     matter, and core.js re-applying the same value later is a no-op. Inline
+     on purpose: an external file is a round trip, and a round trip is the
+     flash. -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('artShowTracker.theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (_) {
+    /* Private mode or blocked storage. Falling through leaves the CSS
+       defaults in charge, which is exactly what happened before. */
+  }
+})();
+</script>
 <title>Show Ledger — Isaac Anderson</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
       referrerpolicy="no-referrer">
-<link rel="stylesheet" href="app.css?v=a63d5b4a">
+<link rel="stylesheet" href="app.css?v=78bee9aa">
 <!-- The ledger shows the same fit/intel drawer the catalogue does, so it needs
      the same styles. Scoped to .idr/.fitchip/.prov and its own tokens; it adds
      to app.css rather than competing with it. -->
-<link rel="stylesheet" href="intel.css?v=a63d5b4a">
+<link rel="stylesheet" href="intel.css?v=78bee9aa">
 </head>
 <body>
 <!-- ==========================================================================
@@ -70,13 +92,23 @@
         <select class="control" id="sortBy" style="width:auto; min-width:150px;">
           <option value="date">Show date</option>
           <option value="deadline">Apply-by date</option>
+          <option value="status">Status</option>
           <option value="rating">Rating</option>
         </select>
       </div>
     </div>
 
-    <div class="row-grid list-head" aria-hidden="true">
-      <div>Stop</div><div>Show</div><div>Dates</div><div>Deadline</div><div>Status</div><div>Rating</div>
+    <!-- Four of these headings are the sort control, the same way the
+         catalogue's are. Stop and Show stay plain labels: the list is already
+         ordered within a date by stop number, and sorting by name is what the
+         catalogue is for. Not aria-hidden any more — it holds real buttons. -->
+    <div class="row-grid list-head" id="listHead" role="row">
+      <div>Stop</div>
+      <div>Show</div>
+      <button type="button" data-sort="date">Dates</button>
+      <button type="button" data-sort="deadline">Deadline</button>
+      <button type="button" data-sort="status">Status</button>
+      <button type="button" data-sort="rating">Rating</button>
     </div>
 
     <div id="showList"></div>
@@ -595,24 +627,24 @@
      sandbox and an unverified hash would break the map outright. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
         referrerpolicy="no-referrer"></script>
-<script src="core.js?v=a63d5b4a"></script>
-<script src="version.js?v=a63d5b4a"></script>
-<script src="map.js?v=a63d5b4a"></script>
+<script src="core.js?v=78bee9aa"></script>
+<script src="version.js?v=78bee9aa"></script>
+<script src="map.js?v=78bee9aa"></script>
 <!-- The fit/intel layer, so a show in the ledger opens the same breakdown
      it does in the catalogue. weather.js and salestax.js are optional to
      intel-ui.js, but without them the drawer silently loses two panels,
      which is worse than carrying two small files. -->
-<script src="fit.js?v=a63d5b4a"></script>
-<script src="intel.js?v=a63d5b4a"></script>
-<script src="members.js?v=a63d5b4a"></script>
-<script src="weather.js?v=a63d5b4a"></script>
-<script src="salestax.js?v=a63d5b4a"></script>
-<script src="intel-ui.js?v=a63d5b4a"></script>
-<script src="store-supabase.js?v=a63d5b4a"></script>
-<script src="import.js?v=a63d5b4a"></script>
-<script src="import-ui.js?v=a63d5b4a"></script>
-<script src="share.js?v=a63d5b4a"></script>
-<script src="share-ui.js?v=a63d5b4a"></script>
+<script src="fit.js?v=78bee9aa"></script>
+<script src="intel.js?v=78bee9aa"></script>
+<script src="members.js?v=78bee9aa"></script>
+<script src="weather.js?v=78bee9aa"></script>
+<script src="salestax.js?v=78bee9aa"></script>
+<script src="intel-ui.js?v=78bee9aa"></script>
+<script src="store-supabase.js?v=78bee9aa"></script>
+<script src="import.js?v=78bee9aa"></script>
+<script src="import-ui.js?v=78bee9aa"></script>
+<script src="share.js?v=78bee9aa"></script>
+<script src="share-ui.js?v=78bee9aa"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE
@@ -633,24 +665,83 @@ window.AST.setNotifier(msg => toast(msg));
 /* ==========================================================================
    6. APP STATE
    ========================================================================== */
-const state = { shows: [], filter: 'all', sort: 'date', editingId: null, lastDeleted: null };
+const state = { shows: [], filter: 'all', sort: 'date', dir: 'asc',
+                editingId: null, lastDeleted: null };
 const $ = sel => document.querySelector(sel);
+
+const FAR = '9999-12-31';
+
+/* Status sorts by where it sits in the pipeline, not alphabetically:
+   interested -> applied -> accepted -> waitlist -> declined -> not applying.
+   Alphabetical would put "accepted" above "applied", which is backwards. */
+const STATUS_ORDER = {};
+STATUSES.forEach((s, i) => { STATUS_ORDER[s.value] = i; });
+
+/* The direction each key opens in, chosen so the first click shows what you
+   actually want: the next show, the closest deadline, your best-rated work. */
+const SORT_DEFAULT_DIR = { date:'asc', deadline:'asc', status:'asc', rating:'desc' };
+
+const DIR_LABEL = {
+  asc:  { date:'Earliest show first', deadline:'Soonest deadline first',
+          status:'Earliest in the pipeline first', rating:'Lowest rated first' },
+  desc: { date:'Latest show first', deadline:'Latest deadline first',
+          status:'Furthest along first', rating:'Highest rated first' }
+};
+
+function compareShows(a, b, key) {
+  if (key === 'rating')   return a.rating - b.rating;
+  if (key === 'deadline') return (a.applyBy || FAR).localeCompare(b.applyBy || FAR);
+  if (key === 'status')   return (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99);
+  return (a.startDate || FAR).localeCompare(b.startDate || FAR);
+}
 
 function sortedShows() {
   const list = state.filter === 'all'
     ? state.shows.slice()
     : state.shows.filter(s => s.status === state.filter);
-  const far = '9999-12-31';
-  if (state.sort === 'rating') {
-    list.sort((a, b) => (b.rating - a.rating) || (a.startDate || far).localeCompare(b.startDate || far));
-  } else if (state.sort === 'deadline') {
-    list.sort((a, b) => (a.applyBy || far).localeCompare(b.applyBy || far) ||
-                        (a.startDate || far).localeCompare(b.startDate || far));
-  } else {
-    list.sort((a, b) => (a.startDate || far).localeCompare(b.startDate || far) ||
-                        a.routeNumber.localeCompare(b.routeNumber, undefined, { numeric: true }));
-  }
+  const sign = state.dir === 'desc' ? -1 : 1;
+  /* Only the chosen key reverses. The tie-breakers stay ascending, so a
+     reversed rating still reads earliest-show-first within each rating
+     rather than scrambling the season backwards. */
+  list.sort((a, b) =>
+    sign * compareShows(a, b, state.sort) ||
+    (a.startDate || FAR).localeCompare(b.startDate || FAR) ||
+    a.routeNumber.localeCompare(b.routeNumber, undefined, { numeric: true }));
   return list;
+}
+
+/* One sort state, two ways to reach it: the toolbar menu and the column
+   headings. Everything that changes the sort goes through applySort so the
+   two cannot drift apart. Mirrors browse.html deliberately. */
+function paintSortDir() {
+  const key = state.sort, desc = state.dir === 'desc';
+  const label = (DIR_LABEL[desc ? 'desc' : 'asc'][key]) ||
+                (desc ? 'Descending' : 'Ascending');
+  $('#sortBy').value = key;
+  $('#listHead').querySelectorAll('[data-sort]').forEach(h => {
+    const on = h.dataset.sort === key;
+    h.classList.toggle('is-sorted', on);
+    h.setAttribute('aria-sort', on ? (desc ? 'descending' : 'ascending') : 'none');
+    h.title = on ? label + ' \u2014 click to reverse'
+                 : 'Sort by ' + h.textContent.trim().toLowerCase();
+  });
+}
+
+/**
+ * @param key   sort key, or null to keep the current one
+ * @param opts.toggle  true -> picking the key that is already active reverses
+ *                     it instead of resetting to its natural direction
+ */
+function applySort(key, opts) {
+  opts = opts || {};
+  if (key && key !== state.sort) {
+    state.sort = key;
+    state.dir = SORT_DEFAULT_DIR[key] || 'asc';
+  } else if (opts.toggle) {
+    state.dir = state.dir === 'desc' ? 'asc' : 'desc';
+  }
+  paintSortDir();
+  renderList();
 }
 
 /* ==========================================================================
@@ -1339,7 +1430,13 @@ $('#statusFilters').addEventListener('click', e => {
   render();
 });
 
-$('#sortBy').addEventListener('change', e => { state.sort = e.target.value; renderList(); });
+$('#sortBy').addEventListener('change', e => applySort(e.target.value));
+
+/* Clicking a heading sorts by it; clicking the sorted one reverses. */
+$('#listHead').addEventListener('click', e => {
+  const h = e.target.closest('[data-sort]');
+  if (h) applySort(h.dataset.sort, { toggle: true });
+});
 $('#f_notes').addEventListener('input', queueAutosave);
 
 /* Rating: pointer over the track picks a half-star; arrows work without a mouse. */
@@ -1530,6 +1627,7 @@ trapFocus($('#shareModal'));
    13. BOOT
    ========================================================================== */
 Theme.init();
+paintSortDir();
 fillStatusSelect();
 setRating(0, { silent: true });
 syncMapChrome();
