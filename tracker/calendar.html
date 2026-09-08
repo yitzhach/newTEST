@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Theme, before first paint. Same snippet as the other pages: Theme.init()
+     in core.js runs after the body is painted, which flashes white on every
+     navigation for anyone in dark mode. Inline on purpose — an external file
+     is a round trip, and the round trip is the flash. -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('artShowTracker.theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (_) { /* blocked storage — CSS defaults stay in charge */ }
+})();
+</script>
+<title>Calendar — Show Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="app.css?v=47a16f1c">
+<link rel="stylesheet" href="intel.css?v=47a16f1c">
+<link rel="stylesheet" href="calendar.css?v=47a16f1c">
+</head>
+<body>
+<header class="app-header">
+  <div class="brand">
+    <h1>Calendar</h1>
+    <span class="sub">your season, and what it collides with</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-quiet" id="btnConnect" type="button">Connect</button>
+    <button class="btn btn-quiet" id="btnExport" type="button">Export .ics</button>
+    <button class="btn btn-icon" id="btnTheme" type="button" aria-label="Switch theme" title="Switch theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" id="iconSun">
+        <circle cx="10" cy="10" r="3.6"/>
+        <path d="M10 1.6v2.2M10 16.2v2.2M2.6 10H4.8M15.2 10h2.2M4.8 4.8l1.6 1.6M13.6 13.6l1.6 1.6M15.2 4.8l-1.6 1.6M6.4 13.6l-1.6 1.6"/>
+      </svg>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" stroke-linejoin="round" id="iconMoon" hidden>
+        <path d="M16.5 11.8A6.9 6.9 0 0 1 8.2 3.5a6.9 6.9 0 1 0 8.3 8.3z"/>
+      </svg>
+    </button>
+    <button class="btn btn-primary" id="btnNew" type="button">+ New</button>
+    <a class="btn btn-quiet" href="browse.html">All shows</a>
+    <a class="btn btn-quiet" href="index.html">Show Ledger</a>
+  </div>
+</header>
+
+<div class="cal-wrap">
+  <div class="cal-toolbar">
+    <div class="cal-nav">
+      <button class="btn btn-icon" id="btnPrev" type="button" aria-label="Previous">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.5 4L6.5 10l6 6"/></svg>
+      </button>
+      <button class="btn btn-icon" id="btnNext" type="button" aria-label="Next">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+             stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4l6 6-6 6"/></svg>
+      </button>
+    </div>
+    <h2 class="cal-title" id="calTitle">&nbsp;</h2>
+    <button class="btn btn-quiet" id="btnToday" type="button">Today</button>
+    <span class="cal-spacer"></span>
+    <div class="cal-views" role="group" aria-label="Calendar view">
+      <button type="button" data-view="year"  aria-pressed="false">Year</button>
+      <button type="button" data-view="month" aria-pressed="true">Month</button>
+      <button type="button" data-view="day"   aria-pressed="false">Day</button>
+    </div>
+  </div>
+
+  <div class="cal-layers" id="calLayers"></div>
+  <div id="calClash"></div>
+  <div id="calView"></div>
+
+  <p class="build-stamp" id="buildStamp"></p>
+</div>
+
+<script src="core.js?v=47a16f1c"></script>
+<script src="version.js?v=47a16f1c"></script>
+<script src="fit.js?v=47a16f1c"></script>
+<script src="intel.js?v=47a16f1c"></script>
+<script src="members.js?v=47a16f1c"></script>
+<script src="weather.js?v=47a16f1c"></script>
+<script src="salestax.js?v=47a16f1c"></script>
+<script src="intel-ui.js?v=47a16f1c"></script>
+<script src="catalogue.js?v=47a16f1c"></script>
+<script src="calendar.js?v=47a16f1c"></script>
+<script src="store-supabase.js?v=47a16f1c"></script>
+<script type="module">
+/* ==========================================================================
+   CALENDAR — the page
+   Rendering only. Every date decision, every overlap and the .ics itself
+   live in calendar.js, which knows nothing about the DOM; this file turns
+   what that returns into elements. Keeping the split clean is what lets a
+   phone app reuse the model rather than reimplement it.
+   ========================================================================== */
+const A = window.AST;
+const CAL = window.ASTCalendar;
+const C = window.ASTCatalogue;
+const UI = window.ASTIntelUI;
+const { esc, fmtRange, Store, Settings, Theme } = A;
+const $ = sel => document.querySelector(sel);
+
+const LAYER_KEY = 'artShowTracker.calLayers';
+
+/* The URL carries where you are looking: '#2027-01-09' or '#2027-01-09/day'.
+   That makes a day linkable — you can send someone a date, come back to one
+   from a bookmark, and it is the hook a shared calendar will hang off. */
+function fromHash() {
+  const m = /^#(\d{4}-\d{2}-\d{2})(?:\/(year|month|day))?$/.exec(location.hash || '');
+  if (!m || !CAL.fromISO(m[1])) return null;
+  return { cursor: m[1], view: m[2] || 'month' };
+}
+const opened = fromHash();
+
+const state = {
+  view: opened ? opened.view : 'month',
+  cursor: opened ? opened.cursor : CAL.todayISO(),   // the day/month/year in view
+  shows: [],
+  events: [],
+  catalogueReady: false,
+  fit: {},                       // fit records by catalogue id, for the drawer
+  layers: readLayers(),
+  items: []
+};
+
+function readLayers() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(LAYER_KEY) || 'null'); } catch (_) {}
+  /* The catalogue is OFF by default. 237 shows over your own nine is not a
+     calendar, it is a wall — you turn it on when you are asking "what else is
+     that weekend?", which is a question, not a default. */
+  return Object.assign({ ledger: true, catalogue: false, personal: true }, saved || {});
+}
+function saveLayers() {
+  try { localStorage.setItem(LAYER_KEY, JSON.stringify(state.layers)); } catch (_) {}
+}
+
+/* ---- data --------------------------------------------------------------- */
+async function loadAll() {
+  state.shows = await Store.list();
+  state.events = await Store.listEvents();
+  if (state.layers.catalogue && !state.catalogueReady) await loadCatalogue();
+  rebuild();
+}
+async function loadCatalogue() {
+  try { await C.load(); state.catalogueReady = true; }
+  catch (e) { console.warn('catalogue did not load:', e); }
+}
+async function loadFit() {
+  /* Only needed to open the drawer, so a failure costs the breakdown, not
+     the calendar. */
+  try {
+    const res = await fetch('fit-data.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    (data.shows || []).forEach(s => { state.fit[s.id] = s; });
+  } catch (e) { console.warn('fit-data.json did not load:', e); }
+}
+
+function rebuild() {
+  state.items = CAL.build({
+    shows: state.shows,
+    catalogue: state.catalogueReady ? C.all() : [],
+    events: state.events,
+    layers: state.layers
+  });
+  render();
+}
+
+/* ---- chrome ------------------------------------------------------------- */
+function renderLayers() {
+  const counts = {
+    ledger: state.items.filter(i => i.layer === 'ledger').length,
+    catalogue: state.items.filter(i => i.layer === 'catalogue').length,
+    personal: state.items.filter(i => i.layer === 'personal').length
+  };
+  const tone = { ledger:'var(--s-accepted)', catalogue:'var(--muted)', personal:'var(--accent)' };
+  $('#calLayers').innerHTML = CAL.LAYERS.map(l => `
+    <label class="cal-layer" data-layer-row="${l.value}" style="--layer:${tone[l.value]}">
+      <input type="checkbox" data-layer="${l.value}" ${state.layers[l.value] ? 'checked' : ''}>
+      <span class="swatch" aria-hidden="true"></span>
+      <span class="lab">${esc(l.label)}</span>
+      <span class="hint">${state.layers[l.value] ? counts[l.value] + ' shown' : esc(l.hint)}</span>
+    </label>`).join('');
+}
+
+function renderClashes() {
+  const pairs = CAL.clashes(state.items);
+  if (!pairs.length) { $('#calClash').innerHTML = ''; return; }
+  $('#calClash').innerHTML = `
+    <div class="cal-clash">
+      <h3>${pairs.length} date clash${pairs.length === 1 ? '' : 'es'}</h3>
+      <ul>${pairs.map(p => `<li>
+        <button type="button" data-jump="${esc(p.a.start)}">${esc(p.a.title)}</button>
+        and <button type="button" data-jump="${esc(p.b.start)}">${esc(p.b.title)}</button>
+        overlap — ${esc(fmtRange(p.a.start, p.a.end))} / ${esc(fmtRange(p.b.start, p.b.end))}
+      </li>`).join('')}</ul>
+    </div>`;
+}
+
+function title() {
+  const d = CAL.fromISO(state.cursor);
+  if (state.view === 'year') return `<span class="yr">${d.getFullYear()}</span>`;
+  if (state.view === 'day') {
+    return `${CAL.WEEKDAYS_LONG[d.getDay()]}, ${CAL.MONTHS_LONG[d.getMonth()]} ${d.getDate()} ` +
+           `<span class="yr">${d.getFullYear()}</span>`;
+  }
+  return `${CAL.MONTHS_LONG[d.getMonth()]} <span class="yr">${d.getFullYear()}</span>`;
+}
+
+function render() {
+  // replaceState, not push: paging a month is not a thing to press Back over.
+  try { history.replaceState(null, '', '#' + state.cursor + '/' + state.view); } catch (_) {}
+  $('#calTitle').innerHTML = title();
+  document.querySelectorAll('.cal-views button').forEach(b =>
+    b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
+  renderLayers();
+  renderClashes();
+  if (state.view === 'month') renderMonth();
+  else if (state.view === 'day') renderDay();
+  else renderYear();
+}
+
+/* ---- month -------------------------------------------------------------- */
+const MAX_LANES = 4;          // beyond this a cell becomes unreadable
+const LANE_H = 21, BARS_TOP = 30;
+
+function barLabel(i) {
+  const time = (!i.allDay && i.startTime) ? `<span class="tm">${esc(CAL.fmtTime(i.startTime))}</span>` : '';
+  const dot = i.layer === 'personal' ? '<span class="dot"></span>' : '';
+  return dot + time + esc(i.title);
+}
+
+function renderMonth() {
+  const d = CAL.fromISO(state.cursor);
+  const weeks = CAL.monthGrid(d.getFullYear(), d.getMonth());
+  const today = CAL.todayISO();
+  const clashing = CAL.clashDays(state.items);
+
+  let html = '<div class="cal-grid">' +
+    '<div class="cal-dows">' + CAL.WEEKDAYS.map(w => `<div>${w}</div>`).join('') + '</div>';
+
+  weeks.forEach(week => {
+    const packed = CAL.packWeek(state.items, week);
+    const shownLanes = Math.min(packed.lanes, MAX_LANES);
+    const height = BARS_TOP + shownLanes * LANE_H + (packed.lanes > MAX_LANES ? 16 : 0) + 8;
+
+    html += `<div class="cal-week" style="--cell-h:${Math.max(112, height)}px">`;
+    week.forEach(cell => {
+      html += `<div class="cal-cell${cell.inMonth ? '' : ' out'}${cell.iso === today ? ' today' : ''}` +
+              `${clashing[cell.iso] ? ' is-clash' : ''}" data-day="${cell.iso}">
+        <button class="cal-daybtn" type="button" data-open-day="${cell.iso}"
+                aria-label="Open ${cell.iso}"><span class="cal-num">${CAL.fromISO(cell.iso).getDate()}</span></button>
+        <button class="cal-add" type="button" data-add="${cell.iso}"
+                aria-label="Add an event on ${cell.iso}">+</button>
+      </div>`;
+    });
+
+    // Bars sit over the whole week so a multi-day show is one element.
+    html += '<div class="cal-bars">';
+    const overflow = {};
+    packed.segments.forEach(seg => {
+      if (seg.lane >= MAX_LANES) {
+        for (let c = seg.col; c < seg.col + seg.span; c++) overflow[c] = (overflow[c] || 0) + 1;
+        return;
+      }
+      const left = (seg.col / 7) * 100, width = (seg.span / 7) * 100;
+      const i = seg.item;
+      html += `<button class="cal-bar l-${i.layer}${i.status ? ' st-' + i.status : ''}` +
+              `${seg.continuesLeft ? ' cont-l' : ''}" type="button" data-item="${esc(i.id)}"
+        style="left:${left}%;width:calc(${width}% - 4px);margin-left:2px;top:${seg.lane * LANE_H}px"
+        title="${esc(i.title)} — ${esc(fmtRange(i.start, i.end))}">${barLabel(i)}</button>`;
+    });
+    Object.keys(overflow).forEach(col => {
+      html += `<button class="cal-more" type="button" data-open-day="${week[col].iso}"
+        style="left:${(col / 7) * 100}%;top:${MAX_LANES * LANE_H}px">+${overflow[col]} more</button>`;
+    });
+    html += '</div></div>';
+  });
+
+  $('#calView').innerHTML = html + '</div>';
+}
+
+/* ---- day ---------------------------------------------------------------- */
+const HOUR_H = 48;
+
+function renderDay() {
+  const iso = state.cursor;
+  const d = CAL.fromISO(iso);
+  const lay = CAL.dayLayout(state.items, iso);
+
+  let html = `<div class="cal-day">
+    <div class="cal-day-head">
+      <span class="dow">${CAL.WEEKDAYS_LONG[d.getDay()]}</span>
+      <span class="dnum">${CAL.MONTHS_LONG[d.getMonth()]} ${d.getDate()}</span>
+    </div>
+    <div class="cal-allday">` +
+    lay.allDay.map(i => `<button class="cal-bar l-${i.layer}${i.status ? ' st-' + i.status : ''}"
+        type="button" data-item="${esc(i.id)}">${barLabel(i)}</button>`).join('') +
+    `</div><div class="cal-hours">`;
+
+  for (let h = 0; h < 24; h++) {
+    const ap = h >= 12 ? 'PM' : 'AM', h12 = h % 12 === 0 ? 12 : h % 12;
+    html += `<div class="cal-hour"><div class="hr">${h === 0 ? '' : h12 + ' ' + ap}</div>
+             <div class="slot" data-add-at="${iso}T${String(h).padStart(2,'0')}:00"></div></div>`;
+  }
+
+  html += '<div class="cal-blocks">';
+  lay.timed.forEach(b => {
+    const top = (b.startMin / 60) * HOUR_H;
+    const height = Math.max(20, ((b.endMin - b.startMin) / 60) * HOUR_H - 2);
+    const w = 100 / b.lanes;
+    html += `<button class="cal-block" type="button" data-item="${esc(b.item.id)}"
+      style="top:${top}px;height:${height}px;left:${b.lane * w}%;width:calc(${w}% - 4px)">
+      <span class="t">${esc(b.item.title)}</span>
+      <span class="s">${esc(CAL.fmtTime(b.item.startTime))}${b.item.endTime ? '–' + esc(CAL.fmtTime(b.item.endTime)) : ''}</span>
+    </button>`;
+  });
+  html += '</div>';
+
+  // The now-line belongs on today and nowhere else.
+  if (iso === CAL.todayISO()) {
+    const now = new Date();
+    const top = ((now.getHours() * 60 + now.getMinutes()) / 60) * HOUR_H;
+    html += `<div class="cal-now" style="top:${top}px"></div>`;
+  }
+
+  html += '</div></div>';
+  if (!lay.allDay.length && !lay.timed.length) {
+    html += '<p class="cal-empty">Nothing on this day. Click an hour, or press + New.</p>';
+  }
+  $('#calView').innerHTML = html;
+}
+
+/* ---- year --------------------------------------------------------------- */
+function renderYear() {
+  const year = CAL.fromISO(state.cursor).getFullYear();
+  const months = CAL.yearSummary(state.items, year);
+  $('#calView').innerHTML = '<div class="cal-year">' + months.map(m => `
+    <button class="cal-ycard" type="button" data-month="${m.month}">
+      <h4>${esc(m.label)}</h4>
+      <div class="n">${m.total}</div>
+      <div class="sub">${m.ledger} in your schedule${m.personal ? ` · ${m.personal} personal` : ''}</div>
+      ${m.clashes ? `<div class="warn">${m.clashes} clash${m.clashes === 1 ? '' : 'es'}</div>` : ''}
+    </button>`).join('') + '</div>';
+}
+
+/* ---- popover ------------------------------------------------------------ */
+function closePop() { const p = $('.cal-pop'); if (p) p.remove(); }
+
+function itemById(id) { return state.items.filter(i => i.id === id)[0] || null; }
+
+function openPop(anchor, item) {
+  closePop();
+  const pop = document.createElement('div');
+  pop.className = 'cal-pop';
+
+  const layerName = { ledger:'My schedule', catalogue:'Catalogue', personal:'Personal' }[item.layer];
+  const rows = [];
+  rows.push(['When', esc(fmtRange(item.start, item.end)) +
+    (!item.allDay && item.startTime ? ' · ' + esc(CAL.fmtTime(item.startTime)) : '')]);
+  if (item.place) rows.push(['Where', esc(item.place)]);
+  if (item.layer === 'ledger' && item.status) rows.push(['Status', esc(A.STATUS_LABEL[item.status] || item.status)]);
+  if (item.layer === 'personal') {
+    rows.push(['Kind', esc(A.EVENT_KIND_LABEL[item.kind] || item.kind)]);
+    const rem = (item.ref.reminders || []);
+    /* Say plainly that nothing will be sent. A reminder the app cannot
+       deliver must not read like one it will. */
+    rows.push(['Reminders', rem.length
+      ? rem.map(r => esc(CAL.reminderLabel(r.minutesBefore))).join(', ') +
+        ' <span class="muted-inline">(no channel connected — not sent)</span>'
+      : '<span class="muted-inline">none</span>']);
+  }
+
+  const catId = item.layer === 'catalogue' ? item.ref.id
+              : (item.ref && item.ref.catalogueId) || '';
+  const hasFit = catId && state.fit[catId];
+
+  pop.innerHTML = `
+    <span class="layer-tag">${esc(layerName)}</span>
+    <h4>${esc(item.title)}</h4>
+    ${item.ref && item.ref.notes ? `<p class="meta">${esc(item.ref.notes)}</p>` : ''}
+    <dl>${rows.map(r => `<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}</dl>
+    <div class="row">
+      ${hasFit ? '<button class="btn btn-primary" data-pop="detail">Show details</button>' : ''}
+      ${item.layer === 'personal' ? '<button class="btn" data-pop="edit">Edit</button>' +
+        '<button class="btn btn-danger" data-pop="delete">Delete</button>' : ''}
+      ${item.layer === 'ledger' ? '<a class="btn" href="index.html">Open ledger</a>' : ''}
+      <button class="btn btn-quiet" data-pop="close">Close</button>
+    </div>`;
+
+  document.body.appendChild(pop);
+  const r = anchor.getBoundingClientRect();
+  // Keep it on screen: flip above when the bottom would run off.
+  const top = r.bottom + window.scrollY + 6;
+  const wouldOverflow = r.bottom + pop.offsetHeight + 12 > window.innerHeight;
+  pop.style.top = (wouldOverflow ? r.top + window.scrollY - pop.offsetHeight - 6 : top) + 'px';
+  pop.style.left = Math.max(8, Math.min(r.left + window.scrollX,
+                            window.scrollX + window.innerWidth - pop.offsetWidth - 8)) + 'px';
+
+  pop.addEventListener('click', async e => {
+    const act = e.target.closest('[data-pop]');
+    if (!act) return;
+    const what = act.dataset.pop;
+    if (what === 'close') return closePop();
+    if (what === 'detail') { closePop(); UI.openShow(state.fit[catId]); return; }
+    if (what === 'edit') { closePop(); openSheet(item.ref); return; }
+    if (what === 'delete') {
+      closePop();
+      await Store.removeEvent(item.ref.id);
+      await loadAll();
+    }
+  });
+}
+
+/* ---- compose sheet ------------------------------------------------------ */
+function closeSheet() {
+  const s = $('.cal-sheet'), sc = $('.cal-scrim');
+  if (s) s.remove(); if (sc) sc.remove();
+}
+
+function openSheet(evt) {
+  closeSheet(); closePop();
+  const e = evt || A.makeEvent({ startDate: state.cursor });
+  const isNew = !evt;
+
+  const scrim = document.createElement('div');
+  scrim.className = 'cal-scrim';
+  const sheet = document.createElement('div');
+  sheet.className = 'cal-sheet';
+  sheet.innerHTML = `
+    <header>
+      <h2>${isNew ? 'New event' : 'Edit event'}</h2>
+      <button class="btn btn-icon" data-sheet="close" aria-label="Close">&times;</button>
+    </header>
+    <div class="body">
+      <div class="cal-field">
+        <label class="label" for="evTitle">Title</label>
+        <input type="text" id="evTitle" value="${esc(e.title)}" placeholder="Drive to Naples">
+      </div>
+      <div class="cal-field">
+        <label class="label" for="evKind">Kind</label>
+        <select id="evKind">${A.EVENT_KINDS.map(k =>
+          `<option value="${k.value}"${k.value === e.kind ? ' selected' : ''}>${esc(k.label)}</option>`).join('')}</select>
+      </div>
+      <div class="cal-row2 cal-field">
+        <div><label class="label" for="evStart">Starts</label>
+          <input type="date" id="evStart" value="${esc(e.startDate)}"></div>
+        <div><label class="label" for="evEnd">Ends</label>
+          <input type="date" id="evEnd" value="${esc(e.endDate)}"></div>
+      </div>
+      <label class="cal-check"><input type="checkbox" id="evAllDay" ${e.allDay ? 'checked' : ''}>
+        All day</label>
+      <div class="cal-row2 cal-field" id="evTimes" ${e.allDay ? 'hidden' : ''}>
+        <div><label class="label" for="evFrom">From</label>
+          <input type="time" id="evFrom" value="${esc(e.startTime)}"></div>
+        <div><label class="label" for="evTo">To</label>
+          <input type="time" id="evTo" value="${esc(e.endTime)}"></div>
+      </div>
+      <div class="cal-field">
+        <label class="label" for="evWhere">Where</label>
+        <input type="text" id="evWhere" value="${esc(e.location)}">
+      </div>
+      <div class="cal-field">
+        <label class="label" for="evRemind">Remind me</label>
+        <select id="evRemind">
+          <option value="">No reminder</option>
+          ${CAL.REMINDER_PRESETS.map(p => `<option value="${p.minutesBefore}"${
+            e.reminders.length && e.reminders[0].minutesBefore === p.minutesBefore ? ' selected' : ''
+          }>${esc(p.label)}</option>`).join('')}
+        </select>
+        <p class="cal-note" style="margin-top:8px">
+          Saved with the event and written into the .ics export, so a calendar you
+          import into can alert you. This app has no email or text channel connected
+          yet, so it will not send anything itself.
+        </p>
+      </div>
+      <div class="cal-field">
+        <label class="label" for="evNotes">Notes</label>
+        <textarea id="evNotes">${esc(e.notes)}</textarea>
+      </div>
+    </div>
+    <footer>
+      <button class="btn btn-primary" data-sheet="save">Save</button>
+      <button class="btn btn-quiet" data-sheet="close">Cancel</button>
+      ${isNew ? '' : '<span class="cal-spacer"></span><button class="btn btn-danger" data-sheet="delete">Delete</button>'}
+    </footer>`;
+
+  document.body.appendChild(scrim);
+  document.body.appendChild(sheet);
+  sheet.querySelector('#evTitle').focus();
+
+  sheet.querySelector('#evAllDay').addEventListener('change', ev => {
+    sheet.querySelector('#evTimes').hidden = ev.target.checked;
+  });
+  scrim.addEventListener('click', closeSheet);
+
+  sheet.addEventListener('click', async ev => {
+    const act = ev.target.closest('[data-sheet]');
+    if (!act) return;
+    if (act.dataset.sheet === 'close') return closeSheet();
+    if (act.dataset.sheet === 'delete') {
+      closeSheet(); await Store.removeEvent(e.id); await loadAll(); return;
+    }
+    const allDay = sheet.querySelector('#evAllDay').checked;
+    const mins = sheet.querySelector('#evRemind').value;
+    const start = sheet.querySelector('#evStart').value;
+    if (!start) { sheet.querySelector('#evStart').focus(); return; }
+    let end = sheet.querySelector('#evEnd').value || start;
+    if (end < start) end = start;             // a backwards range is a typo, not a range
+    await Store.upsertEvent(A.makeEvent({
+      id: e.id, createdAt: e.createdAt,
+      kind: sheet.querySelector('#evKind').value,
+      title: sheet.querySelector('#evTitle').value,
+      startDate: start, endDate: end, allDay: allDay,
+      startTime: allDay ? '' : sheet.querySelector('#evFrom').value,
+      endTime: allDay ? '' : sheet.querySelector('#evTo').value,
+      location: sheet.querySelector('#evWhere').value,
+      notes: sheet.querySelector('#evNotes').value,
+      reminders: mins === '' ? [] : [{ minutesBefore: Number(mins), channel: 'email' }]
+    }));
+    closeSheet();
+    await loadAll();
+  });
+}
+
+/* ---- connect panel ------------------------------------------------------
+   Every row here is deliberately dead, and says so. The working path is the
+   .ics export beside it, which every one of these apps imports today.     */
+function openConnect() {
+  closeSheet(); closePop();
+  const scrim = document.createElement('div');
+  scrim.className = 'cal-scrim';
+  const sheet = document.createElement('div');
+  sheet.className = 'cal-sheet';
+  sheet.innerHTML = `
+    <header>
+      <h2>Connect</h2>
+      <button class="btn btn-icon" data-sheet="close" aria-label="Close">&times;</button>
+    </header>
+    <div class="body">
+      <p class="cal-note">
+        Nothing here is connected yet. Rather than hide the buttons until they
+        work, they are here and switched off — the same rule this app uses for a
+        fact it does not have. <strong>Export .ics works today</strong>, and every
+        app below imports it.
+      </p>
+
+      <p class="label cal-sec">Calendar accounts</p>
+      ${CAL.PROVIDERS.map(p => `
+        <div class="cal-stub">
+          <span class="who">${esc(p.label)}</span>
+          <button class="btn" disabled title="Not connected yet">Connect</button>
+        </div>`).join('')}
+
+      <p class="label cal-sec">Reminder channels</p>
+      ${CAL.CHANNELS.map(c => `
+        <div class="cal-stub">
+          <span class="who">${esc(c.label)}</span>
+          <button class="btn" disabled title="No delivery channel yet">Enable</button>
+        </div>`).join('')}
+
+      <p class="label cal-sec">Sharing</p>
+      <div class="cal-stub">
+        <span class="who">Public link</span>
+        <button class="btn" disabled title="Needs the sync worker deployed">Create</button>
+      </div>
+      <p class="cal-note">
+        A shared calendar needs a server to serve it, and this app deliberately has
+        no server in the read path. The Worker that would host it is written but not
+        deployed — see <code>worker/README.md</code>.
+      </p>
+
+      <p class="label cal-sec">Export</p>
+      <div class="cal-stub">
+        <span class="who">Download .ics — everything on screen</span>
+        <button class="btn btn-primary" data-sheet="ics">Export</button>
+      </div>
+      <p class="cal-note">
+        Exports exactly the layers you have switched on, so what you get is what
+        you are looking at.
+      </p>
+    </div>
+    <footer><button class="btn btn-quiet" data-sheet="close">Close</button></footer>`;
+
+  document.body.appendChild(scrim);
+  document.body.appendChild(sheet);
+  scrim.addEventListener('click', closeSheet);
+  sheet.addEventListener('click', ev => {
+    const act = ev.target.closest('[data-sheet]');
+    if (!act) return;
+    if (act.dataset.sheet === 'close') closeSheet();
+    if (act.dataset.sheet === 'ics') exportICS();
+  });
+}
+
+function exportICS() {
+  const text = CAL.toICS(state.items, { name: 'Art Show Tracker' });
+  const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'art-show-tracker.ics';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* ---- navigation --------------------------------------------------------- */
+function step(dir) {
+  const d = CAL.fromISO(state.cursor);
+  if (state.view === 'day') state.cursor = CAL.addDays(state.cursor, dir);
+  else if (state.view === 'month') state.cursor = CAL.toISO(new Date(d.getFullYear(), d.getMonth() + dir, 1));
+  else state.cursor = CAL.toISO(new Date(d.getFullYear() + dir, d.getMonth(), 1));
+  render();
+}
+function setView(v) { state.view = v; render(); }
+
+/* ---- wiring ------------------------------------------------------------- */
+$('#btnPrev').addEventListener('click', () => step(-1));
+$('#btnNext').addEventListener('click', () => step(1));
+$('#btnToday').addEventListener('click', () => { state.cursor = CAL.todayISO(); render(); });
+$('#btnNew').addEventListener('click', () => openSheet(null));
+$('#btnConnect').addEventListener('click', openConnect);
+$('#btnExport').addEventListener('click', exportICS);
+
+document.querySelector('.cal-views').addEventListener('click', e => {
+  const b = e.target.closest('[data-view]');
+  if (b) setView(b.dataset.view);
+});
+
+$('#calLayers').addEventListener('change', async e => {
+  const box = e.target.closest('[data-layer]');
+  if (!box) return;
+  state.layers[box.dataset.layer] = box.checked;
+  saveLayers();
+  if (box.dataset.layer === 'catalogue' && box.checked && !state.catalogueReady) {
+    await loadCatalogue();
+  }
+  rebuild();
+});
+
+$('#calClash').addEventListener('click', e => {
+  const b = e.target.closest('[data-jump]');
+  if (!b) return;
+  state.cursor = b.dataset.jump; state.view = 'day'; render();
+});
+
+$('#calView').addEventListener('click', e => {
+  const bar = e.target.closest('[data-item]');
+  if (bar) { const i = itemById(bar.dataset.item); if (i) openPop(bar, i); return; }
+
+  const add = e.target.closest('[data-add]');
+  if (add) { state.cursor = add.dataset.add; openSheet(null); return; }
+
+  const slot = e.target.closest('[data-add-at]');
+  if (slot) {
+    const [iso, time] = slot.dataset.addAt.split('T');
+    openSheet(A.makeEvent({ startDate: iso, endDate: iso, allDay: false, startTime: time }));
+    return;
+  }
+
+  const day = e.target.closest('[data-open-day]');
+  if (day) { state.cursor = day.dataset.openDay; setView('day'); return; }
+
+  const mon = e.target.closest('[data-month]');
+  if (mon) {
+    const y = CAL.fromISO(state.cursor).getFullYear();
+    state.cursor = CAL.toISO(new Date(y, Number(mon.dataset.month), 1));
+    setView('month');
+  }
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.cal-pop') && !e.target.closest('[data-item]')) closePop();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closePop(); closeSheet(); }
+  if (e.target.matches('input, textarea, select')) return;
+  if (e.key === 'ArrowLeft') step(-1);
+  if (e.key === 'ArrowRight') step(1);
+  if (e.key === 't') { state.cursor = CAL.todayISO(); render(); }
+  if (e.key === 'm') setView('month');
+  if (e.key === 'd') setView('day');
+  if (e.key === 'y') setView('year');
+});
+
+/* Theme, exactly as the other pages do it. */
+Theme.init();
+Theme.onChange(t => {
+  $('#iconSun').hidden = t === 'dark';
+  $('#iconMoon').hidden = t !== 'dark';
+});
+$('#iconSun').hidden = Theme.current() === 'dark';
+$('#iconMoon').hidden = Theme.current() !== 'dark';
+$('#btnTheme').addEventListener('click', () => Theme.toggle());
+
+/* Same Store swap as the other two pages: a configured Supabase project means
+   the calendar reads whatever the ledger reads. Events themselves are local
+   until an `events` table exists remotely — the shape is already sync-ready. */
+if (window.ASTSupabase && Settings.getConfig()) {
+  try { window.ASTSupabase.connect({ onShows: () => loadAll() }); } catch (_) {}
+}
+
+await loadFit();
+await loadAll();
+window.ASTVersion.mount(document.getElementById('buildStamp'));
+</script>
+</body>
+</html>

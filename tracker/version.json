@@ -1,0 +1,9 @@
+{
+ "version": "2026.09.08-0453",
+ "builtAt": "2026-09-08T04:53:46+00:00",
+ "assetVersion": "47a16f1c",
+ "shows": 237,
+ "commit": null,
+ "deployedAt": null,
+ "note": "commit and deployedAt are written by the GitHub Pages workflow when this is published. Null means this copy was built but has not been deployed."
+}

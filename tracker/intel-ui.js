@@ -56,7 +56,11 @@ window.ASTIntelUI = (function () {
     corroborated: { text:'corroborated', title:'Two or more independent sources agree on this.' },
     search:       { text:'unconfirmed',  title:'Found in a search result and not yet confirmed against the source page. Open the link before you rely on it.' },
     editorial:    { text:'estimate',     title:'An informed editorial estimate, not sourced data.' },
-    member:       { text:'reported',     title:'Reported by artists in the network.' }
+    dataset:      { text:'dataset',      title:'Looked up in a reference dataset shipped with the build. Deterministic and citeable, but nobody opened the show\'s own page to confirm it.' },
+    member:       { text:'reported',     title:'Reported by artists in the network.' },
+    /* Not a grade of evidence — the absence of any. Only the practice show
+       carries it, and it says so in capitals so it cannot be skimmed past. */
+    fixture:      { text:'test data',    title:'Invented. This is the practice show — nothing on this record describes a real event.' }
   };
   function provChip(entry) {
     if (!entry) return '';
@@ -199,6 +203,8 @@ window.ASTIntelUI = (function () {
   var reportTab = 'mine';
 
   function wireShow(root, show, p) {
+    wireWeather(root, show);
+
     var add = root.querySelector('#btnAddIntel');
     if (add) add.addEventListener('click', function () { openReport(show); });
 
@@ -302,16 +308,34 @@ window.ASTIntelUI = (function () {
     /* --- facts --- */
     var factRows = [
       ['Application deadline', f.applyBy ? A.fmtDay(f.applyBy) : null, 'applyBy'],
+      /* Shown even when it is null, and often it is: a notify date earlier
+         than its own deadline is impossible, and the build drops those to
+         "not known" rather than carrying a previous edition's date forward.
+         An artist waiting on a jury result would rather read "not known" than
+         a date that has already passed. */
+      ['Jury notification', f.notifyDate ? A.fmtDay(f.notifyDate) : null, 'notifyDate'],
       ['Jury fee', f.juryFee == null ? null : money(f.juryFee), 'juryFee'],
-      ['Booth fee', f.boothFee == null ? null : money(f.boothFee) +
-        (f.boothFeeNote ? ' <span class="muted-inline">' + esc(f.boothFeeNote) + '</span>' : ''), 'boothFee'],
       ['Artists accepted', f.boothCount, 'boothCount'],
       ['Acceptance rate', f.acceptanceRatePct == null ? null : f.acceptanceRatePct + '%', 'acceptanceRatePct'],
       ['Attendance', f.attendance == null ? null : Number(f.attendance).toLocaleString('en-US'), 'attendance'],
       ['Venue', f.venue, 'venue'],
       ['Setting', f.indoorOutdoor, 'indoorOutdoor'],
       ['Vehicle access to booth', f.vehicleAccessToBooth == null ? null : (f.vehicleAccessToBooth ? 'Yes' : 'No'), 'vehicleAccessToBooth'],
-      ['Booth power', f.powerAvailable == null ? null : (f.powerAvailable ? 'Yes' : 'No'), 'powerAvailable']
+      ['Booth power', f.powerAvailable == null ? null : (f.powerAvailable ? 'Yes' : 'No'), 'powerAvailable'],
+      /* The percentage where a show states one, and otherwise what the
+         application page actually said. "No commission mentioned" is not the
+         same claim as "no commission", and the difference is 15% of a
+         weekend, so the wording is passed through rather than rounded to a
+         number. See build/import_show_research.py. */
+      ['Commission', f.commissionPct != null ? f.commissionPct + '% of sales'
+        : (f.commissionNote ? '<span class="muted-inline">' + esc(f.commissionNote) + '</span>' : null),
+        f.commissionPct != null ? 'commissionPct' : 'commissionNote'],
+      /* Shown because the weather and sales-tax panels below are computed from
+         it, and a number nothing explains is the one thing this drawer is not
+         allowed to contain. The chip says it locates the city, not the venue. */
+      ['Coordinates', (f.lat == null || f.lng == null) ? null :
+        f.lat.toFixed(4) + ', ' + f.lng.toFixed(4) +
+        ' <span class="muted-inline">city centre</span>', 'coordinates']
     ].map(function (row) {
       var known = row[1] != null && row[1] !== '';
       return '<tr' + (known ? '' : ' class="is-unknown"') + '>' +
@@ -329,7 +353,16 @@ window.ASTIntelUI = (function () {
     /* --- network intel --- */
     var intel = intelSection(show, cons, reports, p);
 
-    return head + gateHtml +
+    /* The practice show says what it is before anything else in the drawer,
+       above the score, because a fabricated 8.2 read as a real one is the
+       single worst thing this tool could do. */
+    var testBanner = show.isTest
+      ? '<p class="test-banner"><strong>Practice show.</strong> Nothing here is real — ' +
+        'not the festival, not the venue, not one number. Use it to try the ' +
+        'features without touching a show you might actually apply to.</p>'
+      : '';
+
+    return testBanner + head + gateHtml +
       (show.editorialNote
         ? '<p class="sd-note">' + esc(show.editorialNote) +
           ' <span class="prov prov-editorial" title="Editorial read, not sourced data.">estimate</span></p>'
@@ -338,8 +371,227 @@ window.ASTIntelUI = (function () {
       '<table class="factable"><tbody>' + bars + '</tbody></table>' +
       '<h3 class="sd-h">The facts</h3>' +
       '<table class="facttable"><tbody>' + factRows + '</tbody></table>' +
+      boothFeeSection(show) +
       (links.length ? '<p class="sd-links">' + links.join(' ') + '</p>' : '') +
+      gettingInSection(show) + weatherSection(show) + taxSection(show) +
       intel;
+  }
+
+  /* ---- 2c. GETTING IN -----------------------------------------------------
+     What the jury actually does, from the show's own numbers. The reason this
+     is its own section rather than four more rows in the facts table: an
+     artist deciding whether a $45 jury fee is worth posting is asking one
+     question, and the answer is spread across three counts that only mean
+     something together.                                                     */
+  function gettingInSection(show) {
+    var f = show.facts || {};
+    var subs = f.avgSubmissionsPerYear, acc = f.avgAccepted, exempt = f.avgExemptFromJury;
+    var rate = f.effectiveAcceptanceRatePct != null ? f.effectiveAcceptanceRatePct
+                                                    : f.acceptanceRatePct;
+    var images = f.imagesRequired, apps = f.applicationsAllowed, jurors = f.jurorCount;
+    if (subs == null && acc == null && rate == null && images == null && apps == null) return '';
+
+    var stat = function (value, label) {
+      return value == null ? '' :
+        '<li><strong>' + esc(String(value)) + '</strong><span>' + esc(label) + '</span></li>';
+    };
+    var cells =
+      stat(subs == null ? null : Number(subs).toLocaleString('en-US'), 'apply in a typical year') +
+      stat(acc == null ? null : Number(acc).toLocaleString('en-US'), 'are accepted') +
+      stat(exempt == null ? null : Number(exempt).toLocaleString('en-US'), 'of those skip the jury') +
+      stat(rate == null ? null : rate + '%', 'your odds applying cold');
+
+    /* The sentence that makes the exempt count worth collecting. A show that
+       accepts 65 of 100 looks generous until you learn 20 of those places
+       were never in front of the jury. */
+    var caveat = '';
+    if (exempt != null && exempt > 0 && subs && acc != null) {
+      caveat = '<p class="gi-note">' + acc + ' of ' + subs + ' applicants get in, but ' +
+        exempt + ' of those places go to artists exempt from the jury — returning ' +
+        'award winners, invited artists. Applying cold, you are competing for ' +
+        Math.max(acc - exempt, 0) + ' places, not ' + acc + '.</p>';
+    }
+
+    var extra = [];
+    if (images != null) extra.push(images + ' images required');
+    if (f.boothShotRequired === true) extra.push('booth shot required');
+    if (apps != null) extra.push(apps + ' application' + (apps === 1 ? '' : 's') + ' allowed');
+    if (jurors != null) extra.push(jurors + ' juror' + (jurors === 1 ? '' : 's'));
+    if (f.juryScoringScale) extra.push('scored ' + f.juryScoringScale);
+
+    return '<h3 class="sd-h">Getting in</h3>' +
+      (cells ? '<ul class="wx-stats gi-stats">' + cells + '</ul>' : '') +
+      caveat +
+      (extra.length ? '<p class="fine gi-extra">' + esc(extra.join(' \u00b7 ')) + ' ' +
+        provChip((show.provenance || {}).avgSubmissionsPerYear ||
+                 (show.provenance || {}).imagesRequired) + '</p>' : '') +
+      (f.emergingArtistProgram
+        ? '<p class="gi-note">' + esc(f.emergingArtistProgram) + '</p>' : '');
+  }
+
+  /* ---- 2a. BOOTH FEES -----------------------------------------------------
+     The three numbers an artist actually chooses between: the cheap space,
+     twice the frontage, or the corner. They live together in one box because
+     they are one decision, and a single figure in a table of facts does not
+     let anybody make it.
+
+     Anything the fee schedule did not clearly say reads "n/a" rather than
+     being inferred. Shows quote corners either as a total or as a surcharge
+     on the single; build/import_show_research.py resolves that to a total, so
+     every number here is what actually leaves your bank account.            */
+  function boothFeeSection(show) {
+    var f = show.facts || {};
+    if (f.boothFee == null && f.boothFeeDetail == null) {
+      return '<h3 class="sd-h">Booth fees</h3>' +
+             '<p class="wx-none"><span class="unknown">not known</span> ' +
+             'No fee schedule has been captured for this show yet.</p>';
+    }
+
+    var cell = function (value, label) {
+      return '<li>' + (value == null
+          ? '<strong class="fee-na">n/a</strong>'
+          : '<strong>' + esc(money(value)) + '</strong>') +
+        '<span>' + esc(label) + '</span></li>';
+    };
+
+    return '<h3 class="sd-h">Booth fees</h3>' +
+      '<ul class="wx-stats fee-stats">' +
+        cell(f.boothFee, 'single') +
+        cell(f.boothFeeDouble, 'double') +
+        cell(f.boothFeeCorner, 'corner') +
+      '</ul>' +
+      '<p class="fine fee-note">' +
+        (f.boothFee != null
+          ? 'On top of the jury fee, and before travel. '
+          : 'No standard single rate could be read out of this show\'s schedule. ') +
+        'A corner quoted as a surcharge is shown here as the total. ' +
+        provChip((show.provenance || {}).boothFee ||
+                 (show.provenance || {}).boothFeeDetail) +
+      '</p>' +
+      (f.boothFeeDetail
+        ? '<details class="fee-detail"><summary>The show\'s full fee schedule</summary>' +
+          '<pre>' + esc(f.boothFeeDetail) + '</pre></details>'
+        : '');
+  }
+
+  /* ---- 2b. WHAT THE PLACE IS LIKE ----------------------------------------
+     Two panels that only exist because the shows now have coordinates: what
+     the weather has done in this calendar window, and what an artist has to
+     collect and register for in this jurisdiction. Both are about the venue
+     rather than the show, and both are built to say "not known" cleanly.   */
+
+  function weatherSection(show) {
+    var W = window.ASTWeather;
+    if (!W) return '';
+    /* Rendered as a placeholder and filled in wireWeather(). The lookup is a
+       network call and the drawer must open at once — an artist clicking a
+       show should never wait on a third-party API to see the fit score. */
+    /* The heading cannot know yet whether this will be a forecast or the
+       ten-year record — that depends on a lookup that has not happened. So it
+       names the window, and the panel below says which kind of answer it
+       got. */
+    return '<h3 class="sd-h">Weather on the show\'s own days</h3>' +
+      '<div class="wx" id="wxPanel"><p class="fine">Checking&hellip;</p></div>';
+  }
+
+  function wireWeather(root, show) {
+    var W = window.ASTWeather;
+    var mount = root.querySelector('#wxPanel');
+    if (!W || !mount) return;
+
+    W.forShow(show).then(function (r) {
+      /* The drawer may have been closed or replaced while the request was in
+         flight. Writing into a detached node is harmless but pointless;
+         writing into the NEXT show's drawer would be a lie. */
+      if (!mount.isConnected) return;
+      mount.innerHTML = r.ok ? weatherHtml(show, r)
+        : '<p class="wx-none"><span class="unknown">not known</span> ' +
+          esc(W.reasonText(r.reason)) + '</p>';
+    });
+  }
+
+  function weatherHtml(show, r) {
+    var forecast = r.mode === 'forecast';
+
+    var cards = (r.days || []).map(function (d) {
+      var temps = (d.high == null ? '—' : d.high + '\u00b0') +
+        (d.low == null ? '' : ' <span class="wx-low">' + d.low + '\u00b0</span>');
+      return '<li class="wx-day' + (d.windy ? ' is-windy' : '') + '">' +
+        '<span class="wx-when">' + esc(d.label) + '</span>' +
+        d.icon +
+        '<span class="wx-temp">' + temps + '</span>' +
+        '<span class="wx-cond">' + esc(d.condition || '—') + '</span>' +
+        '<span class="wx-wind">' + (d.wind == null ? '' : d.wind + ' mph') +
+          (d.windy ? ' <span class="wx-flag">canopy weather</span>' : '') + '</span>' +
+        (d.rainChancePct == null ? ''
+          : '<span class="wx-rain">' + d.rainChancePct + '% of years wet</span>') +
+      '</li>';
+    }).join('');
+
+    /* The distinction the whole panel turns on. "76 on Saturday" and "76 on
+       an average Saturday in early March" are different claims, and only one
+       of them is about this year — so the panel says which it is rather than
+       leaving the reader to infer it from how far away the show is. */
+    var caption = forecast
+      ? 'The actual forecast for these dates.'
+      : 'What these dates have done over the last ' + r.years +
+        ' year' + (r.years === 1 ? '' : 's') + ' — ' + r.observations +
+        ' days of history, and not a forecast. Close to the show this panel ' +
+        'switches to the real one.';
+
+    var prov = provChip({
+      status: 'dataset',
+      source: r.source,
+      basis: r.sourceName + '. ' +
+        (forecast ? 'A live forecast for the show\'s own dates.'
+                  : 'Each day averaged against the same calendar date in every ' +
+                    'year, at the city coordinates rather than the venue.'),
+      checked: (r.fetchedAt || '').slice(0, 10)
+    });
+
+    return '<ul class="wx-days">' + cards + '</ul>' +
+      '<p class="fine">' + esc(caption) + ' ' + prov + '</p>';
+  }
+
+  /* The one panel on this site that can cost somebody money if it is wrong.
+     It therefore leads with what it does NOT know, and the state rate is
+     never presented as the rate to collect. See tracker/salestax.js. */
+  function taxSection(show) {
+    var T = window.ASTSalesTax;
+    if (!T) return '';
+    var row = T.forState(show.state);
+    if (!row) return '';
+
+    var rate = row.stateRatePct == null
+      ? '<span class="unknown">not known</span>'
+      : (row.stateRatePct === 0 ? 'No sales tax' : row.stateRatePct + '%');
+
+    var links = [];
+    if (row.lookupUrl) {
+      links.push('<a class="btn-mini" href="' + esc(row.lookupUrl) +
+        '" target="_blank" rel="noopener noreferrer">Look up this address &#8599;</a>');
+    }
+    if (row.permitUrl) {
+      links.push('<a class="btn-mini" href="' + esc(row.permitUrl) +
+        '" target="_blank" rel="noopener noreferrer">Registering to collect &#8599;</a>');
+    }
+
+    return '<h3 class="sd-h">Sales tax and permits</h3>' +
+      '<div class="tax' + (row.stale ? ' is-stale' : '') + '">' +
+        '<p class="tax-rate"><strong>' + rate + '</strong> ' +
+          '<span class="tax-rate-label">state rate in ' + esc(row.state) + '</span> ' +
+          provChip(T.provenanceFor(show.state)) + '</p>' +
+        '<p class="tax-warn">' + esc(row.stateOnly) + '</p>' +
+        (row.localAdded
+          ? '<p class="tax-local"><strong>On top of that:</strong> ' + esc(row.localAdded) + '</p>'
+          : '') +
+        (row.note ? '<p class="tax-note">' + esc(row.note) + '</p>' : '') +
+        (links.length ? '<p class="sd-links">' + links.join(' ') + '</p>' : '') +
+        '<p class="fine">' + esc(row.authority) + ', captured ' + esc(row.capturedAt) +
+          (row.stale ? ' — <strong>over ' + T.STALE_AFTER_DAYS +
+                       ' days old, treat as stale and re-check</strong>' : '') +
+          '. ' + esc(row.notAdvice) + '</p>' +
+      '</div>';
   }
 
   /* The top-of-drawer shortcut. Only appears when there is something to read,

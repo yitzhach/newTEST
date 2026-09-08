@@ -9,12 +9,14 @@
   --sc-low:#a4652a; --sc-poor:#9b4a34; --sc-none:#a3a3a3;
   --prov-verified:#1d6b52; --prov-corroborated:#3f7f8a;
   --prov-search:#8a6d2b; --prov-editorial:#737373; --prov-member:#5b53a6;
+  --prov-dataset:#4a6d8a; --prov-fixture:#8a4a7a;
 }
 html[data-theme="dark"] {
   --sc-top:#6fc39c; --sc-high:#7fb09c; --sc-mid:#d0b95e;
   --sc-low:#e0a06a; --sc-poor:#f08d76; --sc-none:#737373;
   --prov-verified:#6fc39c; --prov-corroborated:#7dc4d1;
   --prov-search:#d8b45e; --prov-editorial:#a3a3a3; --prov-member:#a9a2e8;
+  --prov-dataset:#8fb6d4; --prov-fixture:#d49ec8;
 }
 
 /* ==========================================================================
@@ -46,6 +48,10 @@ html[data-theme="dark"] {
 /* A blocked show stays visible but reads as struck through. */
 .crow.is-blocked, .card.is-blocked { opacity:.55; }
 .crow.is-blocked .c-name a, .card.is-blocked .card-name { text-decoration:line-through; }
+/* A closed deadline reads as dimmed, never struck through. The show is still
+   real and its scores are still worth reading in the month you are deciding
+   about next year — it is this edition you have missed, not the show. */
+.crow.is-closed:not(.is-blocked), .card.is-closed:not(.is-blocked) { opacity:.7; }
 
 /* ==========================================================================
    PROVENANCE CHIPS
@@ -62,6 +68,9 @@ a.prov:hover { filter:brightness(1.15); text-decoration:underline; }
 .prov-corroborated{color:var(--prov-corroborated)}
 .prov-search{color:var(--prov-search); border-style:dashed}
 .prov-editorial{color:var(--prov-editorial); border-style:dotted}
+/* Solid border like the sourced grades, because a dataset lookup IS sourced —
+   but its own colour, because nobody opened the show's page for it. */
+.prov-dataset{color:var(--prov-dataset)}
 .prov-member{color:var(--prov-member)}
 
 .tag {
@@ -123,6 +132,7 @@ body.idr-open { overflow:hidden; }
   border:1px solid currentColor;
 }
 .gate-blocking { color:var(--danger); }
+.gate-closed   { color:var(--warn); font-weight:500; }
 .gate-warning  { color:var(--warn); }
 .gate-hint     { color:var(--muted); }
 
@@ -354,3 +364,101 @@ body.idr-open { overflow:hidden; }
   background: var(--line); color: var(--ink); font-size: 10px; font-weight: 600;
 }
 .rtab.on .rtab-n { background: rgba(255,255,255,.25); color: var(--accent-ink); }
+
+/* ==========================================================================
+   Where the show actually is — weather history and tax jurisdiction
+
+   Both panels exist because the shows finally have coordinates. Both are
+   built so that "not known" is a first-class rendering rather than an empty
+   box, because for a good number of shows that is the true answer.
+   ========================================================================== */
+.wx { margin:0 0 4px; }
+.wx-stats {
+  display:flex; gap:22px; flex-wrap:wrap; list-style:none; margin:0 0 8px; padding:0;
+}
+.wx-stats li { display:flex; flex-direction:column; gap:2px; }
+.wx-stats strong { font-size:19px; font-weight:600; font-variant-numeric:tabular-nums; }
+.wx-stats span { font-size:12px; color:var(--muted); }
+.wx-warn { margin:0 0 6px; font-size:13px; color:var(--warn); }
+.wx-none { margin:0; font-size:13px; color:var(--muted); }
+
+/* The tax panel is bordered and the others are not. That is deliberate: it is
+   the only block on the page whose being wrong costs the reader money, and it
+   should not read as one more row of facts. */
+.tax {
+  border:1px solid var(--line); border-left:3px solid var(--warn);
+  border-radius:4px; padding:12px 14px; margin:0 0 4px;
+}
+.tax.is-stale { border-left-color:var(--danger); }
+.tax-rate { margin:0 0 6px; font-size:13px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.tax-rate strong { font-size:19px; font-weight:600; font-variant-numeric:tabular-nums; }
+.tax-rate-label { color:var(--muted); }
+/* The sentence that stops an artist collecting the state rate and nothing
+   else. It is the point of the whole panel, so it is not small print. */
+.tax-warn { margin:0 0 8px; font-size:13px; font-weight:500; color:var(--warn); line-height:1.5; }
+.tax-local { margin:0 0 8px; font-size:13px; line-height:1.5; }
+.tax-note { margin:0 0 8px; font-size:13px; color:var(--muted); line-height:1.6; }
+
+/* ==========================================================================
+   GETTING IN — the jury numbers, from the show's own reporting
+   ========================================================================== */
+.gi-stats { margin-bottom:10px; }
+.gi-note {
+  margin:0 0 8px; font-size:13px; line-height:1.6; color:var(--muted);
+  max-width:70ch;
+}
+.gi-extra { margin-top:0 !important; }
+
+/* The full fee schedule, verbatim. Collapsed because it is often twenty lines
+   of corner upgrades and electrical hookups — and open to anyone who wants to
+   check the number above it against the source. */
+.fee-detail { margin:14px 0 0; font-size:13px; }
+.fee-detail summary { cursor:pointer; color:var(--muted); }
+.fee-detail summary:hover { color:var(--ink); }
+.fee-detail pre {
+  margin:10px 0 0; padding:12px 14px; background:var(--surface);
+  border-left:2px solid var(--line); border-radius:3px;
+  font-family:inherit; font-size:12px; line-height:1.6;
+  white-space:pre-wrap; overflow-x:auto;
+}
+
+/* Booth fees: three numbers, one decision. "n/a" is a first-class rendering
+   here — most fee schedules do not quote all three, and a blank would read
+   as though the box were broken. */
+.fee-stats { margin-bottom:10px; }
+.fee-stats .fee-na { color:var(--muted); font-weight:400; }
+.fee-note { margin-top:0 !important; }
+
+/* ==========================================================================
+   THE PRACTICE SHOW
+   Its own provenance status, because it is not a weak grade of evidence — it
+   is the absence of any. It must not be able to read as `estimate`.
+   ========================================================================== */
+.prov-fixture {
+  color:var(--prov-fixture); border-style:solid; border-width:2px;
+}
+.tag-test { color:var(--prov-fixture); }
+.test-banner {
+  margin:0 0 18px; padding:11px 14px; border-radius:4px;
+  border:2px solid var(--prov-fixture); color:var(--prov-fixture);
+  font-size:13px; line-height:1.6;
+}
+
+/* ---- Weather, one card per show day -------------------------------------- */
+.wx-days {
+  list-style:none; margin:0 0 4px; padding:0;
+  display:flex; gap:10px; flex-wrap:wrap;
+}
+.wx-day {
+  flex:1 1 132px; min-width:132px; padding:11px 12px;
+  border:1px solid var(--line); border-radius:5px;
+  display:flex; flex-direction:column; gap:3px;
+}
+.wx-day.is-windy { border-color:var(--warn); }
+.wx-when { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.wx-icon { margin:3px 0; color:var(--muted); }
+.wx-temp { font-size:19px; font-weight:600; font-variant-numeric:tabular-nums; }
+.wx-low { font-size:14px; font-weight:400; color:var(--muted); }
+.wx-cond { font-size:13px; }
+.wx-wind, .wx-rain { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
+.wx-flag { color:var(--warn); }

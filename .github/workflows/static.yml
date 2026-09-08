@@ -31,6 +31,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      # The half of the version stamp only the deploy can know. The build
+      # writes tracker/version.json with what it made; this adds the commit
+      # that is actually being published and when. Without it "which version
+      # is live" is a question nobody on either side can answer without
+      # guessing from behaviour, which is how a whole afternoon goes.
+      - name: Stamp the deployed commit into version.json
+        run: |
+          python3 - <<'PY'
+          import json, os, datetime
+          path = 'tracker/version.json'
+          data = json.load(open(path)) if os.path.exists(path) else {}
+          data['commit'] = os.environ['GITHUB_SHA'][:7]
+          data['commitFull'] = os.environ['GITHUB_SHA']
+          data['deployedAt'] = datetime.datetime.now(
+              datetime.timezone.utc).replace(microsecond=0).isoformat()
+          data['runNumber'] = os.environ.get('GITHUB_RUN_NUMBER')
+          data.pop('note', None)
+          json.dump(data, open(path, 'w'), indent=1)
+          print(json.dumps(data, indent=1))
+          PY
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

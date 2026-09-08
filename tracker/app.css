@@ -191,7 +191,25 @@ textarea.control { min-height:110px; resize:vertical; line-height:1.6; }
   gap:0 14px; align-items:baseline;
 }
 .list-head { padding:10px 0 8px; border-bottom:1px solid var(--line); }
-.list-head > div { font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.list-head > div,
+.list-head > [data-sort] { font-size:10px; font-weight:600; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+/* Four of the ledger's headings are the sort control. Same treatment as the
+   catalogue's .rowhead: they still read as headings, and the affordance is the
+   hover and the arrow rather than a button chrome. */
+.list-head [data-sort] {
+  font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit;
+  background:none; border:none; padding:0; cursor:pointer; text-align:left;
+  display:inline-flex; align-items:center; gap:5px;
+}
+.list-head [data-sort]:hover { color:var(--ink); }
+.list-head [data-sort]:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.list-head [data-sort].is-sorted { color:var(--accent); }
+/* The arrow is reserved on every heading so the columns do not shift when the
+   sorted one changes. */
+.list-head [data-sort]::after { content:'\2191'; font-size:11px; letter-spacing:0; opacity:0; }
+.list-head [data-sort]:hover::after { opacity:.35; }
+.list-head [data-sort].is-sorted::after { opacity:1; }
+.list-head [data-sort].is-sorted[aria-sort="descending"]::after { content:'\2193'; }
 /* The row is a wrapper holding the clickable label and the eye, because a
    button cannot nest inside a button. `.show-row` keeps the data-id and the
    hot/hidden classes so every handler and selector still finds it. */
@@ -830,3 +848,26 @@ body.is-splitting-v .leaflet-container { pointer-events:none; }
   .crow .card-stars { grid-column:1; margin-top:3px; }
   .crow .c-act { grid-column:2; grid-row:2 / span 5; align-self:center; }
 }
+
+/* The route into a show's breakdown from the ledger. The name reads as a link
+   because it behaves as one; the `i` beside the eye is the same destination
+   for anyone not using a mouse. */
+.show-row .name[data-detail] { cursor:pointer; text-decoration:underline; text-decoration-style:dotted;
+  text-underline-offset:3px; text-decoration-color:var(--line); }
+.show-row .name[data-detail]:hover { text-decoration-color:currentColor; }
+.row-info {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; flex:none; border:1px solid var(--line);
+  border-radius:50%; background:none; color:var(--muted); cursor:pointer;
+  font-size:12px; font-style:italic; font-family:Georgia, serif; line-height:1;
+}
+.row-info:hover { color:var(--ink); border-color:var(--ink); }
+
+/* Which build is this? Deliberately quiet but always present — the answer to
+   "am I looking at the new one" should never require opening dev tools. */
+.build-stamp {
+  margin:18px 0 0; font-size:11px; color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.build-stamp .ver-tag { font-weight:600; }
+.build-stamp a { color:inherit; }

@@ -3,13 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Theme, before first paint. Everything else about the theme lives in
+     core.js, but Theme.init() runs after the body has already been painted
+     with the light :root defaults — which flashes white on every navigation
+     for anyone in dark mode. This is the same read, done early enough to
+     matter, and core.js re-applying the same value later is a no-op. Inline
+     on purpose: an external file is a round trip, and a round trip is the
+     flash. -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('artShowTracker.theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (_) {
+    /* Private mode or blocked storage. Falling through leaves the CSS
+       defaults in charge, which is exactly what happened before. */
+  }
+})();
+</script>
 <title>Show Ledger — Isaac Anderson</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
       referrerpolicy="no-referrer">
-<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="app.css?v=47a16f1c">
+<!-- The ledger shows the same fit/intel drawer the catalogue does, so it needs
+     the same styles. Scoped to .idr/.fitchip/.prov and its own tokens; it adds
+     to app.css rather than competing with it. -->
+<link rel="stylesheet" href="intel.css?v=47a16f1c">
 </head>
 <body>
 <!-- ==========================================================================
@@ -26,9 +52,11 @@
       <button id="btnViewMap"  type="button" aria-pressed="false">Map</button>
     </div>
     <button class="btn btn-quiet" id="btnFullScreen" type="button"
-            title="Fill the screen with the map (Escape to come back)">Full screen</button>
+            title="Fill the screen with the map (Escape to come back)">Map full screen</button>
     <a class="btn btn-quiet" href="browse.html" id="btnBrowse"
        title="Browse the shows catalogue and pick what to apply to">All shows</a>
+    <a class="btn btn-quiet" href="calendar.html" id="btnCalendar"
+       title="See the season as a calendar, and what it collides with">Calendar</a>
     <button class="sync-pill" id="syncPill" type="button" data-state="local"
             title="Sync status — click for account settings">
       <span class="sync-dot" aria-hidden="true"></span><span id="syncText">On this device</span>
@@ -66,17 +94,28 @@
         <select class="control" id="sortBy" style="width:auto; min-width:150px;">
           <option value="date">Show date</option>
           <option value="deadline">Apply-by date</option>
+          <option value="status">Status</option>
           <option value="rating">Rating</option>
         </select>
       </div>
     </div>
 
-    <div class="row-grid list-head" aria-hidden="true">
-      <div>Stop</div><div>Show</div><div>Dates</div><div>Deadline</div><div>Status</div><div>Rating</div>
+    <!-- Four of these headings are the sort control, the same way the
+         catalogue's are. Stop and Show stay plain labels: the list is already
+         ordered within a date by stop number, and sorting by name is what the
+         catalogue is for. Not aria-hidden any more — it holds real buttons. -->
+    <div class="row-grid list-head" id="listHead" role="row">
+      <div>Stop</div>
+      <div>Show</div>
+      <button type="button" data-sort="date">Dates</button>
+      <button type="button" data-sort="deadline">Deadline</button>
+      <button type="button" data-sort="status">Status</button>
+      <button type="button" data-sort="rating">Rating</button>
     </div>
 
     <div id="showList"></div>
     <p class="list-note" id="listNote"></p>
+    <p class="build-stamp" id="buildStamp"></p>
   </main>
 
   <!-- Draggable divider: grab it to trade list width for map width. -->
@@ -214,6 +253,7 @@
       <div class="form-row">
         <label class="label" for="f_boothFee">Booth fee ($)</label>
         <input class="control" id="f_boothFee" name="boothFee" inputmode="decimal" autocomplete="off">
+        <div class="hint" id="h_boothFee" hidden></div>
         <div class="err" id="e_boothFee" hidden></div>
       </div>
     </div>
@@ -589,13 +629,24 @@
      sandbox and an unverified hash would break the map outright. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
         referrerpolicy="no-referrer"></script>
-<script src="core.js"></script>
-<script src="map.js"></script>
-<script src="store-supabase.js"></script>
-<script src="import.js"></script>
-<script src="import-ui.js"></script>
-<script src="share.js"></script>
-<script src="share-ui.js"></script>
+<script src="core.js?v=47a16f1c"></script>
+<script src="version.js?v=47a16f1c"></script>
+<script src="map.js?v=47a16f1c"></script>
+<!-- The fit/intel layer, so a show in the ledger opens the same breakdown
+     it does in the catalogue. weather.js and salestax.js are optional to
+     intel-ui.js, but without them the drawer silently loses two panels,
+     which is worse than carrying two small files. -->
+<script src="fit.js?v=47a16f1c"></script>
+<script src="intel.js?v=47a16f1c"></script>
+<script src="members.js?v=47a16f1c"></script>
+<script src="weather.js?v=47a16f1c"></script>
+<script src="salestax.js?v=47a16f1c"></script>
+<script src="intel-ui.js?v=47a16f1c"></script>
+<script src="store-supabase.js?v=47a16f1c"></script>
+<script src="import.js?v=47a16f1c"></script>
+<script src="import-ui.js?v=47a16f1c"></script>
+<script src="share.js?v=47a16f1c"></script>
+<script src="share-ui.js?v=47a16f1c"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE
@@ -616,24 +667,83 @@ window.AST.setNotifier(msg => toast(msg));
 /* ==========================================================================
    6. APP STATE
    ========================================================================== */
-const state = { shows: [], filter: 'all', sort: 'date', editingId: null, lastDeleted: null };
+const state = { shows: [], filter: 'all', sort: 'date', dir: 'asc',
+                editingId: null, lastDeleted: null };
 const $ = sel => document.querySelector(sel);
+
+const FAR = '9999-12-31';
+
+/* Status sorts by where it sits in the pipeline, not alphabetically:
+   interested -> applied -> accepted -> waitlist -> declined -> not applying.
+   Alphabetical would put "accepted" above "applied", which is backwards. */
+const STATUS_ORDER = {};
+STATUSES.forEach((s, i) => { STATUS_ORDER[s.value] = i; });
+
+/* The direction each key opens in, chosen so the first click shows what you
+   actually want: the next show, the closest deadline, your best-rated work. */
+const SORT_DEFAULT_DIR = { date:'asc', deadline:'asc', status:'asc', rating:'desc' };
+
+const DIR_LABEL = {
+  asc:  { date:'Earliest show first', deadline:'Soonest deadline first',
+          status:'Earliest in the pipeline first', rating:'Lowest rated first' },
+  desc: { date:'Latest show first', deadline:'Latest deadline first',
+          status:'Furthest along first', rating:'Highest rated first' }
+};
+
+function compareShows(a, b, key) {
+  if (key === 'rating')   return a.rating - b.rating;
+  if (key === 'deadline') return (a.applyBy || FAR).localeCompare(b.applyBy || FAR);
+  if (key === 'status')   return (STATUS_ORDER[a.status] ?? 99) - (STATUS_ORDER[b.status] ?? 99);
+  return (a.startDate || FAR).localeCompare(b.startDate || FAR);
+}
 
 function sortedShows() {
   const list = state.filter === 'all'
     ? state.shows.slice()
     : state.shows.filter(s => s.status === state.filter);
-  const far = '9999-12-31';
-  if (state.sort === 'rating') {
-    list.sort((a, b) => (b.rating - a.rating) || (a.startDate || far).localeCompare(b.startDate || far));
-  } else if (state.sort === 'deadline') {
-    list.sort((a, b) => (a.applyBy || far).localeCompare(b.applyBy || far) ||
-                        (a.startDate || far).localeCompare(b.startDate || far));
-  } else {
-    list.sort((a, b) => (a.startDate || far).localeCompare(b.startDate || far) ||
-                        a.routeNumber.localeCompare(b.routeNumber, undefined, { numeric: true }));
-  }
+  const sign = state.dir === 'desc' ? -1 : 1;
+  /* Only the chosen key reverses. The tie-breakers stay ascending, so a
+     reversed rating still reads earliest-show-first within each rating
+     rather than scrambling the season backwards. */
+  list.sort((a, b) =>
+    sign * compareShows(a, b, state.sort) ||
+    (a.startDate || FAR).localeCompare(b.startDate || FAR) ||
+    a.routeNumber.localeCompare(b.routeNumber, undefined, { numeric: true }));
   return list;
+}
+
+/* One sort state, two ways to reach it: the toolbar menu and the column
+   headings. Everything that changes the sort goes through applySort so the
+   two cannot drift apart. Mirrors browse.html deliberately. */
+function paintSortDir() {
+  const key = state.sort, desc = state.dir === 'desc';
+  const label = (DIR_LABEL[desc ? 'desc' : 'asc'][key]) ||
+                (desc ? 'Descending' : 'Ascending');
+  $('#sortBy').value = key;
+  $('#listHead').querySelectorAll('[data-sort]').forEach(h => {
+    const on = h.dataset.sort === key;
+    h.classList.toggle('is-sorted', on);
+    h.setAttribute('aria-sort', on ? (desc ? 'descending' : 'ascending') : 'none');
+    h.title = on ? label + ' \u2014 click to reverse'
+                 : 'Sort by ' + h.textContent.trim().toLowerCase();
+  });
+}
+
+/**
+ * @param key   sort key, or null to keep the current one
+ * @param opts.toggle  true -> picking the key that is already active reverses
+ *                     it instead of resetting to its natural direction
+ */
+function applySort(key, opts) {
+  opts = opts || {};
+  if (key && key !== state.sort) {
+    state.sort = key;
+    state.dir = SORT_DEFAULT_DIR[key] || 'asc';
+  } else if (opts.toggle) {
+    state.dir = state.dir === 'desc' ? 'asc' : 'desc';
+  }
+  paintSortDir();
+  renderList();
 }
 
 /* ==========================================================================
@@ -688,7 +798,8 @@ function renderList() {
       '" data-id="' + esc(s.id) + '">' +
       '<button type="button" class="row-main row-grid">' +
       '<span class="num' + (s.isAlternate ? ' alt' : '') + '">' + esc(s.routeNumber || '–') + '</span>' +
-      '<span><span class="name">' + esc(s.name || 'Untitled show') + '</span>' +
+      '<span><span class="name" data-detail="' + esc(s.id) + '">' +
+          esc(s.name || 'Untitled show') + '</span>' +
         '<span class="place" style="display:block;">' + esc(place(s)) + '</span></span>' +
       '<span class="meta r-dates">' + esc(fmtRange(s.startDate, s.endDate)) + '</span>' +
       '<span class="' + dlClass + ' r-deadline">' + esc(dlText) + '</span>' +
@@ -698,6 +809,13 @@ function renderList() {
         'title="' + ratingText(s.rating) + '">' + starsSVG(s.rating, 13) +
         '<span class="sr">' + ratingText(s.rating) + '</span></span>' +
       '</button>' +
+      /* The name is inside the row button and a button cannot nest in a
+         button, so the name is a span that the click handler intercepts. This
+         is the keyboard route to the same place, and it also makes the
+         feature findable — a span that happens to be clickable is not. */
+      '<button type="button" class="row-info" data-detail="' + esc(s.id) + '"' +
+        ' title="Fit, facts, weather and tax for this show"' +
+        ' aria-label="Show details for ' + esc(s.name || 'this show') + '">i</button>' +
       '<button type="button" class="row-eye" data-eye="' + esc(s.id) + '"' +
         ' aria-pressed="' + (s.hidden ? 'true' : 'false') + '"' +
         ' title="' + (s.hidden ? 'Show in the route again' : 'Hide from the route') + '"' +
@@ -708,7 +826,8 @@ function renderList() {
   }).join('');
   const nHidden = list.filter(s => s.hidden).length;
   $('#listNote').textContent = list.length + ' of ' + state.shows.length +
-    ' shows · click a row to edit · stop numbers set the route order' +
+    ' shows · click the name for the breakdown, the row to edit · ' +
+    'stop numbers set the route order' +
     (nHidden ? ' · ' + nHidden + ' hidden from the route' : '');
 }
 
@@ -818,7 +937,19 @@ function openDrawer(show) {
   $('#f_routeNumber').value = s.routeNumber;
   $('#f_isAlternate').checked = s.isAlternate;
   $('#f_juryFee').value = s.juryFee === null ? '' : s.juryFee;
-  $('#f_boothFee').value = s.boothFee === null ? '' : s.boothFee;
+  /* A blank booth fee is filled from the catalogue if we know one, so the
+     field starts costed rather than empty. It stays entirely the artist's:
+     this only ever suggests into an empty box, never over a number they
+     typed, and nothing is saved until they save. */
+  const known = s.boothFee === null ? catalogueBoothFee(s) : null;
+  $('#f_boothFee').value = s.boothFee !== null ? s.boothFee
+                         : (known !== null ? known : '');
+  const boothHint = $('#h_boothFee');
+  if (boothHint) {
+    boothHint.hidden = known === null;
+    boothHint.textContent = known === null ? ''
+      : 'Filled in from the catalogue. Change it to whatever you were actually quoted.';
+  }
   $('#f_lat').value = s.lat === null ? '' : s.lat;
   $('#f_lng').value = s.lng === null ? '' : s.lng;
   $('#f_url').value = s.url;
@@ -1220,15 +1351,65 @@ $('#btnDelete').addEventListener('click', deleteShow);
 $('#showForm').addEventListener('submit', e => { e.preventDefault(); saveShow(); });
 
 $('#showList').addEventListener('click', e => {
-  /* The eye sits inside the row, so it has to be checked first or clicking it
-     would also open the drawer. */
+  /* The eye and the info button sit inside the row, so they have to be
+     checked first or clicking either would also open the edit pane. */
   const eye = e.target.closest('.row-eye');
   if (eye) { toggleHidden(eye.dataset.eye); return; }
+
+  /* The show's name, and the info button, open the breakdown. Everything
+     else about the row opens the edit pane — the personal fields are what
+     the ledger is for, and they stay one click away. */
+  const detail = e.target.closest('[data-detail]');
+  if (detail) { openIntel(detail.dataset.detail); return; }
+
   const row = e.target.closest('.show-row');
   if (!row) return;
   const show = state.shows.find(s => s.id === row.dataset.id);
   if (show) openDrawer(show);
 });
+
+/* ---- The fit/intel breakdown, from the ledger --------------------------
+   The same drawer the catalogue opens. A ledger show is linked to its
+   catalogue record by `catalogueId`; a show typed in by hand has no such
+   link, and rather than guess from the name it says so and offers the edit
+   pane, which is where that show's information actually lives.            */
+const fit = { byId: {} };
+
+async function loadFit() {
+  try {
+    const res = await fetch('fit-data.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    (data.shows || []).forEach(s => { fit.byId[s.id] = s; });
+  } catch (e) {
+    /* The ledger is fully usable without it. You lose the breakdown, not
+       your shows. */
+    console.warn('fit-data.json did not load:', e);
+  }
+}
+
+/* The researched booth fee for a ledger show, or null. Only ever read. */
+function catalogueBoothFee(show) {
+  if (!show || !show.catalogueId) return null;
+  const rec = fit.byId[show.catalogueId];
+  const fee = rec && rec.facts ? rec.facts.boothFee : null;
+  return typeof fee === 'number' ? fee : null;
+}
+
+function openIntel(id) {
+  const show = state.shows.find(s => s.id === id);
+  if (!show) return;
+  const rec = show.catalogueId ? fit.byId[show.catalogueId] : null;
+  if (!rec) {
+    toast(show.catalogueId
+      ? 'No breakdown for "' + (show.name || 'this show') + '" yet.'
+      : '"' + (show.name || 'This show') + '" was added by hand, so there is no ' +
+        'catalogue breakdown for it. Your own notes are in Edit.',
+      'Edit', () => openDrawer(show));
+    return;
+  }
+  window.ASTIntelUI.openShow(rec);
+}
 
 /* Hide a show from the plan: it greys out and drops off the map and out of
    the route, but stays in the ledger, the stats and anything shareable. */
@@ -1251,7 +1432,13 @@ $('#statusFilters').addEventListener('click', e => {
   render();
 });
 
-$('#sortBy').addEventListener('change', e => { state.sort = e.target.value; renderList(); });
+$('#sortBy').addEventListener('change', e => applySort(e.target.value));
+
+/* Clicking a heading sorts by it; clicking the sorted one reverses. */
+$('#listHead').addEventListener('click', e => {
+  const h = e.target.closest('[data-sort]');
+  if (h) applySort(h.dataset.sort, { toggle: true });
+});
 $('#f_notes').addEventListener('input', queueAutosave);
 
 /* Rating: pointer over the track picks a half-star; arrows work without a mouse. */
@@ -1416,7 +1603,7 @@ $('#btnFullScreen').addEventListener('click', async () => {
 /* Entering or leaving changes the box, so Leaflet has to be told either way. */
 document.addEventListener('fullscreenchange', () => {
   const on = !!document.fullscreenElement;
-  $('#btnFullScreen').textContent = on ? 'Exit full screen' : 'Full screen';
+  $('#btnFullScreen').textContent = on ? 'Exit full screen' : 'Map full screen';
   if (routeMap) requestAnimationFrame(() => { routeMap.invalidateSize(); routeMap.fitAll(); });
 });
 
@@ -1442,6 +1629,7 @@ trapFocus($('#shareModal'));
    13. BOOT
    ========================================================================== */
 Theme.init();
+paintSortDir();
 fillStatusSelect();
 setRating(0, { silent: true });
 syncMapChrome();
@@ -1452,10 +1640,15 @@ const linkError = ASTSupabase.Auth.errorFromHash();
 startSync();
 paintAccount();
 if (linkError) toast('Sign-in link failed: ' + linkError, null, null, 9000);
+/* Fetched alongside the shows rather than before them: the ledger renders
+   from your own saved list, and the breakdown is only needed once you click
+   into one. A slow or missing fit-data.json must not hold up the page. */
+loadFit();
 refresh().catch(err => {
   console.error(err);
   toast('Could not load saved shows.');
 });
 </script>
+<script>window.ASTVersion.mount(document.getElementById('buildStamp'));</script>
 </body>
 </html>
