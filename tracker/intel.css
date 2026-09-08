@@ -492,3 +492,50 @@ body.idr-open { overflow:hidden; }
 .wx-cond { font-size:13px; }
 .wx-wind, .wx-rain { font-size:12px; color:var(--muted); font-variant-numeric:tabular-nums; }
 .wx-flag { color:var(--warn); }
+
+/* ==========================================================================
+   THE MONEY PAGE
+   ========================================================================== */
+.exp-toolbar {
+  display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap;
+  padding:14px 32px; border-bottom:1px solid var(--line); background:var(--surface);
+}
+.exp-field { display:flex; flex-direction:column; gap:6px; min-width:200px; }
+.exp-field .control { min-height:38px; }
+.exp-page { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:22px; padding:22px 32px; }
+.exp-main { display:flex; flex-direction:column; gap:22px; min-width:0; }
+
+.exp-row {
+  display:flex; justify-content:space-between; align-items:center; gap:14px;
+  padding:11px 4px; border-bottom:1px solid var(--line); cursor:pointer;
+}
+.exp-row:last-child { border-bottom:0; }
+.exp-row:hover, .exp-row:focus-visible { background:var(--surface); outline:none; }
+.exp-cell { min-width:0; }
+.exp-sub { font-size:12.5px; color:var(--muted); margin-top:2px; }
+.exp-amt { font-variant-numeric:tabular-nums; white-space:nowrap; }
+/* A row with no figure is NOT a zero row and must not read like one. */
+.exp-unknown { color:var(--muted); font-style:italic; font-size:12.5px; }
+.exp-cat {
+  display:flex; justify-content:space-between; gap:12px;
+  padding:7px 0; border-bottom:1px solid var(--line); font-size:13.5px;
+}
+.exp-cat:last-child { border-bottom:0; }
+.exp-foot { padding:8px 32px 26px; font-size:12px; color:var(--muted); }
+
+/* ---- Pro previews. Nothing here works, and it has to look that way. ---- */
+.pro-grid { display:flex; flex-direction:column; gap:12px; }
+.pro-card { border:1px dashed var(--line); border-radius:8px; padding:11px 12px; opacity:.72; }
+.pro-head { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+.pro-tag {
+  font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+  border:1px solid var(--line); border-radius:4px; padding:1px 5px; color:var(--muted);
+}
+.pro-blurb { margin:0 0 9px; font-size:13px; color:var(--muted); }
+.pro-card .btn-mini[disabled] { opacity:.55; cursor:not-allowed; }
+
+@media (max-width:900px) {
+  .exp-page { grid-template-columns:minmax(0,1fr); padding:16px; }
+  .exp-toolbar { padding:14px 16px; }
+  .exp-foot { padding:8px 16px 26px; }
+}

@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Theme, before first paint. Everything else about the theme lives in
+     core.js, but Theme.init() runs after the body has already been painted
+     with the light :root defaults — which flashes white on every navigation
+     for anyone in dark mode. This is the same read, done early enough to
+     matter, and core.js re-applying the same value later is a no-op. Inline
+     on purpose: an external file is a round trip, and a round trip is the
+     flash. -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('artShowTracker.theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (_) {
+    /* Private mode or blocked storage. Falling through leaves the CSS
+       defaults in charge, which is exactly what happened before. */
+  }
+})();
+</script>
+<title>Money — Show Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="app.css?v=f894c002">
+<link rel="stylesheet" href="intel.css?v=f894c002">
+</head>
+<body>
+<header class="app-header">
+  <div class="brand">
+    <h1>Money</h1>
+    <span class="sub">What the season actually cost</span>
+  </div>
+  <div class="header-actions">
+    <a class="btn btn-quiet" href="index.html">&larr; Back to ledger</a>
+    <button class="btn btn-icon" id="btnTheme" type="button" aria-label="Switch theme" title="Switch theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" id="iconSun">
+        <circle cx="10" cy="10" r="3.6"/>
+        <path d="M10 1.6v2.2M10 16.2v2.2M2.6 10H4.8M15.2 10h2.2M4.8 4.8l1.6 1.6M13.6 13.6l1.6 1.6M15.2 4.8l-1.6 1.6M6.4 13.6l-1.6 1.6"/>
+      </svg>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" stroke-linejoin="round" id="iconMoon" hidden>
+        <path d="M16.5 11.8A6.9 6.9 0 0 1 8.2 3.5a6.9 6.9 0 1 0 8.3 8.3z"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="exp-toolbar">
+  <div class="exp-field">
+    <label class="label" for="expShow">Show</label>
+    <select class="control" id="expShow"></select>
+  </div>
+  <div class="exp-field">
+    <label class="label" for="expCat">Category</label>
+    <select class="control" id="expCat"></select>
+  </div>
+  <button class="btn btn-primary" id="expAdd" type="button">Add expense</button>
+  <span class="spacer"></span>
+  <button class="btn-mini" id="expCsv" type="button">Export CSV</button>
+</div>
+
+<div class="exp-page">
+  <main class="exp-main">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Expenses</h2>
+        <span class="hint" id="expCount"></span>
+      </div>
+      <div id="expList"></div>
+      <p class="hint" id="expEmpty" hidden>
+        Nothing logged yet. Every figure on this page comes from rows you enter &mdash;
+        the app never estimates what a show cost you.
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Lodging finds</h2></div>
+      <p class="hint">Where you parked or stayed cheaply. Worth real money, and
+        nowhere else records it. Each one is private until you mark it shareable.</p>
+      <div id="expLodging"></div>
+    </section>
+  </main>
+
+  <aside class="rail">
+    <section class="panel">
+      <h2>This season</h2>
+      <div class="stat-grid" id="expStats"></div>
+      <p class="hint" id="expPartial"></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>By category</h2></div>
+      <div id="expCats"></div>
+      <p class="hint" id="expDriving" hidden></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Break-even</h2></div>
+      <div id="expBreakEven"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Coming later</h2></div>
+      <p class="hint">Planned features. None of these work yet.</p>
+      <div id="expPro"></div>
+    </section>
+  </aside>
+</div>
+
+<div class="overlay" id="exOverlay" hidden></div>
+<section class="modal" id="exModal" role="dialog" aria-modal="true" aria-labelledby="exTitle" hidden>
+  <div class="modal-head">
+    <h2 id="exTitle">Add expense</h2>
+    <button class="btn btn-icon" id="exClose" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="exCategory">Category</label>
+        <select class="control" id="exCategory"></select>
+      </div>
+      <div class="form-row">
+        <label class="label" for="exDate">Date</label>
+        <input class="control" id="exDate" type="date">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="exShow">Show</label>
+      <select class="control" id="exShow"></select>
+      <div class="hint">Optional. A roll of canvas in February belongs to no show.</div>
+    </div>
+
+    <div class="grid-2" id="exAmountRow">
+      <div class="form-row">
+        <label class="label" for="exAmount">Amount ($)</label>
+        <input class="control" id="exAmount" inputmode="decimal" autocomplete="off">
+        <div class="hint">Leave blank if you do not know it yet. Blank stays unknown.</div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="exVendor">Paid to</label>
+        <input class="control" id="exVendor" autocomplete="off" placeholder="Optional">
+      </div>
+    </div>
+
+    <!-- Mileage only. The rate is the artist's: no federal figure ships with
+         the app, because a hardcoded rate goes stale the moment the year turns
+         and this is a number that costs money when it is wrong. -->
+    <div class="grid-2" id="exMileageRow" hidden>
+      <div class="form-row">
+        <label class="label" for="exMiles">Miles</label>
+        <input class="control" id="exMiles" inputmode="decimal" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <label class="label" for="exRate">Your rate per mile ($)</label>
+        <input class="control" id="exRate" inputmode="decimal" autocomplete="off" placeholder="e.g. 0.67">
+        <div class="hint">Yours to set. The app ships no rate, because a stale
+          one costs money. This is bookkeeping, not tax advice.</div>
+      </div>
+    </div>
+
+    <!-- Lodging only. -->
+    <div id="exLodgingRow" hidden>
+      <div class="grid-2">
+        <div class="form-row">
+          <label class="label" for="exLodgingKind">How you got it</label>
+          <select class="control" id="exLodgingKind"></select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="exNights">Nights</label>
+          <input class="control" id="exNights" inputmode="decimal" autocomplete="off">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-row">
+          <label class="label" for="exParking">Overnight parking allowed</label>
+          <select class="control" id="exParking">
+            <option value="">Did not check</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="exRv">Room for a van or RV</label>
+          <select class="control" id="exRv">
+            <option value="">Did not check</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="check"><input type="checkbox" id="exShareable">
+          <span style="font-size:13px;">Share this find with other artists</span></label>
+        <div class="hint">Off unless you turn it on. Sharing has no transport yet,
+          so this only marks the row for when it does. Nothing has been sent.</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="exNotes">Notes</label>
+      <textarea class="control" id="exNotes"></textarea>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-primary" id="exSave" type="button">Save</button>
+    <button class="btn btn-quiet" id="exCancel" type="button">Cancel</button>
+    <span class="spacer"></span>
+    <button class="btn btn-quiet btn-danger" id="exDelete" type="button" hidden>Delete</button>
+  </div>
+</section>
+
+<p class="exp-foot" id="buildStamp"></p>
+
+<script src="core.js?v=f894c002"></script>
+<script src="version.js?v=f894c002"></script>
+<script src="expenses.js?v=f894c002"></script>
+<script src="plan.js?v=f894c002"></script>
+<script src="store-supabase.js?v=f894c002"></script>
+<script type="module">
+'use strict';
+/* ==========================================================================
+   The Money page.
+
+   Every figure here comes from a row the artist entered. Nothing is estimated
+   and nothing is defaulted, so a season with half its receipts missing says
+   so out loud rather than presenting a confident wrong total.
+
+   This page never says anything is deductible. Categorising a row is
+   bookkeeping; the other thing is advice, and it is not ours to give.
+   ========================================================================== */
+const { Store, Settings, Theme, esc, EXPENSE_CATEGORIES, EXPENSE_LABEL,
+        LODGING_KINDS, LODGING_KIND_LABEL, fmtDay } = window.AST;
+const X = window.ASTExpenses;
+const $ = sel => document.querySelector(sel);
+
+Theme.init($('#btnTheme'));
+
+const state = { rows: [], shows: [], showId: '', category: '', editingId: null };
+
+const money = n => n == null ? '\u2014' : '$' + Math.round(n).toLocaleString();
+
+async function refresh() {
+  [state.rows, state.shows] = await Promise.all([Store.listExpenses(), Store.list()]);
+  render();
+}
+
+function showName(id) {
+  const s = state.shows.find(x => x.id === id);
+  return s ? s.name : '';
+}
+
+function filtered() {
+  return state.rows.filter(r =>
+    (!state.showId || r.showId === state.showId) &&
+    (!state.category || r.category === state.category));
+}
+
+function fillFilters() {
+  const keep = state.showId;
+  $('#expShow').innerHTML = ['<option value="">All shows</option>']
+    .concat(state.shows.map(s =>
+      '<option value="' + esc(s.id) + '">' + esc(s.name) + '</option>')).join('');
+  $('#expShow').value = keep;
+  const keepC = state.category;
+  $('#expCat').innerHTML = ['<option value="">All categories</option>']
+    .concat(EXPENSE_CATEGORIES.map(c =>
+      '<option value="' + esc(c.value) + '">' + esc(c.label) + '</option>')).join('');
+  $('#expCat').value = keepC;
+}
+
+function renderList() {
+  const rows = filtered().slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  $('#expCount').textContent = rows.length + (rows.length === 1 ? ' row' : ' rows');
+  $('#expEmpty').hidden = rows.length > 0;
+  $('#expList').innerHTML = rows.map(r => {
+    const cost = X.costOf(r);
+    /* A row with no cost yet is not a $0 row, and must not read as one. */
+    const amt = cost == null
+      ? '<span class="exp-unknown">not costed</span>'
+      : money(cost);
+    const sub = [
+      r.date ? fmtDay(r.date) : 'no date',
+      showName(r.showId) || 'no show',
+      r.vendor
+    ].filter(Boolean).join(' \u00b7 ');
+    const miles = r.category === 'mileage' && r.miles != null
+      ? ' <span class="exp-sub">' + esc(r.miles + ' mi') +
+        (r.mileageRate != null ? esc(' @ $' + r.mileageRate) : ' \u00b7 no rate set') + '</span>'
+      : '';
+    return '<div class="exp-row" data-id="' + esc(r.id) + '" tabindex="0" role="button">' +
+      '<div class="exp-cell"><strong>' + esc(EXPENSE_LABEL[r.category]) + '</strong>' + miles +
+        '<div class="exp-sub">' + esc(sub) + '</div></div>' +
+      '<div class="exp-amt">' + amt + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderStats() {
+  const rows = filtered();
+  const s = X.sum(rows);
+  const cells = [
+    ['Rows', s.total || '\u2014'],
+    ['Spent', money(s.amount)],
+    ['Costed', s.total ? s.known + ' of ' + s.total : '\u2014']
+  ];
+  $('#expStats').innerHTML = cells.map(([k, n]) =>
+    '<div class="stat"><div class="n">' + esc(n) + '</div><div class="k">' + esc(k) + '</div></div>').join('');
+  /* The line that stops a partial total reading as a complete one. */
+  $('#expPartial').textContent = !s.total ? ''
+    : s.complete ? 'Every row has a figure.'
+    : 'Known figures only \u2014 ' + (s.total - s.known) + ' row' +
+      (s.total - s.known === 1 ? ' has' : 's have') + ' no amount yet.';
+}
+
+function renderCats() {
+  const cats = X.byCategory(filtered(), EXPENSE_CATEGORIES);
+  $('#expCats').innerHTML = cats.length
+    ? cats.map(c =>
+        '<div class="exp-cat"><span>' + esc(c.label) + '</span>' +
+        '<span>' + esc(money(c.sum.amount)) +
+        (c.sum.complete ? '' : ' <span class="exp-unknown">of ' + c.sum.known + '/' + c.sum.total + '</span>') +
+        '</span></div>').join('')
+    : '<p class="hint">Nothing to total yet.</p>';
+
+  /* Not a warning. Both are legitimate; the artist just needs to know both
+     are in there, because their accountant will want one method, not two. */
+  const both = X.hasBothDrivingMethods(filtered(), state.showId || null);
+  $('#expDriving').hidden = !both;
+  $('#expDriving').textContent = both
+    ? 'You have logged both mileage and fuel. They are two ways of accounting ' +
+      'for the same driving, kept separate here so you can hand your bookkeeper ' +
+      'whichever one they use.' : '';
+}
+
+function renderBreakEven() {
+  const el = $('#expBreakEven');
+  if (!state.showId) {
+    el.innerHTML = '<p class="hint">Pick a show to see what it has to sell to clear zero.</p>';
+    return;
+  }
+  const be = X.breakEven(state.rows, state.showId, null);
+  if (be.value == null) {
+    el.innerHTML = '<p class="hint">Nothing costed for this show yet, so there is ' +
+      'no figure to clear.</p>';
+    return;
+  }
+  el.innerHTML = '<div class="stat"><div class="n">' + esc(money(be.value)) +
+    '</div><div class="k">to break even</div></div>' +
+    '<p class="hint">' +
+      (be.spent.complete ? 'From every row you have entered.'
+        : 'From the ' + be.spent.known + ' of ' + be.spent.total + ' rows that carry a figure, so the real number is higher.') +
+      ' Sales before any commission the show takes \u2014 no commission is recorded ' +
+      'for this show, and "not mentioned" is not the same as zero.' +
+    '</p>';
+}
+
+function renderLodging() {
+  const finds = X.lodgingFinds(state.rows);
+  $('#expLodging').innerHTML = finds.length
+    ? finds.map(r => {
+        const tags = [
+          r.lodgingKind ? LODGING_KIND_LABEL[r.lodgingKind] : '',
+          r.overnightParking === true ? 'overnight parking' : '',
+          r.rvFriendly === true ? 'van/RV ok' : '',
+          r.shareable ? 'shared' : 'private'
+        ].filter(Boolean);
+        return '<div class="exp-row" data-id="' + esc(r.id) + '" tabindex="0" role="button">' +
+          '<div class="exp-cell"><strong>' + esc(r.vendor || 'Unnamed place') + '</strong>' +
+          '<div class="exp-sub">' + esc([showName(r.showId), tags.join(' \u00b7 ')].filter(Boolean).join(' \u2014 ')) + '</div></div>' +
+          '<div class="exp-amt">' + esc(money(X.costOf(r))) + '</div>' +
+        '</div>';
+      }).join('')
+    : '<p class="hint">No finds recorded. Log a lodging row and mark how you got it.</p>';
+}
+
+function render() {
+  fillFilters(); renderList(); renderStats(); renderCats();
+  renderBreakEven(); renderLodging();
+}
+
+/* ---- the editor --------------------------------------------------------- */
+function syncCategoryFields() {
+  const cat = $('#exCategory').value;
+  $('#exMileageRow').hidden = cat !== 'mileage';
+  $('#exLodgingRow').hidden = cat !== 'lodging';
+}
+
+function openEditor(row) {
+  state.editingId = row ? row.id : null;
+  $('#exTitle').textContent = row ? 'Edit expense' : 'Add expense';
+  $('#exCategory').innerHTML = EXPENSE_CATEGORIES.map(c =>
+    '<option value="' + esc(c.value) + '">' + esc(c.label) + '</option>').join('');
+  $('#exShow').innerHTML = ['<option value="">No show</option>']
+    .concat(state.shows.map(s =>
+      '<option value="' + esc(s.id) + '">' + esc(s.name) + '</option>')).join('');
+  $('#exLodgingKind').innerHTML = LODGING_KINDS.map(k =>
+    '<option value="' + esc(k.value) + '">' + esc(k.label) + '</option>').join('');
+
+  $('#exCategory').value = row ? row.category : 'other';
+  $('#exDate').value = row ? row.date : '';
+  $('#exShow').value = row ? row.showId : state.showId;
+  $('#exAmount').value = row && row.amount != null ? row.amount : '';
+  $('#exVendor').value = row ? row.vendor : '';
+  $('#exMiles').value = row && row.miles != null ? row.miles : '';
+  $('#exRate').value = row && row.mileageRate != null ? row.mileageRate : '';
+  $('#exLodgingKind').value = row ? row.lodgingKind : '';
+  $('#exNights').value = row && row.nights != null ? row.nights : '';
+  $('#exParking').value = row && row.overnightParking === true ? 'yes'
+                        : row && row.overnightParking === false ? 'no' : '';
+  $('#exRv').value = row && row.rvFriendly === true ? 'yes'
+                   : row && row.rvFriendly === false ? 'no' : '';
+  $('#exShareable').checked = !!(row && row.shareable);
+  $('#exNotes').value = row ? row.notes : '';
+  $('#exDelete').hidden = !row;
+  syncCategoryFields();
+  $('#exOverlay').hidden = false;
+  $('#exModal').hidden = false;
+  $('#exCategory').focus();
+}
+
+function closeEditor() {
+  state.editingId = null;
+  $('#exModal').hidden = true;
+  $('#exOverlay').hidden = true;
+}
+
+const numOf = sel => { const v = $(sel).value.trim(); return v === '' ? null : Number(v); };
+const triOf = sel => { const v = $(sel).value; return v === 'yes' ? true : v === 'no' ? false : null; };
+
+async function save() {
+  const existing = state.rows.find(r => r.id === state.editingId);
+  await Store.upsertExpense({
+    ...(existing || {}),
+    id: state.editingId || undefined,
+    category: $('#exCategory').value,
+    date: $('#exDate').value,
+    showId: $('#exShow').value,
+    amount: numOf('#exAmount'),
+    vendor: $('#exVendor').value,
+    miles: numOf('#exMiles'),
+    mileageRate: numOf('#exRate'),
+    lodgingKind: $('#exLodgingKind').value,
+    nights: numOf('#exNights'),
+    overnightParking: triOf('#exParking'),
+    rvFriendly: triOf('#exRv'),
+    shareable: $('#exShareable').checked,
+    notes: $('#exNotes').value
+  });
+  await refresh();
+  closeEditor();
+}
+
+async function remove() {
+  if (!state.editingId) return;
+  await Store.removeExpense(state.editingId);
+  await refresh();
+  closeEditor();
+}
+
+/* One row per line, categories spelled out, amounts left blank where unknown
+   rather than zeroed. A bookkeeper can read it; nothing in it is a claim. */
+function toCsv() {
+  const head = ['Date','Category','Show','Paid to','Amount','Miles','Rate','Nights','Notes'];
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const lines = [head.map(q).join(',')].concat(
+    state.rows.slice().sort((a, b) => (a.date || '').localeCompare(b.date || '')).map(r => [
+      r.date, EXPENSE_LABEL[r.category], showName(r.showId), r.vendor,
+      X.costOf(r) == null ? '' : X.costOf(r),
+      r.miles == null ? '' : r.miles,
+      r.mileageRate == null ? '' : r.mileageRate,
+      r.nights == null ? '' : r.nights,
+      r.notes
+    ].map(q).join(',')));
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'expenses.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+document.addEventListener('click', e => {
+  const row = e.target.closest('.exp-row');
+  if (!row) return;
+  const rec = state.rows.find(r => r.id === row.dataset.id);
+  if (rec) openEditor(rec);
+});
+$('#expShow').addEventListener('change', e => { state.showId = e.target.value; render(); });
+$('#expCat').addEventListener('change', e => { state.category = e.target.value; render(); });
+$('#expAdd').addEventListener('click', () => openEditor(null));
+$('#expCsv').addEventListener('click', toCsv);
+$('#exCategory').addEventListener('change', syncCategoryFields);
+$('#exSave').addEventListener('click', save);
+$('#exDelete').addEventListener('click', remove);
+$('#exCancel').addEventListener('click', closeEditor);
+$('#exClose').addEventListener('click', closeEditor);
+$('#exOverlay').addEventListener('click', closeEditor);
+
+$('#expPro').innerHTML = window.ASTPlan.cards(
+  ['accountant_export', 'negotiation', 'art_rep', 'logistics']);
+
+if (window.ASTSupabase) {
+  try { window.ASTSupabase.connect({ onShows: () => refresh() }); } catch (_) {}
+}
+refresh();
+</script>
+<script>window.ASTVersion.mount(document.getElementById('buildStamp'));</script>
+</body>
+</html>

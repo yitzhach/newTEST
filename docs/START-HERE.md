@@ -24,7 +24,7 @@ commands or the rules. Keep it this short:
 > Don't re-read the codebase — open only the files you're changing, and only
 > open `docs/build-phases.md` or `docs/handoff.md` if the task needs them.
 >
-> Before finishing: run the seven suites, then commit, push and merge to `main`.
+> Before finishing: run the eight suites, then commit, push and merge to `main`.
 
 Add a line naming a file or feature if you already know where the work lives —
 that saves a search. Everything else is already loaded.
@@ -168,6 +168,41 @@ which are down — and `applySuggestion()` is the single place a suggestion woul
 be merged back, through the same clamping as every other write. Neither calls a
 model today and there is no network transport in that file.
 
+**The expense log — `tracker/expenses.html`, reached from the ledger.** §7 Stage 2.
+Mileage, fuel, lodging, meals, booth and jury fees, supplies, shipping,
+commission. Fourth use of the child-record pattern, so the shape is now settled.
+
+- **An uncosted row is `null`, never `$0`**, and it renders "not costed". Every
+  total reports `known` of `total` and says "known figures only — 3 rows have no
+  amount yet" whenever those differ.
+- **No mileage rate ships with the app.** The artist enters their own, stored
+  per row. A hardcoded federal rate goes stale the moment the year turns, and
+  this is a number that costs money when it is wrong.
+- **Mileage and fuel are both kept and never merged.** They are two ways of
+  accounting for the same driving; the page says both are present and leaves
+  the choice to the artist's bookkeeper.
+- **Nothing is ever called deductible.** Categorising a row is bookkeeping;
+  the other thing is advice. There is a test asserting the word never appears.
+- **Listed fees are not backfilled.** A show's `boothFee` is what the artist
+  *expects* to pay; an expense row is money that *left*. Converting one to the
+  other would invent a payment.
+
+**Lodging finds.** Where an artist parked or stayed free or cheap, recorded on
+the lodging expense row itself so nobody types the place twice. Free /
+discounted / paid, nights, and two tri-state flags — overnight parking and
+van-or-RV room — where `null` means *nobody checked*, because "no overnight
+parking" and "we don't know" are different answers and one of them gets somebody
+moved on at 2am. Each find is **private unless explicitly marked shareable**,
+and sharing has no transport yet, so the flag only marks the row. A show the
+artist has never stayed at scores `null`, not "expensive".
+
+**Pro previews — `plan.js`.** There is **no billing in this project**: no
+accounts, no entitlement, no payment. A planned feature renders as a disabled
+card saying what it would do and that plans do not exist yet. It never shows a
+price, plan name, trial or sign-up, because quoting a price for something that
+cannot be bought is a false offer. Currently previewed: accountant export,
+negotiating help, art representative, shared logistics, mock jury review.
+
 **Times are picked, not typed.** Fifteen-minute menus labelled the way people
 say them, duration chips, and a start that drags the end along keeping the gap.
 `<input type="time">` was the wrong control: a format to get wrong, half-typed
@@ -219,7 +254,7 @@ written.
 
 ---
 
-## The seven suites — run all of them before pushing
+## The eight suites — run all of them before pushing
 
 ```bash
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --no-save playwright   # once
@@ -237,11 +272,13 @@ node build/pipeline-tests.cjs        # 26 — the migration and its backfill, ju
                                      #      application store, the drawer block
 node build/ranker-tests.cjs           # 32 — saved rankings, the weight editor,
                                      #      export, and refusing a bad import
+node build/expense-tests.cjs          # 30 — the expense log, mileage, landed
+                                     #      cost, lodging finds, Pro previews
 cd worker && npm test                # 45 — API; manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
 ```
 
-All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 45 / 11**.
+All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 30 / 45 / 11**.
 
 Two things worth knowing about the tests:
 

@@ -12,7 +12,7 @@ window.AST = (function () {
   'use strict';
 
   /* ---- 1. MODEL + CONSTANTS --------------------------------------------- */
-  var SCHEMA_VERSION = 6;
+  var SCHEMA_VERSION = 7;
   var DB_KEY = 'artShowTracker.db';
   var THEME_KEY = 'artShowTracker.theme';
   var CONFIG_KEY = 'artShowTracker.supabase';
@@ -159,6 +159,92 @@ window.AST = (function () {
     return m ? m[1] : '';
   }
 
+  /* ---- the expense log ---------------------------------------------------
+     Categories are shaped like Schedule C so a year of rows does not have to
+     be re-sorted at tax time — retrofitting categories onto uncategorised
+     rows is miserable. They are NOT line numbers and this is NOT tax advice:
+     the app categorises a row and never tells anybody it is deductible.
+
+     Mileage and fuel are both here on purpose. They are two ways of
+     accounting for the same driving, and which one an artist uses is between
+     them and their accountant, so the log keeps them apart and adds them up
+     separately rather than choosing. */
+  var EXPENSE_CATEGORIES = [
+    { value:'booth_fee',  label:'Booth fee' },
+    { value:'jury_fee',   label:'Jury / application fee' },
+    { value:'mileage',    label:'Mileage' },
+    { value:'fuel',       label:'Fuel' },
+    { value:'lodging',    label:'Lodging' },
+    { value:'meals',      label:'Meals' },
+    { value:'supplies',   label:'Supplies & materials' },
+    { value:'shipping',   label:'Shipping & freight' },
+    { value:'commission', label:'Commission paid' },
+    { value:'other',      label:'Other' }
+  ];
+  var EXPENSE_LABEL = Object.fromEntries(
+    EXPENSE_CATEGORIES.map(function (c) { return [c.value, c.label]; }));
+
+  /* How an artist got their bed. The reason this is recorded at all: where
+     you can park a van for free is worth real money at a show, it is knowledge
+     artists already trade, and nothing publishes it. */
+  var LODGING_KINDS = [
+    { value:'',         label:'Not recorded' },
+    { value:'free',     label:'Free' },
+    { value:'discount', label:'Discounted' },
+    { value:'paid',     label:'Paid full price' }
+  ];
+  var LODGING_KIND_LABEL = Object.fromEntries(
+    LODGING_KINDS.map(function (k) { return [k.value, k.label]; }));
+
+  /**
+   * One expense. A child record like an application, for the same reason:
+   * money must not be lost to last-write-wins, and a season of individual
+   * rows is not a property of a show.
+   */
+  function makeExpense(input) {
+    input = input || {};
+    var now = new Date().toISOString();
+    var cat = EXPENSE_LABEL[input.category] ? input.category : 'other';
+    return {
+      id: input.id || newId(),
+      /* Optional. A tank of fuel on the way home belongs to a show; a roll of
+         canvas in February does not, and must not be forced under one. */
+      showId: input.showId || '',
+      cycle: cycleOf(input.cycle),
+      category: cat,
+      date: dateOrEmpty(input.date),
+      /* Null is "not recorded". Never 0 — an expense nobody costed is not a
+         free one, and a total that silently absorbs it is wrong. */
+      amount: numOrNull(input.amount),
+      /* Mileage is miles x rate. The RATE IS THE ARTIST'S: no federal figure
+         ships with the app, because a hardcoded rate goes stale the moment the
+         year turns and this is a number that costs money when it is wrong. */
+      miles: numOrNull(input.miles),
+      mileageRate: numOrNull(input.mileageRate),
+      vendor: String(input.vendor || '').trim(),
+      notes: input.notes || '',
+
+      /* ---- lodging only. Meaningless on other categories, and the UI only
+         asks for them when the category is lodging. ---- */
+      lodgingKind: LODGING_KIND_LABEL[input.lodgingKind] ? input.lodgingKind : '',
+      nights: numOrNull(input.nights),
+      /* Tri-state on purpose: true, false, and null for "nobody checked".
+         "No overnight parking" and "we do not know" are different answers and
+         one of them gets an artist moved on at 2am. */
+      overnightParking: input.overnightParking === true ? true
+                      : input.overnightParking === false ? false : null,
+      rvFriendly: input.rvFriendly === true ? true
+                : input.rvFriendly === false ? false : null,
+      /* Opt-in, per row, and false is the only default. A lodging find is
+         shareable; the rest of somebody's spending never is. */
+      shareable: !!input.shareable,
+
+      deletedAt: input.deletedAt || null,
+      createdAt: input.createdAt || now,
+      updatedAt: input.updatedAt || now
+    };
+  }
+
   /**
    * A saved ranking — "Lisa's list". The criteria themselves belong to
    * ranker.js, which owns the factor list; core.js only guarantees the
@@ -290,10 +376,11 @@ window.AST = (function () {
 
   function migrate(db) {
     var d = db;
-    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [] };
+    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [] };
     if (!Array.isArray(d.shows)) d.shows = [];
     if (!Array.isArray(d.applications)) d.applications = [];
     if (!Array.isArray(d.rankers)) d.rankers = [];
+    if (!Array.isArray(d.expenses)) d.expenses = [];
     // v0 (pre-versioning: a bare array or no version) -> v1
     if (!d.schemaVersion) d.schemaVersion = 1;
     // v1 -> v2: soft deletes, so cross-device sync can carry a deletion.
@@ -357,7 +444,16 @@ window.AST = (function () {
     d.shows = d.shows.map(makeShow);
     d.events = (Array.isArray(d.events) ? d.events : []).map(makeEvent);
     d.applications = (Array.isArray(d.applications) ? d.applications : []).map(makeApplication);
+    /* v6 -> v7: the expense log. Nothing is backfilled: a show's boothFee and
+       juryFee are what the artist EXPECTS to pay, and an expense row is money
+       that actually left. Turning the first into the second would invent a
+       payment that may never have happened. */
+    if (d.schemaVersion < 7) {
+      if (!Array.isArray(d.expenses)) d.expenses = [];
+      d.schemaVersion = 7;
+    }
     d.rankers = (Array.isArray(d.rankers) ? d.rankers : []).map(makeRanker);
+    d.expenses = (Array.isArray(d.expenses) ? d.expenses : []).map(makeExpense);
     d.schemaVersion = SCHEMA_VERSION;
     return d;
   }
@@ -366,7 +462,7 @@ window.AST = (function () {
     function read() {
       var raw = null;
       try { raw = localStorage.getItem(DB_KEY); }
-      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [] }; }
+      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [] }; }
       if (raw === null) return null;
       var parsed;
       try { parsed = JSON.parse(raw); } catch (_) { parsed = null; }
@@ -390,7 +486,7 @@ window.AST = (function () {
       // A brand-new device gets the demo season. Flag it: the seed is not the
       // user's data, so on first sign-in it must not be pushed up as if it
       // were — a second device would duplicate the whole season.
-      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], applications: [], rankers: [], pristineSeed: true });
+      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], applications: [], rankers: [], expenses: [], pristineSeed: true });
     }
     /** Any real write means this device's data is no longer the untouched seed. */
     function touch(db) { db.pristineSeed = false; return db; }
@@ -446,7 +542,8 @@ window.AST = (function () {
         var prev = load();
         var db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow),
                    events: prev.events, applications: prev.applications,
-                   rankers: prev.rankers, pristineSeed: false };
+                   rankers: prev.rankers, expenses: prev.expenses,
+                   pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
       },
@@ -457,7 +554,8 @@ window.AST = (function () {
         var prev = load();
         var db = { schemaVersion: SCHEMA_VERSION, shows: rows.map(makeShow),
                    events: prev.events, applications: prev.applications,
-                   rankers: prev.rankers, pristineSeed: false };
+                   rankers: prev.rankers, expenses: prev.expenses,
+                   pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
       },
@@ -553,6 +651,34 @@ window.AST = (function () {
         write(touch(db));
         return Promise.resolve(before);
       },
+      /* ---- expenses ----------------------------------------------------- */
+      listExpenses: function () { return Promise.resolve(live(load().expenses)); },
+      listAllExpenses: function () { return Promise.resolve(load().expenses.slice()); },
+      getExpense: function (id) {
+        return Promise.resolve(live(load().expenses).filter(function (e) { return e.id === id; })[0] || null);
+      },
+      upsertExpense: function (ex) {
+        var db = load();
+        var rec = makeExpense(ex);
+        rec.updatedAt = new Date().toISOString();
+        var i = db.expenses.findIndex(function (e) { return e.id === rec.id; });
+        if (i === -1) db.expenses.push(rec);
+        else db.expenses[i] = Object.assign({}, db.expenses[i], rec);
+        write(touch(db));
+        return Promise.resolve(rec);
+      },
+      removeExpense: function (id) {
+        var db = load();
+        var i = db.expenses.findIndex(function (e) { return e.id === id; });
+        if (i === -1) return Promise.resolve(null);
+        var before = Object.assign({}, db.expenses[i]);
+        db.expenses[i] = Object.assign({}, db.expenses[i], {
+          deletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        write(touch(db));
+        return Promise.resolve(before);
+      },
       markUsed: function () { var db = load(); write(touch(db)); }
     };
   })();
@@ -641,7 +767,12 @@ window.AST = (function () {
     listRankers:  function ()   { return (backend.listRankers  || LocalStore.listRankers).call(backend); },
     getRanker:    function (id) { return (backend.getRanker    || LocalStore.getRanker).call(backend, id); },
     upsertRanker: function (rk) { return (backend.upsertRanker || LocalStore.upsertRanker).call(backend, rk); },
-    removeRanker: function (id) { return (backend.removeRanker || LocalStore.removeRanker).call(backend, id); }
+    removeRanker: function (id) { return (backend.removeRanker || LocalStore.removeRanker).call(backend, id); },
+    /* Expenses, same degrade-to-local fallback. */
+    listExpenses:  function ()   { return (backend.listExpenses  || LocalStore.listExpenses).call(backend); },
+    getExpense:    function (id) { return (backend.getExpense    || LocalStore.getExpense).call(backend, id); },
+    upsertExpense: function (ex) { return (backend.upsertExpense || LocalStore.upsertExpense).call(backend, ex); },
+    removeExpense: function (id) { return (backend.removeExpense || LocalStore.removeExpense).call(backend, id); }
   };
   function useStore(next) { backend = next || LocalStore; return Store; }
   function currentStore() { return backend; }
@@ -964,6 +1095,9 @@ window.AST = (function () {
     STATUSES: STATUSES, STATUS_LABEL: STATUS_LABEL,
     makeShow: makeShow, makeEvent: makeEvent, makeReminder: makeReminder,
     makeApplication: makeApplication, makeRanker: makeRanker,
+    makeExpense: makeExpense,
+    EXPENSE_CATEGORIES: EXPENSE_CATEGORIES, EXPENSE_LABEL: EXPENSE_LABEL,
+    LODGING_KINDS: LODGING_KINDS, LODGING_KIND_LABEL: LODGING_KIND_LABEL,
     STAGES: STAGES, STAGE_LABEL: STAGE_LABEL, STAGE_SETTLED: STAGE_SETTLED,
     EVENT_KINDS: EVENT_KINDS, EVENT_KIND_LABEL: EVENT_KIND_LABEL,
     numOrNull: numOrNull, clampRating: clampRating, migrate: migrate,
