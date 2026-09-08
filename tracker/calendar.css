@@ -132,6 +132,14 @@ html[data-theme="dark"] .cal-bar.l-ledger { color:#0f0f0f; }
 }
 .cal-bar.l-catalogue:hover { color:var(--ink); border-color:var(--muted); }
 
+/* Hearted — your shortlist. Solid enough to read as yours, but outlined in
+   the heart colour so it never passes for something you have committed to. */
+.cal-bar.l-hearted {
+  background:color-mix(in srgb, var(--danger) 12%, transparent);
+  border-color:var(--danger); color:var(--ink);
+}
+.cal-bar.l-hearted:hover { background:color-mix(in srgb, var(--danger) 20%, transparent); }
+
 /* Personal — accent-tinted, distinct from both. */
 .cal-bar.l-personal {
   background:color-mix(in srgb, var(--accent) 14%, transparent);
@@ -259,3 +267,38 @@ html[data-theme="dark"] .cal-bar.l-ledger { color:#0f0f0f; }
   .cal-cell { min-height:86px; }
   .cal-bar { font-size:10px; }
 }
+
+/* ==========================================================================
+   HEART, TIME PICKER, AND THE NOT-YET CONTROLS
+   ========================================================================== */
+.pop-top { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.cal-heart { color:var(--muted); padding:2px; margin:-2px; line-height:0; }
+.cal-heart:hover, .cal-heart[aria-pressed="true"] { color:var(--danger); }
+.cal-heart:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+/* A menu of real times, not a field to type into. Wide enough that the
+   longest label ("11:45 PM") never truncates. */
+.cal-time {
+  width:100%; padding:10px 12px; border:1px solid var(--line); background:var(--bg);
+  min-height:44px;
+}
+.cal-durs { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+.chip-dur {
+  border:1px solid var(--line); padding:6px 12px; font-size:11px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--muted); min-height:34px;
+}
+.chip-dur:hover { color:var(--ink); border-color:var(--ink); }
+.chip-dur[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+.cal-dur-read { margin:10px 0 0; font-size:12px; color:var(--muted); }
+.cal-dur-read.is-bad { color:var(--danger); }
+
+/* A row of controls where most do nothing yet. Disabled, dimmed, and each
+   one carries the reason on hover — the same rule the app uses for a fact it
+   does not have, applied to a button. */
+.cal-stubrow {
+  display:flex; gap:6px; flex-wrap:wrap; margin-top:14px; padding-top:12px;
+  border-top:1px solid var(--line);
+}
+.cal-stubrow .btn { min-height:32px; font-size:9px; padding:0 10px; }
+.cal-stubrow .btn[disabled] { opacity:.4; cursor:not-allowed; }
+.cal-stubrow .btn[disabled]:hover { border-color:transparent; color:var(--muted); }

@@ -16,6 +16,8 @@ numbers cost real money, so unknowns stay unknown.
 - Calendar layers (ledger / catalogue / personal) are never blurred either, and
   the calendar never copies a show — it reads the ledger and the catalogue.
 - A reminder with no delivery channel says so. Nothing claims to have been sent.
+- The heart is one shortlist shared by the catalogue and the calendar, stored
+  per catalogue record. No catalogue record, no heart.
 
 ## Stack
 - **`tracker/`** — vanilla classic scripts. No build, no modules, no framework.
