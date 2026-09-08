@@ -31,11 +31,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
       referrerpolicy="no-referrer">
-<link rel="stylesheet" href="app.css?v=78bee9aa">
+<link rel="stylesheet" href="app.css?v=47a16f1c">
 <!-- The ledger shows the same fit/intel drawer the catalogue does, so it needs
      the same styles. Scoped to .idr/.fitchip/.prov and its own tokens; it adds
      to app.css rather than competing with it. -->
-<link rel="stylesheet" href="intel.css?v=78bee9aa">
+<link rel="stylesheet" href="intel.css?v=47a16f1c">
 </head>
 <body>
 <!-- ==========================================================================
@@ -55,6 +55,8 @@
             title="Fill the screen with the map (Escape to come back)">Map full screen</button>
     <a class="btn btn-quiet" href="browse.html" id="btnBrowse"
        title="Browse the shows catalogue and pick what to apply to">All shows</a>
+    <a class="btn btn-quiet" href="calendar.html" id="btnCalendar"
+       title="See the season as a calendar, and what it collides with">Calendar</a>
     <button class="sync-pill" id="syncPill" type="button" data-state="local"
             title="Sync status — click for account settings">
       <span class="sync-dot" aria-hidden="true"></span><span id="syncText">On this device</span>
@@ -627,24 +629,24 @@
      sandbox and an unverified hash would break the map outright. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
         referrerpolicy="no-referrer"></script>
-<script src="core.js?v=78bee9aa"></script>
-<script src="version.js?v=78bee9aa"></script>
-<script src="map.js?v=78bee9aa"></script>
+<script src="core.js?v=47a16f1c"></script>
+<script src="version.js?v=47a16f1c"></script>
+<script src="map.js?v=47a16f1c"></script>
 <!-- The fit/intel layer, so a show in the ledger opens the same breakdown
      it does in the catalogue. weather.js and salestax.js are optional to
      intel-ui.js, but without them the drawer silently loses two panels,
      which is worse than carrying two small files. -->
-<script src="fit.js?v=78bee9aa"></script>
-<script src="intel.js?v=78bee9aa"></script>
-<script src="members.js?v=78bee9aa"></script>
-<script src="weather.js?v=78bee9aa"></script>
-<script src="salestax.js?v=78bee9aa"></script>
-<script src="intel-ui.js?v=78bee9aa"></script>
-<script src="store-supabase.js?v=78bee9aa"></script>
-<script src="import.js?v=78bee9aa"></script>
-<script src="import-ui.js?v=78bee9aa"></script>
-<script src="share.js?v=78bee9aa"></script>
-<script src="share-ui.js?v=78bee9aa"></script>
+<script src="fit.js?v=47a16f1c"></script>
+<script src="intel.js?v=47a16f1c"></script>
+<script src="members.js?v=47a16f1c"></script>
+<script src="weather.js?v=47a16f1c"></script>
+<script src="salestax.js?v=47a16f1c"></script>
+<script src="intel-ui.js?v=47a16f1c"></script>
+<script src="store-supabase.js?v=47a16f1c"></script>
+<script src="import.js?v=47a16f1c"></script>
+<script src="import-ui.js?v=47a16f1c"></script>
+<script src="share.js?v=47a16f1c"></script>
+<script src="share-ui.js?v=47a16f1c"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE

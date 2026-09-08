@@ -1,0 +1,261 @@
+/* ==========================================================================
+   CALENDAR
+   Tokens, header and buttons come from app.css; this file is only the
+   calendar itself. Everything colour-related resolves through the same
+   variables, so dark mode needs no second set of rules.
+   ========================================================================== */
+
+.cal-wrap { padding:18px 32px 64px; }
+
+/* ---- Toolbar ------------------------------------------------------------ */
+.cal-toolbar {
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding:0 0 16px; border-bottom:1px solid var(--line); margin-bottom:18px;
+}
+.cal-title { margin:0; font-size:26px; font-weight:300; letter-spacing:.01em; min-width:220px; }
+.cal-title .yr { color:var(--muted); }
+.cal-nav { display:flex; align-items:center; gap:2px; }
+.cal-nav .btn-icon { width:36px; min-height:36px; }
+.cal-spacer { flex:1 1 auto; }
+
+/* Segmented view switch. One control, four states — a row of separate
+   buttons reads as four unrelated actions. */
+.cal-views { display:inline-flex; border:1px solid var(--line); }
+.cal-views button {
+  min-height:36px; padding:0 14px; font-size:10px; font-weight:600;
+  letter-spacing:.15em; text-transform:uppercase; color:var(--muted);
+  border-right:1px solid var(--line);
+}
+.cal-views button:last-child { border-right:none; }
+.cal-views button[aria-pressed="true"] { background:var(--accent); color:var(--accent-ink); }
+.cal-views button:not([aria-pressed="true"]):hover { color:var(--ink); background:var(--surface); }
+
+/* ---- Layer switches ----------------------------------------------------- */
+.cal-layers { display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding-bottom:16px; }
+.cal-layer { display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; }
+.cal-layer input { position:absolute; opacity:0; width:0; height:0; }
+.cal-layer .swatch {
+  width:26px; height:15px; border:1px solid var(--line); border-radius:9px;
+  position:relative; background:var(--surface); transition:background .12s, border-color .12s;
+  flex:none;
+}
+.cal-layer .swatch::after {
+  content:''; position:absolute; top:2px; left:2px; width:9px; height:9px; border-radius:50%;
+  background:var(--muted); transition:transform .12s, background .12s;
+}
+.cal-layer input:checked + .swatch { background:var(--layer, var(--accent)); border-color:var(--layer, var(--accent)); }
+.cal-layer input:checked + .swatch::after { transform:translateX(11px); background:#fff; }
+.cal-layer input:focus-visible + .swatch { outline:2px solid var(--accent); outline-offset:2px; }
+.cal-layer .lab { font-weight:600; }
+.cal-layer .hint { color:var(--muted); font-size:11px; }
+
+/* ---- Clash banner ------------------------------------------------------- */
+.cal-clash {
+  border:1px solid var(--warn); border-left-width:3px; background:var(--surface);
+  padding:12px 16px; margin-bottom:16px; font-size:13px;
+}
+.cal-clash h3 {
+  margin:0 0 6px; font-size:10px; font-weight:600; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--warn);
+}
+.cal-clash ul { margin:0; padding-left:18px; }
+.cal-clash li { margin:2px 0; }
+.cal-clash button { text-decoration:underline; text-underline-offset:2px; padding:0; }
+
+/* ==========================================================================
+   MONTH GRID
+   ========================================================================== */
+.cal-grid { border:1px solid var(--line); border-bottom:none; }
+.cal-dows, .cal-week { display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); }
+.cal-dows { border-bottom:1px solid var(--line); background:var(--surface); }
+.cal-dows div {
+  padding:8px 10px; font-size:10px; font-weight:600; letter-spacing:.18em;
+  text-transform:uppercase; color:var(--muted);
+}
+.cal-week { border-bottom:1px solid var(--line); position:relative; }
+.cal-cell {
+  border-right:1px solid var(--line); min-height:var(--cell-h, 120px);
+  padding:6px 6px 4px; position:relative; display:flex; flex-direction:column;
+}
+.cal-cell:last-child { border-right:none; }
+.cal-cell.out { background:var(--surface); }
+.cal-cell.out .cal-num { opacity:.4; }
+.cal-cell.is-clash { box-shadow:inset 0 -3px 0 var(--warn); }
+.cal-cell:hover { background:color-mix(in srgb, var(--accent) 5%, transparent); }
+
+.cal-daybtn {
+  display:flex; align-items:center; gap:6px; align-self:flex-start;
+  padding:2px 4px; margin:-2px 0 2px -4px;
+}
+.cal-num { font-size:13px; font-variant-numeric:tabular-nums; }
+.cal-cell.today .cal-num {
+  background:var(--accent); color:var(--accent-ink); border-radius:50%;
+  width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center;
+  font-weight:600;
+}
+/* The + only appears on the cell you are pointing at: seven of them per row,
+   always visible, is noise on top of the actual schedule. */
+.cal-add {
+  position:absolute; top:5px; right:5px; width:22px; height:22px; line-height:1;
+  font-size:16px; color:var(--muted); border:1px solid transparent; opacity:0;
+  display:flex; align-items:center; justify-content:center;
+}
+.cal-cell:hover .cal-add, .cal-add:focus-visible { opacity:1; }
+.cal-add:hover { color:var(--ink); border-color:var(--line); }
+
+/* Bars are absolutely positioned over the week so a multi-day show is one
+   continuous element rather than a chip repeated per day. */
+.cal-bars { position:absolute; inset:30px 0 4px; pointer-events:none; }
+.cal-bar {
+  position:absolute; height:19px; padding:0 7px; font-size:11px; line-height:19px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left;
+  pointer-events:auto; border:1px solid transparent; display:block; width:100%;
+}
+.cal-bar:hover { filter:brightness(1.08); }
+.cal-bar:focus-visible { outline:2px solid var(--ink); outline-offset:1px; }
+.cal-bar.cont-l { border-top-left-radius:0; border-bottom-left-radius:0; }
+
+/* Ledger — solid, coloured by status. This is what you have committed to. */
+.cal-bar.l-ledger { color:#fff; background:var(--s-interested); }
+.cal-bar.l-ledger.st-applied      { background:var(--s-applied); }
+.cal-bar.l-ledger.st-accepted     { background:var(--s-accepted); }
+.cal-bar.l-ledger.st-waitlist     { background:var(--s-waitlist); }
+.cal-bar.l-ledger.st-declined     { background:var(--s-declined); }
+.cal-bar.l-ledger.st-not_applying { background:var(--s-not_applying); }
+html[data-theme="dark"] .cal-bar.l-ledger { color:#0f0f0f; }
+
+/* Catalogue — outline only, and quiet. It is context, not commitment, and it
+   must never compete with your own schedule for attention. */
+.cal-bar.l-catalogue {
+  background:transparent; border-color:var(--line); border-style:dashed;
+  color:var(--muted);
+}
+.cal-bar.l-catalogue:hover { color:var(--ink); border-color:var(--muted); }
+
+/* Personal — accent-tinted, distinct from both. */
+.cal-bar.l-personal {
+  background:color-mix(in srgb, var(--accent) 14%, transparent);
+  border-color:color-mix(in srgb, var(--accent) 40%, transparent); color:var(--ink);
+}
+.cal-bar .dot { display:inline-block; width:5px; height:5px; border-radius:50%; margin-right:5px;
+                background:currentColor; vertical-align:middle; }
+.cal-bar .tm { opacity:.75; margin-right:4px; font-variant-numeric:tabular-nums; }
+.cal-more { position:absolute; font-size:10px; color:var(--muted); pointer-events:auto;
+            padding:0 6px; height:16px; line-height:16px; }
+.cal-more:hover { color:var(--ink); text-decoration:underline; }
+
+/* ==========================================================================
+   DAY VIEW — the iOS-style hour column
+   ========================================================================== */
+.cal-day { border:1px solid var(--line); }
+.cal-day-head {
+  display:flex; align-items:baseline; gap:12px; padding:14px 16px;
+  border-bottom:1px solid var(--line); background:var(--surface);
+}
+.cal-day-head .dow { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.cal-day-head .dnum { font-size:22px; font-weight:300; }
+.cal-allday { border-bottom:1px solid var(--line); padding:8px 16px 8px 76px; display:grid; gap:4px; }
+.cal-allday:empty { display:none; }
+.cal-allday .cal-bar { position:static; width:auto; height:auto; min-height:22px; line-height:22px; }
+
+.cal-hours { position:relative; }
+.cal-hour { display:grid; grid-template-columns:60px 1fr; min-height:var(--hour-h, 48px); }
+.cal-hour .hr {
+  font-size:10px; color:var(--muted); text-align:right; padding:0 10px 0 0;
+  transform:translateY(-6px); font-variant-numeric:tabular-nums;
+}
+.cal-hour .slot { border-top:1px solid var(--line); border-left:1px solid var(--line); }
+.cal-hour:first-child .slot { border-top:none; }
+.cal-hour .slot:hover { background:color-mix(in srgb, var(--accent) 5%, transparent); cursor:pointer; }
+.cal-blocks { position:absolute; inset:0 8px 0 76px; pointer-events:none; }
+.cal-block {
+  position:absolute; pointer-events:auto; padding:3px 8px; font-size:11px; overflow:hidden;
+  border-left:3px solid var(--accent); text-align:left;
+  background:color-mix(in srgb, var(--accent) 14%, var(--bg));
+}
+.cal-block .t { font-weight:600; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.cal-block .s { color:var(--muted); }
+/* The current time, but only on today — a red line on an arbitrary future
+   day is a lie about where you are. */
+.cal-now { position:absolute; left:60px; right:0; height:0; border-top:2px solid var(--danger); pointer-events:none; }
+.cal-now::before { content:''; position:absolute; left:-4px; top:-4px; width:8px; height:8px;
+                   border-radius:50%; background:var(--danger); }
+
+/* ==========================================================================
+   POPOVER — quick look at a bar without leaving the month
+   ========================================================================== */
+.cal-pop {
+  position:absolute; z-index:60; width:300px; background:var(--bg);
+  border:1px solid var(--line); box-shadow:var(--shadow); padding:14px 16px;
+}
+.cal-pop h4 { margin:0 0 4px; font-size:15px; font-weight:600; line-height:1.3; }
+.cal-pop .meta { color:var(--muted); font-size:12px; margin:0 0 10px; }
+.cal-pop dl { margin:0 0 12px; display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:12px; }
+.cal-pop dt { color:var(--muted); }
+.cal-pop dd { margin:0; }
+.cal-pop .row { display:flex; gap:8px; flex-wrap:wrap; }
+.cal-pop .btn { min-height:34px; font-size:10px; padding:0 12px; }
+.cal-pop .layer-tag {
+  font-size:9px; font-weight:600; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--muted); border:1px solid var(--line); padding:2px 6px; margin-bottom:8px;
+  display:inline-block;
+}
+
+/* ==========================================================================
+   SHEETS — compose an event, and the connect panel
+   ========================================================================== */
+.cal-scrim { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:70; }
+.cal-sheet {
+  position:fixed; top:0; right:0; bottom:0; width:min(440px, 100vw); z-index:71;
+  background:var(--bg); border-left:1px solid var(--line); box-shadow:var(--shadow);
+  display:flex; flex-direction:column;
+}
+.cal-sheet header {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:18px 22px; border-bottom:1px solid var(--line);
+}
+.cal-sheet header h2 { margin:0; font-size:13px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; }
+.cal-sheet .body { padding:20px 22px; overflow:auto; flex:1; }
+.cal-sheet footer { padding:16px 22px; border-top:1px solid var(--line); display:flex; gap:8px; }
+.cal-field { margin-bottom:16px; }
+.cal-field > label { display:block; margin-bottom:6px; }
+.cal-field input[type="text"], .cal-field input[type="date"], .cal-field input[type="time"],
+.cal-field select, .cal-field textarea {
+  width:100%; padding:10px 12px; border:1px solid var(--line); background:var(--bg);
+  min-height:44px;
+}
+.cal-field textarea { min-height:80px; resize:vertical; }
+.cal-row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.cal-check { display:flex; align-items:center; gap:10px; margin-bottom:16px; font-size:13px; }
+.cal-check input { width:18px; height:18px; }
+
+/* A control that does nothing yet must LOOK like it does nothing yet. The
+   whole honesty rule of this app applied to a button. */
+.cal-stub {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  border:1px solid var(--line); padding:12px 14px; margin-bottom:8px;
+}
+.cal-stub .who { display:flex; align-items:center; gap:10px; font-size:13px; }
+.cal-stub .btn { min-height:34px; font-size:10px; padding:0 12px; }
+.cal-stub .btn[disabled] { opacity:.45; cursor:not-allowed; }
+.cal-stub .btn[disabled]:hover { border-color:var(--line); }
+.cal-note { color:var(--muted); font-size:12px; line-height:1.6; margin:0 0 18px; }
+.cal-sec { margin:26px 0 10px; }
+.cal-sec:first-child { margin-top:0; }
+
+/* ---- Year view ---------------------------------------------------------- */
+.cal-year { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px,1fr)); gap:12px; }
+.cal-ycard { border:1px solid var(--line); padding:14px 16px; text-align:left; }
+.cal-ycard:hover { border-color:var(--ink); }
+.cal-ycard h4 { margin:0 0 8px; font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; }
+.cal-ycard .n { font-size:24px; font-weight:300; }
+.cal-ycard .sub { color:var(--muted); font-size:11px; }
+.cal-ycard .warn { color:var(--warn); font-size:11px; }
+
+.cal-empty { color:var(--muted); padding:28px 0; font-size:13px; }
+
+@media (max-width: 860px) {
+  .cal-wrap { padding:14px 14px 56px; }
+  .cal-cell { min-height:86px; }
+  .cal-bar { font-size:10px; }
+}

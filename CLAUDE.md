@@ -13,11 +13,14 @@ numbers cost real money, so unknowns stay unknown.
 - "Not mentioned" ≠ zero (`commissionPct` stays null).
 - 10 is always good for the artist.
 - Facts / editorial / member intel are three layers the UI never blurs.
+- Calendar layers (ledger / catalogue / personal) are never blurred either, and
+  the calendar never copies a show — it reads the ledger and the catalogue.
+- A reminder with no delivery channel says so. Nothing claims to have been sent.
 
 ## Stack
 - **`tracker/`** — vanilla classic scripts. No build, no modules, no framework.
-  Each publishes one global (`AST`, `ASTCatalogue`, `ASTIntel`, `ASTMembers`,
-  `ASTVersion`, `ASTSupabase`). Opens via `file://` by design.
+  Each publishes one global (`AST`, `ASTCalendar`, `ASTCatalogue`, `ASTIntel`,
+  `ASTMembers`, `ASTVersion`, `ASTSupabase`). Opens via `file://` by design.
 - **`build/`** — Python 3, stdlib + `openpyxl`/`zipcodes`. Writes JSON to `tracker/`.
 - **`worker/`** — Cloudflare Worker, D1 + KV + R2, wrangler 4. Complete, undeployed.
 - **Root `App.tsx`, `components/`, `vite.config.ts`** — a *separate* React + Vite
@@ -35,6 +38,9 @@ adapter both live in `core.js`. Optional sync: Supabase (last-write-wins on
 - `core.js` — model (`makeShow`), store adapter, migrations, theme.
 - `fit.js` — the scoring model.
 - `browse.html` / `index.html` — catalogue / ledger, same drawer.
+- `calendar.html` / `calendar.js` — the calendar. All the date maths, lane
+  packing, clash detection and the .ics live in the js, DOM-free, so a phone
+  app can reuse them; the html only renders.
 - `build/build_fit_data.py` — the build; also date rules and cache-busting.
 - `build/import_show_research.py` — booth fee parser. Fails closed on purpose.
 - `build/research-overrides.json` — hand-audited facts, each with provenance.
@@ -46,6 +52,7 @@ python3 build/build_fit_data.py --selftest
 python3 -m http.server 8765                 # leave up for the two below
 node build/browser-tests.cjs
 node build/ledger-view-tests.cjs
+node build/calendar-tests.cjs
 cd worker && npm test
 ```
 Deploy: push to `main`; Pages rebuilds in ~1 min.

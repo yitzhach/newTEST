@@ -12,7 +12,7 @@ window.AST = (function () {
   'use strict';
 
   /* ---- 1. MODEL + CONSTANTS --------------------------------------------- */
-  var SCHEMA_VERSION = 3;
+  var SCHEMA_VERSION = 4;
   var DB_KEY = 'artShowTracker.db';
   var THEME_KEY = 'artShowTracker.theme';
   var CONFIG_KEY = 'artShowTracker.supabase';
@@ -87,6 +87,71 @@ window.AST = (function () {
     return Math.min(10, n);
   }
 
+  /* ---- 1b. CALENDAR EVENTS ----------------------------------------------
+     Anything on the calendar that is NOT a show: a travel day, a studio
+     block, a deadline you set yourself, a plain reminder. Shows are never
+     duplicated in here — the calendar reads them from the ledger and from
+     the catalogue, so a show's dates have exactly one home.
+
+     Same discipline as a show: a stable id, updatedAt, and a tombstone
+     rather than a delete, so this shape can ride the existing
+     last-write-wins sync the moment an `events` table exists.             */
+  var EVENT_KINDS = [
+    { value:'event',    label:'Event' },
+    { value:'travel',   label:'Travel' },
+    { value:'deadline', label:'Deadline' },
+    { value:'reminder', label:'Reminder' },
+    { value:'personal', label:'Personal' }
+  ];
+  var EVENT_KIND_LABEL = Object.fromEntries(EVENT_KINDS.map(function (k) { return [k.value, k.label]; }));
+
+  var TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+  function timeOrEmpty(v) { return TIME_RE.test(String(v || '')) ? String(v) : ''; }
+
+  /**
+   * Reminders are stored now and delivered by nobody yet. That is deliberate
+   * and it is the same rule as a null fact: the record says what it wants,
+   * the UI says plainly that no channel is connected, and neither pretends a
+   * message went out. When a channel is wired, these rows are already here.
+   */
+  function makeReminder(input) {
+    input = input || {};
+    var mins = Number(input.minutesBefore);
+    return {
+      minutesBefore: Number.isFinite(mins) ? Math.max(0, Math.round(mins)) : 60,
+      channel: ['email','sms','push'].indexOf(input.channel) !== -1 ? input.channel : 'email',
+      // Never delivered, only ever recorded. Set by a delivery channel later.
+      deliveredAt: input.deliveredAt || null
+    };
+  }
+
+  function makeEvent(input) {
+    input = input || {};
+    var now = new Date().toISOString();
+    var start = input.startDate || '';
+    return {
+      id: input.id || newId(),
+      kind: EVENT_KIND_LABEL[input.kind] ? input.kind : 'event',
+      title: String(input.title || '').trim(),
+      notes: input.notes || '',
+      location: String(input.location || '').trim(),
+      startDate: start,
+      // A one-day event ends the day it starts; an empty end is not "forever".
+      endDate: input.endDate || start,
+      allDay: input.allDay === undefined ? true : !!input.allDay,
+      startTime: timeOrEmpty(input.startTime),
+      endTime: timeOrEmpty(input.endTime),
+      /* Optional tie back to a show, so "drive to Naples" can sit under the
+         Naples show and open its drawer. Never a copy of the show. */
+      showId: input.showId || '',
+      catalogueId: input.catalogueId || '',
+      reminders: Array.isArray(input.reminders) ? input.reminders.map(makeReminder) : [],
+      deletedAt: input.deletedAt || null,
+      createdAt: input.createdAt || now,
+      updatedAt: input.updatedAt || now
+    };
+  }
+
   /* ---- 2. SEED — Isaac's 2027 Florida season ----------------------------
      Stops 1-7 as signed off in design/Main.dc.html. Later stops (8-12,
      through Apr 18) are not in the repo docs yet; add them in the drawer.  */
@@ -113,7 +178,7 @@ window.AST = (function () {
 
   function migrate(db) {
     var d = db;
-    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [] };
+    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [] };
     if (!Array.isArray(d.shows)) d.shows = [];
     // v0 (pre-versioning: a bare array or no version) -> v1
     if (!d.schemaVersion) d.schemaVersion = 1;
@@ -133,7 +198,14 @@ window.AST = (function () {
       });
       d.schemaVersion = 3;
     }
+    // v3 -> v4: the calendar. Existing databases simply gain an empty list;
+    // nothing about a show moves, because the calendar never copies one.
+    if (d.schemaVersion < 4) {
+      if (!Array.isArray(d.events)) d.events = [];
+      d.schemaVersion = 4;
+    }
     d.shows = d.shows.map(makeShow);
+    d.events = (Array.isArray(d.events) ? d.events : []).map(makeEvent);
     d.schemaVersion = SCHEMA_VERSION;
     return d;
   }
@@ -142,7 +214,7 @@ window.AST = (function () {
     function read() {
       var raw = null;
       try { raw = localStorage.getItem(DB_KEY); }
-      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [] }; }
+      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [] }; }
       if (raw === null) return null;
       var parsed;
       try { parsed = JSON.parse(raw); } catch (_) { parsed = null; }
@@ -166,7 +238,7 @@ window.AST = (function () {
       // A brand-new device gets the demo season. Flag it: the seed is not the
       // user's data, so on first sign-in it must not be pushed up as if it
       // were — a second device would duplicate the whole season.
-      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, pristineSeed: true });
+      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], pristineSeed: true });
     }
     /** Any real write means this device's data is no longer the untouched seed. */
     function touch(db) { db.pristineSeed = false; return db; }
@@ -217,7 +289,10 @@ window.AST = (function () {
         return Promise.resolve(db.shows.slice());
       },
       replaceAll: function (shows) {
-        var db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow), pristineSeed: false };
+        // Replaces the season, NOT the calendar. Your travel days and
+        // reminders are not shows and must survive a re-import.
+        var db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow),
+                   events: load().events, pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
       },
@@ -225,9 +300,42 @@ window.AST = (function () {
       isPristineSeed: function () { return !!load().pristineSeed; },
       /** Throws away the seed and takes the account's season verbatim. */
       adoptRemote: function (rows) {
-        var db = { schemaVersion: SCHEMA_VERSION, shows: rows.map(makeShow), pristineSeed: false };
+        var db = { schemaVersion: SCHEMA_VERSION, shows: rows.map(makeShow),
+                   events: load().events, pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
+      },
+      /* ---- calendar events -------------------------------------------
+         Deliberately the same surface as the show methods above, tombstones
+         and all, so the sync store can adopt them without a new pattern. */
+      listEvents: function () {
+        return Promise.resolve(live(load().events));
+      },
+      listAllEvents: function () { return Promise.resolve(load().events.slice()); },
+      getEvent: function (id) {
+        return Promise.resolve(live(load().events).filter(function (e) { return e.id === id; })[0] || null);
+      },
+      upsertEvent: function (evt) {
+        var db = load();
+        var rec = makeEvent(evt);
+        rec.updatedAt = new Date().toISOString();
+        var i = db.events.findIndex(function (e) { return e.id === rec.id; });
+        if (i === -1) db.events.push(rec); else db.events[i] = Object.assign({}, db.events[i], rec);
+        write(touch(db));
+        return Promise.resolve(rec);
+      },
+      /** Soft delete, returning the record as it was, so undo is one upsert. */
+      removeEvent: function (id) {
+        var db = load();
+        var i = db.events.findIndex(function (e) { return e.id === id; });
+        if (i === -1) return Promise.resolve(null);
+        var before = Object.assign({}, db.events[i]);
+        db.events[i] = Object.assign({}, db.events[i], {
+          deletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        write(touch(db));
+        return Promise.resolve(before);
       },
       markUsed: function () { var db = load(); write(touch(db)); }
     };
@@ -298,7 +406,14 @@ window.AST = (function () {
     get:        function (id)    { return backend.get(id); },
     upsert:     function (show)  { return backend.upsert(show); },
     remove:     function (id)    { return backend.remove(id); },
-    replaceAll: function (shows) { return backend.replaceAll(shows); }
+    replaceAll: function (shows) { return backend.replaceAll(shows); },
+    /* The calendar. A backend that has not implemented events yet degrades to
+       the local one rather than throwing, which is what keeps the calendar
+       working while the remote `events` table does not exist. */
+    listEvents:  function ()    { return (backend.listEvents  || LocalStore.listEvents).call(backend); },
+    getEvent:    function (id)  { return (backend.getEvent    || LocalStore.getEvent).call(backend, id); },
+    upsertEvent: function (evt) { return (backend.upsertEvent || LocalStore.upsertEvent).call(backend, evt); },
+    removeEvent: function (id)  { return (backend.removeEvent || LocalStore.removeEvent).call(backend, id); }
   };
   function useStore(next) { backend = next || LocalStore; return Store; }
   function currentStore() { return backend; }
@@ -619,7 +734,9 @@ window.AST = (function () {
   return {
     SCHEMA_VERSION: SCHEMA_VERSION,
     STATUSES: STATUSES, STATUS_LABEL: STATUS_LABEL,
-    makeShow: makeShow, numOrNull: numOrNull, clampRating: clampRating, migrate: migrate,
+    makeShow: makeShow, makeEvent: makeEvent, makeReminder: makeReminder,
+    EVENT_KINDS: EVENT_KINDS, EVENT_KIND_LABEL: EVENT_KIND_LABEL,
+    numOrNull: numOrNull, clampRating: clampRating, migrate: migrate,
     SEED: SEED, Store: Store, LocalStore: LocalStore,
     useStore: useStore, currentStore: currentStore, Settings: Settings,
     setNotifier: function (fn) { notify = fn; },

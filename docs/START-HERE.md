@@ -24,7 +24,7 @@ commands or the rules. Keep it this short:
 > Don't re-read the codebase — open only the files you're changing, and only
 > open `docs/build-phases.md` or `docs/handoff.md` if the task needs them.
 >
-> Before finishing: run the four suites, then commit, push and merge to `main`.
+> Before finishing: run the five suites, then commit, push and merge to `main`.
 
 Add a line naming a file or feature if you already know where the work lives —
 that saves a search. Everything else is already loaded.
@@ -82,10 +82,19 @@ through the Pages **Actions** source. ~1 minute, then refresh.
 
 ## What exists
 
-**Two pages, and the difference matters.**
+**Three pages, and the differences matter.**
 
 - **`tracker/browse.html`** — the catalogue. 237 shows, fit scores, and the
   intel drawer with everything below.
+- **`tracker/calendar.html`** — the calendar. Year, month and an iOS-style day
+  view over three switchable layers: your ledger, the whole catalogue (off by
+  default — 237 shows over your nine is a wall, not a calendar) and your own
+  events. Multi-day shows draw as one bar, not a chip per day; two shows you
+  are committed to on one weekend raise a clash banner. `+` composes an event,
+  a bar opens the same drawer, `#2027-01-09/day` deep-links a date, and
+  **Export .ics** is the working half of "connect your calendar" — the Google /
+  Apple / Outlook and email / text buttons are present and visibly disabled,
+  because a control that does nothing must look like it does nothing.
 - **`tracker/index.html`** — the ledger: your own shows, the map, the route,
   the Edit Show pane. Clicking a show's **name** (or the `i` button) opens the
   same drawer the catalogue shows; clicking anywhere else on the row opens the
@@ -137,7 +146,7 @@ written.
 
 ---
 
-## The four suites — run all of them before pushing
+## The five suites — run all of them before pushing
 
 ```bash
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --no-save playwright   # once
@@ -146,12 +155,14 @@ cd worker && npm install && cd ..                                     # once
 python3 -m http.server 8765          # leave running
 node build/browser-tests.cjs         # 79 — model, drawer, provenance, data hygiene,
                                      #      geocode, tax guard rails, fees, weather, version
-node build/ledger-view-tests.cjs     # 21 — details/link split, badges, lenses
+node build/ledger-view-tests.cjs     # 31 — details/link split, badges, lenses
+node build/calendar-tests.cjs        # 50 — grid, lane packing, clashes, day
+                                     #      layout, ics, layers, the stub rules
 cd worker && npm test                # 45 — API; manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
 ```
 
-All green as of this handoff: **79 / 21 / 45 / 11**.
+All green as of this handoff: **79 / 31 / 50 / 45 / 11**.
 
 Two things worth knowing about the tests:
 
