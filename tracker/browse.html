@@ -3,12 +3,34 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Theme, before first paint. Everything else about the theme lives in
+     core.js, but Theme.init() runs after the body has already been painted
+     with the light :root defaults — which flashes white on every navigation
+     for anyone in dark mode. This is the same read, done early enough to
+     matter, and core.js re-applying the same value later is a no-op. Inline
+     on purpose: an external file is a round trip, and a round trip is the
+     flash. -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('artShowTracker.theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (_) {
+    /* Private mode or blocked storage. Falling through leaves the CSS
+       defaults in charge, which is exactly what happened before. */
+  }
+})();
+</script>
 <title>All shows — Show Ledger</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=a63d5b4a">
-<link rel="stylesheet" href="intel.css?v=a63d5b4a">
+<link rel="stylesheet" href="app.css?v=78bee9aa">
+<link rel="stylesheet" href="intel.css?v=78bee9aa">
 </head>
 <body>
 <header class="app-header">
@@ -184,19 +206,19 @@
   <button class="t-act" id="toastAct" type="button" hidden></button>
 </div>
 
-<script src="core.js?v=a63d5b4a"></script>
-<script src="version.js?v=a63d5b4a"></script>
-<script src="fit.js?v=a63d5b4a"></script>
-<script src="intel.js?v=a63d5b4a"></script>
-<script src="members.js?v=a63d5b4a"></script>
+<script src="core.js?v=78bee9aa"></script>
+<script src="version.js?v=78bee9aa"></script>
+<script src="fit.js?v=78bee9aa"></script>
+<script src="intel.js?v=78bee9aa"></script>
+<script src="members.js?v=78bee9aa"></script>
 <!-- Weather fetches at runtime from the visitor's browser; sales tax is a
      static table. Both are optional: intel-ui.js renders without either. -->
-<script src="weather.js?v=a63d5b4a"></script>
-<script src="salestax.js?v=a63d5b4a"></script>
-<script src="intel-ui.js?v=a63d5b4a"></script>
-<script src="catalogue.js?v=a63d5b4a"></script>
-<script src="store-supabase.js?v=a63d5b4a"></script>
-<script src="import.js?v=a63d5b4a"></script>
+<script src="weather.js?v=78bee9aa"></script>
+<script src="salestax.js?v=78bee9aa"></script>
+<script src="intel-ui.js?v=78bee9aa"></script>
+<script src="catalogue.js?v=78bee9aa"></script>
+<script src="store-supabase.js?v=78bee9aa"></script>
+<script src="import.js?v=78bee9aa"></script>
 <script type="module">
 /* ==========================================================================
    ALL SHOWS
