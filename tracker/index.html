@@ -31,11 +31,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
       referrerpolicy="no-referrer">
-<link rel="stylesheet" href="app.css?v=816a4837">
+<link rel="stylesheet" href="app.css?v=7d0bf049">
 <!-- The ledger shows the same fit/intel drawer the catalogue does, so it needs
      the same styles. Scoped to .idr/.fitchip/.prov and its own tokens; it adds
      to app.css rather than competing with it. -->
-<link rel="stylesheet" href="intel.css?v=816a4837">
+<link rel="stylesheet" href="intel.css?v=7d0bf049">
 </head>
 <body>
 <!-- ==========================================================================
@@ -133,6 +133,15 @@
     <section class="panel">
       <h2>Season at a glance</h2>
       <div class="stat-grid" id="statPanel"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Jury fees</h2>
+        <select class="btn-mini" id="pipeCycle" aria-label="Season"></select>
+      </div>
+      <div class="stat-grid" id="pipePanel"></div>
+      <p class="hint" id="pipeNote"></p>
     </section>
 
     <section class="panel map-panel">
@@ -257,6 +266,47 @@
         <div class="err" id="e_boothFee" hidden></div>
       </div>
     </div>
+
+    <!-- The application pipeline (idea 11). This is deliberately a separate
+         block from Status above: Status is where the show stands, these are
+         things you DID and when. They are stored as their own record, one per
+         season, so applying again next year does not overwrite this year. -->
+    <fieldset class="form-row" id="appBlock">
+      <legend class="label">This year's application</legend>
+
+      <div class="grid-2">
+        <div class="form-row">
+          <label class="label" for="f_appStage">Stage</label>
+          <select class="control" id="f_appStage" name="appStage"></select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="f_appliedOn">Applied on</label>
+          <input class="control" id="f_appliedOn" name="appliedOn" type="date">
+          <div class="hint">Blank means not recorded &mdash; never assumed.</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-row">
+          <label class="label" for="f_notifiedOn">Heard back on</label>
+          <input class="control" id="f_notifiedOn" name="notifiedOn" type="date">
+        </div>
+        <div class="form-row">
+          <label class="label" for="f_appJuryFee">Jury fee paid ($)</label>
+          <input class="control" id="f_appJuryFee" name="appJuryFee" inputmode="decimal" autocomplete="off">
+          <div class="hint">What it actually cost, if that differed.</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="label" for="f_expectedGross">What you'd expect to gross ($)</label>
+        <input class="control" id="f_expectedGross" name="expectedGross" inputmode="decimal" autocomplete="off">
+        <div class="hint">Your estimate. Nothing in the catalogue knows this, so
+          without it the expected value below stays unknown.</div>
+      </div>
+
+      <p class="hint" id="evNote"></p>
+    </fieldset>
 
     <div class="grid-2">
       <div class="form-row">
@@ -629,24 +679,25 @@
      sandbox and an unverified hash would break the map outright. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
         referrerpolicy="no-referrer"></script>
-<script src="core.js?v=816a4837"></script>
-<script src="version.js?v=816a4837"></script>
-<script src="map.js?v=816a4837"></script>
+<script src="core.js?v=7d0bf049"></script>
+<script src="version.js?v=7d0bf049"></script>
+<script src="map.js?v=7d0bf049"></script>
 <!-- The fit/intel layer, so a show in the ledger opens the same breakdown
      it does in the catalogue. weather.js and salestax.js are optional to
      intel-ui.js, but without them the drawer silently loses two panels,
      which is worse than carrying two small files. -->
-<script src="fit.js?v=816a4837"></script>
-<script src="intel.js?v=816a4837"></script>
-<script src="members.js?v=816a4837"></script>
-<script src="weather.js?v=816a4837"></script>
-<script src="salestax.js?v=816a4837"></script>
-<script src="intel-ui.js?v=816a4837"></script>
-<script src="store-supabase.js?v=816a4837"></script>
-<script src="import.js?v=816a4837"></script>
-<script src="import-ui.js?v=816a4837"></script>
-<script src="share.js?v=816a4837"></script>
-<script src="share-ui.js?v=816a4837"></script>
+<script src="fit.js?v=7d0bf049"></script>
+<script src="pipeline.js?v=7d0bf049"></script>
+<script src="intel.js?v=7d0bf049"></script>
+<script src="members.js?v=7d0bf049"></script>
+<script src="weather.js?v=7d0bf049"></script>
+<script src="salestax.js?v=7d0bf049"></script>
+<script src="intel-ui.js?v=7d0bf049"></script>
+<script src="store-supabase.js?v=7d0bf049"></script>
+<script src="import.js?v=7d0bf049"></script>
+<script src="import-ui.js?v=7d0bf049"></script>
+<script src="share.js?v=7d0bf049"></script>
+<script src="share-ui.js?v=7d0bf049"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE
@@ -657,7 +708,7 @@
    double-click. Everything below is ledger-page-specific.
    ========================================================================== */
 const {
-  SCHEMA_VERSION, STATUSES, STATUS_LABEL, makeShow, clampRating, Store,
+  SCHEMA_VERSION, STATUSES, STATUS_LABEL, STAGES, STAGE_LABEL, makeShow, clampRating, Store,
   parseISO, daysUntil, fmtDay, fmtRange, fmtCountdown, esc, place,
   starsSVG, ratingText, Theme, Splitter, SplitterV
 } = window.AST;
@@ -667,8 +718,8 @@ window.AST.setNotifier(msg => toast(msg));
 /* ==========================================================================
    6. APP STATE
    ========================================================================== */
-const state = { shows: [], filter: 'all', sort: 'date', dir: 'asc',
-                editingId: null, lastDeleted: null };
+const state = { shows: [], applications: [], filter: 'all', sort: 'date', dir: 'asc',
+                editingId: null, editingAppId: null, lastDeleted: null, cycle: '' };
 const $ = sel => document.querySelector(sel);
 
 const FAR = '9999-12-31';
@@ -863,7 +914,58 @@ function renderStats() {
     '<div class="stat"><div class="n">' + esc(n) + '</div><div class="k">' + esc(k) + '</div></div>').join('');
 }
 
-function render() { renderFilters(); renderList(); renderDeadlines(); renderStats(); renderMap(); }
+/* ---- the jury fee spend tracker (idea 12) --------------------------------
+   The question this answers is "what did applying cost me, and what did it
+   buy". Every cell renders "—" rather than a zero when the answer is not
+   known: a season with no fees entered has not spent $0, it has told us
+   nothing, and those two must not look the same.                          */
+function renderPipeline() {
+  const P = window.ASTPipeline;
+  const sel = $('#pipeCycle'), panel = $('#pipePanel'), note = $('#pipeNote');
+  if (!P || !panel) return;
+
+  /* Seasons are drawn from the applications themselves, so the picker only
+     ever offers a year the artist actually applied in. */
+  const cycles = [...new Set(state.applications.map(a => a.cycle).filter(Boolean))]
+    .sort().reverse();
+  if (!cycles.includes(state.cycle)) state.cycle = cycles[0] || '';
+  sel.innerHTML = ['<option value="">All seasons</option>']
+    .concat(cycles.map(c => '<option value="' + esc(c) + '">' + esc(c) + '</option>')).join('');
+  sel.value = state.cycle;
+  sel.hidden = cycles.length < 2;
+
+  const rows = state.cycle
+    ? state.applications.filter(a => a.cycle === state.cycle)
+    : state.applications;
+  const s = P.spend(rows);
+  const money = n => n == null ? '—' : '$' + Math.round(n).toLocaleString();
+
+  const cells = [
+    ['Applications', s.total || '—'],
+    ['Spent', money(s.spent)],
+    ['Accepted', s.judged ? s.accepted : '—'],
+    ['Each', money(s.costPerAcceptance)]
+  ];
+  panel.innerHTML = cells.map(([k, n]) =>
+    '<div class="stat"><div class="n">' + esc(n) + '</div><div class="k">' + esc(k) + '</div></div>').join('');
+
+  const bits = [];
+  if (!s.total) bits.push('No applications recorded yet.');
+  /* The line that keeps the total honest. A partial total that does not say
+     it is partial is the thing that makes someone budget on a wrong number. */
+  if (s.total && s.feesKnown < s.total) {
+    bits.push('Known fees only — ' + s.feesKnown + ' of ' + s.total + ' have a fee recorded.');
+  }
+  if (s.pending) bits.push(s.pending + ' still waiting to hear.');
+  if (s.judged && s.acceptanceRatePct != null) {
+    bits.push('You are in on ' + Math.round(s.acceptanceRatePct) + '% of the ' +
+              s.judged + ' juried so far' +
+              (s.judged < P.MIN_PERSONAL_SAMPLE ? ', too few to read much into' : '') + '.');
+  }
+  note.textContent = bits.join(' ');
+}
+
+function render() { renderFilters(); renderList(); renderDeadlines(); renderStats(); renderPipeline(); renderMap(); }
 
 /* ==========================================================================
    8. TOAST (with undo)
@@ -893,6 +995,48 @@ let lastFocus = null;
 function fillStatusSelect() {
   $('#f_status').innerHTML = STATUSES.map(s =>
     '<option value="' + s.value + '">' + esc(s.label) + '</option>').join('');
+  $('#f_appStage').innerHTML = ['<option value="">Not applied</option>'].concat(
+    STAGES.map(s => '<option value="' + s.value + '">' + esc(s.label) + '</option>')).join('');
+}
+
+/* ---- expected value on applying (idea 14) -------------------------------
+   Recomputed as the artist types, because the whole point is to see what the
+   estimate does to the answer. When an input is missing it names the input
+   instead of showing a number, which is the difference between a tool and a
+   guess.                                                                   */
+function renderEV() {
+  const P = window.ASTPipeline, note = $('#evNote');
+  if (!P || !note) return;
+  const numOf = el => { const v = $(el).value.trim(); return v === '' ? null : Number(v); };
+  const show = state.shows.find(x => x.id === state.editingId);
+  const ev = P.expectedValue({
+    personalRatePct: P.personalAcceptanceRate(state.applications),
+    acceptanceRatePct: catalogueOdds(show),
+    expectedGross: numOf('#f_expectedGross'),
+    boothFee: numOf('#f_boothFee'),
+    juryFee: numOf('#f_appJuryFee') != null ? numOf('#f_appJuryFee') : numOf('#f_juryFee')
+  });
+  if (ev.value == null) {
+    note.textContent = 'Expected value needs ' + ev.missing.join(', ') + '.';
+    return;
+  }
+  const money = '$' + Math.round(Math.abs(ev.value)).toLocaleString();
+  note.textContent = 'Expected value of applying: ' + (ev.value < 0 ? '−' : '') + money +
+    ' — your odds ' + (ev.basis === 'yours' ? 'from your own record' : "from the show's published rate") +
+    ', against your own gross estimate. A model, not a forecast.';
+}
+
+/** The show's cold acceptance odds from the catalogue, or null.
+    Prefers the effective rate, which nets out the artists exempt from the
+    jury — the published rate flatters a show that seats its returning
+    award winners before the jury sees anybody. */
+function catalogueOdds(show) {
+  if (!show || !show.catalogueId) return null;
+  const rec = fit.byId[show.catalogueId];
+  const f = (rec && rec.facts) || {};
+  const pct = f.effectiveAcceptanceRatePct != null ? f.effectiveAcceptanceRatePct
+                                                   : f.acceptanceRatePct;
+  return typeof pct === 'number' ? pct : null;
 }
 
 function setRating(r, { silent = false } = {}) {
@@ -955,6 +1099,22 @@ function openDrawer(show) {
   $('#f_url').value = s.url;
   $('#f_notes').value = s.notes;
   setRating(s.rating, { silent: true });
+
+  /* The application for THIS show in THIS season. A show with no start date
+     has no season, so it cannot hold an application yet — the block hides
+     rather than silently filing one under a blank year. */
+  const cycle = cycleOf(s);
+  const app = (show && cycle)
+    ? window.ASTPipeline.forCycle(state.applications, s.id, cycle) : null;
+  state.editingAppId = app ? app.id : null;
+  $('#appBlock').hidden = !show || !cycle;
+  $('#f_appStage').value = app ? app.stage : '';
+  $('#f_appliedOn').value = app ? app.appliedOn : '';
+  $('#f_notifiedOn').value = app ? app.notifiedOn : '';
+  $('#f_appJuryFee').value = app && app.juryFee !== null ? app.juryFee : '';
+  $('#f_expectedGross').value = app && app.expectedGross !== null ? app.expectedGross : '';
+  renderEV();
+
   $('#btnDelete').hidden = !show;
   $('#notesHint').textContent = show ? 'Autosaved.' : 'Saved when you save the show.';
   $('#metaHint').textContent = show
@@ -1024,16 +1184,59 @@ function collect() {
   });
 }
 
-async function refresh() { state.shows = await Store.list(); render(); }
+async function refresh() {
+  [state.shows, state.applications] = await Promise.all([Store.list(), Store.listApplications()]);
+  render();
+}
+
+/** The season a show belongs to: its start year. '' when it has no date. */
+function cycleOf(show) {
+  const m = String((show && show.startDate) || '').match(/^(\d{4})/);
+  return m ? m[1] : '';
+}
 
 async function saveShow() {
   const rec = collect();
   if (!rec) return;
   const isNew = !state.editingId;
   await Store.upsert(rec);
+  await saveApplication(rec);
   await refresh();
   closeDrawer();
   toast(isNew ? 'Show added.' : 'Changes saved.', null, null, 2600);
+}
+
+/**
+ * The application is its own record, written after the show so it always has
+ * a real showId to hang off. Clearing the stage back to "Not applied" removes
+ * it — a soft delete, so the row can come back and so a future sync carries
+ * the removal rather than having the other device push it straight back.
+ */
+async function saveApplication(show) {
+  const cycle = cycleOf(show);
+  if (!cycle) return;
+  const stage = $('#f_appStage').value;
+  const existing = state.editingAppId
+    ? state.applications.find(a => a.id === state.editingAppId)
+    : window.ASTPipeline.forCycle(state.applications, show.id, cycle);
+
+  if (!stage) {
+    if (existing) await Store.removeApplication(existing.id);
+    return;
+  }
+  const numOf = el => { const v = $(el).value.trim(); return v === '' ? null : Number(v); };
+  await Store.upsertApplication({
+    ...(existing || {}),
+    id: existing ? existing.id : undefined,
+    showId: show.id,
+    catalogueId: show.catalogueId,
+    cycle,
+    stage,
+    appliedOn: $('#f_appliedOn').value,
+    notifiedOn: $('#f_notifiedOn').value,
+    juryFee: numOf('#f_appJuryFee'),
+    expectedGross: numOf('#f_expectedGross')
+  });
 }
 
 /** Autosave for the fields that should not need a Save click on an existing show. */
@@ -1440,6 +1643,12 @@ $('#listHead').addEventListener('click', e => {
   if (h) applySort(h.dataset.sort, { toggle: true });
 });
 $('#f_notes').addEventListener('input', queueAutosave);
+
+/* Expected value follows the inputs it depends on, live. */
+["#f_expectedGross", "#f_appJuryFee", "#f_juryFee", "#f_boothFee"].forEach(sel =>
+  $(sel).addEventListener('input', renderEV));
+$('#f_appStage').addEventListener('change', renderEV);
+$('#pipeCycle').addEventListener('change', e => { state.cycle = e.target.value; renderPipeline(); });
 
 /* Rating: pointer over the track picks a half-star; arrows work without a mouse. */
 const track = $('#ratingTrack');

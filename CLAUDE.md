@@ -18,6 +18,8 @@ numbers cost real money, so unknowns stay unknown.
 - A reminder with no delivery channel says so. Nothing claims to have been sent.
 - The heart is one shortlist shared by the catalogue and the calendar, stored
   per catalogue record. No catalogue record, no heart.
+- An application is a child record, one per show per season — never fields on
+  the show. A partial fee total must say it is partial.
 
 ## Stack
 - **`tracker/`** — vanilla classic scripts. No build, no modules, no framework.
@@ -39,6 +41,8 @@ adapter both live in `core.js`. Optional sync: Supabase (last-write-wins on
 ## Key files
 - `core.js` — model (`makeShow`), store adapter, migrations, theme.
 - `fit.js` — the scoring model.
+- `pipeline.js` — the application pipeline's arithmetic (spend, expected value).
+  DOM-free like `calendar.js`, so a phone app can reuse it.
 - `browse.html` / `index.html` — catalogue / ledger, same drawer.
 - `calendar.html` / `calendar.js` — the calendar. All the date maths, lane
   packing, clash detection and the .ics live in the js, DOM-free, so a phone
@@ -55,6 +59,7 @@ python3 -m http.server 8765                 # leave up for the two below
 node build/browser-tests.cjs
 node build/ledger-view-tests.cjs
 node build/calendar-tests.cjs
+node build/pipeline-tests.cjs
 cd worker && npm test
 ```
 Deploy: push to `main`; Pages rebuilds in ~1 min.

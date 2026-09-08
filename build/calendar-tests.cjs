@@ -294,10 +294,11 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
     const A = window.AST;
     const old = { schemaVersion: 3, shows: [{ id:'x', name:'Old show', startDate:'2027-01-02' }] };
     const up = A.migrate(old);
-    return { v: up.schemaVersion, shows: up.shows.length, events: Array.isArray(up.events) };
+    return { v: up.schemaVersion, current: A.SCHEMA_VERSION,
+             shows: up.shows.length, events: Array.isArray(up.events) };
   });
-  check('a v3 database migrates to v4 and gains an empty calendar',
-        migrated.v === 4 && migrated.shows === 1 && migrated.events === true,
+  check('a v3 database migrates up to current and gains an empty calendar',
+        migrated.v === migrated.current && migrated.shows === 1 && migrated.events === true,
         JSON.stringify(migrated));
 
   // ---- clicking a bar opens the quick look ------------------------------
