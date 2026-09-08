@@ -23,6 +23,17 @@ numbers cost real money, so unknowns stay unknown.
 - A saved ranking is private by default and never carries shows, calendar,
   applications or fees. An imported one stays marked imported.
 
+## How to report back
+Write the summary at the end of a task **80% shorter** than feels natural, and
+in **plain language** — assume a beginner engineer. Aim for under ~150 words.
+
+- Lead with what now works, in one sentence.
+- Say what broke or was skipped. Never hide it to stay short.
+- Cut: restating the ask, design rationale, anything the code comments say,
+  anything already said earlier in the session.
+- Define a term the first time, or pick a simpler one.
+- Detail belongs in the commit message and the docs, not the chat reply.
+
 ## Stack
 - **`tracker/`** — vanilla classic scripts. No build, no modules, no framework.
   Each publishes one global (`AST`, `ASTCalendar`, `ASTCatalogue`, `ASTIntel`,
