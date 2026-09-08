@@ -24,7 +24,7 @@ commands or the rules. Keep it this short:
 > Don't re-read the codebase — open only the files you're changing, and only
 > open `docs/build-phases.md` or `docs/handoff.md` if the task needs them.
 >
-> Before finishing: run the five suites, then commit, push and merge to `main`.
+> Before finishing: run the six suites, then commit, push and merge to `main`.
 
 Add a line naming a file or feature if you already know where the work lives —
 that saves a search. Everything else is already loaded.
@@ -111,6 +111,30 @@ stored per catalogue record in `artShowTracker.catalogue`, so a show added to
 the ledger stays hearted and a re-import never costs you your picks. A
 hand-added show has no catalogue record and therefore cannot be hearted.
 
+**The application pipeline is a child collection, not fields on a show.**
+A show's `status` is where it stands now; an application is what you *did*, and
+when — one record per show per season, so applying again next year is a second
+row rather than an overwrite. That shape is what lets the jury fee tracker add
+anything up, and it is the pattern the expense log and the sales records in
+`build-phases.md` §7 are meant to reuse. Applications are **local-only**, exactly
+like calendar events: `store-supabase.js` still syncs only the `shows` table, and
+`AST.Store` degrades to the local backend for anything a backend does not
+implement, so the pipeline works today against a Supabase account that has no
+`applications` table.
+
+Three numbers come out of it, and each one refuses to guess:
+
+| | |
+|---|---|
+| **Jury fee spend** | Total, acceptances, and what one acceptance cost. Counts only fees actually recorded, and says "known fees only, 9 of 22" whenever those disagree — a partial total that does not admit it is partial is how somebody budgets on a wrong number |
+| **Your acceptance rate** | Withdrawing is not the jury saying no, so withdrawn applications leave the denominator. Below eight judged applications it declines to quote a rate at all |
+| **Expected value** | P(accept) × (your gross estimate − booth) − jury fee. Nothing in the catalogue knows what you would gross, so with no estimate it renders what it is *missing* rather than a number. Your own rate overrides the published one once there is enough history |
+
+The v4 → v5 migration backfills an application for every show already past
+"interested", because a show marked Accepted is evidence one happened. The
+**dates stay empty**: we know it happened, we do not know when, and a plausible
+date would be a fabrication in the one collection that has to survive an audit.
+
 **Times are picked, not typed.** Fifteen-minute menus labelled the way people
 say them, duration chips, and a start that drags the end along keeping the gap.
 `<input type="time">` was the wrong control: a format to get wrong, half-typed
@@ -162,7 +186,7 @@ written.
 
 ---
 
-## The five suites — run all of them before pushing
+## The six suites — run all of them before pushing
 
 ```bash
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --no-save playwright   # once
@@ -175,11 +199,14 @@ node build/ledger-view-tests.cjs     # 31 — details/link split, badges, lenses
 node build/calendar-tests.cjs        # 77 — grid, lane packing, clashes, day
                                      #      layout, ics, layers, hearts, the
                                      #      time picker, the stub rules
+node build/pipeline-tests.cjs        # 26 — the migration and its backfill, jury
+                                     #      fee arithmetic, expected value, the
+                                     #      application store, the drawer block
 cd worker && npm test                # 45 — API; manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
 ```
 
-All green as of this handoff: **79 / 31 / 77 / 45 / 11**.
+All green as of this handoff: **79 / 31 / 77 / 26 / 45 / 11**.
 
 Two things worth knowing about the tests:
 
@@ -217,10 +244,12 @@ grade of it).
 
 ## What is next
 
-**Phase 3** — see `docs/build-phases.md`. The application pipeline is the
-commercial keystone: the first thing that earns a weekly open. Phase 2 is
-*no longer blocked* — booth fee coverage went 24 → 179, which was the blocker.
-Phase 5's route planner is unblocked too, since the geocode landed.
+**Phase 3 shipped its first three ideas** — the application pipeline (11), the
+jury fee spend tracker (12) and expected value on applying (14). Image sets (21)
+were deferred: they need file storage, and the Worker holding R2 is undeployed.
+
+Phase 2 is *no longer blocked* — booth fee coverage went 24 → 179, which was the
+blocker. Phase 5's route planner is unblocked too, since the geocode landed.
 
 Smaller things left over:
 

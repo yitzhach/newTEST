@@ -12,7 +12,7 @@ window.AST = (function () {
   'use strict';
 
   /* ---- 1. MODEL + CONSTANTS --------------------------------------------- */
-  var SCHEMA_VERSION = 4;
+  var SCHEMA_VERSION = 5;
   var DB_KEY = 'artShowTracker.db';
   var THEME_KEY = 'artShowTracker.theme';
   var CONFIG_KEY = 'artShowTracker.supabase';
@@ -32,6 +32,29 @@ window.AST = (function () {
     { value:'not_applying', label:'Not applying' }
   ];
   var STATUS_LABEL = Object.fromEntries(STATUSES.map(function (s) { return [s.value, s.label]; }));
+
+  /* ---- the application pipeline (idea 11) --------------------------------
+     A show's `status` is where it stands right now. An application is what
+     you DID, and when: one record per show per cycle, so applying to the same
+     show again next season is a second row rather than an overwrite. That is
+     what makes the jury fee tracker (12) able to add anything up.
+
+     These are deliberately NOT the same list as STATUSES. `interested` and
+     `not_applying` describe a show you have not applied to, so they can never
+     be an application; `withdrawn` describes an application but never a show. */
+  var STAGES = [
+    { value:'draft',     label:'Started' },
+    { value:'applied',   label:'Applied' },
+    { value:'accepted',  label:'Accepted' },
+    { value:'waitlist',  label:'Waitlist' },
+    { value:'declined',  label:'Declined' },
+    { value:'withdrawn', label:'Withdrawn' }
+  ];
+  var STAGE_LABEL = Object.fromEntries(STAGES.map(function (s) { return [s.value, s.label]; }));
+  /* Decided one way or the other — the jury is done with it. `withdrawn` is
+     settled too, but it is the artist's doing, so it never counts as a
+     rejection in any rate. */
+  var STAGE_SETTLED = ['accepted','waitlist','declined','withdrawn'];
 
   function newId() {
     if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
@@ -125,6 +148,57 @@ window.AST = (function () {
     };
   }
 
+  /** 'YYYY-MM-DD' or '' — anything else is not a date we will store. */
+  function dateOrEmpty(v) {
+    return (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) ? v : '';
+  }
+  /** A cycle is a four-digit year string. Anything unparseable is ''. */
+  function cycleOf(v) {
+    if (v == null || v === '') return '';
+    var m = String(v).match(/^(\d{4})/);
+    return m ? m[1] : '';
+  }
+
+  /**
+   * One application, to one show, in one cycle. A child record: it has its own
+   * id and updatedAt so two devices adding different applications merge as a
+   * union instead of one overwriting the other. Money must not be lost to
+   * last-write-wins the way a status change safely can be.
+   */
+  function makeApplication(input) {
+    input = input || {};
+    var now = new Date().toISOString();
+    return {
+      id: input.id || newId(),
+      /* Which ledger show this belongs to. An application with no show is
+         orphaned, not global — the UI drops it rather than inventing a parent. */
+      showId: input.showId || '',
+      catalogueId: input.catalogueId || '',
+      /* The season, as a four-digit year string. Two applications to the same
+         show in different years are two rows; in the SAME year they are one,
+         because that is what re-applying to a single jury means. */
+      cycle: cycleOf(input.cycle),
+      stage: STAGE_LABEL[input.stage] ? input.stage : 'draft',
+      /* Dates you actually did the thing. Empty means unknown, never today —
+         a backfilled row genuinely does not know when it was submitted. */
+      appliedOn: dateOrEmpty(input.appliedOn),
+      notifiedOn: dateOrEmpty(input.notifiedOn),
+      /* What the jury fee ACTUALLY cost, which is not always the show's listed
+         fee — early-bird and late rates differ. Null is "not recorded"; it is
+         never 0, because a fee nobody entered is not a free show. */
+      juryFee: numOrNull(input.juryFee),
+      feePaidOn: dateOrEmpty(input.feePaidOn),
+      /* The artist's own estimate of what they would gross at this show. The
+         only honest input to expected value (14): nothing in the catalogue
+         knows it, so with no estimate EV stays null and renders "not known". */
+      expectedGross: numOrNull(input.expectedGross),
+      notes: input.notes || '',
+      deletedAt: input.deletedAt || null,
+      createdAt: input.createdAt || now,
+      updatedAt: input.updatedAt || now
+    };
+  }
+
   function makeEvent(input) {
     input = input || {};
     var now = new Date().toISOString();
@@ -178,8 +252,9 @@ window.AST = (function () {
 
   function migrate(db) {
     var d = db;
-    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [] };
+    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [] };
     if (!Array.isArray(d.shows)) d.shows = [];
+    if (!Array.isArray(d.applications)) d.applications = [];
     // v0 (pre-versioning: a bare array or no version) -> v1
     if (!d.schemaVersion) d.schemaVersion = 1;
     // v1 -> v2: soft deletes, so cross-device sync can carry a deletion.
@@ -204,8 +279,38 @@ window.AST = (function () {
       if (!Array.isArray(d.events)) d.events = [];
       d.schemaVersion = 4;
     }
+    /* v4 -> v5: the application pipeline. Existing databases gain a row for
+       every show already past "interested", because a show marked Accepted is
+       evidence an application happened even though nothing recorded it. The
+       dates stay EMPTY: we know it happened, we do not know when, and a
+       plausible date here would be a fabrication in the one collection that
+       has to survive an audit. The jury fee carries over from the show, which
+       is the figure the artist entered themselves. */
+    if (d.schemaVersion < 5) {
+      if (!Array.isArray(d.applications)) d.applications = [];
+      var STAGE_FROM_STATUS = {
+        applied: 'applied', accepted: 'accepted',
+        waitlist: 'waitlist', declined: 'declined'
+      };
+      d.shows.forEach(function (row) {
+        if (!row || row.deletedAt) return;
+        var stage = STAGE_FROM_STATUS[row.status];
+        if (!stage) return;
+        d.applications.push(makeApplication({
+          showId: row.id,
+          catalogueId: row.catalogueId,
+          cycle: cycleOf(row.startDate),
+          stage: stage,
+          juryFee: row.juryFee,
+          createdAt: row.createdAt,
+          updatedAt: row.updatedAt
+        }));
+      });
+      d.schemaVersion = 5;
+    }
     d.shows = d.shows.map(makeShow);
     d.events = (Array.isArray(d.events) ? d.events : []).map(makeEvent);
+    d.applications = (Array.isArray(d.applications) ? d.applications : []).map(makeApplication);
     d.schemaVersion = SCHEMA_VERSION;
     return d;
   }
@@ -214,7 +319,7 @@ window.AST = (function () {
     function read() {
       var raw = null;
       try { raw = localStorage.getItem(DB_KEY); }
-      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [] }; }
+      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [] }; }
       if (raw === null) return null;
       var parsed;
       try { parsed = JSON.parse(raw); } catch (_) { parsed = null; }
@@ -238,7 +343,7 @@ window.AST = (function () {
       // A brand-new device gets the demo season. Flag it: the seed is not the
       // user's data, so on first sign-in it must not be pushed up as if it
       // were — a second device would duplicate the whole season.
-      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], pristineSeed: true });
+      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], applications: [], pristineSeed: true });
     }
     /** Any real write means this device's data is no longer the untouched seed. */
     function touch(db) { db.pristineSeed = false; return db; }
@@ -291,8 +396,10 @@ window.AST = (function () {
       replaceAll: function (shows) {
         // Replaces the season, NOT the calendar. Your travel days and
         // reminders are not shows and must survive a re-import.
+        var prev = load();
         var db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow),
-                   events: load().events, pristineSeed: false };
+                   events: prev.events, applications: prev.applications,
+                   pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
       },
@@ -300,8 +407,10 @@ window.AST = (function () {
       isPristineSeed: function () { return !!load().pristineSeed; },
       /** Throws away the seed and takes the account's season verbatim. */
       adoptRemote: function (rows) {
+        var prev = load();
         var db = { schemaVersion: SCHEMA_VERSION, shows: rows.map(makeShow),
-                   events: load().events, pristineSeed: false };
+                   events: prev.events, applications: prev.applications,
+                   pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
       },
@@ -331,6 +440,38 @@ window.AST = (function () {
         if (i === -1) return Promise.resolve(null);
         var before = Object.assign({}, db.events[i]);
         db.events[i] = Object.assign({}, db.events[i], {
+          deletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        write(touch(db));
+        return Promise.resolve(before);
+      },
+      /* ---- applications ----------------------------------------------
+         The same surface again, for the same reason: when the pipeline does
+         get a remote table, the sync store adopts it without learning a new
+         shape. Local-only today, exactly like events. */
+      listApplications: function () { return Promise.resolve(live(load().applications)); },
+      listAllApplications: function () { return Promise.resolve(load().applications.slice()); },
+      getApplication: function (id) {
+        return Promise.resolve(live(load().applications).filter(function (a) { return a.id === id; })[0] || null);
+      },
+      upsertApplication: function (app) {
+        var db = load();
+        var rec = makeApplication(app);
+        rec.updatedAt = new Date().toISOString();
+        var i = db.applications.findIndex(function (a) { return a.id === rec.id; });
+        if (i === -1) db.applications.push(rec);
+        else db.applications[i] = Object.assign({}, db.applications[i], rec);
+        write(touch(db));
+        return Promise.resolve(rec);
+      },
+      /** Soft delete, returning the record as it was, so undo is one upsert. */
+      removeApplication: function (id) {
+        var db = load();
+        var i = db.applications.findIndex(function (a) { return a.id === id; });
+        if (i === -1) return Promise.resolve(null);
+        var before = Object.assign({}, db.applications[i]);
+        db.applications[i] = Object.assign({}, db.applications[i], {
           deletedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         });
@@ -413,7 +554,14 @@ window.AST = (function () {
     listEvents:  function ()    { return (backend.listEvents  || LocalStore.listEvents).call(backend); },
     getEvent:    function (id)  { return (backend.getEvent    || LocalStore.getEvent).call(backend, id); },
     upsertEvent: function (evt) { return (backend.upsertEvent || LocalStore.upsertEvent).call(backend, evt); },
-    removeEvent: function (id)  { return (backend.removeEvent || LocalStore.removeEvent).call(backend, id); }
+    removeEvent: function (id)  { return (backend.removeEvent || LocalStore.removeEvent).call(backend, id); },
+    /* The pipeline. Same degrade-to-local fallback as events, which is what
+       lets applications work today against a Supabase backend that has no
+       `applications` table yet. */
+    listApplications:  function ()    { return (backend.listApplications  || LocalStore.listApplications).call(backend); },
+    getApplication:    function (id)  { return (backend.getApplication    || LocalStore.getApplication).call(backend, id); },
+    upsertApplication: function (app) { return (backend.upsertApplication || LocalStore.upsertApplication).call(backend, app); },
+    removeApplication: function (id)  { return (backend.removeApplication || LocalStore.removeApplication).call(backend, id); }
   };
   function useStore(next) { backend = next || LocalStore; return Store; }
   function currentStore() { return backend; }
@@ -735,6 +883,8 @@ window.AST = (function () {
     SCHEMA_VERSION: SCHEMA_VERSION,
     STATUSES: STATUSES, STATUS_LABEL: STATUS_LABEL,
     makeShow: makeShow, makeEvent: makeEvent, makeReminder: makeReminder,
+    makeApplication: makeApplication,
+    STAGES: STAGES, STAGE_LABEL: STAGE_LABEL, STAGE_SETTLED: STAGE_SETTLED,
     EVENT_KINDS: EVENT_KINDS, EVENT_KIND_LABEL: EVENT_KIND_LABEL,
     numOrNull: numOrNull, clampRating: clampRating, migrate: migrate,
     SEED: SEED, Store: Store, LocalStore: LocalStore,

@@ -63,7 +63,7 @@ These numbers are referenced across sessions. Do not renumber them; append.
 |---|---|---|
 | **1** | ~~Data hygiene, geocode (1), weather (2), sales tax (9)~~ **done** | — |
 | **2** | Landed cost (8), break-even (13), cash flow (16), expense log (18) | ~~booth fees~~ — unblocked, see §7 |
-| **3** | Application pipeline (11), jury fee tracker (12), expected value (14), image sets (21) | nothing |
+| **3** | ~~Application pipeline (11), jury fee tracker (12), expected value (14)~~ **done** · image sets (21) still open | image sets: R2, so a deployed Worker |
 | **4** | Square import (15), sell-through (19), debrief (22), collector CRM (20) | nothing |
 | **5** | Route planner (17), demographics (3), tourism (4) | ~~Phase 1 geocode~~ — unblocked |
 | **6** | Booth-level (23), benchmarking (24), weather-adjusted (25), load-in (26), wait-list (10) | **Worker deployed + ~20 members** |
