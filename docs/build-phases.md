@@ -290,6 +290,33 @@ artist's preferences* is fine, but a model's claim about *a show's facts* earns
 
 ---
 
+## 6b. Mock jury review — scaffolded, plumbing absent
+
+Not one of the 26 ideas. A paid review: the artist submits images and a
+question, a recruited juror scores and writes back.
+
+Decided with the owner and worth not relitigating:
+
+- **Real jurors**, recruited and paid — not AI, and not a self-scoring rubric.
+- **Nothing is owed until a juror claims the request.** The status flow
+  (draft -> requested -> claimed -> returned) exists to carry that rule, and
+  `chargeableAt()` encodes it so it survives being forgotten.
+- **Written feedback plus a score out of 10.** No live calls, no annotation
+  tool; both were considered and deferred as disproportionate.
+- **A juror's score never sits beside a show's published jury odds** and never
+  enters the fit model. Same layer discipline as facts/editorial/intel.
+
+Three things block it, all the same block: **the Worker is undeployed**, so
+there is no image storage (R2), no transport to reach a juror, and no billing.
+The page is built and honest about all three. `canUpload()` and `canSubmit()`
+return false from one place each.
+
+This is now the third feature waiting on that deployment, alongside Phase 6 and
+network sharing of rankings. Deploying it has become the highest-leverage
+infrastructure task in the project.
+
+---
+
 ## 7. The accounting suite — mapped, not started
 
 Asked for as "sales detail per show, and ways to follow up with clients". Not new

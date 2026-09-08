@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Theme, before first paint. Everything else about the theme lives in
+     core.js, but Theme.init() runs after the body has already been painted
+     with the light :root defaults — which flashes white on every navigation
+     for anyone in dark mode. This is the same read, done early enough to
+     matter, and core.js re-applying the same value later is a no-op. Inline
+     on purpose: an external file is a round trip, and a round trip is the
+     flash. -->
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('artShowTracker.theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (_) {
+    /* Private mode or blocked storage. Falling through leaves the CSS
+       defaults in charge, which is exactly what happened before. */
+  }
+})();
+</script>
+<title>Mock jury — Show Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
+<link rel="stylesheet" href="app.css?v=bcf93cce">
+<link rel="stylesheet" href="intel.css?v=bcf93cce">
+</head>
+<body>
+<header class="app-header">
+  <div class="brand">
+    <h1>Mock jury</h1>
+    <span class="sub">A juror looks at your images before a real one does</span>
+  </div>
+  <div class="header-actions">
+    <a class="btn btn-quiet" href="index.html">&larr; Back to ledger</a>
+    <button class="btn btn-icon" id="btnTheme" type="button" aria-label="Switch theme" title="Switch theme">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" id="iconSun">
+        <circle cx="10" cy="10" r="3.6"/>
+        <path d="M10 1.6v2.2M10 16.2v2.2M2.6 10H4.8M15.2 10h2.2M4.8 4.8l1.6 1.6M13.6 13.6l1.6 1.6M15.2 4.8l-1.6 1.6M6.4 13.6l-1.6 1.6"/>
+      </svg>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3"
+           stroke-linecap="round" stroke-linejoin="round" id="iconMoon" hidden>
+        <path d="M16.5 11.8A6.9 6.9 0 0 1 8.2 3.5a6.9 6.9 0 1 0 8.3 8.3z"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- The state of the whole feature, said once, at the top, before anybody
+     invests time assembling a submission. -->
+<div class="jy-banner" id="jyBanner"></div>
+
+<div class="exp-page">
+  <main class="exp-main">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Your submissions</h2>
+        <button class="btn btn-primary" id="jyNew" type="button">Start one</button>
+      </div>
+      <div id="jyList"></div>
+      <p class="hint" id="jyEmpty" hidden>
+        Nothing started yet. A submission is a set of images and a question you
+        want a juror to answer.
+      </p>
+    </section>
+  </main>
+
+  <aside class="rail">
+    <section class="panel">
+      <h2>At a glance</h2>
+      <div class="stat-grid" id="jyStats"></div>
+      <p class="hint" id="jyScoreNote"></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>How it will work</h2></div>
+      <ol class="jy-steps">
+        <li>You put together five works and a booth shot, and say what you want looked at.</li>
+        <li>A juror claims it. <strong>Nothing is owed until somebody claims it</strong> &mdash;
+            you are never charged for work that has not started.</li>
+        <li>They score it and write back. You keep the feedback.</li>
+      </ol>
+      <p class="hint">There is no payment anywhere in this app yet, so nothing
+        can be bought and nothing has been charged.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Coming later</h2></div>
+      <div id="jyPro"></div>
+    </section>
+  </aside>
+</div>
+
+<div class="overlay" id="jyOverlay" hidden></div>
+<section class="modal" id="jyModal" role="dialog" aria-modal="true" aria-labelledby="jyTitle" hidden>
+  <div class="modal-head">
+    <h2 id="jyTitle">Submission</h2>
+    <button class="btn btn-icon" id="jyClose" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <label class="label" for="jyShow">Aiming at</label>
+      <select class="control" id="jyShow"></select>
+      <div class="hint">Optional &mdash; a portfolio review before you pick a show is fine.</div>
+    </div>
+
+    <div class="form-row">
+      <span class="label">Images</span>
+      <p class="hint" id="jyStorageNote"></p>
+      <div id="jyImages"></div>
+      <div class="jy-add">
+        <button class="btn-mini" id="jyAddWork" type="button">Add a work</button>
+        <button class="btn-mini" id="jyAddBooth" type="button">Add booth shot</button>
+        <button class="btn-mini" id="jyUpload" type="button" disabled>Upload files</button>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="jyAsked">What do you want looked at?</label>
+      <textarea class="control" id="jyAsked"
+        placeholder="e.g. Is the booth reading as too crowded? Are these five hanging together as a body of work?"></textarea>
+    </div>
+
+    <p class="hint" id="jyReady"></p>
+
+    <!-- Only ever filled in by a juror. Read-only to the artist, and absent
+         entirely until a review comes back. -->
+    <div class="form-row" id="jyFeedbackBlock" hidden>
+      <span class="label">What the juror said</span>
+      <div class="jy-feedback" id="jyFeedback"></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-primary" id="jySave" type="button">Save draft</button>
+    <button class="btn" id="jySubmit" type="button" disabled>Send to a juror</button>
+    <button class="btn btn-quiet" id="jyCancel" type="button">Cancel</button>
+    <span class="spacer"></span>
+    <button class="btn btn-quiet btn-danger" id="jyDelete" type="button" hidden>Delete</button>
+  </div>
+</section>
+
+<p class="exp-foot" id="buildStamp"></p>
+
+<script src="core.js?v=bcf93cce"></script>
+<script src="version.js?v=bcf93cce"></script>
+<script src="jury.js?v=bcf93cce"></script>
+<script src="plan.js?v=bcf93cce"></script>
+<script src="store-supabase.js?v=bcf93cce"></script>
+<script type="module">
+'use strict';
+/* ==========================================================================
+   The mock jury page.
+
+   Most of the work here is refusing to overstate a feature whose plumbing
+   does not exist. Images cannot be uploaded, requests cannot reach a juror,
+   and nothing can be paid for. All three are said plainly, up front, before
+   anybody spends half an hour assembling a submission.
+   ========================================================================== */
+const { Store, Theme, esc, REVIEW_STAGES, REVIEW_STAGE_LABEL,
+        IMAGE_KINDS, IMAGE_KIND_LABEL, makeReviewImage, fmtDay } = window.AST;
+const J = window.ASTJury;
+const $ = sel => document.querySelector(sel);
+
+Theme.init($('#btnTheme'));
+
+const state = { reviews: [], shows: [], editingId: null, draftImages: [], draft: null };
+
+async function refresh() {
+  [state.reviews, state.shows] = await Promise.all([Store.listReviews(), Store.list()]);
+  render();
+}
+
+function showName(id) {
+  const s = state.shows.find(x => x.id === id);
+  return s ? s.name : '';
+}
+
+function renderBanner() {
+  /* Said once, at the top. An artist should know before they start. */
+  $('#jyBanner').innerHTML =
+    '<strong>Not running yet.</strong> ' + esc(J.NO_TRANSPORT) + ' ' +
+    esc(J.NO_STORAGE);
+}
+
+function renderList() {
+  const rows = state.reviews.slice()
+    .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+  $('#jyEmpty').hidden = rows.length > 0;
+  $('#jyList').innerHTML = rows.map(r => {
+    const score = J.scoreOf(r);
+    const ready = J.readiness(r);
+    const sub = [
+      showName(r.showId) || 'no show chosen',
+      r.images.length + ' image' + (r.images.length === 1 ? '' : 's'),
+      ready.ready ? 'ready' : ready.missing.length + ' thing' +
+        (ready.missing.length === 1 ? '' : 's') + ' missing'
+    ].join(' \u00b7 ');
+    return '<div class="exp-row" data-id="' + esc(r.id) + '" tabindex="0" role="button">' +
+      '<div class="exp-cell"><strong>' + esc(REVIEW_STAGE_LABEL[r.stage]) + '</strong>' +
+        '<div class="exp-sub">' + esc(sub) + '</div></div>' +
+      '<div class="exp-amt">' +
+        (score == null ? '<span class="exp-unknown">not scored</span>' : esc(score + ' / 10')) +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderStats() {
+  const s = J.summary(state.reviews);
+  const cells = [
+    ['Started', s.total || '\u2014'],
+    ['Waiting', s.waiting || '\u2014'],
+    ['Back', s.returned || '\u2014']
+  ];
+  $('#jyStats').innerHTML = cells.map(([k, n]) =>
+    '<div class="stat"><div class="n">' + esc(n) + '</div><div class="k">' + esc(k) + '</div></div>').join('');
+  /* The layer rule, said wherever a score could be mistaken for odds. */
+  $('#jyScoreNote').textContent = J.SCORE_IS_NOT_ODDS;
+}
+
+function render() { renderBanner(); renderList(); renderStats(); }
+
+/* ---- the editor --------------------------------------------------------- */
+function renderImages() {
+  $('#jyImages').innerHTML = state.draftImages.length
+    ? state.draftImages.map((img, i) =>
+        '<div class="jy-img" data-i="' + i + '">' +
+          '<span class="pro-tag">' + esc(IMAGE_KIND_LABEL[img.kind]) + '</span>' +
+          '<input class="control" data-f="title" placeholder="Title" value="' + esc(img.title) + '">' +
+          '<input class="control" data-f="medium" placeholder="Medium, size" value="' + esc(img.medium) + '">' +
+          '<button class="btn-mini" data-remove="' + i + '" type="button">Remove</button>' +
+        '</div>').join('')
+    : '<p class="hint">No images described yet.</p>';
+  renderReady();
+}
+
+function renderReady() {
+  const ready = J.readiness({ images: state.draftImages, askedAbout: $('#jyAsked').value });
+  $('#jyReady').textContent = ready.ready
+    ? 'That is a full submission: ' + ready.works + ' works and a booth shot.'
+    : 'Still needs ' + ready.missing.join(', ') + '.';
+}
+
+function openEditor(rec) {
+  state.editingId = rec ? rec.id : null;
+  state.draft = rec || null;
+  state.draftImages = rec ? rec.images.map(i => ({ ...i })) : [];
+  $('#jyTitle').textContent = rec ? 'Submission' : 'New submission';
+  $('#jyShow').innerHTML = ['<option value="">No show chosen</option>']
+    .concat(state.shows.map(s =>
+      '<option value="' + esc(s.id) + '">' + esc(s.name) + '</option>')).join('');
+  $('#jyShow').value = rec ? rec.showId : '';
+  $('#jyAsked').value = rec ? rec.askedAbout : '';
+  $('#jyDelete').hidden = !rec;
+  $('#jyStorageNote').textContent = J.NO_STORAGE;
+  $('#jyUpload').title = J.NO_STORAGE;
+  $('#jySubmit').title = J.NO_TRANSPORT;
+
+  const back = rec && J.isReturned(rec);
+  $('#jyFeedbackBlock').hidden = !back;
+  $('#jyFeedback').textContent = back
+    ? (rec.feedback || 'The juror left no written notes.') : '';
+
+  renderImages();
+  $('#jyOverlay').hidden = false;
+  $('#jyModal').hidden = false;
+  $('#jyShow').focus();
+}
+
+function closeEditor() {
+  state.editingId = null; state.draft = null; state.draftImages = [];
+  $('#jyModal').hidden = true;
+  $('#jyOverlay').hidden = true;
+}
+
+async function save() {
+  await Store.upsertReview({
+    ...(state.draft || {}),
+    id: state.editingId || undefined,
+    showId: $('#jyShow').value,
+    askedAbout: $('#jyAsked').value,
+    images: state.draftImages,
+    /* Stays a draft. There is no transport, so nothing can move past it and
+       nothing may imply it has. */
+    stage: state.draft && state.draft.stage !== 'draft' ? state.draft.stage : 'draft'
+  });
+  await refresh();
+  closeEditor();
+}
+
+async function remove() {
+  if (!state.editingId) return;
+  await Store.removeReview(state.editingId);
+  await refresh();
+  closeEditor();
+}
+
+$('#jyNew').addEventListener('click', () => openEditor(null));
+document.addEventListener('click', e => {
+  const row = e.target.closest('.exp-row');
+  if (!row) return;
+  const rec = state.reviews.find(r => r.id === row.dataset.id);
+  if (rec) openEditor(rec);
+});
+$('#jyAddWork').addEventListener('click', () => {
+  state.draftImages.push(makeReviewImage({ kind: 'work' })); renderImages();
+});
+$('#jyAddBooth').addEventListener('click', () => {
+  state.draftImages.push(makeReviewImage({ kind: 'booth' })); renderImages();
+});
+$('#jyImages').addEventListener('input', e => {
+  const wrap = e.target.closest('.jy-img');
+  if (!wrap || !e.target.dataset.f) return;
+  state.draftImages[Number(wrap.dataset.i)][e.target.dataset.f] = e.target.value;
+  renderReady();
+});
+$('#jyImages').addEventListener('click', e => {
+  const btn = e.target.closest('[data-remove]');
+  if (!btn) return;
+  state.draftImages.splice(Number(btn.dataset.remove), 1);
+  renderImages();
+});
+$('#jyAsked').addEventListener('input', renderReady);
+$('#jySave').addEventListener('click', save);
+$('#jyDelete').addEventListener('click', remove);
+$('#jyCancel').addEventListener('click', closeEditor);
+$('#jyClose').addEventListener('click', closeEditor);
+$('#jyOverlay').addEventListener('click', closeEditor);
+
+$('#jyPro').innerHTML = window.ASTPlan.cards(['jury_review']);
+
+if (window.ASTSupabase) {
+  try { window.ASTSupabase.connect({ onShows: () => refresh() }); } catch (_) {}
+}
+refresh();
+</script>
+<script>window.ASTVersion.mount(document.getElementById('buildStamp'));</script>
+</body>
+</html>
