@@ -29,8 +29,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=7d0bf049">
-<link rel="stylesheet" href="intel.css?v=7d0bf049">
+<link rel="stylesheet" href="app.css?v=1437361d">
+<link rel="stylesheet" href="intel.css?v=1437361d">
 </head>
 <body>
 <header class="app-header">
@@ -64,6 +64,30 @@
      season. Everything below re-ranks from these three controls.
      ========================================================================== -->
 <div class="profilebar" id="profileBar"></div>
+
+<!-- ==========================================================================
+     SAVED RANKINGS. The profile bar above is one implicit set of criteria;
+     this turns it into named ones you can keep, switch between and hand to
+     another artist. Private unless deliberately exported.
+     ========================================================================== -->
+<div class="rankerbar" id="rankerBar">
+  <div class="rk-row">
+    <div class="rk-field">
+      <label class="label" for="rkPick">Rank by</label>
+      <select class="control" id="rkPick"></select>
+    </div>
+    <button class="btn-mini" id="rkEdit" type="button">Edit</button>
+    <button class="btn-mini" id="rkNew" type="button">New ranking</button>
+    <button class="btn-mini" id="rkExport" type="button">Export</button>
+    <button class="btn-mini" id="rkImport" type="button">Import</button>
+    <!-- Sharing has no transport until the Worker is deployed. A control that
+         does nothing must look like it does nothing. -->
+    <button class="btn-mini" id="rkShare" type="button" disabled
+            title="Sharing to the network needs the member service, which is not deployed yet. Export sends a file today.">Share to network</button>
+    <input type="file" id="rkFile" accept="application/json,.json" hidden>
+  </div>
+  <p class="rk-note" id="rkNote"></p>
+</div>
 
 <div class="browse">
   <!-- ==========================================================================
@@ -210,19 +234,88 @@
   <button class="t-act" id="toastAct" type="button" hidden></button>
 </div>
 
-<script src="core.js?v=7d0bf049"></script>
-<script src="version.js?v=7d0bf049"></script>
-<script src="fit.js?v=7d0bf049"></script>
-<script src="intel.js?v=7d0bf049"></script>
-<script src="members.js?v=7d0bf049"></script>
+<!-- ==========================================================================
+     THE RANKING EDITOR
+     ========================================================================== -->
+<div class="overlay" id="rkOverlay" hidden></div>
+<section class="modal" id="rkModal" role="dialog" aria-modal="true" aria-labelledby="rkTitle" hidden>
+  <div class="modal-head">
+    <h2 id="rkTitle">Edit ranking</h2>
+    <button class="btn btn-icon" id="rkClose" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <label class="label" for="rkName">Name</label>
+      <input class="control" id="rkName" maxlength="60" placeholder="Lisa&rsquo;s list" autocomplete="off">
+      <div class="hint">What you&rsquo;d call this list. It is yours and stays on this device.</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="rkOwner">Your name</label>
+        <input class="control" id="rkOwner" maxlength="60" placeholder="Optional" autocomplete="off">
+        <div class="hint">Only used if you export this list.</div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="rkDiscipline">Built for</label>
+        <select class="control" id="rkDiscipline"></select>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="rkBand">Selling at</label>
+        <select class="control" id="rkBand"></select>
+      </div>
+      <div class="form-row">
+        <label class="label" for="rkStrategy">This season</label>
+        <select class="control" id="rkStrategy"></select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <span class="label">What matters to you</span>
+      <div class="hint" id="rkWeightHint">Each factor runs 0 to 10, and 10 is always
+        good for you. Set one to 0 and it drops out of the ranking entirely rather
+        than counting as average.</div>
+      <div class="rk-weights" id="rkWeights"></div>
+      <button class="btn-mini" id="rkReset" type="button">Back to the presets</button>
+    </div>
+
+    <div class="form-row">
+      <label class="label" for="rkNotes">Notes</label>
+      <textarea class="control" id="rkNotes" maxlength="600"
+                placeholder="Why this list is the way it is."></textarea>
+    </div>
+
+    <p class="hint" id="rkOriginNote"></p>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-primary" id="rkSave" type="button">Save ranking</button>
+    <button class="btn btn-quiet" id="rkCancel" type="button">Cancel</button>
+    <span class="spacer"></span>
+    <button class="btn btn-quiet btn-danger" id="rkDelete" type="button" hidden>Delete</button>
+  </div>
+</section>
+
+<script src="core.js?v=1437361d"></script>
+<script src="version.js?v=1437361d"></script>
+<script src="fit.js?v=1437361d"></script>
+<script src="ranker.js?v=1437361d"></script>
+<script src="intel.js?v=1437361d"></script>
+<script src="members.js?v=1437361d"></script>
 <!-- Weather fetches at runtime from the visitor's browser; sales tax is a
      static table. Both are optional: intel-ui.js renders without either. -->
-<script src="weather.js?v=7d0bf049"></script>
-<script src="salestax.js?v=7d0bf049"></script>
-<script src="intel-ui.js?v=7d0bf049"></script>
-<script src="catalogue.js?v=7d0bf049"></script>
-<script src="store-supabase.js?v=7d0bf049"></script>
-<script src="import.js?v=7d0bf049"></script>
+<script src="weather.js?v=1437361d"></script>
+<script src="salestax.js?v=1437361d"></script>
+<script src="intel-ui.js?v=1437361d"></script>
+<script src="catalogue.js?v=1437361d"></script>
+<script src="store-supabase.js?v=1437361d"></script>
+<script src="import.js?v=1437361d"></script>
 <script type="module">
 /* ==========================================================================
    ALL SHOWS
@@ -263,7 +356,7 @@ async function loadFit() {
 /* Attach a score to every row for the current profile. Member consensus, where
    there is enough of it, replaces the editorial estimate before scoring. */
 function rescore() {
-  const profile = INTEL.getProfile();
+  const profile = activeProfile();
   state.profile = profile;
   state.rows.forEach(r => {
     const rec = fit.byId[r.id];
@@ -364,6 +457,8 @@ const state = {
   quick: 'all',
   view: 'cards',
   profile: null,
+  rankers: [],
+  rankerId: '',
   reportsByShow: {}
 };
 
@@ -858,6 +953,217 @@ $('#btnTheme').addEventListener('click', () => {
 
 /* Same Store swap as the ledger: a configured Supabase project means shows
    added here sync, otherwise they land in localStorage. */
+/* ==========================================================================
+   SAVED RANKINGS
+
+   The profile bar is one implicit set of criteria. This makes them named,
+   plural and portable. Everything here compiles down to a normal fit profile
+   and goes through FIT.scoreShow — there is no second scorer, because a
+   second scorer would be a second set of honesty rules to keep in step.
+   ========================================================================== */
+const RK = window.ASTRanker;
+
+function activeRanker() {
+  return state.rankers.find(r => r.id === state.rankerId) || null;
+}
+
+/**
+ * The profile the list is actually scored against. With no saved ranking
+ * selected this is exactly the profile bar, unchanged — which is what every
+ * artist gets until they build one.
+ */
+function activeProfile() {
+  const base = INTEL.getProfile();
+  const rk = activeRanker();
+  if (!rk) return base;
+  return Object.assign({}, base, {
+    /* An empty field on the ranking means "whatever the bar says", so a
+       ranking about weights alone does not silently reset the discipline. */
+    discipline: rk.discipline || base.discipline,
+    priceBand: rk.priceBand || base.priceBand,
+    strategy: rk.strategy || base.strategy,
+    customWeights: Array.isArray(rk.weights) ? rk.weights.map(RK.clampWeight) : null,
+    lens: base.lens
+  });
+}
+
+async function loadRankers() {
+  state.rankers = await Store.listRankers();
+  const l = Settings.getLayout();
+  const wanted = l.activeRanker || '';
+  state.rankerId = state.rankers.some(r => r.id === wanted) ? wanted : '';
+  renderRankerBar();
+}
+
+function renderRankerBar() {
+  const pick = $('#rkPick');
+  pick.innerHTML = ['<option value="">Standard — the presets above</option>']
+    .concat(state.rankers.map(r =>
+      '<option value="' + esc(r.id) + '">' + esc(r.name || 'Untitled ranking') +
+      (r.origin === 'imported' ? ' (imported)' : '') + '</option>')).join('');
+  pick.value = state.rankerId;
+
+  const rk = activeRanker();
+  $('#rkEdit').disabled = !rk;
+  $('#rkExport').disabled = !rk;
+
+  const note = $('#rkNote');
+  if (!rk) {
+    note.textContent = 'Scoring on the presets for what you make and what it sells for. ' +
+      'Build a ranking to weight the ten factors yourself.';
+    return;
+  }
+  const ex = RK.explain(rk);
+  const bits = [];
+  if (rk.origin === 'imported') {
+    /* Somebody else's judgment has to keep announcing itself. */
+    bits.push('Imported' + (rk.sourceName ? ' from ' + rk.sourceName : '') +
+              ' — their weighting, not yours.');
+  }
+  if (!ex.custom) bits.push('Following the presets; nothing reweighted yet.');
+  else {
+    if (ex.up.length) bits.push('Weighted up: ' + ex.up.map(f => f.label.toLowerCase()).join(', ') + '.');
+    if (ex.down.length) bits.push('Weighted down: ' + ex.down.map(f => f.label.toLowerCase()).join(', ') + '.');
+    if (!ex.up.length && !ex.down.length) bits.push('Close to the presets.');
+  }
+  note.textContent = bits.join(' ');
+}
+
+/* ---- the editor --------------------------------------------------------- */
+let rkDraft = null;
+
+function fillRankerSelects() {
+  $('#rkDiscipline').innerHTML = FIT.DISCIPLINES.map(d =>
+    '<option value="' + esc(d.key) + '">' + esc(d.label) + '</option>').join('');
+  $('#rkBand').innerHTML = FIT.PRICE_BANDS.map(b =>
+    '<option value="' + esc(b.key) + '">' + esc(b.label) + '</option>').join('');
+  $('#rkStrategy').innerHTML = FIT.STRATEGIES.map(x =>
+    '<option value="' + esc(x.key) + '">' + esc(x.label) + '</option>').join('');
+}
+
+function renderWeights(weights) {
+  $('#rkWeights').innerHTML = FIT.FACTORS.map((f, i) => {
+    const v = weights[i];
+    return '<div class="rk-w' + (v === 0 ? ' is-off' : '') + '" data-i="' + i + '">' +
+      '<label for="rkw' + i + '" title="' + esc(f.help) + '">' + esc(f.label) + '</label>' +
+      '<input type="range" id="rkw' + i + '" min="0" max="10" step="0.5" value="' + v + '">' +
+      '<span class="rk-val">' + esc(String(v)) + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function openRankerEditor(rk) {
+  rkDraft = rk
+    ? Object.assign({}, rk)
+    : { name: '', ownerName: '', discipline: '', priceBand: '', strategy: '',
+        weights: null, notes: '', origin: 'mine', shared: false };
+
+  const base = INTEL.getProfile();
+  $('#rkTitle').textContent = rk ? 'Edit ranking' : 'New ranking';
+  $('#rkName').value = rkDraft.name;
+  $('#rkOwner').value = rkDraft.ownerName;
+  $('#rkDiscipline').value = rkDraft.discipline || base.discipline;
+  $('#rkBand').value = rkDraft.priceBand || base.priceBand;
+  $('#rkStrategy').value = rkDraft.strategy || base.strategy;
+  $('#rkNotes').value = rkDraft.notes;
+  $('#rkDelete').hidden = !rk;
+
+  const origin = $('#rkOriginNote');
+  origin.hidden = rkDraft.origin !== 'imported';
+  origin.className = 'rk-imported';
+  origin.textContent = rkDraft.origin === 'imported'
+    ? 'This ranking came from ' + (rkDraft.sourceName || 'another artist') +
+      '. Editing it here changes only your copy — they are never notified, and ' +
+      'nothing of yours goes back to them.'
+    : '';
+
+  renderWeights(RK.editableWeights({
+    weights: rkDraft.weights,
+    discipline: $('#rkDiscipline').value,
+    priceBand: $('#rkBand').value,
+    strategy: $('#rkStrategy').value
+  }));
+
+  $('#rkOverlay').hidden = false;
+  $('#rkModal').hidden = false;
+  $('#rkName').focus();
+}
+
+function closeRankerEditor() {
+  rkDraft = null;
+  $('#rkModal').hidden = true;
+  $('#rkOverlay').hidden = true;
+}
+
+function draftWeights() {
+  return FIT.FACTORS.map((_, i) => Number($('#rkw' + i).value));
+}
+
+async function saveRanker() {
+  const name = $('#rkName').value.trim();
+  if (!name) { $('#rkName').focus(); return; }
+  const rec = await Store.upsertRanker(Object.assign({}, rkDraft, {
+    name,
+    ownerName: $('#rkOwner').value.trim(),
+    discipline: $('#rkDiscipline').value,
+    priceBand: $('#rkBand').value,
+    strategy: $('#rkStrategy').value,
+    weights: draftWeights(),
+    notes: $('#rkNotes').value.trim()
+  }));
+  state.rankerId = rec.id;
+  Settings.setLayout(Object.assign({}, Settings.getLayout(), { activeRanker: rec.id }));
+  await loadRankers();
+  closeRankerEditor();
+  rescore(); render();
+}
+
+async function deleteRanker() {
+  const rk = rkDraft && rkDraft.id ? rkDraft : null;
+  if (!rk) return;
+  await Store.removeRanker(rk.id);
+  if (state.rankerId === rk.id) {
+    state.rankerId = '';
+    Settings.setLayout(Object.assign({}, Settings.getLayout(), { activeRanker: '' }));
+  }
+  await loadRankers();
+  closeRankerEditor();
+  rescore(); render();
+}
+
+/* ---- sharing, such as it is --------------------------------------------
+   A file. The payload carries the criteria and nothing else — no shows, no
+   calendar, no applications, no fees. A ranking says what somebody values;
+   it must not say where they will be standing in June.                    */
+function exportRanker() {
+  const rk = activeRanker();
+  if (!rk) return;
+  const blob = new Blob([JSON.stringify(RK.toPayload(rk), null, 2)],
+                        { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (rk.name || 'ranking').replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.ranking.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function importRanker(file) {
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const parsed = RK.fromPayload(String(reader.result || ''));
+    if (!parsed.ok) { $('#rkNote').textContent = parsed.error; return; }
+    const rec = await Store.upsertRanker(parsed.ranking);
+    state.rankerId = rec.id;
+    Settings.setLayout(Object.assign({}, Settings.getLayout(), { activeRanker: rec.id }));
+    await loadRankers();
+    rescore(); render();
+  };
+  reader.onerror = () => { $('#rkNote').textContent = 'That file could not be read.'; };
+  reader.readAsText(file);
+}
+
 (async () => {
   if (window.ASTSupabase) {
     try { window.ASTSupabase.connect({ onShows: () => refresh() }); } catch (_) {}
@@ -889,7 +1195,66 @@ $('#btnTheme').addEventListener('click', () => {
      proposition depending on what you make. */
   UI.mountProfileBar($('#profileBar'), () => {
     UI.invalidate();
+    /* A saved ranking pins the settings it names, so the bar re-ranks only
+       what the ranking left to it. The note says which is in charge. */
+    renderRankerBar();
     loadReports().then(() => { rescore(); render(); });
+  });
+
+  fillRankerSelects();
+  await loadRankers();
+
+  $('#rkPick').addEventListener('change', async e => {
+    state.rankerId = e.target.value;
+    Settings.setLayout(Object.assign({}, Settings.getLayout(), { activeRanker: state.rankerId }));
+    renderRankerBar();
+    rescore(); render();
+  });
+  $('#rkNew').addEventListener('click', () => openRankerEditor(null));
+  $('#rkEdit').addEventListener('click', () => { const r = activeRanker(); if (r) openRankerEditor(r); });
+  $('#rkExport').addEventListener('click', exportRanker);
+  $('#rkImport').addEventListener('click', () => $('#rkFile').click());
+  $('#rkFile').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (f) importRanker(f);
+    e.target.value = '';
+  });
+  $('#rkSave').addEventListener('click', saveRanker);
+  $('#rkDelete').addEventListener('click', deleteRanker);
+  $('#rkCancel').addEventListener('click', closeRankerEditor);
+  $('#rkClose').addEventListener('click', closeRankerEditor);
+  $('#rkOverlay').addEventListener('click', closeRankerEditor);
+  $('#rkReset').addEventListener('click', () => {
+    /* Back to the presets means genuinely null, not a copy of today's preset
+       numbers frozen in place — so a later change to the model still reaches
+       this ranking. */
+    rkDraft.weights = null;
+    renderWeights(RK.editableWeights({
+      weights: null,
+      discipline: $('#rkDiscipline').value,
+      priceBand: $('#rkBand').value,
+      strategy: $('#rkStrategy').value
+    }));
+  });
+  /* Changing what the ranking is built for moves the baseline underneath the
+     sliders, so an untouched ranking follows it. */
+  ['#rkDiscipline', '#rkBand', '#rkStrategy'].forEach(sel =>
+    $(sel).addEventListener('change', () => {
+      if (rkDraft && rkDraft.weights) return;
+      renderWeights(RK.editableWeights({
+        weights: null,
+        discipline: $('#rkDiscipline').value,
+        priceBand: $('#rkBand').value,
+        strategy: $('#rkStrategy').value
+      }));
+    }));
+  $('#rkWeights').addEventListener('input', e => {
+    const row = e.target.closest('.rk-w');
+    if (!row) return;
+    const v = Number(e.target.value);
+    row.querySelector('.rk-val').textContent = String(v);
+    row.classList.toggle('is-off', v === 0);
+    if (rkDraft) rkDraft.weights = draftWeights();
   });
   $('#btnNetwork').addEventListener('click', () => UI.openNetwork());
 

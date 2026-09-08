@@ -12,7 +12,7 @@ window.AST = (function () {
   'use strict';
 
   /* ---- 1. MODEL + CONSTANTS --------------------------------------------- */
-  var SCHEMA_VERSION = 5;
+  var SCHEMA_VERSION = 6;
   var DB_KEY = 'artShowTracker.db';
   var THEME_KEY = 'artShowTracker.theme';
   var CONFIG_KEY = 'artShowTracker.supabase';
@@ -160,6 +160,44 @@ window.AST = (function () {
   }
 
   /**
+   * A saved ranking — "Lisa's list". The criteria themselves belong to
+   * ranker.js, which owns the factor list; core.js only guarantees the
+   * envelope every stored record shares, so sync and tombstones work the
+   * same way here as everywhere else.
+   *
+   * `weights` is left exactly as given: a null means "follow the presets",
+   * and ranker.js is the only thing allowed to interpret or clamp it.
+   */
+  function makeRanker(input) {
+    input = input || {};
+    var now = new Date().toISOString();
+    return {
+      id: input.id || newId(),
+      name: String(input.name || '').trim(),
+      /* Whose list this is, for a shared one. Free text the artist typed,
+         never an identity the app asserts. */
+      ownerName: String(input.ownerName || '').trim(),
+      discipline: input.discipline || '',
+      priceBand: input.priceBand || '',
+      strategy: input.strategy || '',
+      weights: Array.isArray(input.weights) ? input.weights.slice() : null,
+      notes: input.notes || '',
+      /* Where it came from. An imported list stays marked as imported for as
+         long as it exists: a ranking someone else built is not your judgment,
+         and the UI has to keep being able to say so. */
+      origin: input.origin === 'imported' ? 'imported' : 'mine',
+      sourceName: String(input.sourceName || '').trim(),
+      /* Sharing is opt-in, per record, and false is the only default. Artists
+         protect their show lists; nothing here leaves the device unless it is
+         deliberately exported. */
+      shared: !!input.shared,
+      deletedAt: input.deletedAt || null,
+      createdAt: input.createdAt || now,
+      updatedAt: input.updatedAt || now
+    };
+  }
+
+  /**
    * One application, to one show, in one cycle. A child record: it has its own
    * id and updatedAt so two devices adding different applications merge as a
    * union instead of one overwriting the other. Money must not be lost to
@@ -252,9 +290,10 @@ window.AST = (function () {
 
   function migrate(db) {
     var d = db;
-    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [] };
+    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [] };
     if (!Array.isArray(d.shows)) d.shows = [];
     if (!Array.isArray(d.applications)) d.applications = [];
+    if (!Array.isArray(d.rankers)) d.rankers = [];
     // v0 (pre-versioning: a bare array or no version) -> v1
     if (!d.schemaVersion) d.schemaVersion = 1;
     // v1 -> v2: soft deletes, so cross-device sync can carry a deletion.
@@ -308,9 +347,17 @@ window.AST = (function () {
       });
       d.schemaVersion = 5;
     }
+    /* v5 -> v6: saved rankings. Nothing is seeded — an artist who has not
+       built one is not given somebody else's idea of a good show, and the
+       preset profile keeps working exactly as before until they do. */
+    if (d.schemaVersion < 6) {
+      if (!Array.isArray(d.rankers)) d.rankers = [];
+      d.schemaVersion = 6;
+    }
     d.shows = d.shows.map(makeShow);
     d.events = (Array.isArray(d.events) ? d.events : []).map(makeEvent);
     d.applications = (Array.isArray(d.applications) ? d.applications : []).map(makeApplication);
+    d.rankers = (Array.isArray(d.rankers) ? d.rankers : []).map(makeRanker);
     d.schemaVersion = SCHEMA_VERSION;
     return d;
   }
@@ -319,7 +366,7 @@ window.AST = (function () {
     function read() {
       var raw = null;
       try { raw = localStorage.getItem(DB_KEY); }
-      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [] }; }
+      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [] }; }
       if (raw === null) return null;
       var parsed;
       try { parsed = JSON.parse(raw); } catch (_) { parsed = null; }
@@ -343,7 +390,7 @@ window.AST = (function () {
       // A brand-new device gets the demo season. Flag it: the seed is not the
       // user's data, so on first sign-in it must not be pushed up as if it
       // were — a second device would duplicate the whole season.
-      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], applications: [], pristineSeed: true });
+      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], applications: [], rankers: [], pristineSeed: true });
     }
     /** Any real write means this device's data is no longer the untouched seed. */
     function touch(db) { db.pristineSeed = false; return db; }
@@ -399,7 +446,7 @@ window.AST = (function () {
         var prev = load();
         var db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow),
                    events: prev.events, applications: prev.applications,
-                   pristineSeed: false };
+                   rankers: prev.rankers, pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
       },
@@ -410,7 +457,7 @@ window.AST = (function () {
         var prev = load();
         var db = { schemaVersion: SCHEMA_VERSION, shows: rows.map(makeShow),
                    events: prev.events, applications: prev.applications,
-                   pristineSeed: false };
+                   rankers: prev.rankers, pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
       },
@@ -472,6 +519,34 @@ window.AST = (function () {
         if (i === -1) return Promise.resolve(null);
         var before = Object.assign({}, db.applications[i]);
         db.applications[i] = Object.assign({}, db.applications[i], {
+          deletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        write(touch(db));
+        return Promise.resolve(before);
+      },
+      /* ---- saved rankings --------------------------------------------- */
+      listRankers: function () { return Promise.resolve(live(load().rankers)); },
+      listAllRankers: function () { return Promise.resolve(load().rankers.slice()); },
+      getRanker: function (id) {
+        return Promise.resolve(live(load().rankers).filter(function (r) { return r.id === id; })[0] || null);
+      },
+      upsertRanker: function (rk) {
+        var db = load();
+        var rec = makeRanker(rk);
+        rec.updatedAt = new Date().toISOString();
+        var i = db.rankers.findIndex(function (r) { return r.id === rec.id; });
+        if (i === -1) db.rankers.push(rec);
+        else db.rankers[i] = Object.assign({}, db.rankers[i], rec);
+        write(touch(db));
+        return Promise.resolve(rec);
+      },
+      removeRanker: function (id) {
+        var db = load();
+        var i = db.rankers.findIndex(function (r) { return r.id === id; });
+        if (i === -1) return Promise.resolve(null);
+        var before = Object.assign({}, db.rankers[i]);
+        db.rankers[i] = Object.assign({}, db.rankers[i], {
           deletedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         });
@@ -561,7 +636,12 @@ window.AST = (function () {
     listApplications:  function ()    { return (backend.listApplications  || LocalStore.listApplications).call(backend); },
     getApplication:    function (id)  { return (backend.getApplication    || LocalStore.getApplication).call(backend, id); },
     upsertApplication: function (app) { return (backend.upsertApplication || LocalStore.upsertApplication).call(backend, app); },
-    removeApplication: function (id)  { return (backend.removeApplication || LocalStore.removeApplication).call(backend, id); }
+    removeApplication: function (id)  { return (backend.removeApplication || LocalStore.removeApplication).call(backend, id); },
+    /* Saved rankings, same degrade-to-local fallback again. */
+    listRankers:  function ()   { return (backend.listRankers  || LocalStore.listRankers).call(backend); },
+    getRanker:    function (id) { return (backend.getRanker    || LocalStore.getRanker).call(backend, id); },
+    upsertRanker: function (rk) { return (backend.upsertRanker || LocalStore.upsertRanker).call(backend, rk); },
+    removeRanker: function (id) { return (backend.removeRanker || LocalStore.removeRanker).call(backend, id); }
   };
   function useStore(next) { backend = next || LocalStore; return Store; }
   function currentStore() { return backend; }
@@ -883,7 +963,7 @@ window.AST = (function () {
     SCHEMA_VERSION: SCHEMA_VERSION,
     STATUSES: STATUSES, STATUS_LABEL: STATUS_LABEL,
     makeShow: makeShow, makeEvent: makeEvent, makeReminder: makeReminder,
-    makeApplication: makeApplication,
+    makeApplication: makeApplication, makeRanker: makeRanker,
     STAGES: STAGES, STAGE_LABEL: STAGE_LABEL, STAGE_SETTLED: STAGE_SETTLED,
     EVENT_KINDS: EVENT_KINDS, EVENT_KIND_LABEL: EVENT_KIND_LABEL,
     numOrNull: numOrNull, clampRating: clampRating, migrate: migrate,

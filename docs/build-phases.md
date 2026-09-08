@@ -251,6 +251,45 @@ Not blocking Phase 1, but they need an answer before the phase that needs them:
 
 ---
 
+## 6a. Saved rankings — shipped
+
+Not one of the 26 numbered ideas; it came out of a later conversation and is
+recorded here because it changes what several of them mean.
+
+An artist builds their own weighting over the ten factors, names it, and ranks
+the catalogue by it. It is a thin layer over `fit.js` — `customWeights` already
+existed and already overrode the presets, so a ranking compiles to a normal fit
+profile and goes through the audited scoring path. Nothing in `ranker.js`
+scores a show.
+
+Three decisions worth not relitigating:
+
+- **Private by default, per record.** Artists guard their show lists. `shared`
+  starts false and the export payload carries criteria only — never shows,
+  calendar, applications or fees.
+- **Sharing is a file today.** The network transport needs the Worker; the
+  control is present and visibly disabled. Export/import is the working half.
+- **An import is untrusted input and is validated as such.** The payload names
+  the factor list its weights were written against, and a mismatch is refused.
+  Weights are positional: a quiet mismatch produces a plausible wrong ranking,
+  which is worse than a refusal.
+
+This is also where idea 24 (peer benchmarking) starts looking different. A
+shared ranking is the thing members would compare *through* — "shows that rank
+well on Lisa's list" is a more useful network query than a global average, and
+it needs no reported results to be interesting. Worth weighing when Phase 6 is
+specified.
+
+The **AI-refinement seam** is `explain()` and `applySuggestion()` in
+`ranker.js`. `explain()` already returns the ranking as structured deltas
+against the preset baseline, which is the input an assistant needs; nothing
+calls a model, and no network egress exists in that file. If refinement is
+built, note that §3's finding still holds — a model's suggestion about *this
+artist's preferences* is fine, but a model's claim about *a show's facts* earns
+`search` at best and never `verified`.
+
+---
+
 ## 7. The accounting suite — mapped, not started
 
 Asked for as "sales detail per show, and ways to follow up with clients". Not new

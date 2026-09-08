@@ -24,7 +24,7 @@ commands or the rules. Keep it this short:
 > Don't re-read the codebase — open only the files you're changing, and only
 > open `docs/build-phases.md` or `docs/handoff.md` if the task needs them.
 >
-> Before finishing: run the six suites, then commit, push and merge to `main`.
+> Before finishing: run the seven suites, then commit, push and merge to `main`.
 
 Add a line naming a file or feature if you already know where the work lives —
 that saves a search. Everything else is already loaded.
@@ -135,6 +135,39 @@ The v4 → v5 migration backfills an application for every show already past
 **dates stay empty**: we know it happened, we do not know when, and a plausible
 date would be a fabrication in the one collection that has to survive an audit.
 
+**Saved rankings — "Lisa's list".** The profile bar is one implicit set of
+criteria; a *ranking* makes them named, plural and portable. An artist weights
+the ten factors themselves, saves it under a name, and switches between them
+from the catalogue's Rank-by picker. It compiles down to a normal fit profile
+and goes through `FIT.scoreShow` — there is no second scorer, because a second
+scorer would be a second set of honesty rules to keep in step.
+
+- **Private is the only default.** `shared` starts false, nothing leaves the
+  device unless deliberately exported, and the exported payload carries the
+  criteria *only* — no shows, calendar, applications or fees. A ranking says
+  what somebody values; it must not say where they will be standing in June.
+- **Sharing to the network has no transport yet** — it needs the Worker. The
+  control ships visibly disabled and says so, the way the calendar's Google and
+  Apple buttons do. Export/import a file is the half that works today.
+- **An import is untrusted input.** The payload names the factor list its
+  weights were written against, and a mismatch is *refused* rather than
+  applied: weights are positional, so a quiet mismatch would produce a ranking
+  that looks plausible and is wrong. Wrong format, wrong version, wrong length
+  and junk are all refused with a message. Out-of-range weights clamp.
+- **An imported ranking stays marked imported**, with whose it was, for as long
+  as it exists. Somebody else's judgment does not quietly become yours.
+- **A factor dragged to zero drops out of the average** — it does not score 5.
+  That is the existing model rule, and the editor shows a zeroed factor struck
+  through so it reads as *out*, not merely unimportant.
+- **"Back to the presets" stores null**, not a frozen copy of today's preset
+  numbers, so a later change to the model still reaches the ranking.
+
+`ranker.js` also carries the **AI-refinement seam**: `explain()` returns the
+ranking as structured deltas against the preset baseline — which factors are up,
+which are down — and `applySuggestion()` is the single place a suggestion would
+be merged back, through the same clamping as every other write. Neither calls a
+model today and there is no network transport in that file.
+
 **Times are picked, not typed.** Fifteen-minute menus labelled the way people
 say them, duration chips, and a start that drags the end along keeping the gap.
 `<input type="time">` was the wrong control: a format to get wrong, half-typed
@@ -186,7 +219,7 @@ written.
 
 ---
 
-## The six suites — run all of them before pushing
+## The seven suites — run all of them before pushing
 
 ```bash
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm install --no-save playwright   # once
@@ -202,11 +235,13 @@ node build/calendar-tests.cjs        # 77 — grid, lane packing, clashes, day
 node build/pipeline-tests.cjs        # 26 — the migration and its backfill, jury
                                      #      fee arithmetic, expected value, the
                                      #      application store, the drawer block
+node build/ranker-tests.cjs           # 32 — saved rankings, the weight editor,
+                                     #      export, and refusing a bad import
 cd worker && npm test                # 45 — API; manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
 ```
 
-All green as of this handoff: **79 / 31 / 77 / 26 / 45 / 11**.
+All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 45 / 11**.
 
 Two things worth knowing about the tests:
 

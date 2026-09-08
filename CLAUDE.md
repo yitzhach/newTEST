@@ -20,6 +20,8 @@ numbers cost real money, so unknowns stay unknown.
   per catalogue record. No catalogue record, no heart.
 - An application is a child record, one per show per season — never fields on
   the show. A partial fee total must say it is partial.
+- A saved ranking is private by default and never carries shows, calendar,
+  applications or fees. An imported one stays marked imported.
 
 ## Stack
 - **`tracker/`** — vanilla classic scripts. No build, no modules, no framework.
@@ -43,6 +45,8 @@ adapter both live in `core.js`. Optional sync: Supabase (last-write-wins on
 - `fit.js` — the scoring model.
 - `pipeline.js` — the application pipeline's arithmetic (spend, expected value).
   DOM-free like `calendar.js`, so a phone app can reuse it.
+- `ranker.js` — saved named rankings; compiles to a fit profile, never scores.
+  Owns import validation, which is untrusted input.
 - `browse.html` / `index.html` — catalogue / ledger, same drawer.
 - `calendar.html` / `calendar.js` — the calendar. All the date maths, lane
   packing, clash detection and the .ics live in the js, DOM-free, so a phone
@@ -60,6 +64,7 @@ node build/browser-tests.cjs
 node build/ledger-view-tests.cjs
 node build/calendar-tests.cjs
 node build/pipeline-tests.cjs
+node build/ranker-tests.cjs
 cd worker && npm test
 ```
 Deploy: push to `main`; Pages rebuilds in ~1 min.

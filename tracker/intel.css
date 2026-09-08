@@ -33,6 +33,36 @@ html[data-theme="dark"] {
 .pf-sep { opacity:.5; padding:0 4px; }
 
 /* ==========================================================================
+   RANKER BAR + THE RANKING EDITOR
+   ========================================================================== */
+.rankerbar {
+  padding:12px 32px; border-bottom:1px solid var(--line); background:var(--bg);
+}
+.rk-row { display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; }
+.rk-field { display:flex; flex-direction:column; gap:6px; min-width:220px; }
+.rk-field .control { min-height:36px; }
+.rk-note { margin:8px 0 0; font-size:13px; color:var(--muted); max-width:88ch; }
+/* A disabled control must read as disabled, not as merely quiet. */
+.rankerbar .btn-mini[disabled] { opacity:.45; cursor:not-allowed; }
+
+.rk-weights { display:flex; flex-direction:column; gap:10px; margin:10px 0 12px; }
+.rk-w { display:grid; grid-template-columns:1fr 150px 34px; gap:12px; align-items:center; }
+.rk-w label { font-size:13px; color:var(--ink); }
+.rk-w input[type=range] { width:100%; accent-color:var(--ink); }
+.rk-w .rk-val { font-size:13px; color:var(--muted); text-align:right; font-variant-numeric:tabular-nums; }
+/* A factor dragged to zero is out of the ranking, not merely unimportant.
+   It has to look different from a 1. */
+.rk-w.is-off label, .rk-w.is-off .rk-val { color:var(--muted); text-decoration:line-through; }
+.rk-imported {
+  margin:0; padding:8px 10px; border-left:3px solid var(--line);
+  font-size:13px; color:var(--muted);
+}
+@media (max-width:640px) {
+  .rankerbar { padding:12px 16px; }
+  .rk-w { grid-template-columns:1fr 90px 30px; gap:8px; }
+}
+
+/* ==========================================================================
    FIT SCORE CHIP — used in cards, rows and the drawer
    ========================================================================== */
 .fitchip {
