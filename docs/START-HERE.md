@@ -16,20 +16,18 @@ honesty constraints, the file map); `docs/build-phases.md` is the roadmap and th
 
 ## Paste this into a new chat
 
-> Working on the art show tracker in `yitzhach/newTEST`.
+`CLAUDE.md` loads on its own, so the prompt does not repeat the stack, the
+commands or the rules. Keep it this short:
+
+> Read `docs/START-HERE.md`, then work on: **…**
 >
-> Read `docs/START-HERE.md` — it is current and self-contained. Only open
-> `docs/handoff.md` (the model and honesty rules) or `docs/build-phases.md`
-> (the roadmap) if the task actually needs them. Don't re-read the codebase;
-> open only the files you're changing.
+> Don't re-read the codebase — open only the files you're changing, and only
+> open `docs/build-phases.md` or `docs/handoff.md` if the task needs them.
 >
-> Deploys: push to `main` → GitHub Pages rebuilds → refresh. Nothing else.
-> Check what's live at https://yitzhach.github.io/newTEST/tracker/version.json
->
-> Before finishing: run the four suites listed in START-HERE, then commit,
-> push, and merge to `main` so it deploys.
->
-> What I want to work on: …
+> Before finishing: run the four suites, then commit, push and merge to `main`.
+
+Add a line naming a file or feature if you already know where the work lives —
+that saves a search. Everything else is already loaded.
 
 ---
 
