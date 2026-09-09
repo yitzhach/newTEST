@@ -420,6 +420,15 @@ one function call away and deliberately not wired, because a scorer that quietly
 started using the artist's own history would be a second set of honesty rules to
 keep in step with the first.
 
+**Parked, and asked for explicitly: "Ask about this show" (idea 27)** — an AI
+chat in the drawer answering questions about the show in front of you. Not
+built, deliberately. `docs/build-phases.md` §8 is the whole note; the short
+version is that it is the first feature here where a confident sentence can be
+produced with no source behind it, so it has to answer *from the show record*
+with the same provenance grades the drawer already uses, it needs the Worker
+deployed because an API key cannot ship in `tracker/`, and it lands first as a
+disabled `plan.js` card because there is still no billing in this project.
+
 **Stage 4 (contacts and follow-up, ideas 20 and 22) is next** and is no longer
 premature: it now has sales history behind it, which is the whole reason it was
 staged last. Other people's contact details raise a higher bar than show notes

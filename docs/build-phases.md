@@ -45,6 +45,7 @@ These numbers are referenced across sessions. Do not renumber them; append.
 | 20 | Collector CRM tied to the show | Post-show follow-up is real revenue |
 | 21 | Image sets per application | Five images + booth shot, specs differ per show |
 | 22 | 90-second post-show debrief | Feeds intel; artist gets their own P&L back |
+| 27 | Ask about this show — AI answers grounded in the show record | See §8. Not built |
 
 ### C. Network-only — the moat, worthless below ~20 members
 
@@ -430,3 +431,91 @@ loop is what earns a weekly open, and it becomes idea 24 once there are members.
   contact details raise a higher bar than show notes.
 - ~~Does Stage 1's gross-sales field belong on the show record or wait for
   Stage 3?~~ Answered: on the show record. See the Stage 1 note above.
+
+---
+
+## 8. "Ask about this show" — an AI answer in the drawer. NOT BUILT.
+
+Asked for as: an artist opens a show, taps a chat control in the drawer, and
+asks a question about *that show* — "how many images does this one want?",
+"if I take a double, is the corner included or is that a separate add-on?",
+"what does the prospectus say about tents?" — and gets a straight answer
+instead of reading four screens.
+
+Parked deliberately. Nothing below is a commitment to build it, and none of it
+is started. This section exists so the next session does not re-derive it.
+
+### Why it fits here, and why it is dangerous
+
+It fits because the drawer already holds the answer to most of those questions
+and the artist still has to go and find it. Booth fees, jury statistics, the fee
+schedule, sales tax, the dates, the weather — all of it is loaded on the page
+when they open it. The gap is retrieval, not knowledge.
+
+It is dangerous because it is the first feature in this app where a **confident
+sentence can be produced with no source behind it**, which is the exact failure
+every rule in `CLAUDE.md` was written to prevent. A wrong booth fee costs money.
+A wrong image count costs an application. "The double includes the corner" is a
+sentence a language model will happily write about a show whose prospectus says
+the opposite, and the artist has no way to tell the two apart.
+
+So the constraint is not "add a chat box". It is:
+
+**The model may only answer from the show record, and every answer carries the
+same provenance grade the underlying fact carries.** If `boothFeeCorner` is
+null, the answer is "not known" — the same words the drawer already uses — and
+the model is not permitted to reach for a plausible number. If the fact came in
+at `search` grade, the answer says "unconfirmed" the way the drawer does. A
+`verified` fact is the only kind that gets stated flatly.
+
+That means the useful shape is **retrieval over the record we already have**,
+not a general question-answering model let loose on the topic of art shows.
+The show's own JSON, its research row, its fee schedule text and its intel go
+in as context; the answer comes back citing which field it used; anything not
+in that context is answered "the record does not say", with a link to the
+show's own page so the artist can go and read it.
+
+### What it would take
+
+- **A server.** An API key cannot ship in `tracker/`, which is classic scripts
+  a browser hands the user in plain text. The Cloudflare Worker is already
+  built, already holds D1/KV/R2, and is **undeployed** — it is the obvious
+  home, and this feature is a second reason to deploy it. See
+  `worker/README.md`. Nothing about this can be done client-side.
+- **A context builder.** Almost certainly DOM-free in `tracker/`, alongside
+  `fit.js` and `sales.js`: given a show, assemble exactly the facts, their
+  provenance grades and their source URLs, and hand back a bounded payload.
+  This is the honest half of the feature and it is testable without any model
+  at all — which is where it should start.
+- **An answer contract.** Cited field, provenance grade, and an explicit "not
+  in the record" path. Tests assert the refusals, the way `jury-tests.cjs` and
+  `expense-tests.cjs` already do: a null fact must not come back as a number,
+  and a `search`-grade fact must not come back stated flatly.
+- **A model, and what it costs.** Undecided on purpose. Both are moving
+  targets and writing today's answer into this file guarantees it is wrong by
+  the time somebody reads it. Decide it when it is built, from current docs.
+
+### The paid-tier part
+
+The request was for this to sit behind the full feature set. **There is still no
+billing in this project** — no accounts, no entitlement, no payment — and that
+does not change by adding an AI feature. So the first thing that ships is a
+`plan.js` preview card, disabled, saying what it would do, with no price, no
+plan name and no sign-up, exactly like the other five. The entitlement check is
+a later, separate piece of work, and until it exists a control that looked
+purchasable would be a false offer.
+
+### The "own database" idea
+
+Also raised: eventually building our own question-and-answer set over the shows
+rather than answering from the record each time.
+
+That is worth writing down and worth leaving alone for now. Its real value is
+the same as the network ideas (23–26) — it becomes worth something once there
+are members generating answers nobody else has. Before then it is a cache of
+answers derived from the same catalogue the app already ships, with a second
+copy of every provenance decision to keep in step, and staleness that nobody
+would notice: a show changes its image requirement and the stored answer keeps
+confidently giving last year's. Answering from the live record has none of
+those problems. Revisit it when there are members and the answers start coming
+from artists rather than from the prospectus.
