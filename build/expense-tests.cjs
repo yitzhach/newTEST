@@ -111,6 +111,76 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
         Math.round(maths.beComm.value) === 1168 && maths.beComm.commissionKnown === true,
         String(maths.beComm.value));
 
+  // ---- did it pay for itself (§7 Stage 1) ---------------------------------
+  console.log('\n-- the post-show number --');
+  const rec2 = await p.evaluate(() => window.AST.makeShow({ name: 'x' }).grossSales);
+  check('a show with no takings recorded stores null, not 0', rec2 === null, JSON.stringify(rec2));
+  const mig9 = await p.evaluate(() => {
+    const A = window.AST;
+    const up = A.migrate({ schemaVersion: 8, shows: [
+      { id:'s1', name:'Old show', startDate:'2026-05-01', boothFee: 600 }
+    ], events: [], applications: [], rankers: [], expenses: [], reviews: [] });
+    return { v: up.schemaVersion, current: A.SCHEMA_VERSION, gross: up.shows[0].grossSales };
+  });
+  check('a v8 database migrates to the current schema',
+        mig9.v === mig9.current, String(mig9.v));
+  /* The app has never had anywhere to put this number, so it cannot know it. */
+  check('an existing show is "not recorded", never $0 of sales',
+        mig9.gross === null, JSON.stringify(mig9.gross));
+
+  const result = await p.evaluate(() => {
+    const X = window.ASTExpenses;
+    const rows = [
+      { category:'booth_fee', amount:600, showId:'s1' },
+      { category:'fuel',      amount:80,  showId:'s1' },
+      { category:'booth_fee', amount:400, showId:'s2' },
+      { category:'meals',     amount:null, showId:'s2' }
+    ];
+    return {
+      noGross:   X.showResult(rows, 's1', {}),
+      cleared:   X.showResult(rows, 's1', { grossSales: 2000 }),
+      lost:      X.showResult(rows, 's1', { grossSales: 500 }),
+      comm:      X.showResult(rows, 's1', { grossSales: 2000, commissionPct: 10 }),
+      partial:   X.showResult(rows, 's2', { grossSales: 1000 }),
+      noSpend:   X.showResult(rows, 'nope', { grossSales: 1000 }),
+      season:    X.seasonResult(rows, [
+                   { id:'s1', name:'A', grossSales: 2000 },
+                   { id:'s2', name:'B', grossSales: 1000 },
+                   { id:'s3', name:'C', grossSales: null }
+                 ])
+    };
+  });
+  /* Without the artist's own figure there is no answer, and a zero would
+     turn every unrecorded weekend into a loss. */
+  check('no gross figure means no answer, not a loss',
+        result.noGross.net === null && result.noGross.missing.includes('gross sales'),
+        JSON.stringify(result.noGross.missing));
+  check('a show that cleared its costs reports what is left',
+        result.cleared.net === 1320 && result.cleared.cleared === true,
+        JSON.stringify(result.cleared.net));
+  check('a show that did not is negative, not hidden',
+        result.lost.net === -180 && result.lost.cleared === false, String(result.lost.net));
+  check('a known commission comes off the top',
+        result.comm.net === 1120 && result.comm.commissionKnown === true, String(result.comm.net));
+  /* "Not mentioned" is not zero: nothing is subtracted, and the caller has to
+     say the figure is before whatever the show takes. */
+  check('an unknown commission subtracts nothing and says so',
+        result.cleared.commissionCut === null && result.cleared.commissionKnown === false,
+        JSON.stringify(result.cleared.commissionCut));
+  /* Uncosted rows can only push the real net down, so it is a ceiling. */
+  check('a net over a partial expense total is marked provisional and unsettled',
+        result.partial.net === 600 && result.partial.provisional === true &&
+        result.partial.cleared === null, JSON.stringify(result.partial));
+  check('a show with no costed expenses has no net either',
+        result.noSpend.net === null, JSON.stringify(result.noSpend.net));
+  check('the season nets the shows it can answer',
+        result.season.net === 1920 && result.season.known === 2 && result.season.total === 3,
+        JSON.stringify(result.season.net));
+  check('and a show with no gross is left out rather than counted as zero',
+        result.season.complete === false &&
+        !result.season.shows.some(s => s.showId === 's3'),
+        JSON.stringify(result.season.shows.map(s => s.showId)));
+
   console.log('\n-- lodging --');
   check('a free stay with parking is recorded as such',
         maths.lodging.free === true && maths.lodging.overnightParking === true &&
@@ -148,12 +218,16 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
     list: document.getElementById('expList').textContent.replace(/\s+/g, ' '),
     partial: document.getElementById('expPartial').textContent,
     lodging: document.getElementById('expLodging').textContent.replace(/\s+/g, ' '),
-    stats: document.getElementById('expStats').textContent.replace(/\s+/g, ' ')
+    stats: document.getElementById('expStats').textContent.replace(/\s+/g, ' '),
+    result: document.getElementById('expResult').textContent.replace(/\s+/g, ' ')
   }));
   check('the log lists the rows', /Booth fee/.test(page.list) && /Lodging/.test(page.list), page.list.slice(0, 120));
   /* The single most important line on the page. */
   check('an uncosted row shows "not costed", not $0',
         /not costed/.test(page.list) && !/\$0\b/.test(page.list), page.list.slice(0, 160));
+  check('the money page answers "did it pay for itself" only when it can',
+        /Gross sales are entered on the show|No show has a gross sales figure/.test(page.result),
+        page.result.slice(0, 160));
   check('the season total says it is partial',
         /Known figures only/.test(page.partial), page.partial);
   check('the lodging find is listed with how it was got',

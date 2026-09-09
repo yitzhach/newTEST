@@ -12,7 +12,7 @@ window.AST = (function () {
   'use strict';
 
   /* ---- 1. MODEL + CONSTANTS --------------------------------------------- */
-  var SCHEMA_VERSION = 8;
+  var SCHEMA_VERSION = 9;
   var DB_KEY = 'artShowTracker.db';
   var THEME_KEY = 'artShowTracker.theme';
   var CONFIG_KEY = 'artShowTracker.supabase';
@@ -79,6 +79,16 @@ window.AST = (function () {
       rating: clampRating(input.rating),
       juryFee: numOrNull(input.juryFee),
       boothFee: numOrNull(input.boothFee),
+      /* §7 Stage 1 — what the show actually took, before any commission it
+         charges. The one number that turns the expense log from bookkeeping
+         into an answer to "did that weekend pay for itself".
+
+         It lives on the show and not in a child collection because there is
+         exactly one of it per show per season, which is the shape a scalar
+         already has; sales one at a time are Stage 3 and are a different
+         record. Null is "not recorded", never zero: a show that took nothing
+         and a show nobody has added up yet are different weekends. */
+      grossSales: numOrNull(input.grossSales),
       routeNumber: input.routeNumber == null ? '' : String(input.routeNumber),
       isAlternate: !!input.isAlternate,
       /* Phase 7: temporarily out of the plan. A hidden show greys out in the
@@ -542,6 +552,13 @@ window.AST = (function () {
     if (d.schemaVersion < 8) {
       if (!Array.isArray(d.reviews)) d.reviews = [];
       d.schemaVersion = 8;
+    }
+    /* v8 -> v9: gross sales per show. Nothing is backfilled and nothing is
+       defaulted to 0 — every existing show becomes "not recorded", because
+       the app has never had anywhere to put this number and so cannot know
+       it. makeShow supplies the null. */
+    if (d.schemaVersion < 9) {
+      d.schemaVersion = 9;
     }
     d.expenses = (Array.isArray(d.expenses) ? d.expenses : []).map(makeExpense);
     d.reviews = (Array.isArray(d.reviews) ? d.reviews : []).map(makeReview);

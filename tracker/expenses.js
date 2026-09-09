@@ -117,6 +117,77 @@ var ASTExpenses = (function () {
     return { value: spent.amount / (1 - pct / 100), spent: spent, commissionKnown: true };
   }
 
+  /**
+   * §7 Stage 1 — did the weekend pay for itself?
+   *
+   * Gross is the artist's own figure for what the show took. The show's cut
+   * comes off it, then everything the expense log knows they spent, and what
+   * is left is the net. Three refusals hold this together:
+   *
+   *  - No gross, no answer. `null` is "not recorded", and inventing a zero
+   *    would turn every unrecorded show into a loss.
+   *  - A partial expense total makes the net PROVISIONAL, and it is returned
+   *    as such: uncosted rows can only push the real number down, so a net
+   *    computed over 3 of 9 rows is a ceiling, not a result.
+   *  - "Not mentioned" is not zero. A null commission means no cut is
+   *    subtracted and `commissionKnown` is false, so the caller says the
+   *    figure is before whatever the show takes rather than implying nothing.
+   */
+  function showResult(rows, showId, opts) {
+    opts = opts || {};
+    var spent = landedCost(rows, showId);
+    var gross = num(opts.grossSales);
+    var pct = num(opts.commissionPct);
+    var commissionKnown = pct != null && pct > 0 && pct < 100;
+    var cut = (gross != null && commissionKnown) ? gross * (pct / 100) : null;
+
+    var missing = [];
+    if (gross == null) missing.push('gross sales');
+    if (spent.amount == null) missing.push('at least one costed expense');
+
+    var net = null;
+    if (gross != null && spent.amount != null) {
+      net = gross - (cut || 0) - spent.amount;
+    }
+    return {
+      gross: gross,
+      commissionKnown: commissionKnown,
+      commissionCut: cut,
+      spent: spent,
+      net: net,
+      /* Only a complete expense total settles the question. Anything else is
+         a best case, and `cleared` says so by staying null. */
+      cleared: (net == null || !spent.complete) ? null : net >= 0,
+      provisional: net != null && !spent.complete,
+      missing: missing
+    };
+  }
+
+  /**
+   * The same question across a season: how many shows can actually be
+   * answered, and what the answered ones came to. Shows with no gross are
+   * counted as unanswered rather than as zeroes.
+   */
+  function seasonResult(rows, shows) {
+    var list = (shows || []).filter(function (s) { return s && !s.deletedAt; });
+    var answered = [], provisional = 0, net = null;
+    list.forEach(function (s) {
+      var r = showResult(rows, s.id, { grossSales: s.grossSales, commissionPct: s.commissionPct });
+      if (r.net == null) return;
+      answered.push({ showId: s.id, name: s.name, result: r });
+      if (r.provisional) provisional++;
+      net = (net == null ? 0 : net) + r.net;
+    });
+    return {
+      total: list.length,
+      known: answered.length,
+      provisional: provisional,
+      net: net,
+      shows: answered,
+      complete: list.length > 0 && answered.length === list.length && provisional === 0
+    };
+  }
+
   /* ---- lodging finds -----------------------------------------------------
      Where an artist could park or stay cheaply is worth real money, is
      knowledge artists already trade between themselves, and is published
@@ -165,6 +236,8 @@ var ASTExpenses = (function () {
     landedCost: landedCost,
     hasBothDrivingMethods: hasBothDrivingMethods,
     breakEven: breakEven,
+    showResult: showResult,
+    seasonResult: seasonResult,
     lodgingFinds: lodgingFinds,
     shareableFinds: shareableFinds,
     lodgingAffordability: lodgingAffordability

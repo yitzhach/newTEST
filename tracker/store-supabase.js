@@ -32,6 +32,11 @@ window.ASTSupabase = (function () {
     ['startDate','start_date'], ['endDate','end_date'], ['applyBy','apply_by'],
     ['status','status'], ['rating','rating'],
     ['juryFee','jury_fee'], ['boothFee','booth_fee'],
+    /* `grossSales` is deliberately NOT here. The shows table on an existing
+       Supabase account has no such column, and sending one makes every upsert
+       fail — which would cost somebody their sync to gain a field. So gross
+       sales stay on the device, the same as applications, expenses and
+       calendar events. Add the column to the table first, then this line. */
     ['routeNumber','route_number'], ['isAlternate','is_alternate'],
     ['hidden','hidden'], ['catalogueId','catalogue_id'],
     ['notes','notes'], ['url','url'], ['source','source'],
