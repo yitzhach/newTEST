@@ -539,6 +539,21 @@ body.idr-open { overflow:hidden; }
   .exp-toolbar { padding:14px 16px; }
   .exp-foot { padding:8px 16px 26px; }
 }
+/* The toolbar's two selects have a 200px floor, which on a 375px screen
+   leaves the buttons squeezed into a column beside them. Below 767px every
+   control takes the full width and the buttons sit in a row under them. */
+@media (max-width:767px) {
+  .exp-toolbar { gap:10px; }
+  .exp-field { min-width:0; flex:1 1 100%; }
+  .exp-toolbar .btn { flex:1 1 auto; }
+  .exp-toolbar .spacer { display:none; }
+  .exp-toolbar .btn-mini { flex:1 1 auto; min-height:38px; }
+  /* A sale or expense row is a name and a figure; on a narrow screen the
+     figure drops under the name rather than crushing the name to an
+     ellipsis. The amount stays on its own line so it never wraps mid-number. */
+  .exp-row { flex-wrap:wrap; gap:4px 14px; }
+  .exp-amt { flex:1 1 100%; }
+}
 
 /* ==========================================================================
    MOCK JURY

@@ -79,6 +79,8 @@ adapter both live in `core.js`. Optional sync: Supabase (last-write-wins on
   lodging finds. DOM-free maths, same as `pipeline.js`.
 - `sales.js` — individual sales: the mix by price band and state, the stated
   gross vs. the rows, and the Square/Stripe CSV import. DOM-free.
+- `nav.js` — the one page menu, mounted into `.header-actions` on every page.
+  Add a page here and nowhere else.
 - `plan.js` — Pro previews. Renders disabled cards only; no billing exists.
 - `jury.js` / `jury.html` — mock jury review. Mostly refusals: no storage, no
   transport, no billing, and it says so up front.
@@ -115,6 +117,13 @@ Deploy: push to `main`; Pages rebuilds in ~1 min.
 - Worker suite saying `Something went wrong` = stale `wrangler dev` holding D1.
 - Pages set `data-theme` inline in `<head>` before paint, or dark mode flashes
   white on navigation. New pages need that snippet.
+- A `.modal` MUST wrap its head/body/foot in `<div class="modal-card">`. The
+  outer `.modal` is `pointer-events:none` scaffolding; without the wrapper the
+  dialog renders transparent and cannot be typed into at all. Three shipped
+  that way and the suites missed it, because `el.click()` in a test ignores
+  `pointer-events` — assert the computed style, not just that a click worked.
+- Text inputs are 16px on phones. Under that, iOS zooms in on focus and never
+  zooms back out.
 
 ## Do NOT
 - Assume React/TS — root `package.json` is the portfolio site.

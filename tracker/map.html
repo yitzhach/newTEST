@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
       referrerpolicy="no-referrer">
-<link rel="stylesheet" href="app.css?v=b8fe4702">
+<link rel="stylesheet" href="app.css?v=1de8e957">
 </head>
 <body>
 <!-- ==========================================================================
@@ -97,9 +97,10 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
         referrerpolicy="no-referrer"></script>
-<script src="core.js?v=b8fe4702"></script>
-<script src="map.js?v=b8fe4702"></script>
-<script src="store-supabase.js?v=b8fe4702"></script>
+<script src="core.js?v=1de8e957"></script>
+<script src="nav.js?v=1de8e957"></script>
+<script src="map.js?v=1de8e957"></script>
+<script src="store-supabase.js?v=1de8e957"></script>
 <script type="module">
 /* ==========================================================================
    FULL-PAGE MAP
@@ -257,5 +258,6 @@ Store.list().then(shows => {
   $('#itinerary').innerHTML = '<p class="empty">Could not load saved shows.</p>';
 });
 </script>
+<script>window.ASTNav.auto();</script>
 </body>
 </html>

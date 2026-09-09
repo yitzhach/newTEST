@@ -29,8 +29,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=b8fe4702">
-<link rel="stylesheet" href="intel.css?v=b8fe4702">
+<link rel="stylesheet" href="app.css?v=1de8e957">
+<link rel="stylesheet" href="intel.css?v=1de8e957">
 </head>
 <body>
 <header class="app-header">
@@ -239,83 +239,86 @@
      ========================================================================== -->
 <div class="overlay" id="rkOverlay" hidden></div>
 <section class="modal" id="rkModal" role="dialog" aria-modal="true" aria-labelledby="rkTitle" hidden>
-  <div class="modal-head">
-    <h2 id="rkTitle">Edit ranking</h2>
-    <button class="btn btn-icon" id="rkClose" type="button" aria-label="Close">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-        <path d="M5 5l10 10M15 5L5 15"/>
-      </svg>
-    </button>
-  </div>
-  <div class="modal-body">
-    <div class="form-row">
-      <label class="label" for="rkName">Name</label>
-      <input class="control" id="rkName" maxlength="60" placeholder="Lisa&rsquo;s list" autocomplete="off">
-      <div class="hint">What you&rsquo;d call this list. It is yours and stays on this device.</div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="rkTitle">Edit ranking</h2>
+      <button class="btn btn-icon" id="rkClose" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+          <path d="M5 5l10 10M15 5L5 15"/>
+        </svg>
+      </button>
     </div>
-
-    <div class="grid-2">
+    <div class="modal-body">
       <div class="form-row">
-        <label class="label" for="rkOwner">Your name</label>
-        <input class="control" id="rkOwner" maxlength="60" placeholder="Optional" autocomplete="off">
-        <div class="hint">Only used if you export this list.</div>
+        <label class="label" for="rkName">Name</label>
+        <input class="control" id="rkName" maxlength="60" placeholder="Lisa&rsquo;s list" autocomplete="off">
+        <div class="hint">What you&rsquo;d call this list. It is yours and stays on this device.</div>
       </div>
+
+      <div class="grid-2">
+        <div class="form-row">
+          <label class="label" for="rkOwner">Your name</label>
+          <input class="control" id="rkOwner" maxlength="60" placeholder="Optional" autocomplete="off">
+          <div class="hint">Only used if you export this list.</div>
+        </div>
+        <div class="form-row">
+          <label class="label" for="rkDiscipline">Built for</label>
+          <select class="control" id="rkDiscipline"></select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-row">
+          <label class="label" for="rkBand">Selling at</label>
+          <select class="control" id="rkBand"></select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="rkStrategy">This season</label>
+          <select class="control" id="rkStrategy"></select>
+        </div>
+      </div>
+
       <div class="form-row">
-        <label class="label" for="rkDiscipline">Built for</label>
-        <select class="control" id="rkDiscipline"></select>
+        <span class="label">What matters to you</span>
+        <div class="hint" id="rkWeightHint">Each factor runs 0 to 10, and 10 is always
+          good for you. Set one to 0 and it drops out of the ranking entirely rather
+          than counting as average.</div>
+        <div class="rk-weights" id="rkWeights"></div>
+        <button class="btn-mini" id="rkReset" type="button">Back to the presets</button>
       </div>
-    </div>
 
-    <div class="grid-2">
       <div class="form-row">
-        <label class="label" for="rkBand">Selling at</label>
-        <select class="control" id="rkBand"></select>
+        <label class="label" for="rkNotes">Notes</label>
+        <textarea class="control" id="rkNotes" maxlength="600"
+                  placeholder="Why this list is the way it is."></textarea>
       </div>
-      <div class="form-row">
-        <label class="label" for="rkStrategy">This season</label>
-        <select class="control" id="rkStrategy"></select>
-      </div>
-    </div>
 
-    <div class="form-row">
-      <span class="label">What matters to you</span>
-      <div class="hint" id="rkWeightHint">Each factor runs 0 to 10, and 10 is always
-        good for you. Set one to 0 and it drops out of the ranking entirely rather
-        than counting as average.</div>
-      <div class="rk-weights" id="rkWeights"></div>
-      <button class="btn-mini" id="rkReset" type="button">Back to the presets</button>
+      <p class="hint" id="rkOriginNote"></p>
     </div>
-
-    <div class="form-row">
-      <label class="label" for="rkNotes">Notes</label>
-      <textarea class="control" id="rkNotes" maxlength="600"
-                placeholder="Why this list is the way it is."></textarea>
+    <div class="modal-foot">
+      <button class="btn btn-primary" id="rkSave" type="button">Save ranking</button>
+      <button class="btn btn-quiet" id="rkCancel" type="button">Cancel</button>
+      <span class="spacer"></span>
+      <button class="btn btn-quiet btn-danger" id="rkDelete" type="button" hidden>Delete</button>
     </div>
-
-    <p class="hint" id="rkOriginNote"></p>
-  </div>
-  <div class="modal-foot">
-    <button class="btn btn-primary" id="rkSave" type="button">Save ranking</button>
-    <button class="btn btn-quiet" id="rkCancel" type="button">Cancel</button>
-    <span class="spacer"></span>
-    <button class="btn btn-quiet btn-danger" id="rkDelete" type="button" hidden>Delete</button>
   </div>
 </section>
 
-<script src="core.js?v=b8fe4702"></script>
-<script src="version.js?v=b8fe4702"></script>
-<script src="fit.js?v=b8fe4702"></script>
-<script src="ranker.js?v=b8fe4702"></script>
-<script src="intel.js?v=b8fe4702"></script>
-<script src="members.js?v=b8fe4702"></script>
+<script src="core.js?v=1de8e957"></script>
+<script src="nav.js?v=1de8e957"></script>
+<script src="version.js?v=1de8e957"></script>
+<script src="fit.js?v=1de8e957"></script>
+<script src="ranker.js?v=1de8e957"></script>
+<script src="intel.js?v=1de8e957"></script>
+<script src="members.js?v=1de8e957"></script>
 <!-- Weather fetches at runtime from the visitor's browser; sales tax is a
      static table. Both are optional: intel-ui.js renders without either. -->
-<script src="weather.js?v=b8fe4702"></script>
-<script src="salestax.js?v=b8fe4702"></script>
-<script src="intel-ui.js?v=b8fe4702"></script>
-<script src="catalogue.js?v=b8fe4702"></script>
-<script src="store-supabase.js?v=b8fe4702"></script>
-<script src="import.js?v=b8fe4702"></script>
+<script src="weather.js?v=1de8e957"></script>
+<script src="salestax.js?v=1de8e957"></script>
+<script src="intel-ui.js?v=1de8e957"></script>
+<script src="catalogue.js?v=1de8e957"></script>
+<script src="store-supabase.js?v=1de8e957"></script>
+<script src="import.js?v=1de8e957"></script>
 <script type="module">
 /* ==========================================================================
    ALL SHOWS
@@ -1272,6 +1275,10 @@ function importRanker(file) {
   applyHash();
 })();
 </script>
-<script>window.ASTVersion.mount(document.getElementById('buildStamp'));</script>
+<script>
+window.ASTVersion.mount(document.getElementById('buildStamp'));
+/* One menu on every page, mounted first in the header. */
+window.ASTNav.auto();
+</script>
 </body>
 </html>

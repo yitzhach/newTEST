@@ -23,9 +23,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=b8fe4702">
-<link rel="stylesheet" href="intel.css?v=b8fe4702">
-<link rel="stylesheet" href="calendar.css?v=b8fe4702">
+<link rel="stylesheet" href="app.css?v=1de8e957">
+<link rel="stylesheet" href="intel.css?v=1de8e957">
+<link rel="stylesheet" href="calendar.css?v=1de8e957">
 </head>
 <body>
 <header class="app-header">
@@ -82,17 +82,18 @@
   <p class="build-stamp" id="buildStamp"></p>
 </div>
 
-<script src="core.js?v=b8fe4702"></script>
-<script src="version.js?v=b8fe4702"></script>
-<script src="fit.js?v=b8fe4702"></script>
-<script src="intel.js?v=b8fe4702"></script>
-<script src="members.js?v=b8fe4702"></script>
-<script src="weather.js?v=b8fe4702"></script>
-<script src="salestax.js?v=b8fe4702"></script>
-<script src="intel-ui.js?v=b8fe4702"></script>
-<script src="catalogue.js?v=b8fe4702"></script>
-<script src="calendar.js?v=b8fe4702"></script>
-<script src="store-supabase.js?v=b8fe4702"></script>
+<script src="core.js?v=1de8e957"></script>
+<script src="nav.js?v=1de8e957"></script>
+<script src="version.js?v=1de8e957"></script>
+<script src="fit.js?v=1de8e957"></script>
+<script src="intel.js?v=1de8e957"></script>
+<script src="members.js?v=1de8e957"></script>
+<script src="weather.js?v=1de8e957"></script>
+<script src="salestax.js?v=1de8e957"></script>
+<script src="intel-ui.js?v=1de8e957"></script>
+<script src="catalogue.js?v=1de8e957"></script>
+<script src="calendar.js?v=1de8e957"></script>
+<script src="store-supabase.js?v=1de8e957"></script>
 <script type="module">
 /* ==========================================================================
    CALENDAR — the page
@@ -904,6 +905,7 @@ if (window.ASTSupabase && Settings.getConfig()) {
 await loadFit();
 await loadAll();
 window.ASTVersion.mount(document.getElementById('buildStamp'));
+window.ASTNav.auto();
 </script>
 </body>
 </html>

@@ -490,6 +490,120 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
         /neither is corrected from the other/.test(sp.result),
         sp.result.slice(-260));
 
+  // ---- the phone -----------------------------------------------------------
+  /* The bug this covers: the modals were built without the .modal-card
+     wrapper the stylesheet expects, so .modal's own `pointer-events:none`
+     stayed in force and the dialog could not be typed into AT ALL — with no
+     background and no width, it rendered as a transparent skinny column over
+     the page. It looked like a mobile problem and was not. */
+  console.log('\n-- the editors are usable --');
+  const cards = await p.evaluate(() => {
+    const out = {};
+    for (const id of ['exModal', 'saModal', 'imModal']) {
+      const m = document.getElementById(id);
+      const card = m.querySelector(':scope > .modal-card');
+      out[id] = {
+        hasCard: !!card,
+        events: card ? getComputedStyle(card).pointerEvents : getComputedStyle(m).pointerEvents
+      };
+    }
+    return out;
+  });
+  check('every editor has the card wrapper the stylesheet expects',
+        Object.values(cards).every(c => c.hasCard), JSON.stringify(cards));
+  check('and it accepts pointer input rather than being inert',
+        Object.values(cards).every(c => c.events === 'auto'), JSON.stringify(cards));
+
+  const typed = await p.evaluate(async () => {
+    document.getElementById('saleAdd').click();
+    const el = document.getElementById('saPiece');
+    el.focus();
+    return { open: !document.getElementById('saModal').hidden,
+             focused: document.activeElement === el };
+  });
+  check('the Add sale editor opens and its first field takes focus',
+        typed.open && typed.focused, JSON.stringify(typed));
+
+  await p.setViewportSize({ width: 390, height: 844 });   // a phone, portrait
+  await p.waitForTimeout(200);
+  const phone = await p.evaluate(() => {
+    const card = document.querySelector('#saModal > .modal-card');
+    const r = card.getBoundingClientRect();
+    const input = document.getElementById('saPiece').getBoundingClientRect();
+    const save = document.getElementById('saSave').getBoundingClientRect();
+    return {
+      cardWidth: Math.round(r.width), viewport: window.innerWidth,
+      inputWidth: Math.round(input.width),
+      fontSize: parseFloat(getComputedStyle(document.getElementById('saPiece')).fontSize),
+      saveVisible: save.bottom <= window.innerHeight && save.width > 0,
+      bodyScrollsSideways: document.documentElement.scrollWidth > window.innerWidth + 1
+    };
+  });
+  check('on a phone the editor fills the screen instead of a skinny column',
+        phone.cardWidth === phone.viewport, JSON.stringify(phone));
+  check('and its fields are full width, not a few characters wide',
+        phone.inputWidth > phone.viewport * 0.7, String(phone.inputWidth));
+  /* Under 16px, iOS zooms the page in on focus and never zooms back out. */
+  check('text inputs are 16px so iOS does not zoom the page on focus',
+        phone.fontSize >= 16, String(phone.fontSize));
+  check('Save is reachable without scrolling the dialog off screen',
+        phone.saveVisible === true, JSON.stringify(phone.saveVisible));
+  check('and the page never scrolls sideways',
+        phone.bodyScrollsSideways === false, String(phone.bodyScrollsSideways));
+
+  await p.evaluate(() => document.getElementById('saCancel').click());
+
+  // ---- the page menu -------------------------------------------------------
+  console.log('\n-- the menu --');
+  const nav = await p.evaluate(() => {
+    const btn = document.getElementById('navMenuBtn');
+    const before = document.getElementById('navMenuList').hidden;
+    btn.click();
+    const list = document.getElementById('navMenuList');
+    const items = [...list.querySelectorAll('.nav-item')];
+    return {
+      exists: !!btn,
+      closedFirst: before,
+      opens: !list.hidden,
+      expanded: btn.getAttribute('aria-expanded'),
+      links: items.map(a => a.getAttribute('href')),
+      labels: list.textContent.replace(/\s+/g, ' '),
+      here: items.filter(a => a.getAttribute('aria-current') === 'page')
+                 .map(a => a.getAttribute('href')),
+      firstInHeader: document.querySelector('.header-actions').firstElementChild
+                       .classList.contains('nav-menu')
+    };
+  });
+  check('every page carries the menu button', nav.exists === true);
+  check('it starts closed and opens on a click',
+        nav.closedFirst === true && nav.opens === true && nav.expanded === 'true',
+        JSON.stringify([nav.closedFirst, nav.opens]));
+  check('it reaches the money page, the mock jury and the rest',
+        ['index.html','browse.html','calendar.html','expenses.html','jury.html','map.html']
+          .every(f => nav.links.includes(f)), JSON.stringify(nav.links));
+  check('each entry says what the page is for, not just its name',
+        /Expenses, sales/.test(nav.labels) && /Practice review/.test(nav.labels),
+        nav.labels.slice(0, 160));
+  /* Being told where you already are is the difference between a menu and a
+     list of links. */
+  check('and it marks the page you are already on',
+        nav.here.length === 1 && nav.here[0] === 'expenses.html', JSON.stringify(nav.here));
+  check('the menu is the first control in the header, so a thumb finds it',
+        nav.firstInHeader === true, String(nav.firstInHeader));
+
+  const closes = await p.evaluate(() => {
+    document.body.click();
+    const afterClick = document.getElementById('navMenuList').hidden;
+    document.getElementById('navMenuBtn').click();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    return { afterClick, afterEsc: document.getElementById('navMenuList').hidden };
+  });
+  check('it closes on an outside tap and on Escape',
+        closes.afterClick === true && closes.afterEsc === true, JSON.stringify(closes));
+
+  await p.setViewportSize({ width: 1480, height: 1000 });
+  await p.waitForTimeout(150);
+
   // ---- Pro previews are inert ---------------------------------------------
   console.log('\n-- Pro previews --');
   const pro = await p.evaluate(() => {

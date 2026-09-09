@@ -82,6 +82,12 @@ through the Pages **Actions** source. ~1 minute, then refresh.
 
 ## What exists
 
+**One menu reaches every page.** `nav.js`, mounted first in the header on all
+six pages, so the Money page and the mock jury are one tap from anywhere
+instead of a trip back through the ledger. Each entry says what the page is
+for, and the page you are on is marked. It is plain links — no routing — so
+Cmd-click, middle-click and a screenreader all behave.
+
 **Three pages, and the differences matter.**
 
 - **`tracker/browse.html`** — the catalogue. 237 shows, fit scores, and the
@@ -364,18 +370,19 @@ node build/pipeline-tests.cjs        # 26 — the migration and its backfill, ju
                                      #      application store, the drawer block
 node build/ranker-tests.cjs           # 32 — saved rankings, the weight editor,
                                      #      export, and refusing a bad import
-node build/expense-tests.cjs          # 87 — the expense log, mileage, landed
+node build/expense-tests.cjs          # 102 — the expense log, mileage, landed
                                      #      cost, lodging finds, individual sales,
                                      #      the price-band and region mix, the
                                      #      stated-gross-vs-rows rule, the
-                                     #      Square/Stripe import, Pro previews
+                                     #      Square/Stripe import, Pro previews,
+                                     #      the phone layout, the page menu
 node build/jury-tests.cjs             # 33 — mock jury: the money rule, the
                                      #      missing plumbing, score-is-not-odds
 cd worker && npm test                # 45 — API; manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
 ```
 
-All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 87 / 33 / 45 / 11**.
+All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 102 / 33 / 45 / 11**.
 
 Two things worth knowing about the tests:
 

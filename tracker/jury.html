@@ -29,8 +29,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=b8fe4702">
-<link rel="stylesheet" href="intel.css?v=b8fe4702">
+<link rel="stylesheet" href="app.css?v=1de8e957">
+<link rel="stylesheet" href="intel.css?v=1de8e957">
 </head>
 <body>
 <header class="app-header">
@@ -101,63 +101,66 @@
 
 <div class="overlay" id="jyOverlay" hidden></div>
 <section class="modal" id="jyModal" role="dialog" aria-modal="true" aria-labelledby="jyTitle" hidden>
-  <div class="modal-head">
-    <h2 id="jyTitle">Submission</h2>
-    <button class="btn btn-icon" id="jyClose" type="button" aria-label="Close">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-        <path d="M5 5l10 10M15 5L5 15"/>
-      </svg>
-    </button>
-  </div>
-  <div class="modal-body">
-    <div class="form-row">
-      <label class="label" for="jyShow">Aiming at</label>
-      <select class="control" id="jyShow"></select>
-      <div class="hint">Optional &mdash; a portfolio review before you pick a show is fine.</div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="jyTitle">Submission</h2>
+      <button class="btn btn-icon" id="jyClose" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+          <path d="M5 5l10 10M15 5L5 15"/>
+        </svg>
+      </button>
     </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="label" for="jyShow">Aiming at</label>
+        <select class="control" id="jyShow"></select>
+        <div class="hint">Optional &mdash; a portfolio review before you pick a show is fine.</div>
+      </div>
 
-    <div class="form-row">
-      <span class="label">Images</span>
-      <p class="hint" id="jyStorageNote"></p>
-      <div id="jyImages"></div>
-      <div class="jy-add">
-        <button class="btn-mini" id="jyAddWork" type="button">Add a work</button>
-        <button class="btn-mini" id="jyAddBooth" type="button">Add booth shot</button>
-        <button class="btn-mini" id="jyUpload" type="button" disabled>Upload files</button>
+      <div class="form-row">
+        <span class="label">Images</span>
+        <p class="hint" id="jyStorageNote"></p>
+        <div id="jyImages"></div>
+        <div class="jy-add">
+          <button class="btn-mini" id="jyAddWork" type="button">Add a work</button>
+          <button class="btn-mini" id="jyAddBooth" type="button">Add booth shot</button>
+          <button class="btn-mini" id="jyUpload" type="button" disabled>Upload files</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="label" for="jyAsked">What do you want looked at?</label>
+        <textarea class="control" id="jyAsked"
+          placeholder="e.g. Is the booth reading as too crowded? Are these five hanging together as a body of work?"></textarea>
+      </div>
+
+      <p class="hint" id="jyReady"></p>
+
+      <!-- Only ever filled in by a juror. Read-only to the artist, and absent
+           entirely until a review comes back. -->
+      <div class="form-row" id="jyFeedbackBlock" hidden>
+        <span class="label">What the juror said</span>
+        <div class="jy-feedback" id="jyFeedback"></div>
       </div>
     </div>
-
-    <div class="form-row">
-      <label class="label" for="jyAsked">What do you want looked at?</label>
-      <textarea class="control" id="jyAsked"
-        placeholder="e.g. Is the booth reading as too crowded? Are these five hanging together as a body of work?"></textarea>
+    <div class="modal-foot">
+      <button class="btn btn-primary" id="jySave" type="button">Save draft</button>
+      <button class="btn" id="jySubmit" type="button" disabled>Send to a juror</button>
+      <button class="btn btn-quiet" id="jyCancel" type="button">Cancel</button>
+      <span class="spacer"></span>
+      <button class="btn btn-quiet btn-danger" id="jyDelete" type="button" hidden>Delete</button>
     </div>
-
-    <p class="hint" id="jyReady"></p>
-
-    <!-- Only ever filled in by a juror. Read-only to the artist, and absent
-         entirely until a review comes back. -->
-    <div class="form-row" id="jyFeedbackBlock" hidden>
-      <span class="label">What the juror said</span>
-      <div class="jy-feedback" id="jyFeedback"></div>
-    </div>
-  </div>
-  <div class="modal-foot">
-    <button class="btn btn-primary" id="jySave" type="button">Save draft</button>
-    <button class="btn" id="jySubmit" type="button" disabled>Send to a juror</button>
-    <button class="btn btn-quiet" id="jyCancel" type="button">Cancel</button>
-    <span class="spacer"></span>
-    <button class="btn btn-quiet btn-danger" id="jyDelete" type="button" hidden>Delete</button>
   </div>
 </section>
 
 <p class="exp-foot" id="buildStamp"></p>
 
-<script src="core.js?v=b8fe4702"></script>
-<script src="version.js?v=b8fe4702"></script>
-<script src="jury.js?v=b8fe4702"></script>
-<script src="plan.js?v=b8fe4702"></script>
-<script src="store-supabase.js?v=b8fe4702"></script>
+<script src="core.js?v=1de8e957"></script>
+<script src="nav.js?v=1de8e957"></script>
+<script src="version.js?v=1de8e957"></script>
+<script src="jury.js?v=1de8e957"></script>
+<script src="plan.js?v=1de8e957"></script>
+<script src="store-supabase.js?v=1de8e957"></script>
 <script type="module">
 'use strict';
 /* ==========================================================================
@@ -346,6 +349,10 @@ if (window.ASTSupabase) {
 }
 refresh();
 </script>
-<script>window.ASTVersion.mount(document.getElementById('buildStamp'));</script>
+<script>
+window.ASTVersion.mount(document.getElementById('buildStamp'));
+/* One menu on every page, mounted first in the header. */
+window.ASTNav.auto();
+</script>
 </body>
 </html>

@@ -29,8 +29,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=b8fe4702">
-<link rel="stylesheet" href="intel.css?v=b8fe4702">
+<link rel="stylesheet" href="app.css?v=1de8e957">
+<link rel="stylesheet" href="intel.css?v=1de8e957">
 </head>
 <body>
 <header class="app-header">
@@ -157,221 +157,228 @@
 
 <div class="overlay" id="exOverlay" hidden></div>
 <section class="modal" id="exModal" role="dialog" aria-modal="true" aria-labelledby="exTitle" hidden>
-  <div class="modal-head">
-    <h2 id="exTitle">Add expense</h2>
-    <button class="btn btn-icon" id="exClose" type="button" aria-label="Close">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-        <path d="M5 5l10 10M15 5L5 15"/>
-      </svg>
-    </button>
-  </div>
-  <div class="modal-body">
-    <div class="grid-2">
-      <div class="form-row">
-        <label class="label" for="exCategory">Category</label>
-        <select class="control" id="exCategory"></select>
-      </div>
-      <div class="form-row">
-        <label class="label" for="exDate">Date</label>
-        <input class="control" id="exDate" type="date">
-      </div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="exTitle">Add expense</h2>
+      <button class="btn btn-icon" id="exClose" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+          <path d="M5 5l10 10M15 5L5 15"/>
+        </svg>
+      </button>
     </div>
-
-    <div class="form-row">
-      <label class="label" for="exShow">Show</label>
-      <select class="control" id="exShow"></select>
-      <div class="hint">Optional. A roll of canvas in February belongs to no show.</div>
-    </div>
-
-    <div class="grid-2" id="exAmountRow">
-      <div class="form-row">
-        <label class="label" for="exAmount">Amount ($)</label>
-        <input class="control" id="exAmount" inputmode="decimal" autocomplete="off">
-        <div class="hint">Leave blank if you do not know it yet. Blank stays unknown.</div>
-      </div>
-      <div class="form-row">
-        <label class="label" for="exVendor">Paid to</label>
-        <input class="control" id="exVendor" autocomplete="off" placeholder="Optional">
-      </div>
-    </div>
-
-    <!-- Mileage only. The rate is the artist's: no federal figure ships with
-         the app, because a hardcoded rate goes stale the moment the year turns
-         and this is a number that costs money when it is wrong. -->
-    <div class="grid-2" id="exMileageRow" hidden>
-      <div class="form-row">
-        <label class="label" for="exMiles">Miles</label>
-        <input class="control" id="exMiles" inputmode="decimal" autocomplete="off">
-      </div>
-      <div class="form-row">
-        <label class="label" for="exRate">Your rate per mile ($)</label>
-        <input class="control" id="exRate" inputmode="decimal" autocomplete="off" placeholder="e.g. 0.67">
-        <div class="hint">Yours to set. The app ships no rate, because a stale
-          one costs money. This is bookkeeping, not tax advice.</div>
-      </div>
-    </div>
-
-    <!-- Lodging only. -->
-    <div id="exLodgingRow" hidden>
+    <div class="modal-body">
       <div class="grid-2">
         <div class="form-row">
-          <label class="label" for="exLodgingKind">How you got it</label>
-          <select class="control" id="exLodgingKind"></select>
+          <label class="label" for="exCategory">Category</label>
+          <select class="control" id="exCategory"></select>
         </div>
         <div class="form-row">
-          <label class="label" for="exNights">Nights</label>
-          <input class="control" id="exNights" inputmode="decimal" autocomplete="off">
+          <label class="label" for="exDate">Date</label>
+          <input class="control" id="exDate" type="date">
         </div>
       </div>
-      <div class="grid-2">
-        <div class="form-row">
-          <label class="label" for="exParking">Overnight parking allowed</label>
-          <select class="control" id="exParking">
-            <option value="">Did not check</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <label class="label" for="exRv">Room for a van or RV</label>
-          <select class="control" id="exRv">
-            <option value="">Did not check</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <label class="check"><input type="checkbox" id="exShareable">
-          <span style="font-size:13px;">Share this find with other artists</span></label>
-        <div class="hint">Off unless you turn it on. Sharing has no transport yet,
-          so this only marks the row for when it does. Nothing has been sent.</div>
-      </div>
-    </div>
 
-    <div class="form-row">
-      <label class="label" for="exNotes">Notes</label>
-      <textarea class="control" id="exNotes"></textarea>
+      <div class="form-row">
+        <label class="label" for="exShow">Show</label>
+        <select class="control" id="exShow"></select>
+        <div class="hint">Optional. A roll of canvas in February belongs to no show.</div>
+      </div>
+
+      <div class="grid-2" id="exAmountRow">
+        <div class="form-row">
+          <label class="label" for="exAmount">Amount ($)</label>
+          <input class="control" id="exAmount" inputmode="decimal" autocomplete="off">
+          <div class="hint">Leave blank if you do not know it yet. Blank stays unknown.</div>
+        </div>
+        <div class="form-row">
+          <label class="label" for="exVendor">Paid to</label>
+          <input class="control" id="exVendor" autocomplete="off" placeholder="Optional">
+        </div>
+      </div>
+
+      <!-- Mileage only. The rate is the artist's: no federal figure ships with
+           the app, because a hardcoded rate goes stale the moment the year turns
+           and this is a number that costs money when it is wrong. -->
+      <div class="grid-2" id="exMileageRow" hidden>
+        <div class="form-row">
+          <label class="label" for="exMiles">Miles</label>
+          <input class="control" id="exMiles" inputmode="decimal" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <label class="label" for="exRate">Your rate per mile ($)</label>
+          <input class="control" id="exRate" inputmode="decimal" autocomplete="off" placeholder="e.g. 0.67">
+          <div class="hint">Yours to set. The app ships no rate, because a stale
+            one costs money. This is bookkeeping, not tax advice.</div>
+        </div>
+      </div>
+
+      <!-- Lodging only. -->
+      <div id="exLodgingRow" hidden>
+        <div class="grid-2">
+          <div class="form-row">
+            <label class="label" for="exLodgingKind">How you got it</label>
+            <select class="control" id="exLodgingKind"></select>
+          </div>
+          <div class="form-row">
+            <label class="label" for="exNights">Nights</label>
+            <input class="control" id="exNights" inputmode="decimal" autocomplete="off">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-row">
+            <label class="label" for="exParking">Overnight parking allowed</label>
+            <select class="control" id="exParking">
+              <option value="">Did not check</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="label" for="exRv">Room for a van or RV</label>
+            <select class="control" id="exRv">
+              <option value="">Did not check</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="check"><input type="checkbox" id="exShareable">
+            <span style="font-size:13px;">Share this find with other artists</span></label>
+          <div class="hint">Off unless you turn it on. Sharing has no transport yet,
+            so this only marks the row for when it does. Nothing has been sent.</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="label" for="exNotes">Notes</label>
+        <textarea class="control" id="exNotes"></textarea>
+      </div>
     </div>
-  </div>
-  <div class="modal-foot">
-    <button class="btn btn-primary" id="exSave" type="button">Save</button>
-    <button class="btn btn-quiet" id="exCancel" type="button">Cancel</button>
-    <span class="spacer"></span>
-    <button class="btn btn-quiet btn-danger" id="exDelete" type="button" hidden>Delete</button>
+    <div class="modal-foot">
+      <button class="btn btn-primary" id="exSave" type="button">Save</button>
+      <button class="btn btn-quiet" id="exCancel" type="button">Cancel</button>
+      <span class="spacer"></span>
+      <button class="btn btn-quiet btn-danger" id="exDelete" type="button" hidden>Delete</button>
+    </div>
   </div>
 </section>
 
 <section class="modal" id="saModal" role="dialog" aria-modal="true" aria-labelledby="saTitle" hidden>
-  <div class="modal-head">
-    <h2 id="saTitle">Add sale</h2>
-    <button class="btn btn-icon" id="saClose" type="button" aria-label="Close">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-        <path d="M5 5l10 10M15 5L5 15"/>
-      </svg>
-    </button>
-  </div>
-  <div class="modal-body">
-    <div class="form-row">
-      <label class="label" for="saPiece">Piece</label>
-      <input class="control" id="saPiece" autocomplete="off" placeholder="Title, or how you refer to it">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="saTitle">Add sale</h2>
+      <button class="btn btn-icon" id="saClose" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+          <path d="M5 5l10 10M15 5L5 15"/>
+        </svg>
+      </button>
     </div>
-    <div class="grid-2">
+    <div class="modal-body">
       <div class="form-row">
-        <label class="label" for="saPrice">Price ($)</label>
-        <input class="control" id="saPrice" inputmode="decimal" autocomplete="off">
-        <div class="hint">Leave blank if you do not know it yet. Blank stays unknown &mdash; it never counts as $0.</div>
+        <label class="label" for="saPiece">Piece</label>
+        <input class="control" id="saPiece" autocomplete="off" placeholder="Title, or how you refer to it">
+      </div>
+      <div class="grid-2">
+        <div class="form-row">
+          <label class="label" for="saPrice">Price ($)</label>
+          <input class="control" id="saPrice" inputmode="decimal" autocomplete="off">
+          <div class="hint">Leave blank if you do not know it yet. Blank stays unknown &mdash; it never counts as $0.</div>
+        </div>
+        <div class="form-row">
+          <label class="label" for="saDate">Date</label>
+          <input class="control" id="saDate" type="date">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-row">
+          <label class="label" for="saSize">Size</label>
+          <input class="control" id="saSize" autocomplete="off" placeholder="e.g. 24 x 36 in">
+        </div>
+        <div class="form-row">
+          <label class="label" for="saMedium">Medium</label>
+          <input class="control" id="saMedium" autocomplete="off" placeholder="e.g. oil on panel">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-row">
+          <label class="label" for="saPayment">Payment method</label>
+          <select class="control" id="saPayment"></select>
+        </div>
+        <div class="form-row">
+          <label class="label" for="saQty">How many</label>
+          <input class="control" id="saQty" inputmode="numeric" autocomplete="off" placeholder="1">
+        </div>
       </div>
       <div class="form-row">
-        <label class="label" for="saDate">Date</label>
-        <input class="control" id="saDate" type="date">
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="form-row">
-        <label class="label" for="saSize">Size</label>
-        <input class="control" id="saSize" autocomplete="off" placeholder="e.g. 24 x 36 in">
+        <label class="label" for="saShow">Show</label>
+        <select class="control" id="saShow"></select>
+        <div class="hint">Optional. A studio sale in February belongs to no show,
+          and is still a sale.</div>
       </div>
       <div class="form-row">
-        <label class="label" for="saMedium">Medium</label>
-        <input class="control" id="saMedium" autocomplete="off" placeholder="e.g. oil on panel">
+        <label class="label" for="saNotes">Notes</label>
+        <textarea class="control" id="saNotes"></textarea>
       </div>
+      <p class="hint" id="saOrigin" hidden></p>
     </div>
-    <div class="grid-2">
-      <div class="form-row">
-        <label class="label" for="saPayment">Payment method</label>
-        <select class="control" id="saPayment"></select>
-      </div>
-      <div class="form-row">
-        <label class="label" for="saQty">How many</label>
-        <input class="control" id="saQty" inputmode="numeric" autocomplete="off" placeholder="1">
-      </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" id="saSave" type="button">Save</button>
+      <button class="btn btn-quiet" id="saCancel" type="button">Cancel</button>
+      <span class="spacer"></span>
+      <button class="btn btn-quiet btn-danger" id="saDelete" type="button" hidden>Delete</button>
     </div>
-    <div class="form-row">
-      <label class="label" for="saShow">Show</label>
-      <select class="control" id="saShow"></select>
-      <div class="hint">Optional. A studio sale in February belongs to no show,
-        and is still a sale.</div>
-    </div>
-    <div class="form-row">
-      <label class="label" for="saNotes">Notes</label>
-      <textarea class="control" id="saNotes"></textarea>
-    </div>
-    <p class="hint" id="saOrigin" hidden></p>
-  </div>
-  <div class="modal-foot">
-    <button class="btn btn-primary" id="saSave" type="button">Save</button>
-    <button class="btn btn-quiet" id="saCancel" type="button">Cancel</button>
-    <span class="spacer"></span>
-    <button class="btn btn-quiet btn-danger" id="saDelete" type="button" hidden>Delete</button>
   </div>
 </section>
 
 <section class="modal" id="imModal" role="dialog" aria-modal="true" aria-labelledby="imTitle" hidden>
-  <div class="modal-head">
-    <h2 id="imTitle">Import sales CSV</h2>
-    <button class="btn btn-icon" id="imClose" type="button" aria-label="Close">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-        <path d="M5 5l10 10M15 5L5 15"/>
-      </svg>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p class="hint">A Square or Stripe export, downloaded as CSV. The file is
-      read here on your device and nothing is uploaded. Rows that cannot be read
-      are refused and listed rather than guessed at, refunds are skipped, and a
-      row with no readable amount comes in unpriced instead of as $0.</p>
-    <div class="form-row">
-      <label class="label" for="imShow">Attach these sales to</label>
-      <select class="control" id="imShow"></select>
-      <div class="hint">The export knows a date, not which weekend it was. This
-        is your call, not the file&rsquo;s.</div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2 id="imTitle">Import sales CSV</h2>
+      <button class="btn btn-icon" id="imClose" type="button" aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+          <path d="M5 5l10 10M15 5L5 15"/>
+        </svg>
+      </button>
     </div>
-    <div class="form-row">
-      <label class="label" for="imFile">CSV file</label>
-      <input class="control" id="imFile" type="file" accept=".csv,text/csv">
+    <div class="modal-body">
+      <p class="hint">A Square or Stripe export, downloaded as CSV. The file is
+        read here on your device and nothing is uploaded. Rows that cannot be read
+        are refused and listed rather than guessed at, refunds are skipped, and a
+        row with no readable amount comes in unpriced instead of as $0.</p>
+      <div class="form-row">
+        <label class="label" for="imShow">Attach these sales to</label>
+        <select class="control" id="imShow"></select>
+        <div class="hint">The export knows a date, not which weekend it was. This
+          is your call, not the file&rsquo;s.</div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="imFile">CSV file</label>
+        <input class="control" id="imFile" type="file" accept=".csv,text/csv">
+      </div>
+      <div class="form-row">
+        <label class="label" for="imText">&hellip; or paste it</label>
+        <textarea class="control" id="imText" rows="5" placeholder="Date,Item,Qty,Gross Sales,&hellip;"></textarea>
+      </div>
+      <div id="imReport"></div>
     </div>
-    <div class="form-row">
-      <label class="label" for="imText">&hellip; or paste it</label>
-      <textarea class="control" id="imText" rows="5" placeholder="Date,Item,Qty,Gross Sales,&hellip;"></textarea>
+    <div class="modal-foot">
+      <button class="btn" id="imCheck" type="button">Check the file</button>
+      <button class="btn btn-primary" id="imApply" type="button" disabled>Import</button>
+      <button class="btn btn-quiet" id="imCancel" type="button">Cancel</button>
     </div>
-    <div id="imReport"></div>
-  </div>
-  <div class="modal-foot">
-    <button class="btn" id="imCheck" type="button">Check the file</button>
-    <button class="btn btn-primary" id="imApply" type="button" disabled>Import</button>
-    <button class="btn btn-quiet" id="imCancel" type="button">Cancel</button>
   </div>
 </section>
 
 <p class="exp-foot" id="buildStamp"></p>
 
-<script src="core.js?v=b8fe4702"></script>
-<script src="version.js?v=b8fe4702"></script>
-<script src="expenses.js?v=b8fe4702"></script>
-<script src="sales.js?v=b8fe4702"></script>
-<script src="plan.js?v=b8fe4702"></script>
-<script src="store-supabase.js?v=b8fe4702"></script>
+<script src="core.js?v=1de8e957"></script>
+<script src="nav.js?v=1de8e957"></script>
+<script src="version.js?v=1de8e957"></script>
+<script src="expenses.js?v=1de8e957"></script>
+<script src="sales.js?v=1de8e957"></script>
+<script src="plan.js?v=1de8e957"></script>
+<script src="store-supabase.js?v=1de8e957"></script>
 <script type="module">
 'use strict';
 /* ==========================================================================
@@ -976,6 +983,10 @@ if (window.ASTSupabase) {
 }
 refresh();
 </script>
-<script>window.ASTVersion.mount(document.getElementById('buildStamp'));</script>
+<script>
+window.ASTVersion.mount(document.getElementById('buildStamp'));
+/* One menu on every page, mounted first in the header. */
+window.ASTNav.auto();
+</script>
 </body>
 </html>
