@@ -427,6 +427,15 @@ one function call away and deliberately not wired, because a scorer that quietly
 started using the artist's own history would be a second set of honesty rules to
 keep in step with the first.
 
+**Parked, and asked for explicitly: the Dinero handoff (idea 28)** — the tracker
+linking to, and eventually feeding, the separate accounting app at
+`dinero-art.bobdylan2000.workers.dev`. `docs/build-phases.md` §9 is the note.
+Nothing about that app has been inspected — this sandbox has no web egress —
+so step one is to open it and write down what is actually there before any
+code is written against it. The link itself is a ten-minute job; the sync is
+the first time data would ever leave the device, which is the line the whole
+project is built on.
+
 **Parked, and asked for explicitly: "Ask about this show" (idea 27)** — an AI
 chat in the drawer answering questions about the show in front of you. Not
 built, deliberately. `docs/build-phases.md` §8 is the whole note; the short

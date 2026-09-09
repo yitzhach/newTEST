@@ -46,6 +46,7 @@ These numbers are referenced across sessions. Do not renumber them; append.
 | 21 | Image sets per application | Five images + booth shot, specs differ per show |
 | 22 | 90-second post-show debrief | Feeds intel; artist gets their own P&L back |
 | 27 | Ask about this show — AI answers grounded in the show record | See §8. Not built |
+| 28 | Dinero handoff — the tracker feeds a real accounting app | See §9. Not built |
 
 ### C. Network-only — the moat, worthless below ~20 members
 
@@ -519,3 +520,90 @@ would notice: a show changes its image requirement and the stored answer keeps
 confidently giving last year's. Answering from the live record has none of
 those problems. Revisit it when there are members and the answers start coming
 from artists rather than from the prospectus.
+
+---
+
+## 9. The Dinero handoff — the tracker feeds a real accounting app. NOT BUILT.
+
+**The app:** https://dinero-art.bobdylan2000.workers.dev/ — a separate
+Cloudflare Worker, owned by the same person, and **not in this repo**.
+
+Asked for as two things, and they are two very different sizes of job:
+
+1. **Go there to do the actual accounting.** The Money page covers a season:
+   what a show cost, what it took, whether it paid for itself. Real
+   bookkeeping — a chart of accounts, a tax year, invoices, reconciliation —
+   is a different application, and the tracker should hand off to it rather
+   than grow into it.
+2. **Eventually, what is entered here builds up over there automatically**, as
+   an upgrade for clients doing more than the basic tier.
+
+### What is known, and what is not
+
+Nothing about the Dinero app has been inspected from this repo — the sandbox
+has no web egress, so its pages, its data model and whether it has an API at
+all are **unverified**. Do not write code against an assumed shape. The first
+job in any session picking this up is to open it and write down what is
+actually there.
+
+Open, and blocking the interesting half:
+
+- Does it have an HTTP API, or only a UI? If only a UI, the handoff is an
+  export file the artist uploads, not a sync.
+- Does it have accounts? Sync needs a way to say *whose* books these are, and
+  the tracker has no accounts at all today.
+- What are its records called? Ours are `expenses` and `sales` with a
+  `showId`. A show is not an accounting concept, and something has to decide
+  whether a show becomes a class, a job, a project or a tag.
+
+### Stage 1 — the link. Small, and worth doing first.
+
+Add it to `nav.js`'s `PAGES` array with a note saying what it is, and to the
+Money page. That is the whole change: one array entry plus a link. It is an
+**external site**, so it must look like one — `rel="noopener"` and say where it
+goes, because a menu that silently leaves the app is a menu that lost you.
+
+No data moves in Stage 1, and the menu must not imply any does.
+
+### Stage 2 — the export handoff. The honest middle step.
+
+The Money page already exports expenses and sales as CSV. If Dinero can import
+a CSV, most of the value lands with no integration at all: the artist exports,
+uploads, done. Worth checking before building anything, because a working
+manual handoff beats a broken automatic one.
+
+### Stage 3 — the sync. The upgrade, and where the care goes.
+
+This is the first time data in this app would leave the device, and that
+crosses the line the whole project is built on: **local-first, private by
+default, nothing sent unless deliberately exported.** So:
+
+- **Opt-in, explicit, per-artist.** Not a setting that defaults on. The tracker
+  has never sent a row anywhere; the first time it does, the artist must have
+  said so in words.
+- **One direction to start: tracker → Dinero.** Two-way sync means conflict
+  resolution over financial records, and last-write-wins is already ruled out
+  for money in §7. Push only, until there is a reason not to.
+- **Every row keeps its origin.** A row that arrived from the tracker says so,
+  the way an imported sale already says it came from Square. Re-pushing must
+  update the row it already made, not add a second one — the same
+  `externalId` discipline `sales.js` already uses for Square and Stripe.
+- **Nothing is derived on the way over.** Send what the artist entered. Net,
+  break-even and expected value are model output wearing a currency sign, and
+  they must not land in a ledger as if they were transactions.
+- **A failed push says so.** No silent queue that looks like it worked. Same
+  rule as the calendar's reminders: nothing claims to have been sent.
+- **Credentials cannot ship in `tracker/`.** Classic scripts the browser hands
+  over as plain text. Anything holding a key runs in a Worker.
+
+### The tier question
+
+"An upgrade for clients who do more than the basic tier" — **there is still no
+billing in this project.** No accounts, no entitlement check, no payment. So
+Stage 3 lands first as a disabled `plan.js` card, no price, no plan name, no
+sign-up, like the other five. `accountant_export` is already in that list and
+is arguably this feature's placeholder — decide whether it becomes this or
+stays separate.
+
+Stages 1 and 2 are **not** paid features and should not be gated. A link is a
+link.
