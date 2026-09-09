@@ -24,6 +24,9 @@ numbers cost real money, so unknowns stay unknown.
   applications or fees. An imported one stays marked imported.
 - Expenses: an uncosted row is null, never $0, and a total says how many rows
   it could see. No mileage rate ships with the app — the artist sets it.
+- Gross sales are one field on the show, null = not recorded, never $0. A net
+  over a partial expense total is provisional, and a show with no gross drops
+  out of the season net instead of counting as zero.
 - Never say anything is deductible. Categorising a row is bookkeeping.
 - A Pro feature is always disabled and never shows a price, plan or sign-up.
   There is no billing in this project.

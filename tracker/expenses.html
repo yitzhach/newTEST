@@ -29,8 +29,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=bcf93cce">
-<link rel="stylesheet" href="intel.css?v=bcf93cce">
+<link rel="stylesheet" href="app.css?v=9402d235">
+<link rel="stylesheet" href="intel.css?v=9402d235">
 </head>
 <body>
 <header class="app-header">
@@ -106,6 +106,13 @@
     <section class="panel">
       <div class="panel-head"><h2>Break-even</h2></div>
       <div id="expBreakEven"></div>
+    </section>
+
+    <!-- §7 Stage 1. Gross sales are entered on the show itself, in the
+         ledger's edit pane; this panel only reports what they add up to. -->
+    <section class="panel">
+      <div class="panel-head"><h2>Did it pay for itself?</h2></div>
+      <div id="expResult"></div>
     </section>
 
     <section class="panel">
@@ -225,11 +232,11 @@
 
 <p class="exp-foot" id="buildStamp"></p>
 
-<script src="core.js?v=bcf93cce"></script>
-<script src="version.js?v=bcf93cce"></script>
-<script src="expenses.js?v=bcf93cce"></script>
-<script src="plan.js?v=bcf93cce"></script>
-<script src="store-supabase.js?v=bcf93cce"></script>
+<script src="core.js?v=9402d235"></script>
+<script src="version.js?v=9402d235"></script>
+<script src="expenses.js?v=9402d235"></script>
+<script src="plan.js?v=9402d235"></script>
+<script src="store-supabase.js?v=9402d235"></script>
 <script type="module">
 'use strict';
 /* ==========================================================================
@@ -368,6 +375,56 @@ function renderBreakEven() {
     '</p>';
 }
 
+function renderResult() {
+  const el = $('#expResult');
+  const show = state.shows.find(x => x.id === state.showId);
+
+  /* No show picked: answer for the season instead, and be plain about how
+     many shows could be answered at all. */
+  if (!show) {
+    const season = X.seasonResult(state.rows, state.shows);
+    if (!season.known) {
+      el.innerHTML = '<p class="hint">No show has a gross sales figure yet. ' +
+        'Add one on the show itself in the ledger, and the answer appears here.</p>';
+      return;
+    }
+    el.innerHTML = '<div class="stat"><div class="n">' + esc(money(season.net)) +
+      '</div><div class="k">net across ' + season.known + ' of ' + season.total + ' shows</div></div>' +
+      '<p class="hint">' +
+        (season.complete
+          ? 'Every show has a gross figure and every expense row carries an amount.'
+          : 'Shows with no gross sales figure are left out entirely \u2014 they are ' +
+            'not counted as zero.') +
+        (season.provisional
+          ? ' ' + season.provisional + ' of them still have uncosted expense rows, ' +
+            'so the real net is lower than this.' : '') +
+      '</p>';
+    return;
+  }
+
+  const r = X.showResult(state.rows, show.id, { grossSales: show.grossSales });
+  if (r.net == null) {
+    el.innerHTML = '<p class="hint">Needs ' + esc(r.missing.join(' and ')) + '. ' +
+      (r.gross == null
+        ? 'Gross sales are entered on the show in the ledger; blank stays blank rather than counting as nothing sold.'
+        : 'Cost at least one expense row for this show.') + '</p>';
+    return;
+  }
+
+  el.innerHTML = '<div class="stat"><div class="n">' +
+      (r.net < 0 ? '\u2212' : '') + esc(money(Math.abs(r.net))) +
+    '</div><div class="k">' + (r.net < 0 ? 'short of covering it' : 'left after costs') + '</div></div>' +
+    '<p class="hint">' +
+      esc(money(r.gross)) + ' taken, ' + esc(money(r.spent.amount)) + ' spent' +
+      (r.spent.complete ? '' : ' across the ' + r.spent.known + ' of ' + r.spent.total +
+        ' rows that carry a figure, so this is a best case and the real number is lower') + '. ' +
+      (r.commissionKnown
+        ? 'The show\u2019s commission has been taken off.'
+        : 'Before any commission the show takes \u2014 none is recorded, and ' +
+          '\u201cnot mentioned\u201d is not the same as zero.') +
+    '</p>';
+}
+
 function renderLodging() {
   const finds = X.lodgingFinds(state.rows);
   $('#expLodging').innerHTML = finds.length
@@ -389,7 +446,7 @@ function renderLodging() {
 
 function render() {
   fillFilters(); renderList(); renderStats(); renderCats();
-  renderBreakEven(); renderLodging();
+  renderBreakEven(); renderResult(); renderLodging();
 }
 
 /* ---- the editor --------------------------------------------------------- */

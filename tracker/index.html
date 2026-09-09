@@ -31,11 +31,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
       referrerpolicy="no-referrer">
-<link rel="stylesheet" href="app.css?v=bcf93cce">
+<link rel="stylesheet" href="app.css?v=9402d235">
 <!-- The ledger shows the same fit/intel drawer the catalogue does, so it needs
      the same styles. Scoped to .idr/.fitchip/.prov and its own tokens; it adds
      to app.css rather than competing with it. -->
-<link rel="stylesheet" href="intel.css?v=bcf93cce">
+<link rel="stylesheet" href="intel.css?v=9402d235">
 </head>
 <body>
 <!-- ==========================================================================
@@ -267,6 +267,18 @@
         <div class="hint" id="h_boothFee" hidden></div>
         <div class="err" id="e_boothFee" hidden></div>
       </div>
+    </div>
+
+    <!-- What the weekend actually took (build-phases.md §7 Stage 1). Blank is
+         "not recorded" and stays blank: a show that took nothing and a show
+         nobody has added up are different weekends. -->
+    <div class="form-row">
+      <label class="label" for="f_grossSales">Gross sales ($)</label>
+      <input class="control" id="f_grossSales" name="grossSales" inputmode="decimal" autocomplete="off">
+      <div class="hint">After the show, what it took &mdash; before any commission
+        the show charges. Blank means not recorded, never zero. The Money page
+        uses it to work out whether the weekend paid for itself.</div>
+      <div class="err" id="e_grossSales" hidden></div>
     </div>
 
     <!-- The application pipeline (idea 11). This is deliberately a separate
@@ -681,25 +693,25 @@
      sandbox and an unverified hash would break the map outright. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"
         referrerpolicy="no-referrer"></script>
-<script src="core.js?v=bcf93cce"></script>
-<script src="version.js?v=bcf93cce"></script>
-<script src="map.js?v=bcf93cce"></script>
+<script src="core.js?v=9402d235"></script>
+<script src="version.js?v=9402d235"></script>
+<script src="map.js?v=9402d235"></script>
 <!-- The fit/intel layer, so a show in the ledger opens the same breakdown
      it does in the catalogue. weather.js and salestax.js are optional to
      intel-ui.js, but without them the drawer silently loses two panels,
      which is worse than carrying two small files. -->
-<script src="fit.js?v=bcf93cce"></script>
-<script src="pipeline.js?v=bcf93cce"></script>
-<script src="intel.js?v=bcf93cce"></script>
-<script src="members.js?v=bcf93cce"></script>
-<script src="weather.js?v=bcf93cce"></script>
-<script src="salestax.js?v=bcf93cce"></script>
-<script src="intel-ui.js?v=bcf93cce"></script>
-<script src="store-supabase.js?v=bcf93cce"></script>
-<script src="import.js?v=bcf93cce"></script>
-<script src="import-ui.js?v=bcf93cce"></script>
-<script src="share.js?v=bcf93cce"></script>
-<script src="share-ui.js?v=bcf93cce"></script>
+<script src="fit.js?v=9402d235"></script>
+<script src="pipeline.js?v=9402d235"></script>
+<script src="intel.js?v=9402d235"></script>
+<script src="members.js?v=9402d235"></script>
+<script src="weather.js?v=9402d235"></script>
+<script src="salestax.js?v=9402d235"></script>
+<script src="intel-ui.js?v=9402d235"></script>
+<script src="store-supabase.js?v=9402d235"></script>
+<script src="import.js?v=9402d235"></script>
+<script src="import-ui.js?v=9402d235"></script>
+<script src="share.js?v=9402d235"></script>
+<script src="share-ui.js?v=9402d235"></script>
 <script type="module">
 /* ==========================================================================
    1-5. SHARED CORE
@@ -989,7 +1001,7 @@ function hideToast() { clearTimeout(toastTimer); $('#toast').hidden = true; }
    9. DRAWER — add / edit
    ========================================================================== */
 const FIELDS = ['name','city','state','startDate','endDate','applyBy','status','routeNumber',
-                'juryFee','boothFee','lat','lng','url','notes'];
+                'juryFee','boothFee','grossSales','lat','lng','url','notes'];
 let draftRating = 0;
 let notesTimer = null;
 let lastFocus = null;
@@ -1096,6 +1108,7 @@ function openDrawer(show) {
     boothHint.textContent = known === null ? ''
       : 'Filled in from the catalogue. Change it to whatever you were actually quoted.';
   }
+  $('#f_grossSales').value = s.grossSales === null ? '' : s.grossSales;
   $('#f_lat').value = s.lat === null ? '' : s.lat;
   $('#f_lng').value = s.lng === null ? '' : s.lng;
   $('#f_url').value = s.url;
@@ -1155,12 +1168,15 @@ function collect() {
     showError('applyBy', 'Apply-by falls after the show starts.'); ok = false;
   }
 
-  const nums = { juryFee: v('juryFee'), boothFee: v('boothFee'), lat: v('lat'), lng: v('lng') };
+  const nums = { juryFee: v('juryFee'), boothFee: v('boothFee'),
+                 grossSales: v('grossSales'), lat: v('lat'), lng: v('lng') };
   for (const [k, raw] of Object.entries(nums)) {
     if (raw === '') continue;
     const n = Number(raw);
     if (!Number.isFinite(n)) { showError(k, 'Numbers only.'); ok = false; continue; }
-    if ((k === 'juryFee' || k === 'boothFee') && n < 0) { showError(k, 'Cannot be negative.'); ok = false; }
+    if ((k === 'juryFee' || k === 'boothFee' || k === 'grossSales') && n < 0) {
+      showError(k, 'Cannot be negative.'); ok = false;
+    }
     if (k === 'lat' && Math.abs(n) > 90) { showError('lat', 'Latitude runs −90 to 90.'); ok = false; }
     if (k === 'lng' && Math.abs(n) > 180) { showError('lng', 'Longitude runs −180 to 180.'); ok = false; }
   }
@@ -1178,6 +1194,7 @@ function collect() {
     status: $('#f_status').value,
     rating: draftRating,
     juryFee: nums.juryFee, boothFee: nums.boothFee,
+    grossSales: nums.grossSales,
     routeNumber: v('routeNumber'),
     isAlternate: $('#f_isAlternate').checked,
     notes: $('#f_notes').value,

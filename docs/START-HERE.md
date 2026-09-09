@@ -187,6 +187,27 @@ commission. Fourth use of the child-record pattern, so the shape is now settled.
   *expects* to pay; an expense row is money that *left*. Converting one to the
   other would invent a payment.
 
+**The post-show number — gross sales.** §7 Stage 1. One field on the show
+itself, in the ledger's edit pane: what the weekend actually took, before any
+commission. The Money page turns it into "did it pay for itself" — per show and
+across the season.
+
+- **Blank is "not recorded", never $0.** A show that took nothing and a show
+  nobody has added up are different weekends, and a zero would turn every
+  unrecorded show into a loss. Nothing is backfilled by the v8 → v9 migration.
+- **A net over a partial expense total is provisional and says so.** Uncosted
+  rows can only push the real figure down, so it is a ceiling, not a result;
+  `cleared` stays null until every row carries an amount.
+- **A show with no gross drops out of the season net** rather than being added
+  in as zero, exactly like an unscored factor dropping out of the average.
+- **It is local-only.** The Supabase `shows` table has no `gross_sales`
+  column, and sending one would break every upsert — costing somebody their
+  sync to gain a field. `store-supabase.js` says where to add it if the column
+  is ever created.
+- **Commission still follows the catalogue rule.** No commission recorded means
+  none is subtracted and the page says the figure is *before* whatever the show
+  takes.
+
 **Lodging finds.** Where an artist parked or stayed free or cheap, recorded on
 the lodging expense row itself so nobody types the place twice. Free /
 discounted / paid, nights, and two tri-state flags — overnight parking and
@@ -308,7 +329,7 @@ cd worker && npm test                # 45 — API; manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
 ```
 
-All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 30 / 33 / 45 / 11**.
+All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 43 / 33 / 45 / 11**.
 
 Two things worth knowing about the tests:
 
@@ -345,6 +366,11 @@ grade of it).
 ---
 
 ## What is next
+
+**§7 Stage 1 is shipped**, so trending is unblocked: break-even (13) now has a
+figure to compare against, and landed cost (8) has a top line. Stage 3
+(individual sales) is the next one that matters — it is where the artist's own
+numbers start improving the recommendations.
 
 **Phase 3 shipped its first three ideas** — the application pipeline (11), the
 jury fee spend tracker (12) and expected value on applying (14). Image sets (21)

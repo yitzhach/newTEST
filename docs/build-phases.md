@@ -349,11 +349,19 @@ export and an audit.
 
 ### Staging — each stage is useful on its own
 
+> **Stage 1 shipped.** Gross sales are a scalar on the show record
+> (`grossSales`, null = not recorded), which answers the open question below:
+> one figure per show per season already has a scalar's shape, and sales one at
+> a time are Stage 3's child records, not this. When Stage 3 lands, this field
+> stays the artist's stated total and the rows are the detail; if the two
+> disagree the page must say which it is showing rather than picking one.
+> It is local-only — see `store-supabase.js` for why.
+>
 > **Stage 2 shipped** (`tracker/expenses.html`). The sync question below was
 > answered by the pipeline, not here: child records, local-only, same envelope.
 > Stage 1's gross-sales field is still open and is what trending waits on.
 
-**Stage 1 — the post-show number.** One field per show: gross sales. Delivers
+**Stage 1 — the post-show number. SHIPPED.** One field per show: gross sales. Delivers
 landed cost (8) and break-even (13) immediately, since booth and jury fees are
 already in the model. No new record types, no migration risk. The smallest thing
 that answers "did that show pay for itself".
@@ -395,5 +403,5 @@ loop is what earns a weekly open, and it becomes idea 24 once there are members.
 - Does the expense log need multi-year scoping, or is one season enough?
 - If the Worker is deployed, do contacts sync or stay device-only? Other people's
   contact details raise a higher bar than show notes.
-- Does Stage 1's gross-sales field belong on the show record or wait for Stage 3
-  so there is only ever one place a sales figure lives?
+- ~~Does Stage 1's gross-sales field belong on the show record or wait for
+  Stage 3?~~ Answered: on the show record. See the Stage 1 note above.
