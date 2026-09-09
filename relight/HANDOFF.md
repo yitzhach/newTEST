@@ -53,7 +53,7 @@ Paste this, unchanged, as the first message:
 > you'd do next, or I'll tell you what I want changed.
 
 If instead you are picking this up to **shoot the six-exposure capture**, the
-prompt is the same but start at §9 item 5, and read §5 and §6 first.
+prompt is the same but start at §9 item 6, and read §5 and §6 first.
 
 ### Files to bring
 
@@ -295,7 +295,7 @@ Three things worth not re-deriving:
   moved between exposures — a circle on paint returns six directions within 4.2° of
   each other), and the fit residual before against after (0.16% → 6.35%).
 
-### Four capture rules enforced in code
+### Five capture rules, four of them enforced in code
 
 1. **Ambient must be fitted, and that needs varied light elevation.** Ambient biases
    recovered tilt to 9.7° against a true 12.2°. Fitting it as a fourth unknown fixes
@@ -353,6 +353,29 @@ Three things worth not re-deriving:
    fault and is graded — highlight spread 5° → 0.39°, 10° → 1.55°, 15° → 3.44°,
    20° → 6.02°, 30° → 13.04° — so satin steel is usable only if it is still a true
    sphere. Reproduce with the reflector bench in `README.md`, "Capture protocol".
+5. **The lamp must be far away, and this dominates everything else in the capture.**
+   The solve assumes a distant light — one direction and one brightness per
+   exposure. Measured on a 600mm piece with the 30/60 rig:
+
+   | lamp distance | ÷ piece width | angular error | normals nx | fit residual |
+   |---|---|---|---|---|
+   | 750mm | 1.3× | 34.97° | 0.378 | 8.03% |
+   | 1500mm | 2.5× | **14.95°** | 0.713 | 3.91% |
+   | 3000mm | 5× | 7.17° | 0.901 | 2.03% |
+   | 10m | 16.7× | 2.16° | 0.990 | 0.71% |
+   | infinite | — | 0.32° | 0.9995 | 0.29% |
+
+   A chrome ball 10% off spherical costs 4.75°; a lamp at 1.5m costs **15°**. The
+   reflector argument that precedes this rule is second-order beside it.
+
+   Two faults, and the intuitive one is the smaller: rerun with inverse-square
+   falloff disabled and 1500mm reads 4.77°, so **the brightness gradient across the
+   piece costs about 3× more than the direction spread**. Both scale as
+   (piece width / lamp distance); aim for **≥ 10×**.
+
+   Unlike the reflector fault, the Fit view *does* see this (0.29% → 3.91%), so it
+   is detectable after the shoot. And both errors are exactly computable from the
+   lamp's 3-D **position** — which a tape measure gives and a sphere never can.
 
 ### The Fit view
 
@@ -659,14 +682,22 @@ because they need a lamp and a room, not because they matter less.
    but note what it must NOT become: a score. §7 item 7 is the condition number,
    which is already computed, looks exactly like a grade, and correlates with
    recovery at r = -0.06.
-3. **A preset / save-load system for light rigs.** Listed in §10 as a known
+3. **Near-lamp correction, from a recorded lamp position.** §5 rule 5 measures a
+   15° error for a lamp at 2.5× the piece width, three quarters of it inverse-square
+   falloff rather than direction spread. Both are exactly computable given the
+   lamp's position in mm, and neither is recoverable from a direction alone — so
+   this is a `capture.json` change (record position, not just azimuth/elevation)
+   plus a per-pixel term in the solve. It would relax the ≥10× room requirement,
+   which is the harshest line in the protocol. Measure it on the bench first: the
+   experiment is already written, in the capture-prep session's notes.
+4. **A preset / save-load system for light rigs.** Listed in §10 as a known
    absence. Nothing measured blocks it; it is straightforwardly missing.
-4. **The Fit view is the most important control in the app and the least
+5. **The Fit view is the most important control in the app and the least
    discoverable.** It is one tab among six, and §5 is the argument that it is the
    only diagnostic a real capture has. Worth considering whether a bad fit should
    announce itself rather than waiting to be visited. Careful: "announce" must mean
    reporting the residual, never grading the photograph — §7.
-5. **A six-exposure photometric capture of a real piece.** §7 established over six
+6. **A six-exposure photometric capture of a real piece.** §7 established over six
    independent attempts that nothing computed from a single photograph can say
    whether recovery worked. A capture is the only instrument that can, and it also
    yields six (photograph → known normals) pairs on real material — the first
@@ -681,26 +712,26 @@ because they need a lamp and a room, not because they matter less.
    **After the shoot, before the set comes down**, `tools/score-real.mjs --preflight`
    reads the actual frames and catches what a plan cannot: reframing, an undersized
    or clipped sphere, a circle that is not on the sphere.
-6. **Retune single-image defaults against that capture.** `--sweep` is the tool. It
+7. **Retune single-image defaults against that capture.** `--sweep` is the tool. It
    returns 3px on the bench — the shipped default, and the bench's own weave period —
    which is the check that it measures what it claims. §3.3 says real material is
    broadband and no single default fits, so expect a control that shows which band is
    being read rather than a better constant.
-7. **Fit the sphere's circle against the photometric residual.** The one hand-set
+8. **Fit the sphere's circle against the photometric residual.** The one hand-set
    number that still costs real accuracy. Three parameters, an objective the tool
    already computes, ground truth in the bench. Note the residual is blind to a
    *uniform* rotation of the rig, so this refines a circle but never replaces the
    sphere.
-8. **Keep every capture as a labelled bundle** (`README.md`, "Capture bundles").
+9. **Keep every capture as a labelled bundle** (`README.md`, "Capture bundles").
    Cheap now, impossible to reconstruct once the paint has been rephotographed. If
    the no-model decision is ever revisited, a solved bundle is exactly the training
    pair a single-image estimator needs — at r ≈ 0.9995 per pair, with §5 and §6 being
    what make the labels trustworthy rather than silently rotated.
-9. **A resample-free correction path for registration.** The estimate is essentially
+10. **A resample-free correction path for registration.** The estimate is essentially
    exact and the remaining loss is interpolation. Fold each frame's sub-pixel offset
    into the solve shader's UV rather than pre-shifting pixels. Measure first — a GPU
    sampler gives bilinear, the worst kernel measured.
-10. **Register rotation as well as translation.** Only if a real capture needs it.
+11. **Register rotation as well as translation.** Only if a real capture needs it.
 
 ### Open question worth stating plainly
 
@@ -739,6 +770,14 @@ in its box, and §9 items 1-4 are all real work that does not need it.
   `#psSpread` 15 builds the 37.5/52.5 rig, and the spread slider stops at 25 so the
   recommended 30/60 cannot be reached. Harness and docs are correct; the interface is
   not. §9 item 1.
+- **A near lamp is the largest uncorrected error in a capture.** The solve assumes
+  a distant light; at 2.5× the piece width that costs 15° of normal error, three
+  quarters of it inverse-square falloff. Mitigated only by moving the lamp back
+  (≥10× the piece width) — no code corrects it yet. §5 rule 5, §9 item 3.
+- **Light directions can only be measured off a sphere or typed in.** A tape-measured
+  lamp position is more accurate than any sphere available here (0.29-0.72° against
+  1.28°) and is the only route to correcting a near lamp, but nothing reads it: it
+  has to be converted to azimuth/elevation by hand. §9 item 3.
 - No preset system, no save/load of light rigs, no undo.
 - **`smoke.mjs` needs playwright installed by hand** — it is not a dependency and the
   repo has no lockfile for it. §8.2 has the working invocation, including the

@@ -484,6 +484,26 @@ is over — it is the check to run *before the set comes down*, not before it go
    what nothing else here can see — finding 7. Accuracy scales with its radius in
    pixels; aim for 300px or more. Take the reading before cropping it out.
 
+   **A mirror ball is not the only way, and may not be the best one.** What §5
+   actually needs is each light direction measured against the room. Measured
+   against the same bench:
+
+   | method | error | needs |
+   |---|---|---|
+   | tape-measure the lamp position, ±10mm at 1.5m | **0.29°** | a tape measure |
+   | tape-measure the lamp position, ±25mm at 1.5m | **0.72°** | a tape measure |
+   | gnomon: 100mm rod, shadow tip to 3px | **0.15-0.20°** | a rod, and new code |
+   | perfect chrome ball, r = 300px | 1.28° | an 89mm true sphere |
+   | perfect chrome ball, r = 150px | 2.57° | a 45mm true sphere |
+   | chrome object 10% off spherical | 4.75° | undetectable, see above |
+
+   Tape-measuring the lamp beats every sphere option available here, needs nothing
+   bought, and — decisively — yields the lamp's **position**, which is what rule 6's
+   two corrections require. A sphere returns a direction and can never supply them.
+   The tool currently reads directions off a sphere or takes typed angles; typed
+   angles that were *physically measured* are not the failure mode §5 warns about,
+   which is a remembered or template rig. Say so in `capture.json` "notes".
+
    Sizing is a proportion, not a lens calculation: if the sphere sits in the plane
    of the piece and the piece fills the frame, `radius_px / image_width_px =
    (diameter_mm / 2) / frame_width_mm`. A 600mm piece at 4032px needs an **89mm
@@ -519,11 +539,41 @@ is over — it is the check to run *before the set comes down*, not before it go
    where a lamp 1.5m out subtends a direction 3.6–6.2° different from the one at the
    piece. That error goes straight into every solved normal, and it is larger than
    the placement error it was meant to fix. Get a bigger ball, keep it in the plane.
-6. Fixed exposure, white balance, and focus. Shoot raw or at least uncompressed;
+6. **Put the lamp far away — this is the largest error in the whole capture, and
+   it is not about the sphere.** The solve assumes a *distant* light: one direction
+   per exposure, one brightness. A lamp close to the piece breaks both. Measured on
+   a 600mm piece with the 30/60 rig, solved the way the tool solves it:
+
+   | lamp distance | distance / piece width | angular error | normals nx | fit residual |
+   |---|---|---|---|---|
+   | 750mm | 1.3× | 34.97° | 0.378 | 8.03% |
+   | 1500mm | 2.5× | 14.95° | 0.713 | 3.91% |
+   | 3000mm | 5× | 7.17° | 0.901 | 2.03% |
+   | 10m | 16.7× | 2.16° | 0.990 | 0.71% |
+   | infinite | — | 0.32° | 0.9995 | 0.29% |
+
+   For scale: a chrome ball 10% off spherical costs 4.75°. A lamp at 1.5m from a
+   600mm piece costs **15°**. Reflector choice is a second-order worry next to this.
+
+   Two separate faults, and the smaller one is the obvious one. Repeating the
+   measurement with inverse-square falloff switched off isolates them: at 1500mm the
+   direction-varies-across-the-piece error is 4.77°, so **the brightness gradient
+   costs about three times more than the direction spread**. Both scale as
+   (piece width / lamp distance).
+
+   **Aim for lamp distance ≥ 10× the piece width**, and if the room will not allow
+   it, photograph a smaller piece or a smaller region of one. The good news, unlike
+   the reflector fault above: the Fit view *does* see this — 0.29% at infinity
+   against 3.91% at 1500mm — so it is a fault you can detect after the fact.
+
+   It is also the reason to **record the lamp's 3-D position, not only its
+   direction** (see below). Both errors are exactly computable from the position and
+   neither is recoverable from a direction alone.
+7. Fixed exposure, white balance, and focus. Shoot raw or at least uncompressed;
    the solve is linear and JPEG at fine detail is not. HEIC cannot be decoded here
    — set the phone to Settings → Camera → Formats → **Most Compatible**, or convert
    with `sips -s format png in.HEIC --out out.png`.
-7. Kill the room light if you can. What you cannot kill, fit — see rule 3.
+8. Kill the room light if you can. What you cannot kill, fit — see rule 3.
 
 Reproduce every number above with `node relight/tools/validate.mjs` (the
 "Rig geometry" section).
