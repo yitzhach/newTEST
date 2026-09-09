@@ -132,17 +132,41 @@ var ASTExpenses = (function () {
    *  - "Not mentioned" is not zero. A null commission means no cut is
    *    subtracted and `commissionKnown` is false, so the caller says the
    *    figure is before whatever the show takes rather than implying nothing.
+   *
+   * §7 Stage 3 adds a fourth. There are now TWO records of what a weekend
+   * took: the stated `grossSales` field and the individual sale rows. They
+   * are collected at different moments and they will disagree. This does not
+   * reconcile them and never rewrites one from the other — it returns both,
+   * plus `grossSource` naming which one the net was built on, so the page can
+   * say which figure is on screen instead of quietly picking one.
    */
   function showResult(rows, showId, opts) {
     opts = opts || {};
     var spent = landedCost(rows, showId);
-    var gross = num(opts.grossSales);
+    var stated = num(opts.grossSales);
+    /* §7 Stage 3. The caller passes the show's sale rows already added up —
+       the object `ASTSales.sum` returns — rather than the rows themselves, so
+       there is exactly one piece of code in the app that decides what a sale
+       row is worth. Two would drift, and drift here is a wrong total. */
+    var salesSummary = opts.salesSummary || null;
+    var fromRows = salesSummary ? num(salesSummary.amount) : null;
+
+    /* Which figure a net is built on, named rather than silently chosen. The
+       stated total is the artist's assertion about the whole weekend and the
+       rows are explicitly allowed to be incomplete, so the stated figure is
+       what a net uses when both exist — but `grossAgrees` goes false and both
+       numbers are returned, so the page reports the pair. */
+    var grossSource = stated != null ? 'stated' : (fromRows != null ? 'rows' : null);
+    var gross = stated != null ? stated : fromRows;
+    var grossAgrees = (stated != null && fromRows != null)
+      ? Math.round((stated - fromRows) * 100) / 100 === 0 : null;
+
     var pct = num(opts.commissionPct);
     var commissionKnown = pct != null && pct > 0 && pct < 100;
     var cut = (gross != null && commissionKnown) ? gross * (pct / 100) : null;
 
     var missing = [];
-    if (gross == null) missing.push('gross sales');
+    if (gross == null) missing.push('gross sales or at least one priced sale row');
     if (spent.amount == null) missing.push('at least one costed expense');
 
     var net = null;
@@ -151,6 +175,13 @@ var ASTExpenses = (function () {
     }
     return {
       gross: gross,
+      /* Both records, always, so nothing downstream has to guess which one it
+         is looking at or go back for the other. */
+      grossStated: stated,
+      grossFromRows: fromRows,
+      grossSource: grossSource,
+      grossAgrees: grossAgrees,
+      sales: salesSummary,
       commissionKnown: commissionKnown,
       commissionCut: cut,
       spent: spent,
@@ -168,20 +199,38 @@ var ASTExpenses = (function () {
    * answered, and what the answered ones came to. Shows with no gross are
    * counted as unanswered rather than as zeroes.
    */
-  function seasonResult(rows, shows) {
+  function seasonResult(rows, shows, opts) {
+    opts = opts || {};
+    /* Optional: showId -> the `ASTSales.sum` object for that show's sale
+       rows. Given one, a show with no stated gross can still be answered from
+       its rows; without one the season behaves exactly as it did before
+       Stage 3 landed. */
+    var salesFor = typeof opts.salesFor === 'function' ? opts.salesFor : null;
     var list = (shows || []).filter(function (s) { return s && !s.deletedAt; });
-    var answered = [], provisional = 0, net = null;
+    var answered = [], provisional = 0, net = null, disagreeing = 0, fromRows = 0;
     list.forEach(function (s) {
-      var r = showResult(rows, s.id, { grossSales: s.grossSales, commissionPct: s.commissionPct });
+      var r = showResult(rows, s.id, {
+        grossSales: s.grossSales,
+        commissionPct: s.commissionPct,
+        salesSummary: salesFor ? salesFor(s.id) : null
+      });
       if (r.net == null) return;
       answered.push({ showId: s.id, name: s.name, result: r });
       if (r.provisional) provisional++;
+      if (r.grossAgrees === false) disagreeing++;
+      if (r.grossSource === 'rows') fromRows++;
       net = (net == null ? 0 : net) + r.net;
     });
     return {
       total: list.length,
       known: answered.length,
       provisional: provisional,
+      /* How many shows have a stated total AND rows that do not match it.
+         Not an error — it is two records of the same weekend — but the page
+         must not present a season net over them without saying so. */
+      disagreeing: disagreeing,
+      /* How many were answered from sale rows because no total was stated. */
+      fromRows: fromRows,
       net: net,
       shows: answered,
       complete: list.length > 0 && answered.length === list.length && provisional === 0

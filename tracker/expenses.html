@@ -29,8 +29,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap">
-<link rel="stylesheet" href="app.css?v=9402d235">
-<link rel="stylesheet" href="intel.css?v=9402d235">
+<link rel="stylesheet" href="app.css?v=b8fe4702">
+<link rel="stylesheet" href="intel.css?v=b8fe4702">
 </head>
 <body>
 <header class="app-header">
@@ -64,7 +64,9 @@
     <select class="control" id="expCat"></select>
   </div>
   <button class="btn btn-primary" id="expAdd" type="button">Add expense</button>
+  <button class="btn" id="saleAdd" type="button">Add sale</button>
   <span class="spacer"></span>
+  <button class="btn-mini" id="saleImport" type="button">Import sales CSV</button>
   <button class="btn-mini" id="expCsv" type="button">Export CSV</button>
 </div>
 
@@ -79,6 +81,22 @@
       <p class="hint" id="expEmpty" hidden>
         Nothing logged yet. Every figure on this page comes from rows you enter &mdash;
         the app never estimates what a show cost you.
+      </p>
+    </section>
+
+    <!-- §7 Stage 3. One row per sale per show: piece, price, size, medium,
+         date, payment method. These do not replace the show's gross sales
+         field and never rewrite it — the two are separate records of the same
+         weekend, and the rail says which figure it is showing. -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Sales</h2>
+        <span class="hint" id="saleCount"></span>
+      </div>
+      <div id="saleList"></div>
+      <p class="hint" id="saleEmpty" hidden>
+        No sales logged. Add them one at a time, or import your Square or Stripe
+        export &mdash; nothing here is ever worked out from your gross total.
       </p>
     </section>
 
@@ -108,8 +126,22 @@
       <div id="expBreakEven"></div>
     </section>
 
+    <!-- §7 Stage 3, ideas 15 and 19. What sells, and where. -->
+    <section class="panel">
+      <div class="panel-head"><h2>What sells</h2></div>
+      <div id="saleBands"></div>
+      <p class="hint" id="saleBandNote"></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2>Where it sells</h2></div>
+      <div id="saleRegions"></div>
+      <p class="hint" id="saleRegionNote"></p>
+    </section>
+
     <!-- §7 Stage 1. Gross sales are entered on the show itself, in the
-         ledger's edit pane; this panel only reports what they add up to. -->
+         ledger's edit pane; this panel reports what they add up to and, since
+         Stage 3, says whether the sale rows agree with them. -->
     <section class="panel">
       <div class="panel-head"><h2>Did it pay for itself?</h2></div>
       <div id="expResult"></div>
@@ -230,13 +262,116 @@
   </div>
 </section>
 
+<section class="modal" id="saModal" role="dialog" aria-modal="true" aria-labelledby="saTitle" hidden>
+  <div class="modal-head">
+    <h2 id="saTitle">Add sale</h2>
+    <button class="btn btn-icon" id="saClose" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-row">
+      <label class="label" for="saPiece">Piece</label>
+      <input class="control" id="saPiece" autocomplete="off" placeholder="Title, or how you refer to it">
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="saPrice">Price ($)</label>
+        <input class="control" id="saPrice" inputmode="decimal" autocomplete="off">
+        <div class="hint">Leave blank if you do not know it yet. Blank stays unknown &mdash; it never counts as $0.</div>
+      </div>
+      <div class="form-row">
+        <label class="label" for="saDate">Date</label>
+        <input class="control" id="saDate" type="date">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="saSize">Size</label>
+        <input class="control" id="saSize" autocomplete="off" placeholder="e.g. 24 x 36 in">
+      </div>
+      <div class="form-row">
+        <label class="label" for="saMedium">Medium</label>
+        <input class="control" id="saMedium" autocomplete="off" placeholder="e.g. oil on panel">
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="form-row">
+        <label class="label" for="saPayment">Payment method</label>
+        <select class="control" id="saPayment"></select>
+      </div>
+      <div class="form-row">
+        <label class="label" for="saQty">How many</label>
+        <input class="control" id="saQty" inputmode="numeric" autocomplete="off" placeholder="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="label" for="saShow">Show</label>
+      <select class="control" id="saShow"></select>
+      <div class="hint">Optional. A studio sale in February belongs to no show,
+        and is still a sale.</div>
+    </div>
+    <div class="form-row">
+      <label class="label" for="saNotes">Notes</label>
+      <textarea class="control" id="saNotes"></textarea>
+    </div>
+    <p class="hint" id="saOrigin" hidden></p>
+  </div>
+  <div class="modal-foot">
+    <button class="btn btn-primary" id="saSave" type="button">Save</button>
+    <button class="btn btn-quiet" id="saCancel" type="button">Cancel</button>
+    <span class="spacer"></span>
+    <button class="btn btn-quiet btn-danger" id="saDelete" type="button" hidden>Delete</button>
+  </div>
+</section>
+
+<section class="modal" id="imModal" role="dialog" aria-modal="true" aria-labelledby="imTitle" hidden>
+  <div class="modal-head">
+    <h2 id="imTitle">Import sales CSV</h2>
+    <button class="btn btn-icon" id="imClose" type="button" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+        <path d="M5 5l10 10M15 5L5 15"/>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p class="hint">A Square or Stripe export, downloaded as CSV. The file is
+      read here on your device and nothing is uploaded. Rows that cannot be read
+      are refused and listed rather than guessed at, refunds are skipped, and a
+      row with no readable amount comes in unpriced instead of as $0.</p>
+    <div class="form-row">
+      <label class="label" for="imShow">Attach these sales to</label>
+      <select class="control" id="imShow"></select>
+      <div class="hint">The export knows a date, not which weekend it was. This
+        is your call, not the file&rsquo;s.</div>
+    </div>
+    <div class="form-row">
+      <label class="label" for="imFile">CSV file</label>
+      <input class="control" id="imFile" type="file" accept=".csv,text/csv">
+    </div>
+    <div class="form-row">
+      <label class="label" for="imText">&hellip; or paste it</label>
+      <textarea class="control" id="imText" rows="5" placeholder="Date,Item,Qty,Gross Sales,&hellip;"></textarea>
+    </div>
+    <div id="imReport"></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn" id="imCheck" type="button">Check the file</button>
+    <button class="btn btn-primary" id="imApply" type="button" disabled>Import</button>
+    <button class="btn btn-quiet" id="imCancel" type="button">Cancel</button>
+  </div>
+</section>
+
 <p class="exp-foot" id="buildStamp"></p>
 
-<script src="core.js?v=9402d235"></script>
-<script src="version.js?v=9402d235"></script>
-<script src="expenses.js?v=9402d235"></script>
-<script src="plan.js?v=9402d235"></script>
-<script src="store-supabase.js?v=9402d235"></script>
+<script src="core.js?v=b8fe4702"></script>
+<script src="version.js?v=b8fe4702"></script>
+<script src="expenses.js?v=b8fe4702"></script>
+<script src="sales.js?v=b8fe4702"></script>
+<script src="plan.js?v=b8fe4702"></script>
+<script src="store-supabase.js?v=b8fe4702"></script>
 <script type="module">
 'use strict';
 /* ==========================================================================
@@ -250,20 +385,33 @@
    bookkeeping; the other thing is advice, and it is not ours to give.
    ========================================================================== */
 const { Store, Settings, Theme, esc, EXPENSE_CATEGORIES, EXPENSE_LABEL,
-        LODGING_KINDS, LODGING_KIND_LABEL, fmtDay } = window.AST;
+        LODGING_KINDS, LODGING_KIND_LABEL, PAYMENT_METHODS, PAYMENT_LABEL,
+        fmtDay } = window.AST;
 const X = window.ASTExpenses;
+const S = window.ASTSales;
 const $ = sel => document.querySelector(sel);
 
 Theme.init($('#btnTheme'));
 
-const state = { rows: [], shows: [], showId: '', category: '', editingId: null };
+const state = { rows: [], shows: [], sales: [], showId: '', category: '',
+                editingId: null, editingSaleId: null, pendingImport: null };
 
 const money = n => n == null ? '\u2014' : '$' + Math.round(n).toLocaleString();
 
 async function refresh() {
-  [state.rows, state.shows] = await Promise.all([Store.listExpenses(), Store.list()]);
+  [state.rows, state.shows, state.sales] =
+    await Promise.all([Store.listExpenses(), Store.list(), Store.listSales()]);
   render();
 }
+
+/* Sales filtered the same way the expense list is. The category filter is an
+   expense idea and never hides a sale. */
+function filteredSales() {
+  return state.sales.filter(s => !state.showId || s.showId === state.showId);
+}
+/* One place decides what a show's sale rows come to, and both the sales
+   panels and the "did it pay for itself" answer read it from here. */
+const saleSummaryFor = id => S.sum(S.forShow(state.sales, id));
 
 function showName(id) {
   const s = state.shows.find(x => x.id === id);
@@ -382,10 +530,11 @@ function renderResult() {
   /* No show picked: answer for the season instead, and be plain about how
      many shows could be answered at all. */
   if (!show) {
-    const season = X.seasonResult(state.rows, state.shows);
+    const season = X.seasonResult(state.rows, state.shows, { salesFor: saleSummaryFor });
     if (!season.known) {
-      el.innerHTML = '<p class="hint">No show has a gross sales figure yet. ' +
-        'Add one on the show itself in the ledger, and the answer appears here.</p>';
+      el.innerHTML = '<p class="hint">No show has a gross sales figure or a priced ' +
+        'sale row yet. Add a gross total on the show in the ledger, or log the ' +
+        'sales one at a time, and the answer appears here.</p>';
       return;
     }
     el.innerHTML = '<div class="stat"><div class="n">' + esc(money(season.net)) +
@@ -393,8 +542,16 @@ function renderResult() {
       '<p class="hint">' +
         (season.complete
           ? 'Every show has a gross figure and every expense row carries an amount.'
-          : 'Shows with no gross sales figure are left out entirely \u2014 they are ' +
-            'not counted as zero.') +
+          : 'Shows with neither a gross figure nor a priced sale row are left out ' +
+            'entirely \u2014 they are not counted as zero.') +
+        (season.fromRows
+          ? ' ' + season.fromRows + ' of them ' + (season.fromRows === 1 ? 'is' : 'are') +
+            ' answered from sale rows, because no gross total was stated for ' +
+            (season.fromRows === 1 ? 'it' : 'them') + '.' : '') +
+        (season.disagreeing
+          ? ' ' + season.disagreeing + ' show' + (season.disagreeing === 1 ? '' : 's') +
+            ' \u2014 the stated gross is used there, and the sale rows come to ' +
+            'something different. Pick the show to see both figures.' : '') +
         (season.provisional
           ? ' ' + season.provisional + ' of them still have uncosted expense rows, ' +
             'so the real net is lower than this.' : '') +
@@ -402,11 +559,19 @@ function renderResult() {
     return;
   }
 
-  const r = X.showResult(state.rows, show.id, { grossSales: show.grossSales });
+  const r = X.showResult(state.rows, show.id, {
+    grossSales: show.grossSales,
+    salesSummary: saleSummaryFor(show.id)
+  });
+  /* The Stage 1 field and the Stage 3 rows, side by side. Neither is written
+     from the other; the page says which one it is showing. */
+  const rec = S.reconcile(state.sales, show);
+
   if (r.net == null) {
     el.innerHTML = '<p class="hint">Needs ' + esc(r.missing.join(' and ')) + '. ' +
       (r.gross == null
-        ? 'Gross sales are entered on the show in the ledger; blank stays blank rather than counting as nothing sold.'
+        ? 'A gross total goes on the show in the ledger, or log the sales one at a ' +
+          'time here; blank stays blank rather than counting as nothing sold.'
         : 'Cost at least one expense row for this show.') + '</p>';
     return;
   }
@@ -422,7 +587,77 @@ function renderResult() {
         ? 'The show\u2019s commission has been taken off.'
         : 'Before any commission the show takes \u2014 none is recorded, and ' +
           '\u201cnot mentioned\u201d is not the same as zero.') +
-    '</p>';
+    '</p>' +
+    '<p class="hint" id="expGrossSource">' + esc(S.reconcileNote(rec)) + '</p>';
+}
+
+/* ---- §7 Stage 3: the sales panels ---------------------------------------- */
+
+function renderSales() {
+  const rows = filteredSales().slice()
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  $('#saleCount').textContent = rows.length + (rows.length === 1 ? ' sale' : ' sales');
+  $('#saleEmpty').hidden = rows.length > 0;
+  $('#saleList').innerHTML = rows.map(r => {
+    const v = S.valueOf(r);
+    /* An unpriced sale is not a free one, and must not read as one. */
+    const amt = v == null ? '<span class="exp-unknown">not priced</span>' : money(v);
+    const sub = [
+      r.date ? fmtDay(r.date) : 'no date',
+      showName(r.showId) || 'no show',
+      [r.size, r.medium].filter(Boolean).join(', '),
+      r.paymentMethod ? PAYMENT_LABEL[r.paymentMethod] : 'payment not recorded',
+      r.quantity > 1 ? ('x' + r.quantity) : '',
+      /* An imported row stays marked as imported for as long as it exists. */
+      r.source === 'square' || r.source === 'stripe' ? 'imported from ' + r.source : ''
+    ].filter(Boolean).join(' \u00b7 ');
+    return '<div class="sale-row exp-row" data-sale="' + esc(r.id) + '" tabindex="0" role="button">' +
+      '<div class="exp-cell"><strong>' + esc(r.piece || 'Untitled piece') + '</strong>' +
+        '<div class="exp-sub">' + esc(sub) + '</div></div>' +
+      '<div class="exp-amt">' + amt + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderBands() {
+  const rows = filteredSales();
+  const mix = S.byBand(rows);
+  $('#saleBands').innerHTML = mix.bands.length
+    ? mix.bands.map(b =>
+        '<div class="exp-cat"><span>' + esc(b.label) + '</span>' +
+        '<span>' + esc(money(b.sum.amount)) +
+        ' <span class="exp-sub">' + b.sum.total + (b.sum.total === 1 ? ' sale' : ' sales') +
+        (b.shareOfRevenue != null ? ' \u00b7 ' + Math.round(b.shareOfRevenue * 100) + '%' : '') +
+        '</span></span></div>').join('')
+    : '<p class="hint">No priced sales yet, so there is no mix to read.</p>';
+
+  /* The refusal that matters on this panel: sell-through is sold divided by
+     brought, and nothing here knows what went in the van. */
+  const st = S.sellThrough(rows, state.shows);
+  $('#saleBandNote').textContent = !mix.bands.length ? ''
+    : st.sold + (st.sold === 1 ? ' piece' : ' pieces') + ' sold' +
+      (mix.unpriced ? ', ' + mix.unpriced + ' with no price yet' : '') +
+      '. This is the mix of what sold, not sell-through: sell-through needs ' +
+      st.missing.join(' and ') + ', and nothing here records that yet.';
+}
+
+function renderRegions() {
+  const groups = S.byRegion(filteredSales(), state.shows);
+  $('#saleRegions').innerHTML = groups.length
+    ? groups.map(g =>
+        '<div class="exp-cat"><span>' + esc(g.label) + '</span>' +
+        '<span>' + esc(money(g.sum.amount)) +
+        ' <span class="exp-sub">' + g.sum.total + (g.sum.total === 1 ? ' sale' : ' sales') +
+        (g.known && g.shows ? ' \u00b7 ' + g.shows + (g.shows === 1 ? ' show' : ' shows') : '') +
+        '</span></span></div>').join('')
+    : '<p class="hint">No sales to place yet.</p>';
+  const unknown = groups.filter(g => !g.known)[0];
+  $('#saleRegionNote').textContent = !groups.length ? ''
+    : unknown
+      ? unknown.sum.total + (unknown.sum.total === 1 ? ' sale is' : ' sales are') +
+        ' under \u201cNot known\u201d \u2014 no show, or a show with no state. ' +
+        'They are shown rather than filed under somewhere they might not belong.'
+      : 'By the state of the show each sale was made at.';
 }
 
 function renderLodging() {
@@ -447,6 +682,7 @@ function renderLodging() {
 function render() {
   fillFilters(); renderList(); renderStats(); renderCats();
   renderBreakEven(); renderResult(); renderLodging();
+  renderSales(); renderBands(); renderRegions();
 }
 
 /* ---- the editor --------------------------------------------------------- */
@@ -542,15 +778,170 @@ function toCsv() {
       r.nights == null ? '' : r.nights,
       r.notes
     ].map(q).join(',')));
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+  download(lines.join('\n'), 'expenses.csv');
+}
+
+/* Sales out, same shape: one row per sale, prices left blank where none was
+   recorded rather than zeroed, and the source column keeps saying which rows
+   a card reader produced. */
+function salesCsv() {
+  const head = ['Date','Piece','Price','Quantity','Size','Medium','Payment','Show','Source','Notes'];
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const lines = [head.map(q).join(',')].concat(
+    state.sales.slice().sort((a, b) => (a.date || '').localeCompare(b.date || '')).map(r => [
+      r.date, r.piece,
+      r.price == null ? '' : r.price,
+      r.quantity, r.size, r.medium,
+      r.paymentMethod ? PAYMENT_LABEL[r.paymentMethod] : '',
+      showName(r.showId), r.source, r.notes
+    ].map(q).join(',')));
+  download(lines.join('\n'), 'sales.csv');
+}
+
+function download(text, name) {
+  const blob = new Blob([text], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'expenses.csv';
+  a.download = name;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
+/* ---- §7 Stage 3: the sale editor ----------------------------------------- */
+function openSaleEditor(row) {
+  state.editingSaleId = row ? row.id : null;
+  $('#saTitle').textContent = row ? 'Edit sale' : 'Add sale';
+  $('#saPayment').innerHTML = PAYMENT_METHODS.map(m =>
+    '<option value="' + esc(m.value) + '">' + esc(m.label) + '</option>').join('');
+  $('#saShow').innerHTML = ['<option value="">No show</option>']
+    .concat(state.shows.map(x =>
+      '<option value="' + esc(x.id) + '">' + esc(x.name) + '</option>')).join('');
+
+  $('#saPiece').value = row ? row.piece : '';
+  $('#saPrice').value = row && row.price != null ? row.price : '';
+  $('#saDate').value = row ? row.date : '';
+  $('#saSize').value = row ? row.size : '';
+  $('#saMedium').value = row ? row.medium : '';
+  $('#saPayment').value = row ? row.paymentMethod : '';
+  $('#saQty').value = row && row.quantity > 1 ? row.quantity : '';
+  $('#saShow').value = row ? row.showId : state.showId;
+  $('#saNotes').value = row ? row.notes : '';
+  /* Somebody else's machine produced this row. It keeps saying so. */
+  const imported = row && (row.source === 'square' || row.source === 'stripe');
+  $('#saOrigin').hidden = !imported;
+  $('#saOrigin').textContent = imported
+    ? 'Imported from your ' + row.source + ' export' +
+      (row.externalId ? ' (' + row.externalId + ')' : '') +
+      '. Edits you make here stay; re-importing the same export updates this row ' +
+      'rather than adding a second one.' : '';
+  $('#saDelete').hidden = !row;
+  $('#exOverlay').hidden = false;
+  $('#saModal').hidden = false;
+  $('#saPiece').focus();
+}
+function closeSaleEditor() {
+  state.editingSaleId = null;
+  $('#saModal').hidden = true;
+  if ($('#exModal').hidden && $('#imModal').hidden) $('#exOverlay').hidden = true;
+}
+
+async function saveSale() {
+  const existing = state.sales.find(r => r.id === state.editingSaleId);
+  await Store.upsertSale({
+    ...(existing || {}),
+    id: state.editingSaleId || undefined,
+    piece: $('#saPiece').value,
+    price: numOf('#saPrice'),
+    date: $('#saDate').value,
+    size: $('#saSize').value,
+    medium: $('#saMedium').value,
+    paymentMethod: $('#saPayment').value,
+    quantity: numOf('#saQty'),
+    showId: $('#saShow').value,
+    notes: $('#saNotes').value
+  });
+  await refresh();
+  closeSaleEditor();
+}
+async function removeSale() {
+  if (!state.editingSaleId) return;
+  await Store.removeSale(state.editingSaleId);
+  await refresh();
+  closeSaleEditor();
+}
+
+/* ---- §7 Stage 3: Square / Stripe CSV import ------------------------------
+   The file is read in the browser and never uploaded. Nothing is written
+   until the artist has seen what would be written. */
+function openImport() {
+  state.pendingImport = null;
+  $('#imShow').innerHTML = ['<option value="">No show</option>']
+    .concat(state.shows.map(x =>
+      '<option value="' + esc(x.id) + '">' + esc(x.name) + '</option>')).join('');
+  $('#imShow').value = state.showId;
+  $('#imText').value = '';
+  $('#imFile').value = '';
+  $('#imReport').innerHTML = '';
+  $('#imApply').disabled = true;
+  $('#exOverlay').hidden = false;
+  $('#imModal').hidden = false;
+}
+function closeImport() {
+  state.pendingImport = null;
+  $('#imModal').hidden = true;
+  if ($('#exModal').hidden && $('#saModal').hidden) $('#exOverlay').hidden = true;
+}
+
+async function readImportText() {
+  const file = $('#imFile').files && $('#imFile').files[0];
+  if (file) return file.text();
+  return $('#imText').value;
+}
+
+async function checkImport() {
+  const text = await readImportText();
+  const res = S.importCsv(text, { showId: $('#imShow').value });
+  if (!res.ok) {
+    state.pendingImport = null;
+    $('#imApply').disabled = true;
+    $('#imReport').innerHTML = '<p class="hint">' + esc(res.error) + '</p>';
+    return;
+  }
+  const merge = S.mergeImported(state.sales, res.rows);
+  state.pendingImport = merge;
+  const parts = [
+    'Read as a ' + res.format + ' export.',
+    merge.added.length + ' new sale' + (merge.added.length === 1 ? '' : 's') + '.',
+    merge.updated.length
+      ? merge.updated.length + ' already imported and would be updated in place.' : '',
+    res.skipped.length
+      ? res.skipped.length + ' row' + (res.skipped.length === 1 ? '' : 's') +
+        ' skipped: ' + res.skipped.slice(0, 5)
+          .map(k => 'line ' + k.line + ', ' + k.reason).join('; ') + '.' : '',
+    merge.unmatchable
+      ? merge.unmatchable + ' row' + (merge.unmatchable === 1 ? '' : 's') +
+        ' carry no transaction id, so importing this file again would add ' +
+        (merge.unmatchable === 1 ? 'it' : 'them') + ' a second time.' : ''
+  ].concat(res.warnings).filter(Boolean);
+  $('#imReport').innerHTML = parts.map(t => '<p class="hint">' + esc(t) + '</p>').join('');
+  $('#imApply').disabled = !(merge.added.length || merge.updated.length);
+}
+
+async function applyImport() {
+  if (!state.pendingImport) return;
+  const all = state.pendingImport.added.concat(state.pendingImport.updated);
+  for (const row of all) await Store.upsertSale(row);
+  await refresh();
+  closeImport();
+}
+
 document.addEventListener('click', e => {
+  const sale = e.target.closest('.sale-row');
+  if (sale) {
+    const rec = state.sales.find(r => r.id === sale.dataset.sale);
+    if (rec) openSaleEditor(rec);
+    return;
+  }
   const row = e.target.closest('.exp-row');
   if (!row) return;
   const rec = state.rows.find(r => r.id === row.dataset.id);
@@ -559,13 +950,23 @@ document.addEventListener('click', e => {
 $('#expShow').addEventListener('change', e => { state.showId = e.target.value; render(); });
 $('#expCat').addEventListener('change', e => { state.category = e.target.value; render(); });
 $('#expAdd').addEventListener('click', () => openEditor(null));
-$('#expCsv').addEventListener('click', toCsv);
+$('#expCsv').addEventListener('click', () => { toCsv(); salesCsv(); });
 $('#exCategory').addEventListener('change', syncCategoryFields);
 $('#exSave').addEventListener('click', save);
 $('#exDelete').addEventListener('click', remove);
 $('#exCancel').addEventListener('click', closeEditor);
 $('#exClose').addEventListener('click', closeEditor);
-$('#exOverlay').addEventListener('click', closeEditor);
+$('#exOverlay').addEventListener('click', () => { closeEditor(); closeSaleEditor(); closeImport(); });
+$('#saleAdd').addEventListener('click', () => openSaleEditor(null));
+$('#saSave').addEventListener('click', saveSale);
+$('#saDelete').addEventListener('click', removeSale);
+$('#saCancel').addEventListener('click', closeSaleEditor);
+$('#saClose').addEventListener('click', closeSaleEditor);
+$('#saleImport').addEventListener('click', openImport);
+$('#imCheck').addEventListener('click', checkImport);
+$('#imApply').addEventListener('click', applyImport);
+$('#imCancel').addEventListener('click', closeImport);
+$('#imClose').addEventListener('click', closeImport);
 
 $('#expPro').innerHTML = window.ASTPlan.cards(
   ['accountant_export', 'negotiation', 'art_rep', 'logistics']);

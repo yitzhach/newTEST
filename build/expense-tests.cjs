@@ -153,7 +153,8 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
   /* Without the artist's own figure there is no answer, and a zero would
      turn every unrecorded weekend into a loss. */
   check('no gross figure means no answer, not a loss',
-        result.noGross.net === null && result.noGross.missing.includes('gross sales'),
+        result.noGross.net === null &&
+        result.noGross.missing.some(m => /gross sales/.test(m)),
         JSON.stringify(result.noGross.missing));
   check('a show that cleared its costs reports what is left',
         result.cleared.net === 1320 && result.cleared.cleared === true,
@@ -226,7 +227,7 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
   check('an uncosted row shows "not costed", not $0',
         /not costed/.test(page.list) && !/\$0\b/.test(page.list), page.list.slice(0, 160));
   check('the money page answers "did it pay for itself" only when it can',
-        /Gross sales are entered on the show|No show has a gross sales figure/.test(page.result),
+        /gross total goes on the show|No show has a gross sales figure/.test(page.result),
         page.result.slice(0, 160));
   check('the season total says it is partial',
         /Known figures only/.test(page.partial), page.partial);
@@ -234,6 +235,260 @@ const check = (n, ok, d) => { if (ok) { pass++; console.log('  PASS  ' + n); }
         /Fairground lot/.test(page.lodging) && /Free/i.test(page.lodging), page.lodging.slice(0, 140));
   check('and it is marked private, because nothing was shared',
         /private/.test(page.lodging), page.lodging.slice(0, 140));
+
+  // ---- §7 Stage 3: individual sales ---------------------------------------
+  console.log('\n-- the sale record --');
+  const sale = await p.evaluate(() => window.AST.makeSale({ piece: 'Untitled #4' }));
+  /* Same rule as an uncosted expense row, for the same reason: a piece
+     nobody typed a price for is not a piece that was given away. */
+  check('an unpriced sale stores null, not 0', sale.price === null, JSON.stringify(sale.price));
+  check('a sale with no date stays blank rather than being dated today',
+        sale.date === '', JSON.stringify(sale.date));
+  check('payment method defaults to "not recorded", never a guess',
+        sale.paymentMethod === '', JSON.stringify(sale.paymentMethod));
+  check('a hand-entered sale is marked as its own, not as imported',
+        sale.source === 'manual', sale.source);
+  check('a sale is a child record with its own id and timestamp',
+        !!sale.id && !!sale.updatedAt && sale.deletedAt === null, JSON.stringify(sale.id));
+
+  const mig10 = await p.evaluate(() => {
+    const A = window.AST;
+    const up = A.migrate({ schemaVersion: 9, shows: [
+      { id:'s1', name:'A sold-out weekend', startDate:'2026-05-01', grossSales: 4200 }
+    ], events: [], applications: [], rankers: [], expenses: [], reviews: [] });
+    return { v: up.schemaVersion, current: A.SCHEMA_VERSION,
+             sales: up.sales, gross: up.shows[0].grossSales };
+  });
+  check('a v9 database migrates to the current schema',
+        mig10.v === mig10.current && mig10.current === 10, String(mig10.v));
+  /* Splitting one stated total into rows would have to invent pieces, prices,
+     sizes and dates, in the one collection that has to survive an audit. */
+  check('a stated gross total is NOT split into invented sale rows',
+        Array.isArray(mig10.sales) && mig10.sales.length === 0, JSON.stringify(mig10.sales));
+  check('and the stated total is left exactly where it was',
+        mig10.gross === 4200, String(mig10.gross));
+
+  console.log('\n-- the mix --');
+  const mix = await p.evaluate(() => {
+    const S = window.ASTSales;
+    const rows = [
+      { id:'a', showId:'s1', piece:'Small one',  price:80,   quantity:1 },
+      { id:'b', showId:'s1', piece:'Mid',        price:300,  quantity:2 },
+      { id:'c', showId:'s1', piece:'Big',        price:1200, quantity:1 },
+      { id:'d', showId:'s2', piece:'Other',      price:300,  quantity:1 },
+      { id:'e', showId:'s1', piece:'Not priced', price:null, quantity:1 },
+      { id:'f', showId:'s1', piece:'Deleted',    price:500, deletedAt:'2027-01-01T00:00:00Z' }
+    ];
+    const shows = [{ id:'s1', name:'A', state:'WA' }, { id:'s2', name:'B', state:'OR' }];
+    return {
+      sum: S.sum(rows),
+      band: S.bandOf(300),
+      noBand: S.bandOf(null),
+      bands: S.byBand(rows),
+      regions: S.byRegion(rows, shows),
+      orphanRegion: S.byRegion([{ id:'z', showId:'', price:100 }], shows),
+      through: S.sellThrough(rows, shows),
+      counted: S.sellThrough(rows, shows, { piecesBrought: 20 })
+    };
+  });
+  check('a sale of two prints is two pieces at the full price',
+        mix.sum.amount === 2180 && mix.sum.pieces === 6, JSON.stringify(mix.sum));
+  check('the total says how many rows carried a price',
+        mix.sum.known === 4 && mix.sum.total === 5 && mix.sum.complete === false,
+        JSON.stringify(mix.sum));
+  /* Null price means null band. An unpriced piece is not a cheap one. */
+  check('an unpriced sale falls in no band rather than the bottom one',
+        mix.band === '250_499' && mix.noBand === null, JSON.stringify([mix.band, mix.noBand]));
+  check('the mix reports revenue and share per price band',
+        mix.bands.bands.length === 3 &&
+        mix.bands.bands.every(b => b.shareOfRevenue > 0 && b.shareOfRevenue <= 1),
+        JSON.stringify(mix.bands.bands.map(b => [b.key, b.sum.amount])));
+  check('and it counts the unpriced rows rather than dropping them',
+        mix.bands.unpriced === 1 && mix.bands.complete === false, String(mix.bands.unpriced));
+  check('sales are grouped by the state of the show they were made at',
+        mix.regions.map(r => r.key).join(',') === 'WA,OR',
+        JSON.stringify(mix.regions.map(r => [r.key, r.sum.amount])));
+  /* Filing a sale under a state it might not have happened in is exactly the
+     kind of quiet wrong number this app exists not to print. */
+  check('a sale with no show lands in an explicit "not known" bucket',
+        mix.orphanRegion.length === 1 && mix.orphanRegion[0].known === false &&
+        mix.orphanRegion[0].label === 'Not known', JSON.stringify(mix.orphanRegion[0]));
+  /* Sell-through is sold divided by brought, and nothing records what went in
+     the van. A percentage of a made-up denominator is worse than no figure. */
+  check('sell-through refuses a rate and names the input it is missing',
+        mix.through.rate === null && /brought/.test(mix.through.missing.join(' ')),
+        JSON.stringify(mix.through.missing));
+  check('given a real count of pieces brought, it does quote a rate',
+        Math.abs(mix.counted.rate - 0.3) < 1e-9, String(mix.counted.rate));
+
+  console.log('\n-- the stated total vs. the rows --');
+  const rec3 = await p.evaluate(() => {
+    const S = window.ASTSales, X = window.ASTExpenses;
+    const rows = [
+      { id:'a', showId:'s1', price:1000 },
+      { id:'b', showId:'s1', price:500 },
+      { id:'c', showId:'s2', price:900 },
+      { id:'d', showId:'s3', price:null }
+    ];
+    const exp = [{ category:'booth_fee', amount:400, showId:'s1' },
+                 { category:'booth_fee', amount:400, showId:'s2' }];
+    const agreeShow    = { id:'s1', name:'Agrees',  grossSales: 1500 };
+    const disagreeShow = { id:'s1', name:'Differs', grossSales: 1800 };
+    const noTotalShow  = { id:'s2', name:'Rows only', grossSales: null };
+    const noRowsShow   = { id:'s9', name:'Total only', grossSales: 700 };
+    return {
+      agree:    S.reconcile(rows, agreeShow),
+      disagree: S.reconcile(rows, disagreeShow),
+      rowsOnly: S.reconcile(rows, noTotalShow),
+      totalOnly: S.reconcile(rows, noRowsShow),
+      neither:  S.reconcile(rows, { id:'s8', grossSales: null }),
+      note:     S.reconcileNote(S.reconcile(rows, disagreeShow)),
+      rowsNote: S.reconcileNote(S.reconcile(rows, noTotalShow)),
+      resStated: X.showResult(exp, 's1', { grossSales: 1800, salesSummary: S.sum(S.forShow(rows, 's1')) }),
+      resRows:   X.showResult(exp, 's2', { grossSales: null, salesSummary: S.sum(S.forShow(rows, 's2')) }),
+      season:    X.seasonResult(exp, [{ id:'s1', name:'A', grossSales: 1800 },
+                                      { id:'s2', name:'B', grossSales: null }],
+                                { salesFor: id => S.sum(S.forShow(rows, id)) })
+    };
+  });
+  check('a stated total that matches the rows is reported as agreeing',
+        rec3.agree.agree === true && rec3.agree.difference === 0, JSON.stringify(rec3.agree.difference));
+  /* Neither record is authoritative. Both are the artist's own evidence,
+     taken at different moments, and one is not a correction of the other. */
+  check('when they disagree BOTH figures are kept, with the difference',
+        rec3.disagree.agree === false && rec3.disagree.stated === 1800 &&
+        rec3.disagree.rowsTotal === 1500 && rec3.disagree.difference === 300,
+        JSON.stringify(rec3.disagree));
+  check('and it names which figure it is showing rather than picking silently',
+        rec3.disagree.showing === 'stated' && rec3.disagree.both === true,
+        rec3.disagree.showing);
+  check('the note says both numbers out loud',
+        /1,500/.test(rec3.note) && /stated gross/.test(rec3.note) &&
+        /neither is corrected from the other/.test(rec3.note), rec3.note);
+  check('with no stated total the rows answer, and the note says so',
+        rec3.rowsOnly.showing === 'rows' && rec3.rowsOnly.amount === 900 &&
+        /not stated a gross total/.test(rec3.rowsNote), rec3.rowsNote);
+  check('with no rows the stated total answers alone',
+        rec3.totalOnly.showing === 'stated' && rec3.totalOnly.both === false,
+        JSON.stringify(rec3.totalOnly.showing));
+  check('with neither, there is no figure at all',
+        rec3.neither.showing === null && rec3.neither.amount === null,
+        JSON.stringify(rec3.neither.amount));
+  check('the net is built on the stated total and says which one that was',
+        rec3.resStated.net === 1400 && rec3.resStated.grossSource === 'stated' &&
+        rec3.resStated.grossFromRows === 1500 && rec3.resStated.grossAgrees === false,
+        JSON.stringify([rec3.resStated.net, rec3.resStated.grossSource]));
+  /* Stage 3 makes a show answerable that Stage 1 could not answer at all. */
+  check('a show with no stated total is now answered from its sale rows',
+        rec3.resRows.net === 500 && rec3.resRows.grossSource === 'rows',
+        JSON.stringify([rec3.resRows.net, rec3.resRows.grossSource]));
+  check('the season counts how many shows disagree and how many came from rows',
+        rec3.season.disagreeing === 1 && rec3.season.fromRows === 1 && rec3.season.known === 2,
+        JSON.stringify(rec3.season));
+
+  console.log('\n-- the Square / Stripe import --');
+  const imp = await p.evaluate(() => {
+    const S = window.ASTSales;
+    const square = [
+      'Date,Time,Item,Qty,Gross Sales,Discounts,Net Sales,Card Brand,Transaction ID',
+      '05/02/2027,11:04 AM,"Marsh, morning",1,$450.00,$0.00,$450.00,Visa,sq-1',
+      '05/02/2027,02:15 PM,Small study,2,$160.00,$0.00,$160.00,Cash,sq-2',
+      '05/03/2027,10:00 AM,Refunded piece,1,-$450.00,$0.00,-$450.00,Visa,sq-3',
+      '05/03/2027,11:00 AM,No amount,1,,,,Visa,sq-4'
+    ].join('\n');
+    const stripe = [
+      'id,Created (UTC),Amount,Currency,Description,Status,Payment Method Type',
+      'ch_1,2027-05-02 11:04:00,900.00,usd,Large canvas,Paid,card',
+      'ch_2,2027-05-02 12:00:00,120.00,usd,Print,Failed,card'
+    ].join('\n');
+    const junk = 'Name,Email,Phone\nA,a@b.c,555';
+    const sq = S.importCsv(square, { showId: 's1' });
+    return {
+      sq: sq,
+      stripe: S.importCsv(stripe, { showId: 's1' }),
+      junk: S.importCsv(junk, { showId: 's1' }),
+      empty: S.importCsv('Date,Item,Gross Sales', {}),
+      merged: S.mergeImported(
+        [{ id:'existing', source:'square', externalId:'sq-1', price:450 }], sq.rows),
+      quoted: S.parseCsv('a,"b,c",d')[0]
+    };
+  });
+  check('a Square export is recognised and read',
+        imp.sq.ok === true && imp.sq.format === 'square', JSON.stringify(imp.sq.format));
+  check('a Stripe export is recognised too',
+        imp.stripe.ok === true && imp.stripe.format === 'stripe', JSON.stringify(imp.stripe.format));
+  check('the parser handles quoted fields containing commas',
+        imp.quoted.length === 3 && imp.quoted[1] === 'b,c', JSON.stringify(imp.quoted));
+  check('prices, dates, quantities and payment methods come across',
+        imp.sq.rows[0].price === 450 && imp.sq.rows[0].date === '2027-05-02' &&
+        imp.sq.rows[1].quantity === 2 && imp.sq.rows[1].paymentMethod === 'cash' &&
+        imp.sq.rows[0].paymentMethod === 'card',
+        JSON.stringify(imp.sq.rows[0]));
+  /* A refund is not a sale, and subtracting it from a season it was never
+     added to would be worse than leaving it out. */
+  check('a refund is skipped and the reason is given, not silently dropped',
+        imp.sq.skipped.some(k => /refund/.test(k.reason)), JSON.stringify(imp.sq.skipped));
+  check('a Stripe row that never completed is skipped with its status',
+        imp.stripe.rows.length === 1 &&
+        imp.stripe.skipped.some(k => /failed/.test(k.reason)),
+        JSON.stringify(imp.stripe.skipped));
+  check('a row with no readable amount imports unpriced, NOT as $0',
+        imp.sq.rows[2].price === null &&
+        imp.sq.warnings.some(w => /unpriced rather than as \$0/.test(w)),
+        JSON.stringify(imp.sq.warnings));
+  /* Untrusted input: an unknown file is refused whole rather than column-guessed. */
+  check('a file that is neither export is refused, and nothing is imported',
+        imp.junk.ok === false && imp.junk.rows.length === 0 &&
+        /Square or Stripe/.test(imp.junk.error), imp.junk.error);
+  check('a header with no rows under it is refused too',
+        imp.empty.ok === false && /no rows/.test(imp.empty.error), imp.empty.error);
+  check('an imported row keeps the processor it came from',
+        imp.sq.rows[0].source === 'square', imp.sq.rows[0].source);
+  /* Re-importing the same export must not double a season's takings. */
+  check('re-importing matches on the transaction id and updates in place',
+        imp.merged.updated.length === 1 && imp.merged.updated[0].id === 'existing' &&
+        imp.merged.added.length === 2,
+        JSON.stringify([imp.merged.updated.length, imp.merged.added.length]));
+
+  console.log('\n-- the sales panels --');
+  const seeded = await p.evaluate(async () => {
+    const St = window.AST.Store;
+    const shows = await St.list();
+    const show = shows.find(x => x.name === 'Expense test show');
+    /* A stated gross that deliberately does NOT match the rows, which is the
+       case the page has to handle out loud. */
+    await St.upsert({ ...show, grossSales: 2000 });
+    await St.upsertSale({ showId: show.id, piece: 'Harbour light', price: 900,
+                          size:'24 x 36 in', medium:'oil', date:'2027-04-01',
+                          paymentMethod:'card' });
+    await St.upsertSale({ showId: show.id, piece: 'Study', price: null,
+                          date:'2027-04-02' });
+    return show.id;
+  });
+  await p.reload({ waitUntil: 'networkidle' });
+  await p.waitForTimeout(600);
+  const sp = await p.evaluate(id => {
+    document.getElementById('expShow').value = id;
+    document.getElementById('expShow').dispatchEvent(new Event('change'));
+    const t = el => document.getElementById(el).textContent.replace(/\s+/g, ' ');
+    return { list: t('saleList'), bands: t('saleBands'), bandNote: t('saleBandNote'),
+             regions: t('saleRegions'), result: t('expResult') };
+  }, seeded);
+  check('the sales panel lists each sale with its piece and price',
+        /Harbour light/.test(sp.list) && /\$900/.test(sp.list), sp.list.slice(0, 140));
+  check('an unpriced sale shows "not priced", not $0',
+        /not priced/.test(sp.list) && !/\$0\b/.test(sp.list), sp.list.slice(0, 200));
+  check('the price band mix is shown', /\$500|\$999/.test(sp.bands), sp.bands.slice(0, 140));
+  /* The refusal, on the page and not only in the module. */
+  check('the page says this is the mix and not sell-through, and why',
+        /not sell-through/.test(sp.bandNote) && /brought/.test(sp.bandNote),
+        sp.bandNote.slice(0, 200));
+  check('sales are placed by state', sp.regions.length > 0, sp.regions.slice(0, 120));
+  /* The whole point of Stage 3 meeting Stage 1: two records, both shown. */
+  check('the page names which gross figure it is showing when they disagree',
+        /stated gross/.test(sp.result) && /\$900/.test(sp.result) &&
+        /neither is corrected from the other/.test(sp.result),
+        sp.result.slice(-260));
 
   // ---- Pro previews are inert ---------------------------------------------
   console.log('\n-- Pro previews --');

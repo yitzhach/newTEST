@@ -208,6 +208,49 @@ across the season.
   none is subtracted and the page says the figure is *before* whatever the show
   takes.
 
+**Individual sales — the same Money page.** §7 Stage 3, ideas 15 and 19. One row
+per sale per show: piece, price, size, medium, date, payment method, quantity.
+Fifth use of the child-record pattern, and the one it was chosen for — two
+devices each selling a different piece on the same Saturday must merge as a
+union, because last-write-wins here loses somebody a sale.
+
+- **An unpriced sale is `null`, never `$0`**, and it renders "not priced". Every
+  total says how many rows carried a price, exactly like the expense log.
+- **The stated gross and the sale rows are two records, not one.** Stage 1's
+  `grossSales` is what the artist said the weekend took; the rows are what they
+  wrote down piece by piece. They are collected at different moments and they
+  *will* disagree — a cash sale nobody logged, a refund, a correction. Neither
+  is authoritative. `reconcile` returns both plus the difference, and the page
+  **says which figure it is showing** rather than picking one silently. A show
+  with no stated total is now answerable from its rows, and says that too.
+- **Nothing is backfilled by the v9 → v10 migration.** Splitting one stated
+  total into rows would invent pieces, prices, sizes and dates in the one
+  collection that has to survive an audit.
+- **Sell-through quotes no rate.** The figure everybody means is sold ÷ brought,
+  and nothing here records how many pieces went in the van. The mix by price
+  band and by state is reported in full; the rate stays null and names what it
+  is missing. Hand it a real `piecesBrought` and it will quote one.
+- **A sale with no show is still a sale** — a studio sale in February — and it
+  lands in an explicit "Not known" region bucket rather than being filed under
+  a weekend it did not happen at.
+
+**Square / Stripe CSV import.** Manual entry at a booth is a thing nobody does,
+so the card reader's export is how rows realistically arrive. It is **untrusted
+input** and is treated the way the ranking importer treats one:
+
+- **An unrecognised file is refused whole**, not column-guessed. Guessing at the
+  columns of an unknown file puts wrong prices in a sales log.
+- **A refund is skipped with its reason**, and so is a Stripe row that never
+  completed. A refund is not a sale, and subtracting it from a season it was
+  never added to would be worse.
+- **A row with no readable amount imports unpriced**, not as $0, and the report
+  says how many did.
+- **The processor's transaction id is kept**, so re-importing the same export
+  updates the rows it already made instead of doubling the season's takings.
+  Rows with no id are counted and the artist is told they cannot be matched.
+- **An imported row stays marked as imported**, with which processor, for as
+  long as it exists. The file is read on the device; nothing is uploaded.
+
 **Lodging finds.** Where an artist parked or stayed free or cheap, recorded on
 the lodging expense row itself so nobody types the place twice. Free /
 discounted / paid, nights, and two tri-state flags — overnight parking and
@@ -321,15 +364,18 @@ node build/pipeline-tests.cjs        # 26 — the migration and its backfill, ju
                                      #      application store, the drawer block
 node build/ranker-tests.cjs           # 32 — saved rankings, the weight editor,
                                      #      export, and refusing a bad import
-node build/expense-tests.cjs          # 30 — the expense log, mileage, landed
-                                     #      cost, lodging finds, Pro previews
+node build/expense-tests.cjs          # 87 — the expense log, mileage, landed
+                                     #      cost, lodging finds, individual sales,
+                                     #      the price-band and region mix, the
+                                     #      stated-gross-vs-rows rule, the
+                                     #      Square/Stripe import, Pro previews
 node build/jury-tests.cjs             # 33 — mock jury: the money rule, the
                                      #      missing plumbing, score-is-not-odds
 cd worker && npm test                # 45 — API; manages its own worker
 python3 build/build_fit_data.py --selftest   # 11 — the date rules themselves
 ```
 
-All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 43 / 33 / 45 / 11**.
+All green as of this handoff: **79 / 31 / 77 / 26 / 32 / 87 / 33 / 45 / 11**.
 
 Two things worth knowing about the tests:
 
@@ -367,10 +413,17 @@ grade of it).
 
 ## What is next
 
-**§7 Stage 1 is shipped**, so trending is unblocked: break-even (13) now has a
-figure to compare against, and landed cost (8) has a top line. Stage 3
-(individual sales) is the next one that matters — it is where the artist's own
-numbers start improving the recommendations.
+**§7 Stages 1–3 are shipped.** Sales are now individual rows, so the mix by
+price band and by state is real data rather than an editorial guess. What it
+does *not* yet do is feed back into `fit.js` — the loop that idea 24 needs is
+one function call away and deliberately not wired, because a scorer that quietly
+started using the artist's own history would be a second set of honesty rules to
+keep in step with the first.
+
+**Stage 4 (contacts and follow-up, ideas 20 and 22) is next** and is no longer
+premature: it now has sales history behind it, which is the whole reason it was
+staged last. Other people's contact details raise a higher bar than show notes
+— that open question is still open.
 
 **Phase 3 shipped its first three ideas** — the application pipeline (11), the
 jury fee spend tracker (12) and expected value on applying (14). Image sets (21)
