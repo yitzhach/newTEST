@@ -490,6 +490,30 @@ is over — it is the check to run *before the set comes down*, not before it go
    sphere** for 300px of radius — bigger than most people assume. A 50mm ball there
    reads r = 168px.
 
+   **Shape fidelity beats size, and nothing in the tool can see shape error.**
+   Measured by rendering a mirror flattened toward the camera — an object whose
+   silhouette is still an *exact circle*, so the circle fit is perfect:
+
+   | reflector | worst direction error | fit residual | recovered normals |
+   |---|---|---|---|
+   | true sphere | 0.42° | 0.28% | 0.24° |
+   | 10% flattened | 4.75° | 0.37% | 0.92° |
+   | 20% flattened | 10.74° | 0.61% | 1.95° |
+   | 30% flattened | 17.78° | 0.98% | 3.05° |
+
+   The fit residual barely moves, and the "six readings that all agree cannot be a
+   moving lamp" check never fires, because the readings *do* vary — they are just
+   wrong. So a chrome object that is not a sphere fails exactly the way finding 7
+   fails: confidently. Do not use a chrome sculpture, a hemispherical knob, or
+   anything whose curvature you cannot vouch for. A 22mm ball bearing at r = 150px
+   (2.57°) beats a big chrome object 10% off true (4.75°).
+
+   Dullness is the milder fault, and it is graded rather than binary — highlight
+   spread against direction error, on a true sphere: 5° → 0.39°, 10° → 1.55°,
+   15° → 3.44°, 20° → 6.02°, 30° → 13.04°. A satin or brushed surface is usable
+   only if it is still a true sphere and the lamp is small and bright; polished
+   chrome is what the 0.39° assumes.
+
    Moving a small sphere *nearer the camera* to make it bigger is a bad trade, and
    `--sphere` costs it out: gaining 300px that way puts the sphere ~190mm forward,
    where a lamp 1.5m out subtends a direction 3.6–6.2° different from the one at the

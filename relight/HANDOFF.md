@@ -342,6 +342,18 @@ Three things worth not re-deriving:
    larger than the placement error it was meant to fix. `plan.mjs --sphere` prints
    both sides.
 
+   **The reflector must be a sphere, and nothing here can tell you it isn't.** A
+   mirror flattened toward the camera keeps an exactly circular silhouette, so the
+   circle fit is perfect and both existing checks pass: 10% flattened reads 4.75°
+   off with the fit residual at 0.37% against a clean 0.28%; 20% reads 10.74° at
+   0.61%. The "readings that all agree cannot be a moving lamp" check never fires,
+   because they do vary — they are simply wrong. This is §5's blindness again, in a
+   second place. Shape fidelity beats size: a 22mm ball bearing at r = 150px costs
+   2.57°, a big chrome sculpture 10% off true costs more. Dullness is the gentler
+   fault and is graded — highlight spread 5° → 0.39°, 10° → 1.55°, 15° → 3.44°,
+   20° → 6.02°, 30° → 13.04° — so satin steel is usable only if it is still a true
+   sphere. Reproduce with the reflector bench in `README.md`, "Capture protocol".
+
 ### The Fit view
 
 The diagnostic a real capture can have, since it comes with no ground truth.
