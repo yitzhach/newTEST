@@ -12,7 +12,7 @@ window.AST = (function () {
   'use strict';
 
   /* ---- 1. MODEL + CONSTANTS --------------------------------------------- */
-  var SCHEMA_VERSION = 9;
+  var SCHEMA_VERSION = 10;
   var DB_KEY = 'artShowTracker.db';
   var THEME_KEY = 'artShowTracker.theme';
   var CONFIG_KEY = 'artShowTracker.supabase';
@@ -338,6 +338,79 @@ window.AST = (function () {
     };
   }
 
+  /* ---- §7 Stage 3 — individual sales (ideas 15 and 19) -------------------
+     How the money was taken. Free text would make sell-through by payment
+     method unanswerable, and a made-up default would make it wrong, so there
+     is an explicit "not recorded" and it is what a blank row gets. */
+  var PAYMENT_METHODS = [
+    { value:'',       label:'Not recorded' },
+    { value:'cash',   label:'Cash' },
+    { value:'card',   label:'Card' },
+    { value:'check',  label:'Check' },
+    { value:'online', label:'Online / invoice' },
+    { value:'other',  label:'Other' }
+  ];
+  var PAYMENT_LABEL = Object.fromEntries(
+    PAYMENT_METHODS.map(function (m) { return [m.value, m.label]; }));
+
+  /* Where a row came from. An imported row stays marked as imported for as
+     long as it exists, the same way an imported ranking does: a figure a
+     card reader produced and a figure the artist typed are different kinds
+     of evidence, and the page has to keep being able to say which is which. */
+  var SALE_SOURCES = ['manual', 'square', 'stripe', 'csv'];
+
+  /**
+   * One sale of one piece, at one show. The fifth use of the child-record
+   * pattern, and the one the pattern was chosen for: two devices each selling
+   * a different piece on the same Saturday must merge as a union, because
+   * last-write-wins here loses somebody a sale.
+   *
+   * The show's `grossSales` (Stage 1) is NOT replaced by these rows and is
+   * never recomputed from them. It is the artist's own stated total; the rows
+   * are the detail. When the two disagree the page says which figure it is
+   * showing — see `ASTSales.reconcile` — because silently preferring either
+   * one would hide a missing row or overwrite a correction.
+   */
+  function makeSale(input) {
+    input = input || {};
+    var now = new Date().toISOString();
+    return {
+      id: input.id || newId(),
+      /* Which ledger show this was sold at. A sale with no show is a studio
+         sale and stays valid — it simply drops out of every per-show figure
+         rather than being forced under a weekend it did not happen at. */
+      showId: input.showId || '',
+      catalogueId: input.catalogueId || '',
+      cycle: cycleOf(input.cycle || input.date),
+      /* What was sold. Free text: only the artist knows their own titles,
+         and an "Untitled #4" is a real answer. */
+      piece: String(input.piece || '').trim(),
+      /* Null is "not recorded", never 0. A piece given away and a piece
+         nobody has typed the price of are different sales, and a zero would
+         quietly drag every average down. */
+      price: numOrNull(input.price),
+      /* As the artist writes it — "24 x 36 in", "small". Parsing this into
+         numbers would invent a precision nobody entered. */
+      size: String(input.size || '').trim(),
+      medium: String(input.medium || '').trim(),
+      /* Empty means unknown, never today. An imported row with no readable
+         date genuinely does not know when it sold. */
+      date: dateOrEmpty(input.date),
+      paymentMethod: PAYMENT_LABEL[input.paymentMethod] ? input.paymentMethod : '',
+      quantity: input.quantity == null || input.quantity === '' ? 1
+              : Math.max(1, Math.round(Number(input.quantity)) || 1),
+      source: SALE_SOURCES.indexOf(input.source) !== -1 ? input.source : 'manual',
+      /* The processor's own id for the transaction, kept so re-importing the
+         same export updates the row it already made instead of doubling the
+         season's takings. */
+      externalId: String(input.externalId || '').trim(),
+      notes: input.notes || '',
+      deletedAt: input.deletedAt || null,
+      createdAt: input.createdAt || now,
+      updatedAt: input.updatedAt || now
+    };
+  }
+
   /**
    * A saved ranking — "Lisa's list". The criteria themselves belong to
    * ranker.js, which owns the factor list; core.js only guarantees the
@@ -469,12 +542,13 @@ window.AST = (function () {
 
   function migrate(db) {
     var d = db;
-    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [], reviews: [] };
+    if (!d || typeof d !== 'object') d = { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [], reviews: [], sales: [] };
     if (!Array.isArray(d.shows)) d.shows = [];
     if (!Array.isArray(d.applications)) d.applications = [];
     if (!Array.isArray(d.rankers)) d.rankers = [];
     if (!Array.isArray(d.expenses)) d.expenses = [];
     if (!Array.isArray(d.reviews)) d.reviews = [];
+    if (!Array.isArray(d.sales)) d.sales = [];
     // v0 (pre-versioning: a bare array or no version) -> v1
     if (!d.schemaVersion) d.schemaVersion = 1;
     // v1 -> v2: soft deletes, so cross-device sync can carry a deletion.
@@ -560,6 +634,21 @@ window.AST = (function () {
     if (d.schemaVersion < 9) {
       d.schemaVersion = 9;
     }
+    /* v9 -> v10: individual sales. NOTHING IS BACKFILLED, and this is the
+       migration the child-record pattern was argued for.
+
+       A show's `grossSales` is one number the artist stated. Splitting it
+       into sale rows would have to invent pieces, prices, sizes and dates
+       that nobody recorded, in the one collection that has to survive an
+       audit — and it would then read back as detail somebody entered. The
+       stated total stays exactly where it is and keeps its own meaning; the
+       rows are a second, independent record, and where both exist the page
+       reports both rather than reconciling them behind the artist's back. */
+    if (d.schemaVersion < 10) {
+      if (!Array.isArray(d.sales)) d.sales = [];
+      d.schemaVersion = 10;
+    }
+    d.sales = (Array.isArray(d.sales) ? d.sales : []).map(makeSale);
     d.expenses = (Array.isArray(d.expenses) ? d.expenses : []).map(makeExpense);
     d.reviews = (Array.isArray(d.reviews) ? d.reviews : []).map(makeReview);
     d.schemaVersion = SCHEMA_VERSION;
@@ -570,7 +659,7 @@ window.AST = (function () {
     function read() {
       var raw = null;
       try { raw = localStorage.getItem(DB_KEY); }
-      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [], reviews: [] }; }
+      catch (_) { return { schemaVersion: SCHEMA_VERSION, shows: [], events: [], applications: [], rankers: [], expenses: [], reviews: [], sales: [] }; }
       if (raw === null) return null;
       var parsed;
       try { parsed = JSON.parse(raw); } catch (_) { parsed = null; }
@@ -594,7 +683,7 @@ window.AST = (function () {
       // A brand-new device gets the demo season. Flag it: the seed is not the
       // user's data, so on first sign-in it must not be pushed up as if it
       // were — a second device would duplicate the whole season.
-      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], applications: [], rankers: [], expenses: [], reviews: [], pristineSeed: true });
+      return write({ schemaVersion: SCHEMA_VERSION, shows: SEED, events: [], applications: [], rankers: [], expenses: [], reviews: [], sales: [], pristineSeed: true });
     }
     /** Any real write means this device's data is no longer the untouched seed. */
     function touch(db) { db.pristineSeed = false; return db; }
@@ -650,7 +739,7 @@ window.AST = (function () {
         var prev = load();
         var db = { schemaVersion: SCHEMA_VERSION, shows: shows.map(makeShow),
                    events: prev.events, applications: prev.applications,
-                   rankers: prev.rankers, expenses: prev.expenses,
+                   rankers: prev.rankers, expenses: prev.expenses, sales: prev.sales,
                    reviews: prev.reviews, pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
@@ -662,7 +751,7 @@ window.AST = (function () {
         var prev = load();
         var db = { schemaVersion: SCHEMA_VERSION, shows: rows.map(makeShow),
                    events: prev.events, applications: prev.applications,
-                   rankers: prev.rankers, expenses: prev.expenses,
+                   rankers: prev.rankers, expenses: prev.expenses, sales: prev.sales,
                    reviews: prev.reviews, pristineSeed: false };
         write(db);
         return Promise.resolve(db.shows.slice());
@@ -781,6 +870,36 @@ window.AST = (function () {
         if (i === -1) return Promise.resolve(null);
         var before = Object.assign({}, db.expenses[i]);
         db.expenses[i] = Object.assign({}, db.expenses[i], {
+          deletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        write(touch(db));
+        return Promise.resolve(before);
+      },
+      /* ---- sales ---------------------------------------------------------
+         §7 Stage 3. Same surface again, so a remote `sales` table can be
+         adopted later without anything above learning a new shape. */
+      listSales: function () { return Promise.resolve(live(load().sales)); },
+      listAllSales: function () { return Promise.resolve(load().sales.slice()); },
+      getSale: function (id) {
+        return Promise.resolve(live(load().sales).filter(function (s) { return s.id === id; })[0] || null);
+      },
+      upsertSale: function (sale) {
+        var db = load();
+        var rec = makeSale(sale);
+        rec.updatedAt = new Date().toISOString();
+        var i = db.sales.findIndex(function (s) { return s.id === rec.id; });
+        if (i === -1) db.sales.push(rec);
+        else db.sales[i] = Object.assign({}, db.sales[i], rec);
+        write(touch(db));
+        return Promise.resolve(rec);
+      },
+      removeSale: function (id) {
+        var db = load();
+        var i = db.sales.findIndex(function (s) { return s.id === id; });
+        if (i === -1) return Promise.resolve(null);
+        var before = Object.assign({}, db.sales[i]);
+        db.sales[i] = Object.assign({}, db.sales[i], {
           deletedAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         });
@@ -913,7 +1032,13 @@ window.AST = (function () {
     listReviews:  function ()   { return (backend.listReviews  || LocalStore.listReviews).call(backend); },
     getReview:    function (id) { return (backend.getReview    || LocalStore.getReview).call(backend, id); },
     upsertReview: function (rv) { return (backend.upsertReview || LocalStore.upsertReview).call(backend, rv); },
-    removeReview: function (id) { return (backend.removeReview || LocalStore.removeReview).call(backend, id); }
+    removeReview: function (id) { return (backend.removeReview || LocalStore.removeReview).call(backend, id); },
+    /* Sales, same degrade-to-local fallback. The Supabase `shows` table has
+       no sales anything, so this is local-only exactly like the rest. */
+    listSales:  function ()     { return (backend.listSales  || LocalStore.listSales).call(backend); },
+    getSale:    function (id)   { return (backend.getSale    || LocalStore.getSale).call(backend, id); },
+    upsertSale: function (sale) { return (backend.upsertSale || LocalStore.upsertSale).call(backend, sale); },
+    removeSale: function (id)   { return (backend.removeSale || LocalStore.removeSale).call(backend, id); }
   };
   function useStore(next) { backend = next || LocalStore; return Store; }
   function currentStore() { return backend; }
@@ -1237,6 +1362,8 @@ window.AST = (function () {
     makeShow: makeShow, makeEvent: makeEvent, makeReminder: makeReminder,
     makeApplication: makeApplication, makeRanker: makeRanker,
     makeExpense: makeExpense, makeReview: makeReview, makeReviewImage: makeReviewImage,
+    makeSale: makeSale,
+    PAYMENT_METHODS: PAYMENT_METHODS, PAYMENT_LABEL: PAYMENT_LABEL,
     REVIEW_STAGES: REVIEW_STAGES, REVIEW_STAGE_LABEL: REVIEW_STAGE_LABEL,
     IMAGE_KINDS: IMAGE_KINDS, IMAGE_KIND_LABEL: IMAGE_KIND_LABEL,
     EXPENSE_CATEGORIES: EXPENSE_CATEGORIES, EXPENSE_LABEL: EXPENSE_LABEL,

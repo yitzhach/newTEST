@@ -357,6 +357,10 @@ export and an audit.
 > disagree the page must say which it is showing rather than picking one.
 > It is local-only — see `store-supabase.js` for why.
 >
+> **Stage 3 shipped** (`tracker/sales.js`, on the same page). The open question
+> at the top of this section — child records or denormalised — is now answered
+> in code for the fifth time: child records, local-only, same envelope.
+>
 > **Stage 2 shipped** (`tracker/expenses.html`). The sync question below was
 > answered by the pipeline, not here: child records, local-only, same envelope.
 > Stage 1's gross-sales field is still open and is what trending waits on.
@@ -371,9 +375,29 @@ categories from the start — retrofitting tax categories onto a year of
 uncategorised rows is miserable. First child-record collection, so this is where
 the sync question above has to actually be answered.
 
-**Stage 3 — individual sales (15, 19).** Piece, price, size, medium, date, payment
-method. Sell-through becomes real and feeds back into the fit model. Square/Stripe
-CSV import belongs here; manual entry at a show is a thing nobody does.
+**Stage 3 — individual sales (15, 19). SHIPPED.** Piece, price, size, medium, date,
+payment method, quantity — one row per sale per show, the fifth child collection
+(`sales`, v9 → v10). Square/Stripe CSV import is in `sales.js` and is treated as
+untrusted input: an unrecognised file is refused whole rather than
+column-guessed, a refund is skipped with its reason, a row with no readable
+amount imports unpriced instead of as $0, and the processor's transaction id is
+kept so re-importing the same export updates rows instead of doubling a season.
+
+Two things came out differently from the plan:
+
+- **Sell-through quotes no rate.** The figure everybody means is sold ÷ brought,
+  and nothing in the app records how many pieces went in the van. So the mix by
+  price band and by state is reported in full, and `rate` stays null with the
+  missing input named. `sellThrough` takes a `piecesBrought` for the day
+  something records it.
+- **The stated total and the rows are two records, not one.** Stage 1's
+  `grossSales` is never recomputed from the rows and the rows are never derived
+  from it. `ASTSales.reconcile` returns both, plus `showing`, which names the
+  figure a headline came from; where both exist a net is built on the stated
+  total (the artist's assertion about the whole weekend) and the page reports
+  the pair and the difference. The v9 → v10 migration backfills nothing at all:
+  splitting one stated total into rows would invent pieces, prices, sizes and
+  dates in the collection that has to survive an audit.
 
 **Stage 4 — contacts and follow-up (20, 22).** Name, email, what they looked at,
 what they bought or did not, when to follow up. Deliberately last: a CRM with no
@@ -399,7 +423,8 @@ loop is what earns a weekly open, and it becomes idea 24 once there are members.
 
 ### Open questions for this suite
 
-- Child records vs denormalised. Blocks Stages 2–4.
+- ~~Child records vs denormalised. Blocks Stages 2–4.~~ Answered: child records,
+  and Stages 2 and 3 both shipped on that shape.
 - Does the expense log need multi-year scoping, or is one season enough?
 - If the Worker is deployed, do contacts sync or stay device-only? Other people's
   contact details raise a higher bar than show notes.

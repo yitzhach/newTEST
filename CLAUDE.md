@@ -27,6 +27,12 @@ numbers cost real money, so unknowns stay unknown.
 - Gross sales are one field on the show, null = not recorded, never $0. A net
   over a partial expense total is provisional, and a show with no gross drops
   out of the season net instead of counting as zero.
+- A sale is a child record, one row per sale per show, and it never rewrites
+  the show's stated gross. Where both exist the page shows both and names which
+  figure it is displaying. An unpriced sale is null, never $0. Sell-through
+  quotes no rate, because nothing records how many pieces were brought.
+- A CSV import is untrusted input: an unknown file is refused whole, refunds
+  are skipped, and an imported row stays marked as imported.
 - Never say anything is deductible. Categorising a row is bookkeeping.
 - A Pro feature is always disabled and never shows a price, plan or sign-up.
   There is no billing in this project.
@@ -71,6 +77,8 @@ adapter both live in `core.js`. Optional sync: Supabase (last-write-wins on
   Owns import validation, which is untrusted input.
 - `expenses.js` / `expenses.html` — the expense log, landed cost, break-even,
   lodging finds. DOM-free maths, same as `pipeline.js`.
+- `sales.js` — individual sales: the mix by price band and state, the stated
+  gross vs. the rows, and the Square/Stripe CSV import. DOM-free.
 - `plan.js` — Pro previews. Renders disabled cards only; no billing exists.
 - `jury.js` / `jury.html` — mock jury review. Mostly refusals: no storage, no
   transport, no billing, and it says so up front.
